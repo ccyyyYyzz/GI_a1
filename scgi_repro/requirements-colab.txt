@@ -1,0 +1,6 @@
+pyyaml
+pandas
+pillow
+scipy
+scikit-image
+torchvision

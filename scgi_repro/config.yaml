@@ -1,0 +1,88 @@
+profile: smoke
+seed: 20240708
+
+paths:
+  results_dir: results
+  data_dir: data
+
+profiles:
+  smoke:
+    image_size: 32
+    num_patterns: 1024
+    num_samples: 48
+    train_samples: 36
+    val_samples: 12
+    batch_size: 8
+    scgi_epochs: 80
+    gamma: 1.0
+    lr: 0.0001
+    ured_steps: 50
+    ured_lr: 0.001
+    device: cuda
+    measurement_chunk: 256
+    data_source: synthetic
+    lambda_min: 0.996
+    lambda_max: 0.999
+  debug:
+    image_size: 64
+    num_patterns: 4096
+    num_samples: 200
+    train_samples: 160
+    val_samples: 40
+    batch_size: 8
+    scgi_epochs: 10
+    gamma: 1.0
+    lr: 0.0001
+    ured_steps: 50
+    ured_lr: 0.001
+    device: cuda
+    measurement_chunk: 128
+    data_source: mnist
+  full:
+    image_size: 128
+    num_patterns: 16384
+    num_samples: 5000
+    train_samples: 4500
+    val_samples: 500
+    batch_size: 16
+    scgi_epochs: 100
+    gamma: 1.0
+    lr: 0.0001
+    ured_steps: 500
+    ured_lr: 0.001
+    device: cuda
+    measurement_chunk: 64
+    data_source: mnist
+
+data:
+  pattern_distribution: uniform
+  lambda_min: 0.9995
+  lambda_max: 1.0
+  normalize: max
+  synthetic_fallback: true
+
+scgi:
+  model_kind: gain_unet
+  unet_base_channels: 16
+  unet_depth: 4
+  use_coord_channels: true
+  gamma_sweep: [0.0, 0.1, 1.0, 10.0]
+
+ured:
+  channels: 24
+  blocks: 3
+  beta: 0.5
+  xi: 0.5
+  x_step: 0.5
+  denoiser: gaussian_blur_fallback
+  final_output: residual_x_minus_u
+
+mechanism:
+  image_size: 32
+  num_pixels: 1024
+  seeds: 5
+  objects: 10
+  rho_values: [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0]
+  sigma_a_values: [0.05, 0.10, 0.15, 0.30, 0.50]
+  reference_periods: [2, 8, 32]
+  read_noise: 0.0

@@ -1,0 +1,158 @@
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+
+import pandas as pd
+
+from run_mechanism_m1 import make_synthetic_objects, simulate_and_reconstruct
+from src.basis import basis_frame_budget, make_basis
+from src.config_utils import load_config, project_root
+from src.mechanisms import reference_anchor_count
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="M2 phase scan with fair frame accounting.")
+    parser.add_argument("--profile", default="smoke")
+    parser.add_argument("--objects", type=int, default=1)
+    parser.add_argument("--seeds", type=int, default=1)
+    parser.add_argument("--output-dir", type=Path, default=Path("results/phase_m2"))
+    parser.add_argument("--no-findings", action="store_true")
+    args = parser.parse_args()
+
+    root = project_root()
+    cfg = load_config(root / "config.yaml", args.profile)
+    mech = cfg.get("mechanism", {})
+    h = int(mech.get("image_size", 32))
+    p = h * h
+    frame_budget, _ = basis_frame_budget(p)
+    rho_values = list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))
+    sigma_values = list(mech.get("sigma_a_values", [0.05, 0.15, 0.3]))
+    reference_periods = [int(x) for x in mech.get("reference_periods", [2, 8, 32])]
+    objects = make_synthetic_objects(args.objects, h, int(cfg.get("seed", 0)))
+    out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    basis_specs = [
+        ("random_uniform", {"num_frames": frame_budget, "reconstruction": "correlation"}),
+        ("random_binary", {"num_frames": frame_budget, "reconstruction": "correlation"}),
+        ("hadamard_paired", {}),
+        ("dct_paired", {}),
+        ("fourier_fourstep", {"num_frames": frame_budget}),
+        ("srht_paired", {}),
+    ]
+    rows = []
+    for basis_name, kwargs in basis_specs:
+        basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
+        corrections = ["none", "oracle", "agc"] + [f"reference_k{k}" for k in reference_periods]
+        if basis.paired:
+            corrections.append("pairwise")
+        for rho in rho_values:
+            for sigma_a in sigma_values:
+                for seed_idx in range(args.seeds):
+                    for obj_idx, obj in enumerate(objects):
+                        for correction in corrections:
+                            metrics = simulate_and_reconstruct(
+                                basis=basis,
+                                obj=obj,
+                                correction=correction,
+                                channel_model="ou",
+                                rho=float(rho),
+                                sigma_a=float(sigma_a),
+                                channel_seed=9000 + seed_idx,
+                                read_noise=float(mech.get("read_noise", 0.0)),
+                                noise_seed=9100 + obj_idx,
+                                agc_window=max(9, int(0.05 * frame_budget)),
+                            )
+                            reference_period = int(correction.rsplit("k", 1)[1]) if correction.startswith("reference_k") else 0
+                            reference_frames = reference_anchor_count(basis.num_frames, reference_period) if reference_period else 0
+                            rows.append(
+                                {
+                                    "basis": basis.name,
+                                    "correction": correction,
+                                    "reference_period": reference_period,
+                                    "rho": float(rho),
+                                    "sigma_a": float(sigma_a),
+                                    "seed": seed_idx,
+                                    "object": obj_idx,
+                                    "num_frames": basis.num_frames,
+                                    "reference_frames": reference_frames,
+                                    "total_physical_frames": basis.num_frames + reference_frames,
+                                    "num_coefficients": basis.num_coefficients,
+                                    "num_pixels": basis.num_pixels,
+                                    **metrics,
+                                }
+                            )
+    df = pd.DataFrame(rows)
+    scan_path = out_dir / "phase_scan.csv"
+    df.to_csv(scan_path, index=False)
+    summary = (
+        df.groupby(["rho", "sigma_a", "basis", "correction"], as_index=False)
+        .agg(
+            psnr_mean=("psnr", "mean"),
+            psnr_std=("psnr", "std"),
+            rel_mse_mean=("rel_mse", "mean"),
+            rel_mse_std=("rel_mse", "std"),
+            num_frames=("num_frames", "first"),
+            reference_frames=("reference_frames", "first"),
+            total_physical_frames=("total_physical_frames", "first"),
+        )
+        .sort_values(["rho", "sigma_a", "psnr_mean"], ascending=[True, True, False])
+    )
+    best = summary.groupby(["rho", "sigma_a"], as_index=False).head(1)
+    blind_summary = summary[summary["correction"] != "oracle"].copy()
+    best_blind = blind_summary.groupby(["rho", "sigma_a"], as_index=False).head(1)
+    equal_frame_blind = blind_summary[blind_summary["total_physical_frames"] == blind_summary["num_frames"]].copy()
+    best_equal_frame_blind = equal_frame_blind.groupby(["rho", "sigma_a"], as_index=False).head(1)
+    reference_summary = blind_summary[blind_summary["correction"].str.startswith("reference_")].copy()
+    best_reference = reference_summary.groupby(["rho", "sigma_a"], as_index=False).head(1)
+    summary.to_csv(out_dir / "phase_summary.csv", index=False)
+    best.to_csv(out_dir / "best_methods.csv", index=False)
+    blind_summary.to_csv(out_dir / "phase_blind_summary.csv", index=False)
+    best_blind.to_csv(out_dir / "best_blind_methods.csv", index=False)
+    equal_frame_blind.to_csv(out_dir / "phase_equal_frame_blind_summary.csv", index=False)
+    best_equal_frame_blind.to_csv(out_dir / "best_equal_frame_blind_methods.csv", index=False)
+    reference_summary.to_csv(out_dir / "phase_reference_summary.csv", index=False)
+    best_reference.to_csv(out_dir / "best_reference_methods.csv", index=False)
+    flip_rows = []
+    for (sigma_a, correction), group in blind_summary.groupby(["sigma_a", "correction"]):
+        pivot = group.pivot_table(index="rho", columns="basis", values="psnr_mean", aggfunc="mean").sort_index()
+        for challenger in ["random_uniform", "random_binary", "fourier_fourstep", "dct_paired", "srht_paired"]:
+            if "hadamard_paired" not in pivot.columns or challenger not in pivot.columns:
+                continue
+            diff = pivot[challenger] - pivot["hadamard_paired"]
+            positive = diff[diff >= 0.0]
+            if not len(positive):
+                rho_star = float("nan")
+                boundary_status = "not_reached"
+            else:
+                rho_star = float(positive.index[0])
+                boundary_status = "left_censored" if rho_star == float(diff.index.min()) else "observed"
+            flip_rows.append(
+                {
+                    "sigma_a": float(sigma_a),
+                    "correction": correction,
+                    "challenger": challenger,
+                    "baseline": "hadamard_paired",
+                    "rho_star_first_ge": rho_star,
+                    "boundary_status": boundary_status,
+                    "max_margin_db": float(diff.max()),
+                    "min_margin_db": float(diff.min()),
+                    "points": int(diff.notna().sum()),
+                }
+            )
+    pd.DataFrame(flip_rows).to_csv(out_dir / "flip_boundary.csv", index=False)
+    if not args.no_findings:
+        with (root / "FINDINGS.md").open("a", encoding="utf-8") as f:
+            f.write("\n## M2 Compact Phase Scan\n\n")
+            f.write(f"Wrote `{scan_path.as_posix()}` and best-method table for smoke-scale phase-map plumbing.\n")
+    print(f"wrote {scan_path}")
+    print(f"wrote {out_dir / 'best_methods.csv'}")
+    print(f"wrote {out_dir / 'best_blind_methods.csv'}")
+    print(f"wrote {out_dir / 'best_equal_frame_blind_methods.csv'}")
+    print(f"wrote {out_dir / 'best_reference_methods.csv'}")
+    print(f"wrote {out_dir / 'flip_boundary.csv'}")
+
+
+if __name__ == "__main__":
+    main()
