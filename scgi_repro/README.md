@@ -41,6 +41,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
 & $py run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
 & $py run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
+& $py run_monitored_job.py --run-id m3_random_comparator_fast_r1 --output-dir results\cli_runs\m3_random_comparator_fast_r1 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_m3_random_comparator.py --objects 10 --seeds 5 --rho-values "1.0,10.0" --sigma-a-values "0.30,0.50" --output-dir results\m3_random_comparator_fast_r1
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 & $py run_m4_agc_targeted.py --output-dir results\theory_m4_agc_targeted_r1
@@ -253,6 +254,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/srht_m3_audit_highrho_r1/`: M3 high-rho SRHT audit tables, JSON
   summary, PNG table, and Markdown report; full SRHT does not meet the prompt's
   `>=3 dB` advantage gate over ordered Hadamard in the fast-drift rows.
+- `results/m3_random_comparator_fast_r1/`: monitored fast-drift M3 comparator
+  adding direct `random_uniform` and `random_binary` baselines at
+  `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of
+  the best random basis but remains slightly below ordered Hadamard, so the
+  strong `>=3 dB` constructive gate is still refuted.
 - Current M1 audit figures are under `results/mechanism_m1_protocol_o10s5/`;
   paper-facing M2/M4 and multipanel drafts live under `results/paper_figures_r1/`.
 

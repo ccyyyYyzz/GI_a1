@@ -600,6 +600,7 @@ Latest M3 high-rho SRHT ablation:
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id m3_random_comparator_fast_r1 --output-dir results\cli_runs\m3_random_comparator_fast_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_m3_random_comparator.py --objects 10 --seeds 5 --rho-values "1.0,10.0" --sigma-a-values "0.30,0.50" --output-dir results\m3_random_comparator_fast_r1
 ```
 
 Outputs:
@@ -608,6 +609,9 @@ Outputs:
 - `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation_summary.csv` (64 rows)
 - `results/srht_m3_audit_highrho_r1/m3_srht_delta_summary.csv` (16 rows)
 - `results/srht_m3_audit_highrho_r1/m3_srht_audit_report.md`
+- `results/m3_random_comparator_fast_r1/m3_random_comparator_raw.csv` (3,600 rows)
+- `results/m3_random_comparator_fast_r1/m3_random_comparator_deltas.csv` (4 rows)
+- `results/m3_random_comparator_fast_r1/m3_random_comparator_report.md`
 
 The high-rho audit makes the M3 conclusion more conservative. Oracle correction
 has minimum mean PSNR 120.0 dB, confirming that ordered Hadamard,
@@ -618,6 +622,12 @@ the prompt's requested `>=3 dB` advantage. The best ablation is usually
 `sign_only`, so the current constructive evidence supports diagonal sign
 randomization more strongly than full row permutation. M3 therefore remains a
 partial mechanism result rather than a closed SRHT theorem.
+
+The direct random-comparator follow-up closes the "not worse than random" check
+for the sampled fast-drift cells: full SRHT is +0.016 to +0.190 dB above the
+best random basis, but it is -0.009 to -0.003 dB below ordered Hadamard. Thus
+the current M3 evidence supports SRHT/pairwise as a strong conservative
+baseline, not a >=3 dB constructive advance over ordered Hadamard.
 
 Latest M4 theory runs:
 

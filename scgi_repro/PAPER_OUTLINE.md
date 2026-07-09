@@ -92,9 +92,11 @@ DCT/Fourier/Hadamard coefficients contain 0.88-0.92 of the object energy,
 whereas random and SRHT bases concentrate only about 0.28 in the top 5% and have
 effective-rank fractions near 0.48. The new high-rho M3 ablation shows full SRHT
 does not beat ordered Hadamard by the prompt-level `>=3 dB` fast-drift gate;
-`sign_only` is often the best ablation. This figure should therefore separate
-the supported energy-spreading observation from the still-open row-permutation
-benefit claim.
+`sign_only` is often the best ablation. A direct random-comparator follow-up
+shows full SRHT is slightly above the best random basis in the sampled fast
+cells, but still slightly below ordered Hadamard. This figure should therefore
+separate the supported energy-spreading observation from the still-open
+row-permutation benefit claim.
 
 ## Current Evidence And Gaps
 
@@ -139,8 +141,12 @@ benefit claim.
   information preservation under oracle correction but does not support a robust
   full-SRHT advantage: for `rho>=1`, `srht_full - hadamard_ordered` stays between
   -0.043 and +0.083 dB under non-oracle corrections, far below the requested
-  `>=3 dB` margin. The manuscript should present this as an ablation-informed
-  limitation unless a broader protocol finds a stable SRHT gain.
+  `>=3 dB` margin. The direct random-comparator run at `rho=1,10` and
+  `sigma_a=0.30,0.50` shows full SRHT is +0.016 to +0.190 dB above the best
+  random basis, so the random-comparator check is closed for this protocol even
+  though the strong constructive advantage is refuted. The manuscript should
+  present this as an ablation-informed limitation unless a broader protocol
+  finds a stable SRHT gain.
 - Flip boundaries are now represented both as observed fits and censored
   intervals. `results/m2_boundary_audit_highrho` gives five prompt-range
   log-rho boundary fits with `R2 >= 0.9`, while

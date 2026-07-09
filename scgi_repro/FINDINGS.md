@@ -358,7 +358,9 @@ map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 Experiment: monitored 10-object x 5-seed M3 ablation over ordered Hadamard,
 row-permutation-only, diagonal-sign-only, and full SRHT variants at
 `rho=0.001,0.1,1,10` with `sigma_a=0.30`, followed by
-`run_m3_srht_audit.py`.
+`run_m3_srht_audit.py`. A second monitored comparator adds direct
+`random_uniform` and `random_binary` baselines at `rho=1,10` and
+`sigma_a=0.30,0.50`.
 
 Prediction: the prompt-level constructive claim would require full SRHT to beat
 ordered Hadamard by at least 3 dB in fast drift while not losing to random-like
@@ -371,15 +373,22 @@ so all four measurement variants are information-preserving when the true gain
 is known. Under non-oracle corrections at `rho>=1`, however, full SRHT minus
 ordered Hadamard ranges only from -0.043 to +0.083 dB, far below the requested
 `>=3 dB` advantage. The best ablation is usually `sign_only`, not `srht_full`.
+`results/m3_random_comparator_fast_r1` adds 3,600 raw rows and 4 delta rows;
+full SRHT is +0.016 to +0.190 dB above the best random basis in those fast cells,
+but -0.009 to -0.003 dB below ordered Hadamard.
 
 Supports/refutes: refutes the strong M3 SRHT-advantage gate under the current
-fast-drift protocol. The useful design signal is diagonal sign randomization;
-the extra row permutation in full SRHT remains unproven and should be framed as
-partial/ablation-informed rather than a closed constructive theorem.
+fast-drift protocol while closing the direct random-comparator check for the
+sampled cells. The useful design signal is diagonal sign randomization and
+paired normalization; the extra row permutation in full SRHT remains unproven
+and should be framed as partial/ablation-informed rather than a closed
+constructive theorem.
 
 ## Rendered Figures
 
-Latest figure manifest: `E:/GAN_FCC_WORK/scgi-repro/results/figures/figure_manifest.csv`.
+Latest paper-facing figure manifest:
+`results/paper_figures_r1/paper_figure_manifest.csv`; M1 audit figures are
+stored with `results/mechanism_m1_protocol_o10s5`.
 
 Latest paper-facing M2/M4 figure manifest:
 `results/paper_figures_r1/paper_figure_manifest.csv`. This includes strict
