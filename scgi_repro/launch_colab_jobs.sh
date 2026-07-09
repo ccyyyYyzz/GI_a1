@@ -6,7 +6,7 @@ RUNNER="$ROOT/colab/colab_github_job_runner.py"
 LOG_DIR="$ROOT/results/colab_runs"
 COLAB="/var/tmp/codex-colab-tools/colab-cli-venv/bin/colab"
 REPO="https://github.com/ccyyyYyzz/GI_a1.git"
-REF="3113233d8bc238804f1b648b6ae021bb26b34867"
+REF="${REF:-scgi-colab-20260709}"
 
 mkdir -p "$LOG_DIR"
 
