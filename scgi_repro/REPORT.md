@@ -468,6 +468,7 @@ Latest M4 theory runs:
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_merged --output-dir results\theory_m4_paper_r1
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_highrho_merged --output-dir results\theory_m4_paper_r2_highrho
 ```
 
 Outputs:
@@ -492,16 +493,18 @@ Key M4 checks:
 | residual gain law, 16/32/64 | `sigma_delta` exponent 2.001-2.003 across bases, min R2 0.99992; bootstrap 95% CIs tightly bracket 2 |
 | fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998; bootstrap CIs roughly [-0.75,-0.70] and [-0.77,-0.66] |
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
-| flip-boundary fits | 4 observed-only fits; censored interval tables now retain 22 left-censored and 144 not-reached dense-frozen boundary entries |
+| flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has five R2-qualified fits |
 | high-rho M2 boundary audit | prompt rho range now reaches 10; five log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner is SRHT/pairwise in 45/45 cells |
-| AGC window law | best-window scaling is logged, but fits are weak for random/SRHT bases (R2 0.29-0.55), so this remains diagnostic |
+| AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; empirical best-window fits remain weak for random/SRHT bases (R2 0.29-0.55), so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
 the main log-linear fits, censored-aware flip-boundary interval tables, and an
-AGC window-law diagnostic. It still needs a cleaner analytical AGC
-bias-variance derivation. The M2 boundary grid has now been extended to
-`rho=10`, but the high-rho boundary audit still needs to be converted into
-paper-ready curves and captions.
+AGC window-law diagnostic. `results/theory_m4_paper_r2_highrho` reruns these
+hooks against the prompt-range frozen high-rho phase table. `THEORY.md` now
+contains the candidate AGC bias-variance law, and `PAPER_OUTLINE.md` contains
+draft captions for the eight main figures. The remaining publication work is
+final vector plotting plus a targeted AGC sweep that avoids window-grid
+saturation.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -613,6 +616,10 @@ Additional checks:
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
 - M4 paper-r1 theory runner writes larger-N, bootstrap, censored-boundary, and
   AGC-window diagnostics under `results/theory_m4_paper_r1`.
+- M4 high-rho r2 reruns the same hooks against
+  `results/phase_m2_scgi_frozen_dense_r1_highrho_merged` and writes
+  `results/theory_m4_paper_r2_highrho`; `THEORY.md` and `PAPER_OUTLINE.md`
+  now contain the AGC-law sketch and figure-caption drafts.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
   comparison tables under `results/nonideal_m2_compact` and
   `results/nonideal_m2_full_r1_merged`.
@@ -636,7 +643,8 @@ Additional checks:
   implemented but underperforms under cross-domain application. The published-channel figure
   anchors now exist; raw detector/SLM hardware calibration remains outside the
   available PDF data.
-- Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC
-  bias-variance derivation and paper-ready boundary figures/captions.
+- Finish M4 from paper-r2 fitted-law hooks to final paper assets: targeted AGC
+  validation beyond the current weak window-law fits and publication-quality
+  vector boundary figures.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

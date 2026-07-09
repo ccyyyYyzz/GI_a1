@@ -118,6 +118,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   flip-boundary fits.
 - `results/theory_m4_paper_r1/`: larger-N M4 fitted-law outputs with bootstrap
   intervals, censored flip-boundary accounting, and AGC window diagnostics.
+- `results/theory_m4_paper_r2_highrho/`: same M4 fitted-law hooks rerun against
+  the prompt-range frozen high-rho M2 phase table; used by the current
+  `THEORY.md` and `PAPER_OUTLINE.md` caption drafts.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.

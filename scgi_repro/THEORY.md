@@ -67,6 +67,37 @@ with `K`, while its physical cost is an overhead of roughly `1/K` extra SLM
 frames. M2 CSVs therefore track both measurement frames and total physical
 frames.
 
+### AGC Window Bias-Variance Sketch
+
+For a blind local-mean AGC estimator, write the ideal bucket sequence as
+`B_n = mu_B + eps_n`, with `E[eps_n]=0` and coefficient of variation
+`CV_B = sigma_B / mu_B`. A centered window estimator has the approximate form
+
+```text
+ahat_n = mean_{j in W(n)} R_j / mu_B
+       = mean_{j in W(n)} a_j (mu_B + eps_j) / mu_B.
+```
+
+The first-order stochastic term has variance roughly `a_n^2 CV_B^2 / W`.
+The drift term is a local smoothing bias: for an OU-like gain, a useful
+engineering approximation is
+
+```text
+E[(ahat_n/a_n - 1)^2] ~= C_v CV_B^2 / W + C_d sigma_a^2 (rho W)^nu,
+```
+
+where `nu` is between 1 and 2 depending on whether the window sees
+non-differentiable OU increments or locally smooth drift. This gives the
+candidate scaling
+
+```text
+W* ∝ (CV_B^2 / (sigma_a^2 rho^nu))^(1/(nu+1)).
+```
+
+The current AGC-window sweep should be interpreted as a diagnostic of this
+tradeoff, not as a confirmed law: many grid cells hit the sampled window bounds,
+and the fitted random/SRHT exponents have only low-to-moderate R2.
+
 ## H4: Energy Concentration
 
 Deterministic transform bases concentrate natural and digit-like objects in a
@@ -98,10 +129,10 @@ a paper-ready theory section:
 - `mechanism_m1_error_scaling_fit.csv` fits residual-gain error propagation.
 
 The dedicated M4 runner `run_theory_m4.py` now adds fitted-law outputs under
-`results/theory_m4_compact` and a stronger paper-r1 run under
-`results/theory_m4_paper_r1`:
+`results/theory_m4_compact`, `results/theory_m4_paper_r1`, and the current
+high-rho rerun `results/theory_m4_paper_r2_highrho`:
 
-- `m4_error_scaling_fit.csv` sweeps image sizes up to 64x64 in the paper-r1 run.
+- `m4_error_scaling_fit.csv` sweeps image sizes up to 64x64 in the paper-r2 run.
   The fitted residual-error exponent for `sigma_delta` is 2.001-2.003 across
   bases with minimum R2 0.99992; bootstrap intervals tightly bracket the
   expected quadratic dependence.
@@ -114,20 +145,24 @@ The dedicated M4 runner `run_theory_m4.py` now adds fitted-law outputs under
   the top 5% of coefficients contain about 0.88-0.92 of DCT/Fourier/Hadamard
   energy, but only about 0.28 for random/SRHT bases; SRHT's effective-rank
   fraction is about 0.482, close to random bases.
-- `m4_flip_boundary_fit.csv` still fits only observed, non-censored
-  flip-boundary points, while `m4_flip_boundary_censored_intervals.csv` and
-  summaries retain left-censored and not-reached cells instead of discarding
-  them. This is a censored-aware accounting layer, not yet a full survival-style
+- `m4_flip_boundary_fit.csv` fits observed, non-censored flip-boundary points,
+  while `m4_flip_boundary_censored_intervals.csv` and summaries retain
+  left-censored and not-reached cells instead of discarding them. In the high-rho
+  r2 run, five observed fits are available; three have R2 >= 0.9
+  (`reference_k32`, `reference_k8`, and `scgi_proxy` against `srht_paired`).
+  This is a censored-aware accounting layer, not yet a full survival-style
   boundary estimator.
 - `results/m2_boundary_audit_highrho` extends the M2 rho grid to the prompt
   upper range `rho=10` and recomputes log-rho interpolated boundaries. Five
   observed boundary fits now have `R2 >= 0.9`, while censored rows distinguish
   "already better at the smallest rho" from "not reached by rho=10".
 - `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The current
-  random/SRHT fits have low-to-moderate R2, so the AGC law should be treated as
-  a diagnostic table pending a cleaner bias-variance derivation.
+  random/SRHT fits have low-to-moderate R2 (`0.29-0.55`), so the candidate
+  bias-variance law above should be treated as an explanatory model that still
+  needs a better-designed window sweep.
 
-Remaining theory work before publication: derive the AGC window bias-variance
-law analytically, turn the high-rho boundary audit into paper-ready curves, and
-connect the published figure-level channel anchors to a hardware-calibrated
-nonideal model if raw detector/SLM logs become available.
+Remaining theory work before publication: validate the AGC window law with a
+dedicated sweep that avoids window-grid saturation, convert the high-rho
+boundary diagnostics into final vector figures, and connect the published
+figure-level channel anchors to a hardware-calibrated nonideal model if raw
+detector/SLM logs become available.

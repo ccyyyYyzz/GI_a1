@@ -267,7 +267,9 @@ errors down as frame count increases; SRHT should spread coefficient energy
 similarly to random bases.
 
 Result: compact output is written to `results/theory_m4_compact`; paper-r1
-output is written to `results/theory_m4_paper_r1`. The residual-gain
+output is written to `results/theory_m4_paper_r1`; high-rho paper-r2 output is
+written to `results/theory_m4_paper_r2_highrho` using the prompt-range frozen
+M2 phase table. The residual-gain
 `sigma_delta` exponent is 2.001-2.003 across bases with minimum R2 0.99992.
 Fixed-P random frame scaling gives `num_frames` exponents about -0.71/-0.72 for
 random binary/uniform bases with R2 > 0.998 and bootstrap intervals excluding
@@ -275,14 +277,16 @@ zero. At 4096 pixels, DCT/Fourier/Hadamard top-5% energy is 0.88-0.92, while
 random/SRHT is about 0.28. Censored flip-boundary tables now retain
 left-censored and not-reached cells. The separate high-rho M2 boundary audit
 extends rho coverage to 10 and yields five boundary fits with `R2 >= 0.9`.
-AGC best-window fits are present but weak for random/SRHT bases, so they are
-diagnostic rather than a final law.
+AGC best-window fits are present but weak for random/SRHT bases (`R2=0.29-0.55`),
+so they are diagnostic rather than a final law. `THEORY.md` now contains a
+candidate AGC bias-variance law and `PAPER_OUTLINE.md` contains draft captions
+for the eight main figures.
 
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
-toward paper-grade closure. It does not yet complete M4 because the AGC
-bias-variance law needs analytical derivation, the high-rho boundary audit needs
-paper-ready figures/captions, and the figure-level published-channel priors need
-to be tied to a hardware-calibrated nonideal model.
+toward paper-grade closure. It still does not fully complete M4 because the AGC
+law needs a targeted validation sweep and the high-rho boundary diagnostics need
+final vector figures; the figure-level published-channel priors also need to be
+tied to a hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 

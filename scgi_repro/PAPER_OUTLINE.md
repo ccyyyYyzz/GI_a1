@@ -29,6 +29,62 @@ Channels
    any-budget, equal-total-frame, and reference-only best-method maps.
 8. SRHT ablation: none / permutation / diagonal signs / both.
 
+## Draft Figure Captions
+
+**Figure 1. Identifiability model for multiplicative single-pixel channels.**
+The measured bucket sequence is modeled as `R_n=a_n<I_n,T>`, where the unknown
+time-varying gain `a_n` is separable only when the ideal coefficient sequence has
+a stable statistical anchor. Random speckles and SRHT-like randomized bases make
+the coefficient sequence close to stationary, whereas ordered orthogonal bases
+mix object-dependent low-order coefficients with gain drift.
+
+**Figure 2. Oracle correction separates information loss from gain-estimation
+failure.** M1 oracle runs divide each bucket by the true gain sequence before
+reconstruction. Deterministic bases recover their static advantage under oracle
+or pairwise-common-gain conditions, showing that their blind failure is mainly an
+identifiability/calibration problem rather than irreversible information loss.
+
+**Figure 3. Blind AGC has a window bias-variance tradeoff.** Local-mean AGC
+reduces random bucket fluctuation as the window grows but increasingly smooths
+over channel drift. The candidate law in `THEORY.md` predicts a competition
+between `CV_B^2/W` variance and a drift-bias term proportional to
+`sigma_a^2(rho W)^nu`; the present `results/theory_m4_paper_r2_highrho` fits are
+diagnostic because many sampled cells hit the window-grid boundary.
+
+**Figure 4. Residual gain errors propagate coherently through orthogonal
+inversion but average through random measurements.** M4 residual-error sweeps
+over 16, 32, and 64 pixel grids give `sigma_delta` exponents 2.001-2.003 with
+minimum R2 0.99992. Fixed-size random-frame sweeps give random uniform/binary
+frame exponents near -0.72 and -0.71, supporting the predicted averaging of
+uncorrelated gain errors.
+
+**Figure 5. Flip-boundary curves over drift rate and gain amplitude.** The
+high-rho boundary audit extends the sampled range to `rho=10` and records
+observed, left-censored, and not-reached crossings. Five log-rho boundary fits
+are observed in `results/m2_boundary_audit_highrho`; the M4 r2 censored tables
+retain the unresolved cells so the figure can show both fitted curves and
+interval-qualified regions.
+
+**Figure 6. Reference-frame calibration improves quality at a physical-frame
+cost.** `reference_k2` is the best all-non-oracle method in 43/45 prompt-range
+rho/sigma cells, but it spends 3073 total physical frames for a 2048-frame
+measurement budget. Under strict equal-frame accounting, `srht_paired+pairwise`
+remains the winner in 45/45 cells.
+
+**Figure 7. Prompt-range phase diagram of basis/correction winners.** Dense M2
+scans over nine drift rates (`rho=0.001..10`) and five gain amplitudes show that
+`srht_paired+pairwise` dominates the strict equal-frame blind map. Frozen SCGI
+direct transfer over the same prompt range remains a negative baseline:
+`scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus `scgi_proxy`,
+and -1.167 dB versus paired-basis `pairwise`.
+
+**Figure 8. SRHT spreads deterministic coefficient energy like a random basis.**
+At 4096 pixels, the top 5% of DCT/Fourier/Hadamard coefficients contain
+0.88-0.92 of the object energy, whereas random and SRHT bases concentrate only
+about 0.28 in the top 5% and have effective-rank fractions near 0.48. This
+supports SRHT as a design rule that retains paired orthogonal acquisition while
+whitening object-dependent coefficient order.
+
 ## Current Evidence And Gaps
 
 - The current SCGI reproduction is strongest at smoke/debug scale. Full
@@ -43,23 +99,25 @@ Channels
   raw/AGC baselines without reference frames, but it does not displace SRHT
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
-- Frozen-network M2 smoke and dense baselines now exist. Directly applying the
-  returned SCGI checkpoint to M2 sequences underperforms proxy/pairwise
-  baselines, so a credible network-level phase diagram would need basis-aware
-  retraining, fine-tuning, or a different sequence representation.
+- Frozen-network M2 smoke and prompt-range dense baselines now exist. Directly
+  applying the returned SCGI checkpoint to M2 sequences underperforms
+  proxy/pairwise baselines, so a credible network-level phase diagram would need
+  basis-aware retraining, fine-tuning, or a different sequence representation.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples. Compact and full nonideal digital-twin scans now exist, and the full
   scan preserves the pairwise winner under detector/SLM perturbations. Published
   APL/OE figure-level channel anchors now exist, but raw detector/SLM calibration
   is still needed before claiming hardware-calibrated nonideal performance.
-- Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
-  with full uncertainty, although `results/m2_boundary_audit_highrho` now gives
-  five prompt-range log-rho boundary fits with `R2 >= 0.9`.
-- M4 paper-r1 theory hooks now support quadratic residual-gain scaling with
+- Flip boundaries are now represented both as observed fits and censored
+  intervals. `results/m2_boundary_audit_highrho` gives five prompt-range
+  log-rho boundary fits with `R2 >= 0.9`, while
+  `results/theory_m4_paper_r2_highrho` keeps the censored cells for paper
+  plotting.
+- M4 high-rho r2 theory hooks now support quadratic residual-gain scaling with
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
   pixels, censored flip-boundary accounting, and AGC window diagnostics. The
-  publication version still needs a cleaner analytical AGC law and paper-ready
-  boundary figures/captions.
+  publication version still needs final vector plotting and a more targeted AGC
+  validation sweep.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the implemented frozen dense baseline underperforms.
 - Published-curve calibration is limited to figure-level priors: APL intensity
