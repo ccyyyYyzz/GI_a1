@@ -135,10 +135,13 @@ whitening object-dependent coefficient order.
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
   pixels, censored flip-boundary accounting, and AGC window diagnostics.
   `results/paper_figures_r1` now renders the current M2/M4 figure draft set
-  with PNG previews, SVG sidecars, and raster/vector manifests. The targeted
-  and boundary-aware AGC sweeps are complete but remain diagnostic, so the
-  publication version still needs final venue-formatted multi-panel assembly and
-  a stronger AGC estimator or tighter censored-law validation.
+  with PNG previews, SVG sidecars, and raster/vector manifests. The new
+  `results/paper_figures_r1/multipanels` directory adds draft 300-dpi
+  multipanel PNG/PDF/SVG assemblies for Figures 3, 4, and 7, with an 11-row
+  panel manifest linking each panel to source CSV evidence. The targeted and
+  boundary-aware AGC sweeps are complete but remain diagnostic, so the
+  publication version still needs venue-specific final artwork and a stronger
+  AGC estimator or tighter censored-law validation.
 - A competitive fine-tuned SCGI-network correction is now present in the dense
   prompt-range M2 phase diagram, but it is a secondary baseline rather than the
   dominant correction strategy.

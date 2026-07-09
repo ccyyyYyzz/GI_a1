@@ -611,7 +611,10 @@ the grid boundary. `results/theory_m4_agc_boundary_aware_r1` then treats those
 boundary selections as censored intervals and writes four basis fits plus 180
 interval rows; random binary/uniform reach 0.80 interval satisfaction, SRHT 0.64,
 and Hadamard 0.40. The candidate AGC law therefore remains diagnostic. The
-remaining publication work is final venue-formatted multi-panel assembly plus a
+new `run_make_paper_multipanels.py` assembles those audited assets into draft
+300-dpi PNG/PDF/SVG layouts for Figures 3, 4, and 7 under
+`results/paper_figures_r1/multipanels`, with an 11-row panel provenance
+manifest. The remaining publication work is venue-specific final artwork plus a
 stronger AGC estimator or tighter censored-law validation.
 
 Latest nonideal M2 digital-twin runs:
@@ -670,6 +673,11 @@ writes:
 matching SVG sidecars under `results/paper_figures_r1`. The raster manifest is
 `paper_figure_manifest.csv`; the vector-only manifest is
 `paper_figure_manifest_vectors.csv`.
+
+`run_make_paper_multipanels.py` writes three draft 300-dpi multipanel assemblies
+under `results/paper_figures_r1/multipanels`: `figure3_agc_diagnostics`,
+`figure4_error_scaling`, and `figure7_phase_diagram`, each as PNG, PDF, and SVG.
+The panel-level provenance file is `paper_multipanel_manifest.csv`.
 
 ## Verification
 
@@ -768,6 +776,9 @@ Additional checks:
 - Paper-facing M2/M4 figures are rendered under `results/paper_figures_r1` with
   `paper_figure_manifest.csv`, SVG sidecars, and
   `paper_figure_manifest_vectors.csv`.
+- Draft paper multipanels are rendered under
+  `results/paper_figures_r1/multipanels` with PNG/PDF/SVG outputs for Figures
+  3, 4, and 7 plus an 11-row `paper_multipanel_manifest.csv`.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
   comparison tables under `results/nonideal_m2_compact` and
   `results/nonideal_m2_full_r1_merged`.
@@ -792,8 +803,9 @@ Additional checks:
   detector/SLM hardware calibration remains outside the available PDF data.
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: the targeted
   and boundary-aware AGC analyses are now present but diagnostic, SVG sidecars
-  exist for the current draft figures, and the paper still needs
-  publication-quality multi-panel figure assembly.
+  exist for the current draft figures, draft multipanel PNG/PDF/SVG assemblies
+  now exist for Figures 3, 4, and 7, and the paper still needs venue-specific
+  final artwork and stronger AGC validation.
 - Configure an authenticated mounted persistence target before future long
   Colab runs if mid-run copies are required. The code path now supports
   `PERSIST_ROOT`, but it does not perform Google Drive authorization or GitHub

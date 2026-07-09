@@ -43,6 +43,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_m4_agc_boundary_aware.py --output-dir results\theory_m4_agc_boundary_aware_r1
 & $py run_make_figures.py --output-dir results\figures
 & $py run_make_paper_figures.py --output-dir results\paper_figures_r1
+& $py run_make_paper_multipanels.py --output-dir results\paper_figures_r1\multipanels
 & $py -m unittest discover tests -v
 ```
 
@@ -200,6 +201,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/paper_figures_r1/`: paper-facing M2/M4 winner maps, boundary-fit
   tables, fitted-law plots, SVG vector sidecars, captions, and
   `paper_figure_manifest.csv` / `paper_figure_manifest_vectors.csv`.
+- `results/paper_figures_r1/multipanels/`: draft 300-dpi multipanel PNG/PDF/SVG
+  assemblies for Figures 3, 4, and 7 plus `paper_multipanel_manifest.csv`
+  linking each panel to its audited source CSV.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.

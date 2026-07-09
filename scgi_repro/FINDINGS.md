@@ -324,6 +324,13 @@ curve and fit table, top-5% coefficient-energy curve, and AGC window-law table.
 Each manifest row now has a `vector_svg` sidecar, and
 `paper_figure_manifest_vectors.csv` lists the 11 SVG assets directly.
 
+Draft multipanel assemblies now exist under
+`results/paper_figures_r1/multipanels`. `run_make_paper_multipanels.py` combines
+the audited single-panel assets into 300-dpi PNG/PDF/SVG layouts for Figure 3
+(`figure3_agc_diagnostics`), Figure 4 (`figure4_error_scaling`), and Figure 7
+(`figure7_phase_diagram`). `paper_multipanel_manifest.csv` records 11 panel rows
+and links each panel back to its source CSV and caption.
+
 ## M4 Theory Hooks
 
 Experiment: dedicated M4 runner over image sizes 16/32/64, residual gain
@@ -363,9 +370,9 @@ toward paper-grade closure. The targeted AGC sweep is now complete and shows the
 simple window law is still too boundary-sensitive for a final quantitative
 claim; the censored model is a useful interpretation layer but not a replacement
 for a stronger AGC estimator. M4 remains short of full publication closure
-because the current paper figures are individual SVG sidecars rather than final
-venue-formatted multi-panel layouts, and the figure-level published-channel
-priors still need to be tied to a hardware-calibrated nonideal model.
+because only draft multipanel layouts exist so far, not venue-specific final
+artwork, and the figure-level published-channel priors still need to be tied to
+a hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 
