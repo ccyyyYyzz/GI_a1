@@ -1,0 +1,18 @@
+{
+  "raw_rows": 3200,
+  "summary_rows": 64,
+  "rho_values": [
+    0.001,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "sigma_a_values": [
+    0.3
+  ],
+  "oracle_min_psnr": 120.0,
+  "fast_srht_minus_ordered_min_db": -0.04322663306421326,
+  "fast_srht_minus_ordered_max_db": 0.08267707442970718,
+  "fast_srht_gap_to_best_min_db": -0.06678157990416267,
+  "slow_pairwise_srht_minus_ordered_db": 0.0047083521594970534
+}

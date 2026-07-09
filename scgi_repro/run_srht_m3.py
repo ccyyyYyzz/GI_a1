@@ -11,6 +11,12 @@ from src.basis import MeasurementBasis, hadamard_matrix, interleave_paired_frame
 from src.config_utils import load_config, project_root
 
 
+def parse_floats(text: str | None, default: list[float]) -> list[float]:
+    if text is None:
+        return default
+    return [float(part) for part in text.replace(",", " ").split() if part.strip()]
+
+
 def make_variant(name: str, num_pixels: int, seed: int) -> MeasurementBasis:
     g = torch.Generator(device="cpu").manual_seed(seed)
     h = hadamard_matrix(num_pixels)
@@ -42,6 +48,8 @@ def main() -> None:
     parser.add_argument("--profile", default="smoke")
     parser.add_argument("--objects", type=int, default=1)
     parser.add_argument("--seeds", type=int, default=1)
+    parser.add_argument("--rho-values", default=None)
+    parser.add_argument("--sigma-a", type=float, default=None)
     parser.add_argument("--output-dir", type=Path, default=Path("results/srht_m3"))
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
@@ -52,8 +60,12 @@ def main() -> None:
     h = int(mech.get("image_size", 32))
     p = h * h
     objects = make_synthetic_objects(args.objects, h, int(cfg.get("seed", 0)))
-    rho_values = list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))[:4]
-    sigma_a = float(list(mech.get("sigma_a_values", [0.15]))[min(1, len(mech.get("sigma_a_values", [0.15])) - 1)])
+    rho_values = parse_floats(args.rho_values, list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))[:4])
+    sigma_a = float(
+        args.sigma_a
+        if args.sigma_a is not None
+        else list(mech.get("sigma_a_values", [0.15]))[min(1, len(mech.get("sigma_a_values", [0.15])) - 1)]
+    )
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 

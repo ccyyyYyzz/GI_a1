@@ -563,16 +563,29 @@ coverage and keeps `srht_paired + pairwise` as the strict equal-frame winner in
 competitive against raw/AGC baselines, but it still supports the SRHT-pairwise
 main conclusion.
 
-Latest M3 protocol-statistics run:
+Latest M3 high-rho SRHT ablation:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_srht_m3.py --profile debug --objects 10 --seeds 5 --no-findings --output-dir results\srht_m3_protocol_o10s5
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
 ```
 
 Outputs:
 
-- `srht_ablation.csv` (3200 rows)
-- `srht_ablation_summary.csv` (64 rows)
+- `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation.csv` (3,200 rows)
+- `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation_summary.csv` (64 rows)
+- `results/srht_m3_audit_highrho_r1/m3_srht_delta_summary.csv` (16 rows)
+- `results/srht_m3_audit_highrho_r1/m3_srht_audit_report.md`
+
+The high-rho audit makes the M3 conclusion more conservative. Oracle correction
+has minimum mean PSNR 120.0 dB, confirming that ordered Hadamard,
+permutation-only, sign-only, and full SRHT all preserve the underlying
+information when the gain is known. For `rho>=1` under non-oracle corrections,
+however, full SRHT minus ordered Hadamard ranges from -0.043 to +0.083 dB, not
+the prompt's requested `>=3 dB` advantage. The best ablation is usually
+`sign_only`, so the current constructive evidence supports diagonal sign
+randomization more strongly than full row permutation. M3 therefore remains a
+partial mechanism result rather than a closed SRHT theorem.
 
 Latest M4 theory runs:
 

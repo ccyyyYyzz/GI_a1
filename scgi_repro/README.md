@@ -37,6 +37,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.003,0.01,0.03,0.1,0.3,1.0,3.0,10.0" --sigma-values "0.05,0.10,0.15,0.30,0.50" --reference-periods "2,8,32" --shard i/5 --resume --scgi-checkpoint results\m2_scgi_proxyinput_gain1d_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shardiof5 --no-findings
 & $py merge_phase_m2_shards.py --inputs results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard0of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard1of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard2of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard3of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard4of5 --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_merged
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
+& $py run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
+& $py run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 & $py run_m4_agc_targeted.py --output-dir results\theory_m4_agc_targeted_r1
@@ -221,10 +223,14 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/nonideal_m2_full_r1_merged/`: 157,500-row full ideal/nonideal M2
   digital-twin scan over the dense 7x5 grid, merged from five Colab L4 shards.
 - `results/mechanism_m1_protocol_o10s5/`,
-  `results/phase_m2_reference_protocol_o10s5/`, and
-  `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used
-  by the latest figure rendering.
-- `results/srht_m3_quick/`: compact SRHT ablation plumbing output.
+  `results/phase_m2_reference_protocol_o10s5/`: 10-object x 5-seed M1/M2
+  mechanism outputs used by the latest figure rendering.
+- `results/srht_m3_protocol_o10s5_highrho_r1/`: monitored 10-object x 5-seed
+  M3 SRHT ablation at `rho=0.001,0.1,1,10` and `sigma_a=0.30`, with 3,200 raw
+  rows and 64 summary rows.
+- `results/srht_m3_audit_highrho_r1/`: M3 high-rho SRHT audit tables, JSON
+  summary, PNG table, and Markdown report; full SRHT does not meet the prompt's
+  `>=3 dB` advantage gate over ordered Hadamard in the fast-drift rows.
 - `results/figures/`: compact M1-M3 rendered figure outputs.
 
 ## Tests

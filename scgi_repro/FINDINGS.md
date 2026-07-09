@@ -328,6 +328,30 @@ shows that a learned blind correction can become competitive with raw and AGC
 baselines on the dense prompt grid, but it does not change the best equal-frame
 map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 
+## M3 SRHT Constructive Ablation
+
+Experiment: monitored 10-object x 5-seed M3 ablation over ordered Hadamard,
+row-permutation-only, diagonal-sign-only, and full SRHT variants at
+`rho=0.001,0.1,1,10` with `sigma_a=0.30`, followed by
+`run_m3_srht_audit.py`.
+
+Prediction: the prompt-level constructive claim would require full SRHT to beat
+ordered Hadamard by at least 3 dB in fast drift while not losing to random-like
+alternatives.
+
+Result: `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation.csv` has 3,200
+raw rows and `srht_ablation_summary.csv` has 64 rows. The audit output in
+`results/srht_m3_audit_highrho_r1` reports oracle minimum mean PSNR 120.0 dB,
+so all four measurement variants are information-preserving when the true gain
+is known. Under non-oracle corrections at `rho>=1`, however, full SRHT minus
+ordered Hadamard ranges only from -0.043 to +0.083 dB, far below the requested
+`>=3 dB` advantage. The best ablation is usually `sign_only`, not `srht_full`.
+
+Supports/refutes: refutes the strong M3 SRHT-advantage gate under the current
+fast-drift protocol. The useful design signal is diagonal sign randomization;
+the extra row permutation in full SRHT remains unproven and should be framed as
+partial/ablation-informed rather than a closed constructive theorem.
+
 ## Rendered Figures
 
 Latest figure manifest: `E:/GAN_FCC_WORK/scgi-repro/results/figures/figure_manifest.csv`.

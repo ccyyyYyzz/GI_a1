@@ -86,12 +86,15 @@ variant improves the network baseline to +0.329 dB versus `none` and -0.262 dB
 versus `scgi_proxy`, but still does not change the 45/45 `srht_paired+pairwise`
 winner map.
 
-**Figure 8. SRHT spreads deterministic coefficient energy like a random basis.**
-At 4096 pixels, the top 5% of DCT/Fourier/Hadamard coefficients contain
-0.88-0.92 of the object energy, whereas random and SRHT bases concentrate only
-about 0.28 in the top 5% and have effective-rank fractions near 0.48. This
-supports SRHT as a design rule that retains paired orthogonal acquisition while
-whitening object-dependent coefficient order.
+**Figure 8. Randomized orthogonal bases whiten object energy, but full SRHT
+advantage is not yet closed.** At 4096 pixels, the top 5% of
+DCT/Fourier/Hadamard coefficients contain 0.88-0.92 of the object energy,
+whereas random and SRHT bases concentrate only about 0.28 in the top 5% and have
+effective-rank fractions near 0.48. The new high-rho M3 ablation shows full SRHT
+does not beat ordered Hadamard by the prompt-level `>=3 dB` fast-drift gate;
+`sign_only` is often the best ablation. This figure should therefore separate
+the supported energy-spreading observation from the still-open row-permutation
+benefit claim.
 
 ## Current Evidence And Gaps
 
@@ -126,6 +129,12 @@ whitening object-dependent coefficient order.
   scan preserves the pairwise winner under detector/SLM perturbations. Published
   APL/OE figure-level channel anchors now exist, but raw detector/SLM calibration
   is still needed before claiming hardware-calibrated nonideal performance.
+- M3 now has a monitored 10-object x 5-seed high-rho ablation. It confirms
+  information preservation under oracle correction but does not support a robust
+  full-SRHT advantage: for `rho>=1`, `srht_full - hadamard_ordered` stays between
+  -0.043 and +0.083 dB under non-oracle corrections, far below the requested
+  `>=3 dB` margin. The manuscript should present this as an ablation-informed
+  limitation unless a broader protocol finds a stable SRHT gain.
 - Flip boundaries are now represented both as observed fits and censored
   intervals. `results/m2_boundary_audit_highrho` gives five prompt-range
   log-rho boundary fits with `R2 >= 0.9`, while
