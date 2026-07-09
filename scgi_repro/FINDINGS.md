@@ -91,14 +91,24 @@ Stage 4 stripe-target sweeps:
 RED/UNN screen cannot rescue the binding stripe target: best final CNR is 2.916
 and best target-aware trace CNR is 3.831. `results/stage4_ured_sweep_nlm_r1_stripe`
 then replaces the fallback denoiser with non-local means and improves stripe to
-final CNR 5.131 and best trace CNR 8.913 in a single-object screen. The runner
-was then fixed so object filtering no longer changes each object's dynamic
-lambda draw, and `results/stage4_ured_sweep_nlm_allobjects_r1` reruns the best
-NLM candidates on all four objects. The better fixed 200-step NLM configuration
-has final CNRs `8.453`, `6.033`, `10.270`, and `7.842`, with target-aware trace
-CNRs `13.210`, `8.185`, `19.904`, and `14.300`. This supports the diagnosis
-that the denoiser and stopping rule are the Stage 4 bottleneck, but it still
-refutes a paper-threshold reproduction claim for APL URED 10.43.
+final CNR 5.131 and best target-aware diagnostic trace CNR 8.913 in a
+single-object screen. The runner was then fixed so object filtering no longer
+changes each object's dynamic lambda draw, and
+`results/stage4_ured_sweep_nlm_allobjects_r1` reruns the best NLM candidates on
+all four objects. The better fixed 200-step NLM configuration has final CNRs
+`8.453`, `6.033`, `10.270`, and `7.842`, with target-aware diagnostic trace
+CNRs `13.210`, `8.185`, `19.904`, and `14.300`. This supports denoiser fidelity,
+regularization, and stopping as candidate bottlenecks, but it still refutes a
+paper-threshold reproduction claim for APL URED 10.43.
+
+Stage 4 target-free proxy audit:
+`results/stage4_ured_proxy_audit_r1` adds per-step `proxy_*` traces for losses,
+denoiser residual, TV/roughness, Otsu, entropy, and image range statistics. The
+best simple target-free rule by all-object minimum is `max_proxy_min`, with
+selected CNR mean/min `9.971/6.210`, but it still misses target-aware trace peaks
+by mean/max regret `3.748/12.766`. Loss-based stopping is not viable here:
+`min_loss` selects mean/min CNR `4.015/2.858`. No tested proxy is a validated
+deployable stopping rule.
 
 Published calibration: `results/published_calibration` encodes the APL Fig. 6
 and Fig. 9 CNR targets plus OE PSNR/SSIM target values. Current APL comparison

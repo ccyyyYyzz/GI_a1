@@ -241,20 +241,30 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_sweep_r2_stripe_merged`
 - `results/stage4_ured_sweep_nlm_r1_stripe`
 - `results/stage4_ured_sweep_nlm_allobjects_r1`
+- `results/stage4_ured_proxy_audit_r1`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
 that the average-pool proxy is not enough: the best final stripe CNR is 2.916 and
 the best target-aware trace CNR is 3.831. Replacing the fallback denoiser with
 non-local means is much stronger: a 48-config stripe screen reaches final CNR
-5.131 and best trace CNR 8.913. Because single-object filtering used a different
-lambda draw before the runner was fixed, the authoritative follow-up is the
-all-object NLM audit. There, the better fixed 200-step configuration
+5.131 and best target-aware diagnostic trace CNR 8.913. Because single-object
+filtering used a different lambda draw before the runner was fixed, the
+authoritative follow-up is the all-object NLM audit. There, the better fixed
+200-step configuration
 (`nlm_h=0.08`) reaches CNRs `8.453`, `6.033`, `10.270`, and `7.842` for
 `letter_A`, `stripe_target`, `letter_L`, and `ring`, respectively. This is a
-real improvement over the SCGI/static bound of roughly 2.49-3.55 and approaches
-the APL UNN range, but it still misses the APL URED minimum of 10.43 on three
-objects. The best trace remains target-aware diagnostic evidence, not a
+real improvement over the SCGI/static bound of roughly 2.49-3.55, but only some
+objects approach the APL UNN range and the all-target minimum still misses the
+APL URED minimum of 10.43. The best trace remains target-aware diagnostic
+evidence, not a deployable stopping rule.
+
+A follow-up target-free proxy audit records `loss`, data/augmentation losses,
+denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
+at every URED step. Among these simple rules, `max_proxy_min` is best by
+all-object minimum CNR on this fixed-seed audit (`min=6.210`, `mean=9.971`), but
+it still has mean regret 3.748 and max regret 12.766 versus the target-aware
+trace peak. `min_loss` is worse (`min=2.858`), and no tested proxy validates a
 deployable stopping rule.
 
 Published target calibration:
@@ -595,10 +605,11 @@ Additional checks:
   even after affine alignment, while paired-Hadamard exact inversion reaches 80
   dB, so CNR/ROI, reconstruction-basis choice, and URED fidelity are the
   practical levers. NLM-based URED is materially better than the average-pool
-  fallback on the binding stripe target, but the best final/trace CNRs
-  remain below the APL URED target in the authoritative all-object audit, and
-  the trace peak requires a non-target-aware stopping rule before it can be
-  claimed as a method result.
+  fallback on the binding stripe target, but the best fixed-final and
+  target-aware diagnostic trace CNRs remain below the APL URED target in the
+  authoritative all-object audit. A first target-free proxy audit finds only
+  partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
+  validated deployable stopping rule.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
   diagram is required. The direct frozen dense baseline is implemented but

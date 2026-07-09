@@ -80,6 +80,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   denoiser/hyperparameter screens.
 - `results/stage4_ured_sweep_nlm_allobjects_r1/`: repaired all-object NLM URED
   candidate audit preserving per-object dynamic factors.
+- `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
+  Its target-aware trace peaks are diagnostic only, and no tested proxy is a
+  deployable stopping rule.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/published_channel_calibration/`: figure-level APL intensity-trace

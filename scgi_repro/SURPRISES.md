@@ -99,16 +99,26 @@ and non-sharded runs share the same per-object dynamic factors.
 Follow-up stripe sweeps narrowed the failure mode. A 40-config avg-pool RED
 screen tops out at final CNR `2.916` and target-aware trace CNR `3.831`, while
 switching the denoiser to non-local means raises the same stripe target to final
-CNR `5.131` and trace CNR `8.913`. This is a large implementation sensitivity,
-but not a solved reproduction: the trace peak uses ground truth for diagnosis,
-and even that remains below the APL URED minimum `10.43`.
+CNR `5.131` and target-aware diagnostic trace CNR `8.913`. This is a large
+implementation sensitivity, but not a solved reproduction: the trace peak uses
+ground truth for diagnosis, and even that remains below the APL URED minimum
+`10.43`.
 
 The sweep runner also inherited the earlier sharding trap: filtering to only
 `stripe_target` before drawing dynamic factors gave stripe the first lambda draw.
 That is now fixed. In the repaired all-object NLM audit, fixed 200-step NLM RED
 reaches final CNRs `8.453/6.033/10.270/7.842` for A/stripe/L/ring. The
-all-target minimum is still below 10.43, but the gap is now specifically a
-stopping/regularization problem rather than an average-pool denoiser failure.
+all-target minimum is still below 10.43. The gap is therefore not merely an
+average-pool denoiser failure; stopping, regularization, and NLM fidelity remain
+unresolved.
+
+Target-free proxy traces make this sharper rather than solving it. In
+`results/stage4_ured_proxy_audit_r1`, the best simple proxy rule
+(`max_proxy_min`) lifts the selected all-object minimum to `6.210`, but still
+has max regret `12.766` versus ground-truth trace peaks. Loss minimization is a
+poor stop signal (`min=2.858`). The surprising part is that a visible proxy
+correlation exists, especially for `proxy_min`, but it is not yet reliable
+enough to claim a method.
 
 ## 2026-07-09 Published Curves Are Gentler Than The Prompt Prior
 

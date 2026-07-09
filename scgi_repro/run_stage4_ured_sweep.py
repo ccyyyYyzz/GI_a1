@@ -245,19 +245,23 @@ def main() -> None:
                 "best_trace_cnr": max(result.cnr_trace) if result.cnr_trace else float("nan"),
                 "final_loss": result.loss_trace[-1] if result.loss_trace else float("nan"),
             }
+            if result.proxy_trace:
+                row.update({f"final_{key}": value for key, value in result.proxy_trace[-1].items()})
             metric_rows.append(row)
             if args.save_traces:
-                for step, (loss_value, cnr_value) in enumerate(zip(result.loss_trace, result.cnr_trace), start=1):
-                    trace_rows.append(
-                        {
-                            "config_id": config_id,
-                            "object": name,
-                            "object_index": object_index,
-                            "step": step,
-                            "loss": loss_value,
-                            "cnr": cnr_value,
-                        }
-                    )
+                trace_len = max(len(result.loss_trace), len(result.cnr_trace), len(result.proxy_trace))
+                for trace_index in range(trace_len):
+                    trace_row = {
+                        "config_id": config_id,
+                        "object": name,
+                        "object_index": object_index,
+                        "step": trace_index + 1,
+                        "loss": result.loss_trace[trace_index] if trace_index < len(result.loss_trace) else float("nan"),
+                        "cnr": result.cnr_trace[trace_index] if trace_index < len(result.cnr_trace) else float("nan"),
+                    }
+                    if trace_index < len(result.proxy_trace):
+                        trace_row.update(result.proxy_trace[trace_index])
+                    trace_rows.append(trace_row)
             write_csv(out_dir / "ured_sweep_metrics.csv", metric_rows)
             if args.save_traces:
                 write_csv(out_dir / "ured_sweep_traces.csv", trace_rows)

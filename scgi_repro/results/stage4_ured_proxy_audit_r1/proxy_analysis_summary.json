@@ -1,0 +1,42 @@
+{
+  "trace_csv": "results\\stage4_ured_proxy_audit_r1\\ured_sweep_traces.csv",
+  "rows": 1600,
+  "groups": 8,
+  "proxy_columns": [
+    "proxy_mean",
+    "proxy_std",
+    "proxy_min",
+    "proxy_max",
+    "proxy_range",
+    "proxy_tv_l1",
+    "proxy_roughness_l2",
+    "proxy_otsu_score",
+    "proxy_otsu_threshold",
+    "proxy_otsu_fg_fraction",
+    "proxy_hist_entropy",
+    "proxy_data_loss",
+    "proxy_aug_loss",
+    "proxy_denoiser_mse",
+    "proxy_net_delta_mse",
+    "proxy_dual_abs_mean"
+  ],
+  "best_min_cnr_rule": {
+    "rule": "max_proxy_min",
+    "observations": 8,
+    "mean_selected_cnr": 9.970530450344086,
+    "min_selected_cnr": 6.210352420806885,
+    "mean_regret_to_peak": 3.7480193972587577,
+    "max_regret_to_peak": 12.766304016113281,
+    "mean_improvement_over_final": 3.4956507682800293,
+    "min_improvement_over_final": -3.6861677169799822,
+    "mean_selected_step": 89.0
+  },
+  "best_mean_group_spearman_proxy": {
+    "proxy": "proxy_min",
+    "global_pearson": 0.4787043929593174,
+    "global_spearman": 0.48544513678298684,
+    "mean_group_pearson": 0.6501449299012546,
+    "mean_group_spearman": 0.6566115260929694,
+    "groups": 8
+  }
+}

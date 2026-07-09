@@ -407,6 +407,35 @@ class TestMetrics(unittest.TestCase):
             self.assertLessEqual(p_value, 1.0)
 
 
+class TestUredProxyTrace(unittest.TestCase):
+    def setUp(self):
+        if torch is None:
+            self.skipTest("torch is not available for URED proxy tests.")
+
+    def test_target_free_image_proxies_are_finite(self):
+        ured = importlib.import_module("src.ured")
+        image = torch.zeros((1, 1, 16, 16), dtype=torch.float32)
+        image[..., 4:12, 5:11] = 1.0
+        proxies = ured.target_free_image_proxies(image)
+        expected = {
+            "proxy_mean",
+            "proxy_std",
+            "proxy_range",
+            "proxy_tv_l1",
+            "proxy_otsu_score",
+            "proxy_otsu_fg_fraction",
+            "proxy_hist_entropy",
+        }
+        self.assertTrue(expected.issubset(proxies.keys()))
+        for key, value in proxies.items():
+            self.assertTrue(np.isfinite(value), key)
+        self.assertGreater(proxies["proxy_std"], 0.0)
+        self.assertAlmostEqual(proxies["proxy_range"], 1.0, places=6)
+        self.assertGreater(proxies["proxy_otsu_score"], 0.0)
+        self.assertGreater(proxies["proxy_otsu_fg_fraction"], 0.0)
+        self.assertLess(proxies["proxy_otsu_fg_fraction"], 1.0)
+
+
 class TestChannelMechanisms(unittest.TestCase):
     def setUp(self):
         if torch is None:
