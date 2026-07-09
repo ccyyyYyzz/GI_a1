@@ -100,6 +100,13 @@ all four objects. The better fixed 200-step NLM configuration has final CNRs
 CNRs `13.210`, `8.185`, `19.904`, and `14.300`. This supports denoiser fidelity,
 regularization, and stopping as candidate bottlenecks, but it still refutes a
 paper-threshold reproduction claim for APL URED 10.43.
+`results/stage4_ured_sweep_nlm_deeper_r1_stripe` tests 18 deeper 400-step stripe
+configs around the best region and does not improve the target-aware peak
+(`best_trace_cnr=8.520`). `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`
+then converts the observed early peak into a fixed-step sweep; the best
+deployable stripe final CNR improves to `8.932` at 40 steps and `nlm_h=0.06`,
+but remains below the APL URED minimum. `results/stage4_trace_audit_r1` records
+the combined final-vs-trace audit across these sweeps.
 
 Stage 4 target-free proxy audit:
 `results/stage4_ured_proxy_audit_r1` adds per-step `proxy_*` traces for losses,

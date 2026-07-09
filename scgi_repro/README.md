@@ -111,6 +111,12 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   denoiser/hyperparameter screens.
 - `results/stage4_ured_sweep_nlm_allobjects_r1/`: repaired all-object NLM URED
   candidate audit preserving per-object dynamic factors.
+- `results/stage4_ured_sweep_nlm_deeper_r1_stripe/` and
+  `results/stage4_ured_sweep_nlm_earlystop_r1_stripe/`: monitored local-CUDA
+  stripe follow-ups showing longer 400-step NLM does not help, while fixed
+  early stopping raises stripe final CNR to 8.932.
+- `results/stage4_trace_audit_r1/`: combined final-vs-target-aware trace audit
+  for the Stage 4 NLM URED sweeps against the APL URED minimum CNR.
 - `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
   Its target-aware trace peaks are diagnostic only, and no tested proxy is a
   deployable stopping rule.

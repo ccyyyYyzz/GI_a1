@@ -241,7 +241,10 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_sweep_r2_stripe_merged`
 - `results/stage4_ured_sweep_nlm_r1_stripe`
 - `results/stage4_ured_sweep_nlm_allobjects_r1`
+- `results/stage4_ured_sweep_nlm_deeper_r1_stripe`
+- `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`
 - `results/stage4_ured_proxy_audit_r1`
+- `results/stage4_trace_audit_r1`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
@@ -258,6 +261,17 @@ real improvement over the SCGI/static bound of roughly 2.49-3.55, but only some
 objects approach the APL UNN range and the all-target minimum still misses the
 APL URED minimum of 10.43. The best trace remains target-aware diagnostic
 evidence, not a deployable stopping rule.
+
+Two monitored local-CUDA follow-ups sharpen this conclusion. A deeper 18-config
+stripe sweep at 400 steps around the best NLM region reaches final CNR 5.637 and
+target-aware trace CNR 8.520, so simply running longer is not the answer. A
+40-config fixed-early-stop stripe sweep over `steps=36..160` and
+`nlm_h=0.05..0.09` turns the previously observed early peak into a deployable
+fixed-step result: best final stripe CNR is 8.932 at 40 steps and `nlm_h=0.06`.
+`results/stage4_trace_audit_r1` combines the NLM stripe, all-object, deeper,
+and early-stop sweeps. It shows target-aware traces clear the 10.43 APL URED
+minimum for `letter_A`, `letter_L`, and `ring`, but not for `stripe_target`
+(`best_trace_cnr=8.932`).
 
 A follow-up target-free proxy audit records `loss`, data/augmentation losses,
 denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
@@ -691,7 +705,11 @@ Additional checks:
 - Stage 4 URED stripe sweeps write avg-pool and NLM denoiser hyperparameter
   screens under `results/stage4_ured_sweep_r2_stripe_merged` and
   `results/stage4_ured_sweep_nlm_r1_stripe`, plus the authoritative all-object
-  NLM audit under `results/stage4_ured_sweep_nlm_allobjects_r1`.
+  NLM audit under `results/stage4_ured_sweep_nlm_allobjects_r1`, deeper and
+  fixed-early-stop stripe sweeps under
+  `results/stage4_ured_sweep_nlm_deeper_r1_stripe` and
+  `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`, and a combined trace
+  audit under `results/stage4_trace_audit_r1`.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -722,10 +740,10 @@ Additional checks:
   even after affine alignment, while paired-Hadamard exact inversion reaches 80
   dB, so CNR/ROI, reconstruction-basis choice, and URED fidelity are the
   practical levers. NLM-based URED is materially better than the average-pool
-  fallback on the binding stripe target, but the best fixed-final and
-  target-aware diagnostic trace CNRs remain below the APL URED target in the
-  authoritative all-object audit. A first target-free proxy audit finds only
-  partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
+  fallback on the binding stripe target, and fixed early stopping raises stripe
+  final CNR to 8.932, but the best stripe final and target-aware diagnostic trace
+  CNRs remain below the APL URED target. A first target-free proxy audit finds
+  only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
