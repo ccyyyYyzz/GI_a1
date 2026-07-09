@@ -1,0 +1,21 @@
+{
+  "profile": "smoke",
+  "image_size": 32,
+  "active_num_patterns": 1024,
+  "pattern_factors": [
+    0.5,
+    1.0
+  ],
+  "pattern_counts": [
+    512,
+    1024
+  ],
+  "objects": 5,
+  "requested_dataset_source": "synthetic",
+  "device": "cuda",
+  "chunk_patterns": 128,
+  "elapsed_seconds": 2.244,
+  "figures": [
+    "stage3_static_dgi_affine_psnr.png"
+  ]
+}
