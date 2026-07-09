@@ -81,7 +81,10 @@ scans over nine drift rates (`rho=0.001..10`) and five gain amplitudes show that
 `srht_paired+pairwise` dominates the strict equal-frame blind map. Frozen SCGI
 direct transfer over the same prompt range remains a negative baseline:
 `scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus `scgi_proxy`,
-and -1.167 dB versus paired-basis `pairwise`.
+and -1.167 dB versus paired-basis `pairwise`. A proxy-input 1D trained SCGI
+variant improves the network baseline to +0.329 dB versus `none` and -0.262 dB
+versus `scgi_proxy`, but still does not change the 45/45 `srht_paired+pairwise`
+winner map.
 
 **Figure 8. SRHT spreads deterministic coefficient energy like a random basis.**
 At 4096 pixels, the top 5% of DCT/Fourier/Hadamard coefficients contain
@@ -115,9 +118,9 @@ whitening object-dependent coefficient order.
   average.
 - Signed-safe outputs and true-gain prediction have also been tested. Raw-bucket
   `gain_predictor_unet` remains negative, but fixing checkpoint metadata loading
-  and feeding a blind proxy-gain envelope into a 1D gain predictor yields the
-  first competitive trained smoke: +0.41 dB versus `none` and -0.18 dB versus
-  `scgi_proxy` on the held-out local grid.
+  and feeding a blind proxy-gain envelope into a 1D gain predictor yields a
+  dense trained-network baseline: +0.329 dB versus `none`, +0.604 dB versus AGC,
+  and -0.262 dB versus `scgi_proxy` on the full prompt grid.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples. Compact and full nonideal digital-twin scans now exist, and the full
   scan preserves the pairwise winner under detector/SLM perturbations. Published
@@ -136,8 +139,9 @@ whitening object-dependent coefficient order.
   and boundary-aware AGC sweeps are complete but remain diagnostic, so the
   publication version still needs final venue-formatted multi-panel assembly and
   a stronger AGC estimator or tighter censored-law validation.
-- A competitive fine-tuned SCGI-network correction exists only at smoke scale;
-  it is not yet part of the dense prompt-range M2 phase diagram.
+- A competitive fine-tuned SCGI-network correction is now present in the dense
+  prompt-range M2 phase diagram, but it is a secondary baseline rather than the
+  dominant correction strategy.
 - Published-curve calibration is limited to figure-level priors: APL intensity
   traces fit `lambda_per_measurement = 0.999897-0.999921`, and OE Fig. 6
   fixed-reference PSNR crosses 30 dB near `beta = 1.90 x 10^-2 mm^-1`.

@@ -523,6 +523,27 @@ matches or exceeds `scgi_proxy` in 14/36 cells. It still does not displace
 `srht_paired + pairwise` as the strict equal-frame winner, so the dense
 network-level phase diagram remains open.
 
+Dense proxy-input trained-network phase scan:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.003,0.01,0.03,0.1,0.3,1.0,3.0,10.0" --sigma-values "0.05,0.10,0.15,0.30,0.50" --reference-periods "2,8,32" --shard i/5 --resume --scgi-checkpoint results\m2_scgi_proxyinput_gain1d_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shardiof5 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard0of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard1of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard2of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard3of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard4of5 --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_merged
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_boundary_audit.py --phase-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_merged --output-dir results\m2_boundary_audit_proxyinput_gain1d_dense_r1
+```
+
+The merged dense scan has 114,750 rows over the full prompt grid
+(`rho=0.001..10`, five `sigma_a` values, 10 objects, 5 seeds). The trained
+`scgi_frozen` correction contributes 13,500 rows and averages 15.92 dB, versus
+15.59 dB for `none`, 15.31 dB for AGC, and 16.18 dB for `scgi_proxy`. Across
+matched equal-frame basis/rho/sigma means, it is +0.329 dB versus `none`,
++0.604 dB versus AGC, and -0.262 dB versus `scgi_proxy`; it beats `none` in
+161/270 cells and matches or exceeds `scgi_proxy` in 118/270 cells.
+`results/m2_boundary_audit_proxyinput_gain1d_dense_r1` confirms full prompt rho
+coverage and keeps `srht_paired + pairwise` as the strict equal-frame winner in
+45/45 cells. Thus the network-level phase diagram is now present and mildly
+competitive against raw/AGC baselines, but it still supports the SRHT-pairwise
+main conclusion.
+
 Latest M3 protocol-statistics run:
 
 ```powershell
@@ -764,11 +785,10 @@ Additional checks:
   diagnostic trace CNRs remain below the APL URED target. A first target-free proxy audit finds
   only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.
-- Scale the new competitive smoke-level trained M2 correction into a dense
-  prompt-range phase diagram if a network-level claim is required. The proxy-input
-  1D gain predictor is now above `none`/AGC and close to `scgi_proxy`, but the
-  direct frozen prompt-range dense baseline still underperforms under
-  cross-domain application. The published-channel figure anchors now exist; raw
+- Treat the new proxy-input 1D trained M2 dense scan as a secondary network-level
+  baseline, not the main winner. It is above `none`/AGC and close to
+  `scgi_proxy`, but `srht_paired + pairwise` still dominates the equal-frame
+  prompt-range map. The published-channel figure anchors now exist; raw
   detector/SLM hardware calibration remains outside the available PDF data.
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: the targeted
   and boundary-aware AGC analyses are now present but diagnostic, SVG sidecars

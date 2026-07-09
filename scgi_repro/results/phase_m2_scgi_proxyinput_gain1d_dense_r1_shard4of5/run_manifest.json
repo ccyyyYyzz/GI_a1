@@ -1,0 +1,40 @@
+{
+  "objects": 10,
+  "outputs": {
+    "best_equal_frame_blind": "best_equal_frame_blind_methods.csv",
+    "flip_boundary": "flip_boundary.csv",
+    "progress": "progress.json",
+    "scan": "phase_scan.csv",
+    "summary": "phase_summary.csv"
+  },
+  "profile": "smoke",
+  "reference_periods": [
+    2,
+    8,
+    32
+  ],
+  "resume": true,
+  "rho_values": [
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0,
+    3.0,
+    10.0
+  ],
+  "scgi_checkpoint": "results\\m2_scgi_proxyinput_gain1d_smoke_r1\\m2_scgi_checkpoint.pt",
+  "scgi_checkpoint_map": null,
+  "scgi_model_kind": null,
+  "seeds": 5,
+  "shard": "4/5",
+  "sigma_values": [
+    0.05,
+    0.1,
+    0.15,
+    0.3,
+    0.5
+  ]
+}

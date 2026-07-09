@@ -287,6 +287,18 @@ It beats `none` in 20/36 equal-frame cells and reaches or beats `scgi_proxy` in
 14/36 cells. It remains below paired `pairwise`, so this is a competitive
 trained blind correction smoke, not yet a final dense phase-diagram result.
 
+Dense proxy-input trained SCGI scan:
+`results/phase_m2_scgi_proxyinput_gain1d_dense_r1_merged/phase_scan.csv` merges
+five monitored local shards into 114,750 rows over the full prompt rho/sigma
+grid. The trained `scgi_frozen` row family averages 15.92 dB, compared with
+15.59 dB for `none`, 15.31 dB for AGC, 16.18 dB for `scgi_proxy`, and 19.38 dB
+for paired `pairwise`. On matched equal-frame basis/rho/sigma means,
+`scgi_frozen` is +0.329 dB versus `none`, +0.604 dB versus AGC, and -0.262 dB
+versus `scgi_proxy`; it beats `none` in 161/270 cells and reaches or beats
+`scgi_proxy` in 118/270 cells. `results/m2_boundary_audit_proxyinput_gain1d_dense_r1`
+confirms `rho=0.001..10` coverage and keeps `srht_paired + pairwise` as the
+strict equal-frame winner in 45/45 cells.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best
@@ -296,10 +308,9 @@ baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
 bases and does not change the best equal-frame map. The high-rho boundary audit
 now provides R2-qualified flip-boundary fits. The proxy-input 1D trained network
-shows that a learned blind correction can become competitive with smooth-gain
-proxy baselines, but it has not changed the best equal-frame map and still needs
-a dense prompt-range run before it can support a network-level phase-diagram
-claim.
+shows that a learned blind correction can become competitive with raw and AGC
+baselines on the dense prompt grid, but it does not change the best equal-frame
+map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 
 ## Rendered Figures
 
