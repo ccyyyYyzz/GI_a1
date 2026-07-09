@@ -1,0 +1,42 @@
+{
+  "sizes": [
+    16,
+    32,
+    64
+  ],
+  "objects": 5,
+  "seeds": 4,
+  "residual_sigmas": [
+    0.01,
+    0.02,
+    0.05,
+    0.1
+  ],
+  "bases": [
+    "random_uniform",
+    "random_binary",
+    "hadamard_paired",
+    "dct_paired",
+    "fourier_fourstep",
+    "srht_paired"
+  ],
+  "phase_dir": "E:/GAN_FCC_WORK/scgi-repro/results/phase_m2_scgi_frozen_dense_r1_merged",
+  "outputs": [
+    "m4_error_scaling.csv",
+    "m4_error_scaling_summary.csv",
+    "m4_error_scaling_fit.csv",
+    "m4_energy_concentration.csv",
+    "m4_energy_concentration_summary.csv",
+    "m4_random_frame_scaling.csv",
+    "m4_random_frame_scaling_summary.csv",
+    "m4_random_frame_scaling_fit.csv",
+    "m4_flip_boundary_fit.csv",
+    "m4_flip_boundary_censored_intervals.csv",
+    "m4_flip_boundary_censored_summary.csv",
+    "m4_flip_boundary_censored_fit.csv",
+    "m4_agc_window_law.csv",
+    "m4_agc_window_law_summary.csv",
+    "m4_agc_window_law_fit.csv",
+    "m4_key_summary.json"
+  ]
+}

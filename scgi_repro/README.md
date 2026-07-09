@@ -82,6 +82,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.
+- `results/theory_m4_paper_r1/`: larger-N M4 fitted-law outputs with bootstrap
+  intervals, censored flip-boundary accounting, and AGC window diagnostics.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.

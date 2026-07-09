@@ -187,24 +187,29 @@ Latest figure manifest: `E:/GAN_FCC_WORK/scgi-repro/results/figures/figure_manif
 
 ## M4 Theory Hooks
 
-Experiment: dedicated compact M4 runner over image sizes 8/16/32, residual gain
-amplitudes, fixed-32x32 random frame counts, and dense M2 flip-boundary outputs.
+Experiment: dedicated M4 runner over image sizes 16/32/64, residual gain
+amplitudes, fixed-32x32 random frame counts, dense M2 flip-boundary outputs, AGC
+window fractions, and bootstrap uncertainty intervals.
 
 Prediction: residual gain reconstruction error should scale roughly
 quadratically with residual gain amplitude; random bases should average residual
 errors down as frame count increases; SRHT should spread coefficient energy
 similarly to random bases.
 
-Result: output written to `results/theory_m4_compact`. The residual-gain
-`sigma_delta` exponent is 1.98-2.00 across bases with minimum R2 0.991. Fixed-P
-random frame scaling gives `num_frames` exponents about -0.71/-0.72 for
-random binary/uniform bases with R2 > 0.998. At 1024 pixels, DCT/Fourier/Hadamard
-top-5% energy is 0.81-0.86, while random/SRHT is about 0.28.
+Result: compact output is written to `results/theory_m4_compact`; paper-r1
+output is written to `results/theory_m4_paper_r1`. The residual-gain
+`sigma_delta` exponent is 2.001-2.003 across bases with minimum R2 0.99992.
+Fixed-P random frame scaling gives `num_frames` exponents about -0.71/-0.72 for
+random binary/uniform bases with R2 > 0.998 and bootstrap intervals excluding
+zero. At 4096 pixels, DCT/Fourier/Hadamard top-5% energy is 0.88-0.92, while
+random/SRHT is about 0.28. Censored flip-boundary tables now retain
+left-censored and not-reached cells. AGC best-window fits are present but weak
+for random/SRHT bases, so they are diagnostic rather than a final law.
 
-Supports/refutes: supports H2/H4 as compact fitted-law evidence. It does not yet
-complete the paper-grade theory requirement because flip-boundary fits are still
-mostly censored or insufficiently sampled, and bootstrap uncertainty intervals
-and nonideal calibration are still open.
+Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
+toward paper-grade closure. It does not yet complete M4 because the AGC
+bias-variance law needs analytical derivation, flip boundaries need a denser rho
+grid, and published-channel calibration is still open.
 
 ## Nonideal Digital Twin
 

@@ -69,3 +69,15 @@ simulator, but it also means the original "random bases can blind-correct while
 Hadamard cannot" story needs sharper wording: the best blind method in this
 implementation is a randomized orthogonal paired basis, not an i.i.d. random
 correlation basis.
+
+## 2026-07-09 AGC Window Law Is Weakly Parametric
+
+The paper-r1 M4 run added an empirical best-window AGC law over rho, sigma, and
+window fractions. The output is useful as a diagnostic table, but the fitted
+power law is weak for the bases where it matters most: random binary has
+R2 about 0.55, random uniform about 0.44, and SRHT about 0.29.
+
+This means the AGC bias-variance behavior is not captured well by a simple
+`best_window ~ rho^a sigma_a^b` fit on the current grid. Treat AGC window
+selection as a protocol parameter or derive a richer bias-variance model before
+using it as a theoretical claim.

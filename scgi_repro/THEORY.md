@@ -97,28 +97,32 @@ a paper-ready theory section:
   AGC window length.
 - `mechanism_m1_error_scaling_fit.csv` fits residual-gain error propagation.
 
-The dedicated M4 runner `run_theory_m4.py` now adds compact fitted-law outputs
-under `results/theory_m4_compact`:
+The dedicated M4 runner `run_theory_m4.py` now adds fitted-law outputs under
+`results/theory_m4_compact` and a stronger paper-r1 run under
+`results/theory_m4_paper_r1`:
 
-- `m4_error_scaling_fit.csv` sweeps image sizes 8/16/32 and residual gain
-  amplitudes. The fitted residual-error exponent for `sigma_delta` is 1.98-2.00
-  across bases with minimum R2 0.991, matching the expected quadratic dependence
-  on residual gain amplitude.
+- `m4_error_scaling_fit.csv` sweeps image sizes up to 64x64 in the paper-r1 run.
+  The fitted residual-error exponent for `sigma_delta` is 2.001-2.003 across
+  bases with minimum R2 0.99992; bootstrap intervals tightly bracket the
+  expected quadratic dependence.
 - `m4_random_frame_scaling_fit.csv` fixes the object size at 32x32 and varies
   random measurement frames. Random uniform/binary bases give
   `delta_rel_mse ~ sigma_delta^1.995 * num_frames^-0.71` with R2 > 0.998. This
   supports the random-basis averaging mechanism, though the exponent is a compact
   empirical fit rather than an asymptotic theorem.
-- `m4_energy_concentration_summary.csv` measures H4 directly. At 1024 pixels,
-  the top 5% of coefficients contain about 0.81-0.86 of DCT/Fourier/Hadamard
+- `m4_energy_concentration_summary.csv` measures H4 directly. At 4096 pixels,
+  the top 5% of coefficients contain about 0.88-0.92 of DCT/Fourier/Hadamard
   energy, but only about 0.28 for random/SRHT bases; SRHT's effective-rank
-  fraction is about 0.487, close to random bases.
-- `m4_flip_boundary_fit.csv` fits only observed, non-censored flip-boundary
-  points. Most challenger/correction pairs remain insufficiently sampled; the
-  successful fits are therefore diagnostic, not yet paper-grade phase-boundary
-  laws.
+  fraction is about 0.482, close to random bases.
+- `m4_flip_boundary_fit.csv` still fits only observed, non-censored
+  flip-boundary points, while `m4_flip_boundary_censored_intervals.csv` and
+  summaries retain left-censored and not-reached cells instead of discarding
+  them. This is a censored-aware accounting layer, not yet a full survival-style
+  boundary estimator.
+- `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The current
+  random/SRHT fits have low-to-moderate R2, so the AGC law should be treated as
+  a diagnostic table pending a cleaner bias-variance derivation.
 
-Remaining theory work before publication: extend the N sweep to at least
-16/32/64 with more seeds, add bootstrap confidence intervals, model AGC window
-bias-variance explicitly, and fit censored flip boundaries rather than ignoring
-left-censored/not-reached cells.
+Remaining theory work before publication: derive the AGC window bias-variance
+law analytically, run a denser rho grid for flip boundaries, and calibrate the
+channel model from published intensity traces.

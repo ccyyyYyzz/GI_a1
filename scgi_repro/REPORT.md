@@ -323,10 +323,11 @@ Outputs:
 - `srht_ablation.csv` (3200 rows)
 - `srht_ablation_summary.csv` (64 rows)
 
-Latest M4 compact theory run:
+Latest M4 theory runs:
 
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_merged --output-dir results\theory_m4_paper_r1
 ```
 
 Outputs:
@@ -337,22 +338,28 @@ Outputs:
   `m4_random_frame_scaling_fit.csv`
 - `m4_energy_concentration.csv`, `m4_energy_concentration_summary.csv`
 - `m4_flip_boundary_fit.csv`
+- `m4_flip_boundary_censored_intervals.csv`,
+  `m4_flip_boundary_censored_summary.csv`,
+  `m4_flip_boundary_censored_fit.csv`
+- `m4_agc_window_law.csv`, `m4_agc_window_law_summary.csv`,
+  `m4_agc_window_law_fit.csv`
 - `m4_key_summary.json`
 
 Key M4 checks:
 
 | Check | Result |
 |---|---|
-| residual gain law | `sigma_delta` exponent 1.98-2.00 across bases, min R2 0.991 |
-| fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998 |
-| H4 energy concentration at 1024 pixels | DCT/Fourier/Hadamard top-5% energy 0.81-0.86; random/SRHT about 0.28 |
-| flip-boundary fits | 4 observed-only fits; 28 challenger/correction pairs still insufficiently sampled |
+| residual gain law, 16/32/64 | `sigma_delta` exponent 2.001-2.003 across bases, min R2 0.99992; bootstrap 95% CIs tightly bracket 2 |
+| fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998; bootstrap CIs roughly [-0.75,-0.70] and [-0.77,-0.66] |
+| H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
+| flip-boundary fits | 4 observed-only fits; censored interval tables now retain 22 left-censored and 144 not-reached dense-frozen boundary entries |
+| AGC window law | best-window scaling is logged, but fits are weak for random/SRHT bases (R2 0.29-0.55), so this remains diagnostic |
 
-Interpretation: M4 now has an executable compact N/frame-sweep and fitted-law
-evidence supporting quadratic residual-gain error and random/SRHT energy
-spreading. It is still not a publication-grade theory closure because the large
-16/32/64 sweep, bootstrap intervals, AGC window bias-variance law, and censored
-flip-boundary model remain open.
+Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
+the main log-linear fits, censored-aware flip-boundary interval tables, and an
+AGC window-law diagnostic. It still needs a cleaner analytical AGC
+bias-variance derivation and a denser rho grid if the flip-boundary law itself
+must be fit with high confidence.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -440,6 +447,8 @@ Additional checks:
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
 - M4 compact theory runner writes residual-error, random-frame, energy
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
+- M4 paper-r1 theory runner writes larger-N, bootstrap, censored-boundary, and
+  AGC-window diagnostics under `results/theory_m4_paper_r1`.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
   comparison tables under `results/nonideal_m2_compact` and
   `results/nonideal_m2_full_r1_merged`.
@@ -453,8 +462,8 @@ Additional checks:
   diagram is required. The direct frozen dense baseline is implemented but
   underperforms under cross-domain application. Add published-channel/non-ideal
   detector calibration.
-- Extend M4 from compact fitted-law hooks to paper-grade theory: larger N sweep,
-  bootstrap intervals, AGC window law, censored flip-boundary fitting, and
-  non-ideal detector/SLM calibration.
+- Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC
+  bias-variance derivation, denser flip-boundary grid, and published-channel
+  calibration.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

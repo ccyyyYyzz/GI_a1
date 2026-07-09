@@ -54,10 +54,11 @@ Channels
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty, although `run_theory_m4.py` now provides observed-only
   compact fits as a starting point.
-- M4 compact theory hooks support quadratic residual-gain scaling and
-  random/SRHT coefficient spreading, but the publication version still needs a
-  larger N sweep, bootstrap confidence intervals, AGC window law, and censored
-  flip-boundary treatment.
+- M4 paper-r1 theory hooks now support quadratic residual-gain scaling with
+  bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
+  pixels, censored flip-boundary accounting, and AGC window diagnostics. The
+  publication version still needs a cleaner analytical AGC law and denser
+  flip-boundary grid.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the implemented frozen dense baseline underperforms.
 - Published-curve calibration is still missing: APL intensity traces and OE
