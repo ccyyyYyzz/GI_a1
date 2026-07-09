@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -62,6 +63,7 @@ def load_frozen_scgi_corrector(
     model = make_scgi_model(model_cfg).to(device)
     payload = torch.load(resolved, map_location=device)
     state_dict = payload["model_state_dict"] if isinstance(payload, dict) and "model_state_dict" in payload else payload
+    metadata = payload.get("corrector_metadata", {}) if isinstance(payload, dict) else {}
     model.load_state_dict(state_dict)
     model.eval()
 
@@ -69,10 +71,37 @@ def load_frozen_scgi_corrector(
         source_device = values.device
         source_dtype = values.dtype
         rows = values.detach().reshape(1, -1).to(device=device, dtype=torch.float32)
+        if metadata.get("input_normalize") == "row_max":
+            rows = rows / rows.amax(dim=1, keepdim=True).clamp_min(1.0e-8)
+        elif metadata.get("input_normalize") == "row_absmax":
+            rows = rows / rows.abs().amax(dim=1, keepdim=True).clamp_min(1.0e-8)
         corrected = correct_measurements_padded(model, rows).reshape(-1)
         return corrected.to(device=source_device, dtype=source_dtype)
 
     return correct
+
+
+def load_frozen_scgi_corrector_map(
+    root: Path,
+    cfg: dict,
+    checkpoint_map: Path | None,
+):
+    if checkpoint_map is None:
+        return {}
+    resolved = checkpoint_map if checkpoint_map.is_absolute() else root / checkpoint_map
+    if not resolved.exists():
+        raise FileNotFoundError(f"SCGI checkpoint map not found: {resolved}")
+    entries = json.loads(resolved.read_text(encoding="utf-8-sig"))
+    correctors = {}
+    for basis_name, entry in entries.items():
+        if isinstance(entry, str):
+            checkpoint = Path(entry)
+            model_kind = None
+        else:
+            checkpoint = Path(entry["checkpoint"])
+            model_kind = entry.get("model_kind")
+        correctors[str(basis_name)] = load_frozen_scgi_corrector(root, cfg, checkpoint, model_kind)
+    return correctors
 
 
 def main() -> None:
@@ -83,6 +112,7 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=Path("results/phase_m2"))
     parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
     parser.add_argument("--scgi-checkpoint", type=Path, default=None, help="Optional frozen SCGI checkpoint for scgi_frozen correction.")
+    parser.add_argument("--scgi-checkpoint-map", type=Path, default=None, help="Optional JSON map from basis name to basis-specific SCGI checkpoint.")
     parser.add_argument("--scgi-model-kind", default=None, help="Model kind to use when loading --scgi-checkpoint.")
     parser.add_argument("--rho-values", default="", help="Optional override for mechanism.rho_values, e.g. '0.001 0.01 0.1 1 10'.")
     parser.add_argument("--sigma-values", default="", help="Optional override for mechanism.sigma_a_values, e.g. '0.05 0.1 0.3'.")
@@ -93,6 +123,7 @@ def main() -> None:
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
     scgi_corrector = load_frozen_scgi_corrector(root, cfg, args.scgi_checkpoint, args.scgi_model_kind)
+    scgi_corrector_map = load_frozen_scgi_corrector_map(root, cfg, args.scgi_checkpoint_map)
     shard_index, shard_count = parse_shard(args.shard)
     mech = cfg.get("mechanism", {})
     h = int(mech.get("image_size", 32))
@@ -118,7 +149,8 @@ def main() -> None:
     for basis_name, kwargs in basis_specs:
         basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
         corrections = ["none", "oracle", "agc", "scgi_proxy"]
-        if scgi_corrector is not None:
+        basis_scgi_corrector = scgi_corrector_map.get(basis.name, scgi_corrector)
+        if basis_scgi_corrector is not None:
             corrections.append("scgi_frozen")
         corrections += [f"reference_k{k}" for k in reference_periods]
         if basis.paired:
@@ -155,7 +187,7 @@ def main() -> None:
                                 true_gains=channel.gains,
                                 correction=correction,
                                 agc_window=max(9, int(0.05 * frame_budget)),
-                                scgi_corrector=scgi_corrector,
+                                scgi_corrector=basis_scgi_corrector,
                             )
                             reference_period = int(correction.rsplit("k", 1)[1]) if correction.startswith("reference_k") else 0
                             reference_frames = reference_anchor_count(basis.num_frames, reference_period) if reference_period else 0

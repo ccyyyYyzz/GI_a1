@@ -29,6 +29,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --scgi-checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --scgi-model-kind exponential_residual_unet --output-dir results\phase_m2_scgi_frozen_smoke
+& $py run_m2_scgi_train.py --profile smoke --model-kind gain_unet --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 20 --output-dir results\m2_scgi_finetune_gain_smoke_r1
+& $py run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint-map results\m2_scgi_basis_specific_smoke_r1\checkpoint_map.json --output-dir results\phase_m2_scgi_basis_specific_heldout_smoke_r1 --no-findings
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
@@ -113,6 +115,17 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   the returned SCGI checkpoint and explicit `scgi_frozen` correction.
 - `results/phase_m2_scgi_frozen_dense_r1_merged/`: 89,250-row dense M2 run with
   explicit `scgi_frozen` correction and all five Colab shard labels present.
+- `results/m2_scgi_finetune_smoke_r1/` and
+  `results/m2_scgi_finetune_gain_smoke_r1/`: direct-output and single-checkpoint
+  supervised M2 SCGI smoke training runs.
+- `results/m2_scgi_basis_specific_smoke_r1/`: basis-routed `gain_unet`
+  checkpoints plus `checkpoint_map.json` for random, Hadamard, and SRHT bases.
+- `results/phase_m2_scgi_finetune_smoke_r1/` and
+  `results/phase_m2_scgi_finetune_gain_smoke_r1/`: evaluations of the
+  direct-output and single-checkpoint M2 SCGI fine-tuning smokes.
+- `results/phase_m2_scgi_basis_specific_smoke_r1/` and
+  `results/phase_m2_scgi_basis_specific_heldout_smoke_r1/`: in-distribution and
+  held-out evaluations of the basis-specific fine-tuned SCGI smoke.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.

@@ -239,6 +239,19 @@ selects `srht_paired + pairwise` as the strict equal-frame non-oracle winner in
 competitive: `scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus
 `scgi_proxy`, and -1.167 dB versus paired-basis `pairwise`.
 
+Fine-tuned SCGI-network smoke:
+`run_m2_scgi_train.py` trains a supervised M2-specific corrector on simulated
+observed/ideal frame sequences, and `run_phase_m2.py` now supports checkpoint
+metadata plus a basis-name checkpoint map. A direct-output U-Net smoke is
+strongly negative: mean `scgi_frozen` PSNR is 11.08 dB, or -6.99 dB versus
+raw `none`. A single `gain_unet` checkpoint is less destructive but still weak:
+14.71 dB mean and -3.37 dB versus `none`. The basis-specific `gain_unet` smoke
+shows local signal on a held-out rho/sigma/object grid, where
+`srht_paired + scgi_frozen` wins 2/6 strict equal-frame cells at `rho=0.3`.
+Overall, however, it remains below non-network baselines on matched rows:
+-0.90 dB versus `none`, -1.69 dB versus `scgi_proxy`, and -2.48 dB versus
+paired-basis `pairwise`.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best
@@ -248,8 +261,8 @@ baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
 bases and does not change the best equal-frame map. The high-rho boundary audit
 now provides R2-qualified flip-boundary fits, but the frozen-network results
-show that directly reusing the SCGI checkpoint is a real but weak cross-domain
-baseline, not a replacement for basis-aware retraining or fine-tuning.
+and fine-tuned smoke results show that the current network paths are real but
+weak baselines, not yet a competitive basis-aware SCGI phase diagram.
 
 ## Rendered Figures
 

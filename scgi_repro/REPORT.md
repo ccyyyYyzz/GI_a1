@@ -452,6 +452,27 @@ winner in 45/45 cells. The frozen network flattens near 10.6-11.8 dB at
 `rho=3,10`, so the added high-rho coverage reinforces the direct-transfer
 negative result rather than changing the winner map.
 
+M2 fine-tuned SCGI-network smoke:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_scgi_train.py --profile smoke --model-kind gain_unet --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 20 --output-dir results\m2_scgi_finetune_gain_smoke_r1
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint-map results\m2_scgi_basis_specific_smoke_r1\checkpoint_map.json --output-dir results\phase_m2_scgi_basis_specific_heldout_smoke_r1 --no-findings
+```
+
+`run_m2_scgi_train.py` adds a supervised M2-specific SCGI training path, and
+`run_phase_m2.py` now supports checkpoint metadata plus a basis-name checkpoint
+map. A direct-output U-Net smoke is strongly negative: mean `scgi_frozen` PSNR is
+11.08 dB, or -6.99 dB versus raw `none`. A single `gain_unet` checkpoint is less
+destructive but still weak: 14.71 dB mean and -3.37 dB versus `none`. The
+basis-specific `gain_unet` smoke is the first network result with local signal:
+on the in-distribution small grid, mean `scgi_frozen` PSNR rises to 16.34 dB and
+`srht_paired + scgi_frozen` wins 2/6 strict equal-frame cells. On the held-out
+grid, it again wins 2/6 cells at `rho=0.3`, but overall it remains below the
+non-network baselines (-0.90 dB versus `none`, -1.03 dB versus `agc`, -1.69 dB
+versus `scgi_proxy`, and -2.48 dB versus paired-basis `pairwise` on matched
+rows). This is a useful routing/training prototype, not yet a competitive
+fine-tuned M2 phase diagram.
+
 Latest M3 protocol-statistics run:
 
 ```powershell

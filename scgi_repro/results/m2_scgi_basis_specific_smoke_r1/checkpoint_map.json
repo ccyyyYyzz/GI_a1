@@ -1,0 +1,14 @@
+﻿{
+    "random_uniform":  {
+                           "checkpoint":  "results/m2_scgi_basis_specific_smoke_r1/random_uniform/m2_scgi_checkpoint.pt",
+                           "model_kind":  "gain_unet"
+                       },
+    "hadamard_paired":  {
+                            "checkpoint":  "results/m2_scgi_basis_specific_smoke_r1/hadamard_paired/m2_scgi_checkpoint.pt",
+                            "model_kind":  "gain_unet"
+                        },
+    "srht_paired":  {
+                        "checkpoint":  "results/m2_scgi_basis_specific_smoke_r1/srht_paired/m2_scgi_checkpoint.pt",
+                        "model_kind":  "gain_unet"
+                    }
+}
