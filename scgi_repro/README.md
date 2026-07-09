@@ -36,6 +36,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 & $py run_m4_agc_targeted.py --output-dir results\theory_m4_agc_targeted_r1
+& $py run_m4_agc_boundary_aware.py --output-dir results\theory_m4_agc_boundary_aware_r1
 & $py run_make_figures.py --output-dir results\figures
 & $py run_make_paper_figures.py --output-dir results\paper_figures_r1
 & $py -m unittest discover tests -v
@@ -170,6 +171,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `THEORY.md` and `PAPER_OUTLINE.md` caption drafts.
 - `results/theory_m4_agc_targeted_r1/`: targeted AGC window-law validation with
   dense window grid, saturation diagnostics, and fit tables.
+- `results/theory_m4_agc_boundary_aware_r1/`: censored AGC window-selection
+  analysis with four basis fits and 180 interval-satisfaction rows.
 - `results/paper_figures_r1/`: paper-facing M2/M4 winner maps, boundary-fit
   tables, fitted-law plots, captions, and `paper_figure_manifest.csv`.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan

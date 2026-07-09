@@ -312,7 +312,10 @@ extends rho coverage to 10 and yields five boundary fits with `R2 >= 0.9`.
 AGC best-window fits are present but weak for random/SRHT bases (`R2=0.29-0.55`).
 The targeted AGC rerun in `results/theory_m4_agc_targeted_r1` expands the window
 grid to 86,400 raw rows and improves fit R2 to 0.71-0.82, but 42-56% of
-best-window cells still select a grid boundary. The AGC law is therefore
+best-window cells still select a grid boundary. The boundary-aware rerun in
+`results/theory_m4_agc_boundary_aware_r1` treats those boundary hits as
+upper-bounded intervals and reaches interval satisfaction 0.80 for random
+binary/uniform, 0.64 for SRHT, and 0.40 for Hadamard. The AGC law is therefore
 diagnostic rather than final. `results/paper_figures_r1` now renders the M2/M4
 paper-facing figure draft set from these CSVs. `THEORY.md` contains a candidate
 AGC bias-variance law and `PAPER_OUTLINE.md` contains draft captions for the
@@ -321,10 +324,11 @@ eight main figures.
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
 toward paper-grade closure. The targeted AGC sweep is now complete and shows the
 simple window law is still too boundary-sensitive for a final quantitative
-claim. M4 remains short of full publication closure because the current paper
-figures are PNG drafts rather than final venue-formatted vector panels, and the
-figure-level published-channel priors still need to be tied to a
-hardware-calibrated nonideal model.
+claim; the censored model is a useful interpretation layer but not a replacement
+for a stronger AGC estimator. M4 remains short of full publication closure
+because the current paper figures are PNG drafts rather than final
+venue-formatted vector panels, and the figure-level published-channel priors
+still need to be tied to a hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 

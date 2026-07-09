@@ -281,6 +281,34 @@ def make_m4_paper_figures(root: Path, out_dir: Path) -> list[dict[str, str]]:
             }
         )
 
+    boundary_dir = root / "results" / "theory_m4_agc_boundary_aware_r1"
+    boundary_fit = boundary_dir / "m4_agc_boundary_aware_fit.csv"
+    if boundary_fit.exists():
+        boundary = _read(boundary_fit)
+        out = save_metrics_table(
+            out_dir / "m4_agc_boundary_aware_fit_table.png",
+            boundary[
+                [
+                    "basis",
+                    "n_exact",
+                    "n_upper_bounded",
+                    "rho_exponent",
+                    "sigma_a_exponent",
+                    "hinge_rmse_log10",
+                    "interval_satisfaction_frac",
+                ]
+            ],
+            title="M4 boundary-aware AGC window fits",
+            max_rows=8,
+        )
+        manifest.append(
+            {
+                "figure": out.name,
+                "source": str(boundary_fit),
+                "caption": "Boundary-aware AGC fits treat lower-grid selections as bounded optima; random bases reach 0.80 interval satisfaction, while Hadamard remains weak.",
+            }
+        )
+
     summary_path = theory_dir / "m4_key_summary.json"
     if summary_path.exists():
         summary = json.loads(summary_path.read_text(encoding="utf-8"))

@@ -101,7 +101,13 @@ targeted follow-up in `results/theory_m4_agc_targeted_r1` widens and densifies
 the window grid, but 42-56% of best-window cells still sit on a boundary and
 the fitted R2 values remain 0.71-0.82. This supports the existence of a
 bias-variance tension but not a publication-ready scaling law for the current
-AGC estimator.
+AGC estimator. The boundary-aware follow-up in
+`results/theory_m4_agc_boundary_aware_r1` treats lower-grid selections as
+upper-bounded optimum intervals rather than exact observations. It gives interval-satisfaction
+fractions of 0.80 for random binary/uniform bases, 0.64 for SRHT, and 0.40 for
+Hadamard using exact-point tolerance and bounded-point hinge inequalities, so
+censoring helps interpret random-basis AGC but still argues for a diagnostic
+rather than theorem-level claim.
 
 ## H4: Energy Concentration
 
@@ -168,9 +174,13 @@ high-rho rerun `results/theory_m4_paper_r2_highrho`:
   best-window selections remain boundary-heavy (`boundary_frac = 0.42-0.56`).
   The candidate bias-variance law should therefore remain an explanatory sketch,
   not a claimed quantitative theorem.
+- `results/theory_m4_agc_boundary_aware_r1` fits a censored hinge model to the
+  targeted best-window table. It writes four basis-level fits and 180 interval
+  rows; interval satisfaction is strongest for random binary/uniform bases
+  (`0.80`), moderate for SRHT (`0.64`), and weak for Hadamard (`0.40`).
 
-Remaining theory work before publication: either redesign the AGC estimator or
-derive a boundary-aware/censored window-selection model, convert the high-rho
-boundary diagnostics into final vector figures, and connect the published
-figure-level channel anchors to a hardware-calibrated nonideal model if raw
-detector/SLM logs become available.
+Remaining theory work before publication: redesign or further validate the AGC
+estimator beyond the current censored diagnostic, convert the high-rho boundary
+diagnostics into final vector figures, and connect the published figure-level
+channel anchors to a hardware-calibrated nonideal model if raw detector/SLM logs
+become available.

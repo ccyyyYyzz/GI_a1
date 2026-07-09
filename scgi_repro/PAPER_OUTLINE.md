@@ -50,8 +50,11 @@ over channel drift. The candidate law in `THEORY.md` predicts a competition
 between `CV_B^2/W` variance and a drift-bias term proportional to
 `sigma_a^2(rho W)^nu`. The targeted validation in
 `results/theory_m4_agc_targeted_r1` improves AGC best-window fit R2 to 0.71-0.82
-but still has 42-56% boundary-selected cells, so Figure 3 should present the law
-as an explanatory diagnostic rather than a final theorem.
+but still has 42-56% boundary-selected cells. The boundary-aware fit in
+`results/theory_m4_agc_boundary_aware_r1` treats those hits as upper-bounded
+intervals and reaches 0.80 interval satisfaction for random bases, 0.64 for
+SRHT, and 0.40 for Hadamard, so Figure 3 should present the law as an
+explanatory diagnostic rather than a final theorem.
 
 **Figure 4. Residual gain errors propagate coherently through orthogonal
 inversion but average through random measurements.** M4 residual-error sweeps
@@ -129,10 +132,10 @@ whitening object-dependent coefficient order.
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
   pixels, censored flip-boundary accounting, and AGC window diagnostics.
   `results/paper_figures_r1` now renders the current M2/M4 figure draft set and
-  manifest. The targeted AGC validation sweep is complete but remains
-  boundary-sensitive, so the publication version still needs final
-  venue-formatted vector polishing and either a better AGC estimator or a
-  boundary-aware window-selection model.
+  manifest. The targeted and boundary-aware AGC sweeps are complete but remain
+  diagnostic, so the publication version still needs final venue-formatted
+  vector polishing and a stronger AGC estimator or tighter censored-law
+  validation.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the frozen dense baseline, current fine-tuned smokes, and
   true-gain predictor smokes underperform overall.

@@ -509,6 +509,7 @@ Latest M4 theory runs:
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_merged --output-dir results\theory_m4_paper_r1
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_highrho_merged --output-dir results\theory_m4_paper_r2_highrho
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m4_agc_boundary_aware.py --output-dir results\theory_m4_agc_boundary_aware_r1
 ```
 
 Outputs:
@@ -525,6 +526,9 @@ Outputs:
 - `m4_agc_window_law.csv`, `m4_agc_window_law_summary.csv`,
   `m4_agc_window_law_fit.csv`
 - `m4_key_summary.json`
+- `results/theory_m4_agc_boundary_aware_r1/m4_agc_boundary_aware_fit.csv`,
+  `m4_agc_boundary_aware_intervals.csv`, and
+  `m4_agc_boundary_aware_summary.json`
 
 Key M4 checks:
 
@@ -535,7 +539,7 @@ Key M4 checks:
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
 | flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has five R2-qualified fits |
 | high-rho M2 boundary audit | prompt rho range now reaches 10; five log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner is SRHT/pairwise in 45/45 cells |
-| AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; targeted validation improves fits to R2 0.71-0.82 but still has 42-56% boundary-selected best windows, so this remains diagnostic |
+| AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; targeted validation improves fits to R2 0.71-0.82 but still has 42-56% boundary-selected best windows; the censored follow-up reaches interval satisfaction 0.80 for random bases, 0.64 for SRHT, and 0.40 for Hadamard, so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
 the main log-linear fits, censored-aware flip-boundary interval tables, and an
@@ -549,9 +553,12 @@ random-frame scaling, energy concentration, and AGC-window diagnostics. The
 targeted AGC validation in `results/theory_m4_agc_targeted_r1` adds 86,400 raw
 rows, a denser window grid, best-window saturation statistics, and fit tables.
 It improves fit R2 to 0.71-0.82 but still leaves 42-56% of best-window cells at
-the grid boundary, so the candidate AGC law remains diagnostic. The remaining
-publication work is final venue-formatted vector panel polishing plus either a
-better AGC estimator or a boundary-aware window-selection model.
+the grid boundary. `results/theory_m4_agc_boundary_aware_r1` then treats those
+boundary selections as censored intervals and writes four basis fits plus 180
+interval rows; random binary/uniform reach 0.80 interval satisfaction, SRHT 0.64,
+and Hadamard 0.40. The candidate AGC law therefore remains diagnostic. The
+remaining publication work is final venue-formatted vector panel polishing plus
+a stronger AGC estimator or tighter censored-law validation.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -690,6 +697,9 @@ Additional checks:
   `results/phase_m2_scgi_frozen_dense_r1_highrho_merged` and writes
   `results/theory_m4_paper_r2_highrho`; `THEORY.md` and `PAPER_OUTLINE.md`
   now contain the AGC-law sketch and figure-caption drafts.
+- M4 targeted and boundary-aware AGC runners write dense-window and censored
+  interval diagnostics under `results/theory_m4_agc_targeted_r1` and
+  `results/theory_m4_agc_boundary_aware_r1`.
 - Paper-facing M2/M4 figures are rendered under `results/paper_figures_r1` with
   `paper_figure_manifest.csv`.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
@@ -715,9 +725,9 @@ Additional checks:
   implemented but underperforms under cross-domain application. The published-channel figure
   anchors now exist; raw detector/SLM hardware calibration remains outside the
   available PDF data.
-- Finish M4 from paper-r2 fitted-law hooks to final paper assets: targeted AGC
-  validation beyond the current weak window-law fits and publication-quality
-  vector boundary figures.
+- Finish M4 from paper-r2 fitted-law hooks to final paper assets: the targeted
+  and boundary-aware AGC analyses are now present but diagnostic, and the paper
+  still needs publication-quality vector boundary figures.
 - Configure an authenticated mounted persistence target before future long
   Colab runs if mid-run copies are required. The code path now supports
   `PERSIST_ROOT`, but it does not perform Google Drive authorization or GitHub
