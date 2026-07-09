@@ -32,10 +32,10 @@ locally. A Colab L4 160-epoch debug run reaches SCGI CNR 2.147 and URED CNR
 validation KS pass rate.
 
 Colab full-profile probes: a 128x128, 16384-pattern, 20-epoch run completes on
-L4 in 117 s, and a 100-epoch SCGI-only run completes in 456 s. Both remain far
-from reproduced full results: the 100-epoch run has SCGI CNR 0.127 and
-validation SCGI KS pass rate 0.176. The failure is therefore not just a short
-epoch-count issue; the full-profile loss/data scaling needs redesign.
+L4 in 117 s, and a 100-epoch SCGI-only run completes in 456 s. The original
+100-epoch gain U-Net had SCGI CNR 0.127. After widening the gain range, the same
+full 100-epoch setup reaches SCGI CNR 1.171 and validation MSE 4.21e-4, a large
+improvement but still below the analytic/static CNR 2.535 bound.
 
 Gamma sweep: Colab debug 60-epoch sweep over gamma values `{0, 0.1, 1, 10}`
 finds the best SCGI CNR at gamma=1.0 (2.242), but all four gamma settings fail
@@ -43,9 +43,9 @@ the strict KS gate.
 
 Physics-informed model check: `exponential_residual_unet` adds an exponential
 gain fit before a small residual U-Net. A smoke 2-epoch run reaches SCGI CNR
-3.059, validation SCGI KS pass rate 1.0, and validation MSE 2.69e-6, matching
-the analytic exponential control. This is the preferred next full-profile
-repair path rather than adding more epochs to the unconstrained gain U-Net.
+3.059, validation SCGI KS pass rate 1.0, and validation MSE 2.69e-6. A full
+Colab 2-epoch run reaches SCGI CNR 2.535, validation SCGI KS pass rate 1.0, and
+validation MSE 1.83e-8, matching the analytic exponential/static control.
 
 ## Stage 3 Held-Out Targets
 
@@ -62,6 +62,13 @@ SCGI improves CNR over dynamic DGI for all four held-out objects. In the Colab
 2.77 for `letter_L`, and 2.63 for `ring`.
 
 Supports/refutes: supports directionality but not prompt-level Stage 3 thresholds.
+
+Full-profile exp-residual Stage 3: using the Colab full checkpoint, SCGI matches
+analytic/static CNR on all held-out targets (`letter_A` 3.3095, `letter_L`
+3.5481, `ring` 2.9819, `stripe_target` 2.4919). The all-target CNR>=3 gate still
+fails because the static upper bound is below 3 for `ring` and `stripe_target`;
+the static PSNR>20 gate also fails because static DGI PSNR is only about 7.46-8.76
+dB in this full held-out setup.
 
 ## Stage 1 Diagnostics
 

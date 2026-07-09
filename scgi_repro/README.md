@@ -58,6 +58,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   lambda distribution diagnostics.
 - `results/stage_3/smoke/`: held-out target reconstructions and Stage 3
   acceptance checks using the saved Stage 0 checkpoint.
+- `results/colab_imports/pro2_full_exp_residual_e2_r1/`: full-profile
+  physics-informed SCGI candidate with returned checkpoint and artifacts.
+- `results/stage_3_exp_residual_colab_full/`: held-out full-profile Stage 3
+  validation using that checkpoint.
 - `results/mechanism_m1_basis_expanded_quick/`: compact M1 output with random,
   Hadamard, DCT, Fourier, and SRHT bases.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with

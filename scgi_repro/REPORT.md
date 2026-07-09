@@ -117,6 +117,8 @@ Colab L4 accelerated checks via GitHub transfer:
 | `pro2_full_e20_probe` | 117.2 s | full 128x128, 16384 patterns, 20-epoch feasibility probe |
 | `pro1_gamma_debug_e60_foreground` | 68.9 s | debug gamma sweep, 60 epochs |
 | `pro2_full_e100_skip_ured` | 456.3 s | full 128x128, 16384 patterns, 100 epochs, SCGI only |
+| `pro2_full_e100_gainmin_branch_r4` | 467.9 s | full 100-epoch gain-U-Net after gain-range fix |
+| `pro2_full_exp_residual_e2_r1` | 43.6 s | full 2-epoch physics-informed exponential-residual candidate |
 
 Colab outputs are stored under:
 
@@ -124,6 +126,8 @@ Colab outputs are stored under:
 - `results/colab_imports/pro2_full_e20_probe`
 - `results/colab_imports/pro1_gamma_debug_e60_foreground`
 - `results/colab_imports/pro2_full_e100_skip_ured_foreground`
+- `results/colab_imports/pro2_full_e100_gainmin_branch_r4`
+- `results/colab_imports/pro2_full_exp_residual_e2_r1`
 
 Key Colab SCGI metrics:
 
@@ -132,6 +136,8 @@ Key Colab SCGI metrics:
 | debug 160 epoch | 0.1416 | 2.1466 | 4.4670 | 0.75 | URED clears CNR 3; SCGI still below prompt threshold |
 | full 20 epoch probe | 0.0184 | 0.1280 | 0.1280 | 0.00 | proves full profile runs on L4 but is undertrained |
 | full 100 epoch, skip URED | 0.0184 | 0.1273 | 0.1273 | 0.176 | still not converged; loss/profile needs redesign |
+| full 100 epoch, gain-range fix | 0.0184 | 1.1705 | 1.1705 | 0.054 | gain range fix helps substantially but misses analytic/static CNR 2.535 |
+| full 2 epoch, exp-residual | 0.0184 | 2.5353 | 2.5353 | 1.00 | matches analytic/static upper bound; paper CNR/PSNR gates exceed this DGI setup's static bound |
 
 Gamma sweep on Colab debug 60 epochs:
 
@@ -154,9 +160,11 @@ Physics-informed follow-up:
 This optional model first fits the one-dimensional exponential gain implied by
 the APL simulator and then permits a small U-Net residual. On the smoke profile
 it reaches SCGI CNR 3.0587, validation SCGI KS pass rate 1.0, and validation
-MSE 2.69e-6, essentially matching the analytic exponential upper-bound control.
-It is therefore the next full-profile candidate; it does not replace the saved
-plain `gain_unet` results above.
+MSE 2.69e-6. On the full 128x128/N=16384/M=5000 Colab profile, a 2-epoch run
+reaches SCGI CNR 2.5353, validation SCGI KS pass rate 1.0, and validation MSE
+1.83e-8, essentially matching the analytic/static upper-bound controls. It does
+not replace the saved plain `gain_unet` results above; it shows that the full
+simulator can be corrected when the dynamic-scaling factor is parameterized.
 
 Stage 3 held-out target test:
 
@@ -177,6 +185,13 @@ also improves every held-out target over dynamic DGI. Its SCGI CNRs are 8.54
 for `letter_A`, 2.18 for `stripe_target`, 2.77 for `letter_L`, and 2.63 for
 `ring`, so it passes the directionality gate but still misses the all-target
 CNR >= 3 requirement.
+
+The full-profile exp-residual checkpoint was also tested on held-out targets in
+`results/stage_3_exp_residual_colab_full/full`. SCGI matches analytic/static CNRs
+for all four targets: `letter_A` 3.3095, `letter_L` 3.5481, `ring` 2.9819, and
+`stripe_target` 2.4919. Thus directionality and KS behavior pass, while the
+all-target CNR>=3 and static PSNR>20 gates still fail because the static DGI
+upper bounds for `ring`, `stripe_target`, and PSNR are below those thresholds.
 
 ## Task 2: Measurement-Basis Mechanism Study
 

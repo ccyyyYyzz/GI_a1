@@ -74,10 +74,13 @@ def main() -> None:
     parser.add_argument("--profile", default="smoke")
     parser.add_argument("--checkpoint", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, default=Path("results/stage_3"))
+    parser.add_argument("--model-kind", default=None, help="Override scgi.model_kind for loading a checkpoint.")
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
+    if args.model_kind:
+        cfg.setdefault("scgi", {})["model_kind"] = str(args.model_kind)
     active = cfg["active"]
     h = int(active["image_size"])
     n = int(active["num_patterns"])

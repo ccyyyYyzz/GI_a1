@@ -31,11 +31,11 @@ baselines.
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
-| Stage 2 SCGI U-Net with Gaussian prior and gamma sweep | Partial | `src/scgi_model.py`, `src/train_scgi.py`, Colab gamma sweep; strict KS pass target not met for plain gain U-Net; `exponential_residual_unet` smoke test matches analytic correction |
-| Stage 3 held-out DGI validation | Partial | `results/stage_3/smoke`; Colab Stage3 extracted; directionality passes, all-target CNR >= 3 fails |
+| Stage 2 SCGI U-Net with Gaussian prior and gamma sweep | Partial | `src/scgi_model.py`, `src/train_scgi.py`, Colab gamma sweep; strict KS pass target not met for plain gain U-Net; `exponential_residual_unet` smoke and full tests match analytic correction |
+| Stage 3 held-out DGI validation | Partial | `results/stage_3/smoke`; Colab debug Stage3; full exp-residual Stage3 matches analytic/static but all-target CNR >= 3 fails where static bound is below 3 |
 | Stage 4 SCGI-UNN and SCGI-URED | Partial | Implemented compact URED/UNN path; URED improves Stage0 CNR, but held-out UNN/URED target ranking is not fully validated |
-| Full paper-scale profile, 128x128/N=16384/M=5000/100 epochs | Attempted, not achieved | Colab full e20 and e100 ran; both underfit badly (`SCGI CNR ~0.127` at e100) |
-| Paper-threshold reproduction: SCGI CNR 3-4, UNN 8-14, URED 10-38 | Not achieved | Debug URED reaches 4.467 on one Colab run; full profile and held-out all-target thresholds fail |
+| Full paper-scale profile, 128x128/N=16384/M=5000/100 epochs | Partial | Colab full e100 gain-U-Net now reaches SCGI CNR 1.1705 after gain-range fix; full exp-residual e2 reaches analytic/static CNR 2.5353 and KS pass 1.0 |
+| Paper-threshold reproduction: SCGI CNR 3-4, UNN 8-14, URED 10-38 | Not achieved | Full exp-residual reaches the current static/analytic DGI bound, but that bound is below CNR 3 and PSNR 20 for some full targets; paper UNN/URED ranges remain unvalidated |
 | Colab durability: checkpoint resume, Drive persistence, CU accounting | Partial | GitHub/Colab runners and local artifact extraction work; Drive/checkpoint resume and CU accounting are not implemented |
 
 ## Task 2: Measurement-Basis Mechanism Study
@@ -63,6 +63,7 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_shardcheck_0of2 results\phase_m2_shardcheck_1of2 --output-dir results\phase_m2_shardcheck_merged
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --output-dir results\phase_m2_scgi_proxy_smoke --no-findings
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage0.py --profile smoke --epochs 2 --tag smoke_exp_residual_e2_skipured --model-kind exponential_residual_unet --skip-ured
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --output-dir results\stage_3_exp_residual_colab_full --model-kind exponential_residual_unet
 ```
 
 ## Completion Decision
