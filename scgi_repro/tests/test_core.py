@@ -817,6 +817,30 @@ class TestBasisGeneration(unittest.TestCase):
         self.assertTrue(np.all(np.isfinite(basis)))
         self.assertGreater(np.linalg.norm(basis), 0.0)
 
+    def test_m3_interleaved_and_block_variants_preserve_inverse(self):
+        if torch is None:
+            self.skipTest("torch is required for M3 variant tests.")
+        run_srht_m3 = importlib.import_module("run_srht_m3")
+        p = 64
+        expected_interleaved = torch.tensor(
+            [0, 8, 16, 24, 32, 40, 48, 56, 1, 9, 17, 25, 33, 41, 49, 57],
+            dtype=torch.long,
+        )
+        self.assertTrue(torch.equal(run_srht_m3.interleaved_row_indices(p, block_size=8)[:16], expected_interleaved))
+        x = torch.linspace(0.0, 1.0, p)
+        for name in (
+            "hadamard_time_interleave",
+            "sign_time_interleave",
+            "hadamard_block_shuffle",
+            "sign_block_shuffle",
+        ):
+            basis = run_srht_m3.make_variant(name, p, seed=123, block_size=8)
+            self.assertEqual(tuple(basis.patterns.shape), (2 * p, p))
+            self.assertEqual(sorted(basis.row_indices.tolist()), list(range(p)))
+            self.assertTrue(torch.allclose(basis.patterns[0::2] + basis.patterns[1::2], torch.ones_like(basis.patterns[0::2])))
+            recon = basis.reconstruct(basis.measure(x))
+            self.assertLess(float(torch.mean((recon - x) ** 2)), 1.0e-10, name)
+
     def test_dct_and_fourier_static_roundtrip(self):
         p = 16
         x = torch.linspace(0.0, 1.0, p)

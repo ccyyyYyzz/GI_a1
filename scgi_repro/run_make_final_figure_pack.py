@@ -208,25 +208,26 @@ def render_raster_figure(spec: FigureSpec, out_base: Path, root: Path, dpi: int)
 
 
 def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[str, str, str]:
-    source = root / "results" / "m3_random_comparator_fast_r1" / "m3_random_comparator_deltas.csv"
+    source = root / "results" / "srht_m3_audit_highrho_r2" / "m3_srht_delta_summary.csv"
     df = pd.read_csv(source)
-    table = df[
+    table = df[(df["rho"] >= 1.0) & (df["correction"].isin(["none", "agc", "scgi_proxy", "pairwise"]))][
         [
             "rho",
             "sigma_a",
+            "correction",
             "srht_minus_ordered_db",
-            "srht_minus_best_random_db",
-            "best_srht_ablation",
+            "best_alternative_minus_ordered_db",
+            "best_alternative",
         ]
     ].copy()
     table["srht_minus_ordered_db"] = table["srht_minus_ordered_db"].astype(float).round(3)
-    table["srht_minus_best_random_db"] = table["srht_minus_best_random_db"].astype(float).round(3)
+    table["best_alternative_minus_ordered_db"] = table["best_alternative_minus_ordered_db"].astype(float).round(3)
     panel_dir = out_dir / "panel_assets"
     panel_dir.mkdir(parents=True, exist_ok=True)
-    png = panel_dir / "m3_random_comparator_delta_table.png"
-    svg = panel_dir / "m3_random_comparator_delta_table.svg"
-    save_metrics_table(png, table, title="M3 fast-drift SRHT random comparator", max_rows=8)
-    save_metrics_table_svg(svg, table, title="M3 fast-drift SRHT random comparator", max_rows=8)
+    png = panel_dir / "m3_fallback_delta_table.png"
+    svg = panel_dir / "m3_fallback_delta_table.svg"
+    save_metrics_table(png, table, title="M3 fast-drift fallback deltas", max_rows=8)
+    save_metrics_table_svg(svg, table, title="M3 fast-drift fallback deltas", max_rows=8)
     return rel(svg, root), rel(png, root), rel(source, root)
 
 
@@ -281,16 +282,16 @@ def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
         ),
         FigureSpec(
             figure_id="figure8_srht_energy_ablation",
-            title="Figure 8. SRHT spreads energy but does not give a 3 dB fast-drift win",
-            claim="Diagonal randomization spreads coefficient energy; current fast-drift tests refute the strong full-SRHT advantage gate.",
+            title="Figure 8. Signed time interleaving is best, but not by 3 dB",
+            claim="Diagonal randomization plus time interleaving gives the best fast-drift ablation, but current tests refute the strong >=3 dB gate.",
             caption=(
-                "Energy concentration and fast-drift random-comparator evidence. Full SRHT is slightly above the best random basis in sampled fast cells, "
-                "but it does not beat ordered Hadamard by the requested 3 dB margin."
+                "Energy concentration and fast-drift fallback-ablation evidence. Signed time interleaving is the best fast non-oracle alternative, "
+                "but its advantage over ordered Hadamard remains only about 0.03-0.14 dB."
             ),
             status="strong-claim refuted under current protocol",
             panels=(
                 PanelSpec("A", "Energy spreading", "results/paper_figures_r1/m4_top5_energy_concentration.svg", "results/paper_figures_r1/m4_top5_energy_concentration.png", "results/theory_m4_paper_r2_highrho/m4_energy_concentration_summary.csv", "Energy concentration by basis."),
-                PanelSpec("B", "Fast-drift comparator", m3_svg, m3_png, m3_source, "M3 fast-drift SRHT comparator deltas."),
+                PanelSpec("B", "Fast-drift fallback", m3_svg, m3_png, m3_source, "M3 fast-drift fallback deltas."),
             ),
         ),
     )

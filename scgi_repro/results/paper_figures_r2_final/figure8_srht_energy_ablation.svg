@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1800" height="732" viewBox="0 0 1800 732">
 <rect width="100%" height="100%" fill="#ffffff" />
-<text x="64.0" y="42.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" fill="#111111">Figure 8. SRHT spreads energy but does not give a 3 dB fast-drift win</text>
-<text x="64.0" y="74.0" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#333333">Diagonal randomization spreads coefficient energy; current fast-drift tests refute the strong full-SRHT advantage gate.</text>
+<text x="64.0" y="42.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" fill="#111111">Figure 8. Signed time interleaving is best, but not by 3 dB</text>
+<text x="64.0" y="74.0" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#333333">Diagonal randomization plus time interleaving gives the best fast-drift ablation, but current tests refute the strong &gt;=3 dB gate.</text>
 <text x="64.0" y="102.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#666666">Status: strong-claim refuted under current protocol</text>
 <rect x="64.0" y="128.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
 <text x="78.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">A</text>
@@ -44,62 +44,120 @@
 </g>
 <rect x="918.0" y="128.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
 <text x="932.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">B</text>
-<text x="976.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Fast-drift comparator</text>
-<g transform="translate(934.00,260.42) scale(1.67591)">
+<text x="976.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Fast-drift fallback</text>
+<g transform="translate(934.00,227.14) scale(1.34820)">
 <rect width="100%" height="100%" fill="#ffffff" />
-<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M3 fast-drift SRHT random comparator</text>
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M3 fast-drift fallback deltas</text>
 <rect x="0" y="24" width="32" height="20" fill="#ebeef2" stroke="#b4b4b4" />
 <text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho</text>
 <rect x="32" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
 <text x="40" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a</text>
-<rect x="86" y="24" width="129" height="20" fill="#ebeef2" stroke="#b4b4b4" />
-<text x="94" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_minus_ordered_db</text>
-<rect x="215" y="24" width="152" height="20" fill="#ebeef2" stroke="#b4b4b4" />
-<text x="223" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_minus_best_random_db</text>
-<rect x="367" y="24" width="100" height="20" fill="#ebeef2" stroke="#b4b4b4" />
-<text x="375" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">best_srht_ablation</text>
+<rect x="86" y="24" width="66" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="94" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">correction</text>
+<rect x="152" y="24" width="129" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="160" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_minus_ordered_db</text>
+<rect x="281" y="24" width="184" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="289" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">best_alternative_minus_ordered_db</text>
+<rect x="465" y="24" width="116" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="473" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">best_alternative</text>
 <rect x="0" y="44" width="32" height="20" fill="#ffffff" stroke="#d7d7d7" />
 <text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
 <rect x="32" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
 <text x="40" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
-<rect x="86" y="44" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="94" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.009</text>
-<rect x="215" y="44" width="152" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="223" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.19</text>
-<rect x="367" y="44" width="100" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="375" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_only</text>
+<rect x="86" y="44" width="66" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">agc</text>
+<rect x="152" y="44" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="160" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.083</text>
+<rect x="281" y="44" width="184" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="289" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.141</text>
+<rect x="465" y="44" width="116" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="473" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
 <rect x="0" y="64" width="32" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
 <text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
 <rect x="32" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="40" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.5</text>
-<rect x="86" y="64" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="94" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.008</text>
-<rect x="215" y="64" width="152" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="223" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.082</text>
-<rect x="367" y="64" width="100" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="375" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_only</text>
+<text x="40" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="64" width="66" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">none</text>
+<rect x="152" y="64" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="160" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.009</text>
+<rect x="281" y="64" width="184" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="289" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.05</text>
+<rect x="465" y="64" width="116" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="473" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
 <rect x="0" y="84" width="32" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
 <rect x="32" y="84" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
 <text x="40" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
-<rect x="86" y="84" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="94" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.003</text>
-<rect x="215" y="84" width="152" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="223" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.02</text>
-<rect x="367" y="84" width="100" height="20" fill="#ffffff" stroke="#d7d7d7" />
-<text x="375" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_only</text>
+<rect x="86" y="84" width="66" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">pairwise</text>
+<rect x="152" y="84" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="160" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.031</text>
+<rect x="281" y="84" width="184" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="289" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.035</text>
+<rect x="465" y="84" width="116" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="473" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
 <rect x="0" y="104" width="32" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
 <rect x="32" y="104" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="40" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.5</text>
-<rect x="86" y="104" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="94" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.004</text>
-<rect x="215" y="104" width="152" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="223" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.016</text>
-<rect x="367" y="104" width="100" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
-<text x="375" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_only</text>
+<text x="40" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="104" width="66" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">scgi_proxy</text>
+<rect x="152" y="104" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="160" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.008</text>
+<rect x="281" y="104" width="184" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="289" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.05</text>
+<rect x="465" y="104" width="116" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="473" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
+<rect x="0" y="124" width="32" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<rect x="32" y="124" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="40" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="124" width="66" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">agc</text>
+<rect x="152" y="124" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="160" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.036</text>
+<rect x="281" y="124" width="184" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="289" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.101</text>
+<rect x="465" y="124" width="116" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="473" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
+<rect x="0" y="144" width="32" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<rect x="32" y="144" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="40" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="144" width="66" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">none</text>
+<rect x="152" y="144" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="160" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.026</text>
+<rect x="281" y="144" width="184" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="289" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.039</text>
+<rect x="465" y="144" width="116" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="473" y="160" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
+<rect x="0" y="164" width="32" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<rect x="32" y="164" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="40" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="164" width="66" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">pairwise</text>
+<rect x="152" y="164" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="160" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.043</text>
+<rect x="281" y="164" width="184" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="289" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.027</text>
+<rect x="465" y="164" width="116" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="473" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
+<rect x="0" y="184" width="32" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">10</text>
+<rect x="32" y="184" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="40" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.3</text>
+<rect x="86" y="184" width="66" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">scgi_proxy</text>
+<rect x="152" y="184" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="160" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.025</text>
+<rect x="281" y="184" width="184" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="289" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.039</text>
+<rect x="465" y="184" width="116" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="473" y="200" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sign_time_interleave</text>
 </g>
 <line x1="64" y1="612" x2="1736" y2="612" stroke="#d9d9d9" />
-<text x="64.0" y="630.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">Energy concentration and fast-drift random-comparator evidence. Full SRHT is slightly above the best random basis in sampled fast cells, but it does not beat ordered</text>
-<text x="64.0" y="649.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">Hadamard by the requested 3 dB margin.</text>
+<text x="64.0" y="630.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">Energy concentration and fast-drift fallback-ablation evidence. Signed time interleaving is the best fast non-oracle alternative, but its advantage over ordered</text>
+<text x="64.0" y="649.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">Hadamard remains only about 0.03-0.14 dB.</text>
 </svg>

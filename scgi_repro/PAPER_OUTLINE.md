@@ -86,17 +86,18 @@ variant improves the network baseline to +0.329 dB versus `none` and -0.262 dB
 versus `scgi_proxy`, but still does not change the 45/45 `srht_paired+pairwise`
 winner map.
 
-**Figure 8. Randomized orthogonal bases whiten object energy, but full SRHT
-advantage is not yet closed.** At 4096 pixels, the top 5% of
+**Figure 8. Randomized orthogonal bases whiten object energy, but the 3 dB
+fast-drift advantage is not closed.** At 4096 pixels, the top 5% of
 DCT/Fourier/Hadamard coefficients contain 0.88-0.92 of the object energy,
 whereas random and SRHT bases concentrate only about 0.28 in the top 5% and have
 effective-rank fractions near 0.48. The new high-rho M3 ablation shows full SRHT
 does not beat ordered Hadamard by the prompt-level `>=3 dB` fast-drift gate;
-`sign_only` is often the best ablation. A direct random-comparator follow-up
-shows full SRHT is slightly above the best random basis in the sampled fast
-cells, but still slightly below ordered Hadamard. This figure should therefore
-separate the supported energy-spreading observation from the still-open
-row-permutation benefit claim.
+the prompt-triggered fallback run finds `sign_time_interleave` is best across
+fast non-oracle cells, but only by +0.027 to +0.141 dB over ordered Hadamard. A
+direct random-comparator follow-up shows full SRHT is slightly above the best
+random basis in the sampled fast cells, but still slightly below ordered
+Hadamard. This figure should therefore separate the supported energy-spreading
+observation from the still-open row-ordering benefit claim.
 
 ## Current Evidence And Gaps
 

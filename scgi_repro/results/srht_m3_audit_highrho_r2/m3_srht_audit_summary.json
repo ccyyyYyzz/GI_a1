@@ -1,0 +1,33 @@
+{
+  "raw_rows": 8000,
+  "summary_rows": 160,
+  "variants": [
+    "hadamard_block_shuffle",
+    "hadamard_ordered",
+    "hadamard_time_interleave",
+    "perm_only",
+    "sign_block_shuffle",
+    "sign_only",
+    "sign_time_interleave",
+    "srht_full"
+  ],
+  "rho_values": [
+    0.001,
+    0.1,
+    1.0,
+    10.0
+  ],
+  "sigma_a_values": [
+    0.3
+  ],
+  "oracle_min_psnr": 120.0,
+  "fast_srht_minus_ordered_min_db": -0.04322663306421326,
+  "fast_srht_minus_ordered_max_db": 0.08267707442970718,
+  "fast_srht_gap_to_best_min_db": -0.06977588826366699,
+  "fast_best_alternative_minus_ordered_max_db": 0.14092949370301788,
+  "fast_best_alternative_minus_ordered_min_db": 0.026549255199453725,
+  "fast_best_alternatives": [
+    "sign_time_interleave"
+  ],
+  "slow_pairwise_srht_minus_ordered_db": 0.0047083521594970534
+}

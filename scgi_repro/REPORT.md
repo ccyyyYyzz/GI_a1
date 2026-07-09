@@ -665,29 +665,30 @@ main conclusion.
 Latest M3 high-rho SRHT ablation:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
+& 'D:\Anacondar\anaconda3\python.exe' run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r2 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r2 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\python.exe run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --block-size 32 --output-dir results\srht_m3_protocol_o10s5_highrho_r2 --no-findings
+& 'D:\Anacondar\anaconda3\python.exe' run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r2 --output-dir results\srht_m3_audit_highrho_r2
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id m3_random_comparator_fast_r1 --output-dir results\cli_runs\m3_random_comparator_fast_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_m3_random_comparator.py --objects 10 --seeds 5 --rho-values "1.0,10.0" --sigma-a-values "0.30,0.50" --output-dir results\m3_random_comparator_fast_r1
 ```
 
 Outputs:
 
-- `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation.csv` (3,200 rows)
-- `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation_summary.csv` (64 rows)
-- `results/srht_m3_audit_highrho_r1/m3_srht_delta_summary.csv` (16 rows)
-- `results/srht_m3_audit_highrho_r1/m3_srht_audit_report.md`
+- `results/srht_m3_protocol_o10s5_highrho_r2/srht_ablation.csv` (8,000 rows)
+- `results/srht_m3_protocol_o10s5_highrho_r2/srht_ablation_summary.csv` (160 rows)
+- `results/srht_m3_audit_highrho_r2/m3_srht_delta_summary.csv` (20 rows)
+- `results/srht_m3_audit_highrho_r2/m3_srht_audit_report.md`
 - `results/m3_random_comparator_fast_r1/m3_random_comparator_raw.csv` (3,600 rows)
 - `results/m3_random_comparator_fast_r1/m3_random_comparator_deltas.csv` (4 rows)
 - `results/m3_random_comparator_fast_r1/m3_random_comparator_report.md`
 
-The high-rho audit makes the M3 conclusion more conservative. Oracle correction
-has minimum mean PSNR 120.0 dB, confirming that ordered Hadamard,
-permutation-only, sign-only, and full SRHT all preserve the underlying
+The high-rho fallback audit makes the M3 conclusion more conservative and also
+closes the prompt's conditional follow-up after SRHT failure. Oracle correction
+has minimum mean PSNR 120.0 dB, confirming that the ordered, signed, full-SRHT,
+time-interleaved, and block-shuffled variants all preserve the underlying
 information when the gain is known. For `rho>=1` under non-oracle corrections,
-however, full SRHT minus ordered Hadamard ranges from -0.043 to +0.083 dB, not
-the prompt's requested `>=3 dB` advantage. The best ablation is usually
-`sign_only`, so the current constructive evidence supports diagonal sign
-randomization more strongly than full row permutation. M3 therefore remains a
+however, full SRHT minus ordered Hadamard still ranges from -0.043 to +0.083 dB,
+not the prompt's requested `>=3 dB` advantage. The best fallback is now
+consistently `sign_time_interleave`, but its advantage over ordered Hadamard is
+only +0.027 to +0.141 dB across fast non-oracle cells. M3 therefore remains a
 partial mechanism result rather than a closed SRHT theorem.
 
 The direct random-comparator follow-up closes the "not worse than random" check

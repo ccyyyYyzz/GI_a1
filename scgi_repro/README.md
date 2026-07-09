@@ -39,8 +39,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.003,0.01,0.03,0.1,0.3,1.0,3.0,10.0" --sigma-values "0.05,0.10,0.15,0.30,0.50" --reference-periods "2,8,32" --shard i/5 --resume --scgi-checkpoint results\m2_scgi_proxyinput_gain1d_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shardiof5 --no-findings
 & $py merge_phase_m2_shards.py --inputs results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard0of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard1of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard2of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard3of5 results\phase_m2_scgi_proxyinput_gain1d_dense_r1_shard4of5 --output-dir results\phase_m2_scgi_proxyinput_gain1d_dense_r1_merged
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
-& $py run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r1 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r1 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --output-dir results\srht_m3_protocol_o10s5_highrho_r1 --no-findings
-& $py run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r1 --output-dir results\srht_m3_audit_highrho_r1
+& $py run_monitored_job.py --run-id srht_m3_protocol_o10s5_highrho_r2 --output-dir results\cli_runs\srht_m3_protocol_o10s5_highrho_r2 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_srht_m3.py --profile smoke --objects 10 --seeds 5 --rho-values "0.001,0.1,1.0,10.0" --sigma-a 0.30 --block-size 32 --output-dir results\srht_m3_protocol_o10s5_highrho_r2 --no-findings
+& $py run_m3_srht_audit.py --input-dir results\srht_m3_protocol_o10s5_highrho_r2 --output-dir results\srht_m3_audit_highrho_r2
 & $py run_monitored_job.py --run-id m3_random_comparator_fast_r1 --output-dir results\cli_runs\m3_random_comparator_fast_r1 --heartbeat-seconds 30 --accelerator local_cpu -- $py run_m3_random_comparator.py --objects 10 --seeds 5 --rho-values "1.0,10.0" --sigma-a-values "0.30,0.50" --output-dir results\m3_random_comparator_fast_r1
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
@@ -292,12 +292,14 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `m1_mechanism_audit_report.md`, summary JSON, and compact PNG audit tables.
 - `results/phase_m2_reference_protocol_o10s5/`: 10-object x 5-seed M2
   mechanism output used by the latest figure rendering.
-- `results/srht_m3_protocol_o10s5_highrho_r1/`: monitored 10-object x 5-seed
-  M3 SRHT ablation at `rho=0.001,0.1,1,10` and `sigma_a=0.30`, with 3,200 raw
-  rows and 64 summary rows.
-- `results/srht_m3_audit_highrho_r1/`: M3 high-rho SRHT audit tables, JSON
-  summary, PNG table, and Markdown report; full SRHT does not meet the prompt's
-  `>=3 dB` advantage gate over ordered Hadamard in the fast-drift rows.
+- `results/srht_m3_protocol_o10s5_highrho_r2/`: monitored 10-object x 5-seed
+  M3 fallback ablation at `rho=0.001,0.1,1,10` and `sigma_a=0.30`, with 8,000
+  raw rows and 160 summary rows over ordered, signed, full-SRHT, time-interleaved,
+  and block-shuffled variants.
+- `results/srht_m3_audit_highrho_r2/`: M3 high-rho fallback audit tables, JSON
+  summary, PNG table, and Markdown report. `sign_time_interleave` is the best
+  fast non-oracle alternative, but its gain over ordered Hadamard is only
+  +0.027 to +0.141 dB; full SRHT still misses the prompt's `>=3 dB` gate.
 - `results/m3_random_comparator_fast_r1/`: monitored fast-drift M3 comparator
   adding direct `random_uniform` and `random_binary` baselines at
   `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of

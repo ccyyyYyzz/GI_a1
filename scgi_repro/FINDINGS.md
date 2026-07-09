@@ -410,9 +410,9 @@ map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 ## M3 SRHT Constructive Ablation
 
 Experiment: monitored 10-object x 5-seed M3 ablation over ordered Hadamard,
-row-permutation-only, diagonal-sign-only, and full SRHT variants at
-`rho=0.001,0.1,1,10` with `sigma_a=0.30`, followed by
-`run_m3_srht_audit.py`. A second monitored comparator adds direct
+row-permutation-only, diagonal-sign-only, full SRHT, block-shuffled, and
+time-interleaved variants at `rho=0.001,0.1,1,10` with `sigma_a=0.30`,
+followed by `run_m3_srht_audit.py`. A second monitored comparator adds direct
 `random_uniform` and `random_binary` baselines at `rho=1,10` and
 `sigma_a=0.30,0.50`.
 
@@ -420,23 +420,25 @@ Prediction: the prompt-level constructive claim would require full SRHT to beat
 ordered Hadamard by at least 3 dB in fast drift while not losing to random-like
 alternatives.
 
-Result: `results/srht_m3_protocol_o10s5_highrho_r1/srht_ablation.csv` has 3,200
-raw rows and `srht_ablation_summary.csv` has 64 rows. The audit output in
-`results/srht_m3_audit_highrho_r1` reports oracle minimum mean PSNR 120.0 dB,
-so all four measurement variants are information-preserving when the true gain
+Result: `results/srht_m3_protocol_o10s5_highrho_r2/srht_ablation.csv` has 8,000
+raw rows and `srht_ablation_summary.csv` has 160 rows. The audit output in
+`results/srht_m3_audit_highrho_r2` reports oracle minimum mean PSNR 120.0 dB,
+so all eight measurement variants are information-preserving when the true gain
 is known. Under non-oracle corrections at `rho>=1`, however, full SRHT minus
-ordered Hadamard ranges only from -0.043 to +0.083 dB, far below the requested
-`>=3 dB` advantage. The best ablation is usually `sign_only`, not `srht_full`.
+ordered Hadamard still ranges only from -0.043 to +0.083 dB, far below the
+requested `>=3 dB` advantage. The prompt's fallback alternatives were also
+tested: `sign_time_interleave` is the best fast non-oracle ablation in all eight
+fast cells, but it beats ordered Hadamard by only +0.027 to +0.141 dB.
 `results/m3_random_comparator_fast_r1` adds 3,600 raw rows and 4 delta rows;
 full SRHT is +0.016 to +0.190 dB above the best random basis in those fast cells,
 but -0.009 to -0.003 dB below ordered Hadamard.
 
 Supports/refutes: refutes the strong M3 SRHT-advantage gate under the current
 fast-drift protocol while closing the direct random-comparator check for the
-sampled cells. The useful design signal is diagonal sign randomization and
-paired normalization; the extra row permutation in full SRHT remains unproven
-and should be framed as partial/ablation-informed rather than a closed
-constructive theorem.
+sampled cells. The useful design signal is diagonal sign randomization,
+pair-preserving time interleaving, and paired normalization; the extra row
+permutation in full SRHT remains unproven and should be framed as
+partial/ablation-informed rather than a closed constructive theorem.
 
 ## Rendered Figures
 
