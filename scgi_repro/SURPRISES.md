@@ -103,6 +103,13 @@ CNR `5.131` and trace CNR `8.913`. This is a large implementation sensitivity,
 but not a solved reproduction: the trace peak uses ground truth for diagnosis,
 and even that remains below the APL URED minimum `10.43`.
 
+The sweep runner also inherited the earlier sharding trap: filtering to only
+`stripe_target` before drawing dynamic factors gave stripe the first lambda draw.
+That is now fixed. In the repaired all-object NLM audit, fixed 200-step NLM RED
+reaches final CNRs `8.453/6.033/10.270/7.842` for A/stripe/L/ring. The
+all-target minimum is still below 10.43, but the gap is now specifically a
+stopping/regularization problem rather than an average-pool denoiser failure.
+
 ## 2026-07-09 Published Curves Are Gentler Than The Prompt Prior
 
 Figure-level APL digitization gives collected-trace

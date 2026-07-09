@@ -116,12 +116,14 @@ def main() -> None:
     patterns = generate_patterns(n, h, generator, cfg.get("data", {}).get("pattern_distribution", "uniform"), device=device)
 
     all_objects = make_stage3_objects(h)
+    selected_indices = list(range(len(all_objects)))
     if args.object_names:
         requested = set(parse_strings(args.object_names, []))
-        all_objects = [(name, obj) for name, obj in all_objects if name in requested]
-    selected_objects = select_shard(all_objects, args.object_shard)
-    if not selected_objects:
+        selected_indices = [idx for idx, (name, _obj) in enumerate(all_objects) if name in requested]
+    selected_indices = select_shard(selected_indices, args.object_shard)
+    if not selected_indices:
         raise ValueError("No objects selected for Stage 4 URED sweep.")
+    selected_objects = [all_objects[idx] for idx in selected_indices]
 
     grid = build_grid(args, cfg)
     grid = select_shard(grid, args.config_shard)
@@ -136,6 +138,7 @@ def main() -> None:
         "image_size": h,
         "num_patterns": n,
         "objects": [name for name, _ in selected_objects],
+        "selected_object_indices": selected_indices,
         "num_configs": len(grid),
         "object_shard": str(args.object_shard),
         "config_shard": str(args.config_shard),
@@ -144,7 +147,7 @@ def main() -> None:
     }
     (out_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
-    images = torch.stack([obj for _name, obj in selected_objects], dim=0).unsqueeze(1).to(device)
+    images = torch.stack([obj for _name, obj in all_objects], dim=0).unsqueeze(1).to(device)
     flat = images.reshape(images.shape[0], h * h)
     b_static = normalize_rows(
         compute_static_measurements(flat, patterns, int(active.get("measurement_chunk", 128))),
@@ -165,14 +168,15 @@ def main() -> None:
 
     baseline_rows: list[dict[str, object]] = []
     coarse_recons: list[torch.Tensor] = []
-    for idx, (name, _obj) in enumerate(selected_objects):
-        target = images[idx]
+    for object_position, object_index in enumerate(selected_indices):
+        name, _obj = all_objects[object_index]
+        target = images[object_index]
         baselines = {
-            "static": (dgi_reconstruct(b_static[idx], patterns, h), b_static[idx]),
-            "dynamic": (dgi_reconstruct(r_dynamic[idx], patterns, h), r_dynamic[idx]),
-            "scgi": (dgi_reconstruct(y_scgi[idx], patterns, h), y_scgi[idx]),
-            "analytic": (dgi_reconstruct(y_analytic[idx], patterns, h), y_analytic[idx]),
-            "oracle": (dgi_reconstruct(y_oracle[idx], patterns, h), y_oracle[idx]),
+            "static": (dgi_reconstruct(b_static[object_index], patterns, h), b_static[object_index]),
+            "dynamic": (dgi_reconstruct(r_dynamic[object_index], patterns, h), r_dynamic[object_index]),
+            "scgi": (dgi_reconstruct(y_scgi[object_index], patterns, h), y_scgi[object_index]),
+            "analytic": (dgi_reconstruct(y_analytic[object_index], patterns, h), y_analytic[object_index]),
+            "oracle": (dgi_reconstruct(y_oracle[object_index], patterns, h), y_oracle[object_index]),
         }
         coarse_recons.append(baselines["scgi"][0])
         for method, (recon, measurements) in baselines.items():
@@ -180,9 +184,10 @@ def main() -> None:
             baseline_rows.append(
                 {
                     "object": name,
+                    "object_index": object_index,
                     "method": method,
-                    "lambda_true": float(lambdas[idx].detach().cpu()),
-                    "lambda_analytic": float(lambda_hat[idx].detach().cpu()),
+                    "lambda_true": float(lambdas[object_index].detach().cpu()),
+                    "lambda_analytic": float(lambda_hat[object_index].detach().cpu()),
                     **metrics.__dict__,
                 }
             )
@@ -193,7 +198,8 @@ def main() -> None:
     for config_index, config in enumerate(grid):
         global_config_index = int(config["global_config_index"])
         config_id = f"cfg{global_config_index:04d}"
-        for object_index, (name, _obj) in enumerate(selected_objects):
+        for object_position, object_index in enumerate(selected_indices):
+            name, _obj = all_objects[object_index]
             if args.fixed_init_seed is None:
                 init_seed = int(cfg.get("seed", 0)) + int(args.seed_offset) + 1000 * global_config_index + object_index
             else:
@@ -217,7 +223,7 @@ def main() -> None:
             )
             target = images[object_index]
             result = optimize_untrained(
-                coarse_recons[object_index],
+                coarse_recons[object_position],
                 y_scgi[object_index],
                 patterns,
                 run_cfg,
@@ -232,6 +238,7 @@ def main() -> None:
                 "global_config_index": global_config_index,
                 "init_seed": init_seed,
                 "object": name,
+                "object_index": object_index,
                 "method": "scgi_unn" if float(config["beta"]) == 0.0 else "scgi_ured",
                 **config,
                 **metrics.__dict__,
@@ -245,6 +252,7 @@ def main() -> None:
                         {
                             "config_id": config_id,
                             "object": name,
+                            "object_index": object_index,
                             "step": step,
                             "loss": loss_value,
                             "cnr": cnr_value,
