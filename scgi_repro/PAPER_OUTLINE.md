@@ -29,15 +29,20 @@ Channels
    any-budget, equal-total-frame, and reference-only best-method maps.
 8. SRHT ablation: none / permutation / diagonal signs / both.
 
-## Current Evidence Gaps
+## Current Evidence And Gaps
 
-- The current SCGI reproduction is smoke/debug scale; full APL-scale training is
-  not complete.
-- The M2 dense reference scan is numerical-only and idealizes reference
-  measurements as noiseless gain samples; a non-ideal detector/reference-noise
-  section is still needed.
+- The current SCGI reproduction is strongest at smoke/debug scale. Full
+  APL-scale Colab runs at 20 and 100 epochs complete but do not converge, so the
+  SCGI reproduction should be presented as an executable diagnostic prototype
+  until the full training setup is redesigned.
+- The dense M2 reference scan supports `srht_paired + pairwise` as the strict
+  equal-frame blind winner across the current 35-cell grid. This is useful
+  evidence for the SRHT design rule, but it is still idealized.
+- The M2 dense reference scan idealizes reference measurements as noiseless gain
+  samples; a non-ideal detector/reference-noise section is still needed.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty.
+- SCGI-network correction is not yet part of the M2 phase diagram.
 
 ## Venue Positioning
 

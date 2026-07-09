@@ -30,13 +30,22 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py -m unittest discover tests -v
 ```
 
+M2 scans can be split across Colab or local workers:
+
+```powershell
+& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --no-findings --output-dir results\phase_m2_shard_0of2
+& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --no-findings --output-dir results\phase_m2_shard_1of2
+& $py merge_phase_m2_shards.py --inputs results\phase_m2_shard_0of2 results\phase_m2_shard_1of2 --output-dir results\phase_m2_shard_merged
+```
+
 For a closer-to-prompt debug run, use `--profile debug`. For the paper-scale run, use
 `--profile full` on a GPU machine with torchvision/scipy/skimage/matplotlib installed.
 The verified local CUDA environment is `D:\Anacondar\anaconda3\envs\pytorch\python.exe`.
 
 ## Main Outputs
 
-- `REPORT.md`: SCGI reproduction status and stage-0 smoke metrics.
+- `REPORT.md`: SCGI reproduction status, Colab runs, and mechanism-study summary.
+- `COMPLETION_AUDIT.md`: strict prompt-requirement audit with done/partial/open status.
 - `ASSUMPTIONS.md`: every implementation assumption for undisclosed paper details.
 - `PROTOCOL.md`: fair-comparison rules for basis/channel studies.
 - `THEORY.md`: derivations and theory hooks for H1-H4 and SRHT.
@@ -51,10 +60,11 @@ The verified local CUDA environment is `D:\Anacondar\anaconda3\envs\pytorch\pyth
   Hadamard, DCT, Fourier, and SRHT bases.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with
   frame-count audit columns.
-- `results/phase_m2_reference_smoke/`: dense 7x5 M2 smoke output with
-  `reference_k2/k8/k32` calibration and flip-boundary diagnostics.
+- `results/phase_m2_reference_protocol_o10s5/`: 68,250-row dense 7x5 M2
+  protocol output with `reference_k2/k8/k32` calibration, equal-frame blind
+  summaries, and flip-boundary diagnostics.
 - `results/mechanism_m1_protocol_o10s5/`,
-  `results/phase_m2_protocol_o10s5/`, and
+  `results/phase_m2_reference_protocol_o10s5/`, and
   `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used
   by the latest figure rendering.
 - `results/srht_m3_quick/`: compact SRHT ablation plumbing output.

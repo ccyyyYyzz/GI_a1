@@ -178,6 +178,25 @@ class TestCoreNumerics(unittest.TestCase):
         self.assertTrue(np.all(scales > 0.0))
         self.assertGreater(scales[-1], 0.0)
 
+    def test_gain_corrector_range_covers_full_profile_decay(self):
+        scgi_model = importlib.import_module("src.scgi_model")
+        model = scgi_model.make_scgi_model(
+            {
+                "scgi": {
+                    "model_kind": "gain_unet",
+                    "unet_base_channels": 2,
+                    "unet_depth": 1,
+                    "use_coord_channels": False,
+                    "gain_min": 1.0e-4,
+                    "gain_max": 2.0,
+                }
+            }
+        )
+        full_tail_gain = 0.9995 ** (16_384 - 1)
+        self.assertLess(full_tail_gain, 0.001)
+        self.assertLessEqual(model.gain_min, full_tail_gain)
+        self.assertGreaterEqual(model.gain_max, 1.0)
+
     def test_dgi_output_shape_matches_object_shape(self):
         func = _find_function(
             [

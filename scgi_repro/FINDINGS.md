@@ -25,8 +25,21 @@ and oracle CNR is 3.062. Corrected KS p-value is 0.064.
 
 Supports/refutes: supports the core APL mechanism at smoke scale.
 
-Notes: debug MNIST at 64x64 and 4096 patterns reaches SCGI-URED CNR 3.800, but
-the learned SCGI measurement distribution still fails the strict KS test.
+Notes: debug MNIST at 64x64 and 4096 patterns reaches SCGI-URED CNR 3.800
+locally. A Colab L4 160-epoch debug run reaches SCGI CNR 2.147 and URED CNR
+4.467 with validation SCGI KS pass rate 0.75. This is stronger than the local
+80-epoch run but still below the strict prompt gates for raw SCGI CNR and
+validation KS pass rate.
+
+Colab full-profile probes: a 128x128, 16384-pattern, 20-epoch run completes on
+L4 in 117 s, and a 100-epoch SCGI-only run completes in 456 s. Both remain far
+from reproduced full results: the 100-epoch run has SCGI CNR 0.127 and
+validation SCGI KS pass rate 0.176. The failure is therefore not just a short
+epoch-count issue; the full-profile loss/data scaling needs redesign.
+
+Gamma sweep: Colab debug 60-epoch sweep over gamma values `{0, 0.1, 1, 10}`
+finds the best SCGI CNR at gamma=1.0 (2.242), but all four gamma settings fail
+the strict KS gate.
 
 ## Stage 3 Held-Out Targets
 
@@ -36,9 +49,11 @@ targets not used for training.
 Prediction: dynamic DGI should fail; SCGI should improve over dynamic DGI; oracle
 and analytic exponential correction should remain upper-bound controls.
 
-Result: output written to `results/stage_3/smoke`. SCGI improves CNR over dynamic
-DGI for all four held-out objects, but SCGI CNR is still below 3 for the harder
-stripe, L, and ring targets.
+Result: output written to `results/stage_3/smoke` and
+`results/colab_imports/pro1_debug_e160_stage3/artifacts/stage_3_colab/debug`.
+SCGI improves CNR over dynamic DGI for all four held-out objects. In the Colab
+160-epoch checkpoint, CNRs are 8.54 for `letter_A`, 2.18 for `stripe_target`,
+2.77 for `letter_L`, and 2.63 for `ring`.
 
 Supports/refutes: supports directionality but not prompt-level Stage 3 thresholds.
 
@@ -105,19 +120,23 @@ publication use.
 ## M2 Phase Scan
 
 Experiment: M2 scan with equal 2048 measurement-frame budgets plus explicit
-reference-frame overhead accounting.
+reference-frame overhead accounting, using 10 objects x 5 seeds over the 7 x 5
+rho/sigma grid.
 
 Prediction: best blind method should depend on channel drift speed and amplitude.
 
-Result: `results/phase_m2_reference_smoke/phase_scan.csv` records the full 7x5
-smoke grid with `reference_k2/k8/k32`. The outputs now separate
-`best_blind_methods.csv` from `best_equal_frame_blind_methods.csv`, so
-extra-reference-frame methods are not silently compared as if they used the same
-physical budget.
+Result: `results/phase_m2_reference_protocol_o10s5/phase_scan.csv` records
+68,250 rows. The outputs separate `best_blind_methods.csv` from
+`best_equal_frame_blind_methods.csv`, so extra-reference-frame methods are not
+silently compared as if they used the same physical budget.
 
-Supports/refutes: validates M2 fair-frame accounting and reference calibration
-plumbing. The 10-object x 5-seed reference grid is running and should replace the
-smoke findings once complete.
+Supports/refutes: supports the current M2 compact conclusion that
+`srht_paired + pairwise` is the best strict equal-frame blind method across all
+35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best
+reference-calibrated method across all 35 cells but uses 3073 total physical
+frames instead of 2048, so it should be reported as a separate semi-calibrated
+baseline. Flip-boundary output is now diagnostic rather than a fitted law:
+104 rows are `not_reached`, 17 `left_censored`, and 14 `observed`.
 
 ## Rendered Figures
 

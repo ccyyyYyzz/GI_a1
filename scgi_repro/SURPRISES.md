@@ -43,3 +43,29 @@ still below `1e-12`, and DCT pairwise follows the expected degradation with
 `rho`, but it remains slightly below Hadamard/SRHT in the current protocol-scale
 4x3 grid. Treat this as a prompt for denser flip-boundary tests, not as a final
 conclusion.
+
+## 2026-07-09 Full-Scale SCGI Undertraining
+
+Colab L4 successfully ran the requested full profile at 128x128 and N=16384 for
+both 20 and 100 SCGI epochs. The 100-epoch run did not improve the full-profile
+SCGI result: SCGI CNR stayed near `0.127`, validation SCGI KS pass rate was only
+`0.176`, and the corrected slope remained strongly negative.
+
+This changes the diagnosis from "need more runtime" to "need a redesigned
+full-scale training/data-scaling setup." The analytic and oracle controls still
+recover the static distribution, so the channel is not unrecoverable; the current
+learned full-profile correction is the failing component.
+
+## 2026-07-09 Dense M2 SRHT Dominance
+
+The dense M2 reference protocol over 10 objects x 5 seeds produced a cleaner
+winner structure than expected. Under strict 2048-frame blind comparison,
+`srht_paired + pairwise` wins all 35 rho/sigma cells. Under any-budget
+reference-calibrated comparison, `srht_paired + reference_k2` wins all 35 cells
+but spends 3073 total physical frames.
+
+This supports SRHT as the strongest compact construction in the current ideal
+simulator, but it also means the original "random bases can blind-correct while
+Hadamard cannot" story needs sharper wording: the best blind method in this
+implementation is a randomized orthogonal paired basis, not an i.i.d. random
+correlation basis.

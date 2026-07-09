@@ -77,9 +77,20 @@ def _row_max_normalize_image(x: torch.Tensor) -> torch.Tensor:
 class GainCorrectorUNet(nn.Module):
     """Predict a smooth gain map and output normalized ``measurement / gain``."""
 
-    def __init__(self, base_channels: int = 16, depth: int = 4, use_coord_channels: bool = True):
+    def __init__(
+        self,
+        base_channels: int = 16,
+        depth: int = 4,
+        use_coord_channels: bool = True,
+        gain_min: float = 1.0e-4,
+        gain_max: float = 2.0,
+    ):
         super().__init__()
         self.use_coord_channels = bool(use_coord_channels)
+        self.gain_min = float(gain_min)
+        self.gain_max = float(gain_max)
+        if not (0.0 < self.gain_min < self.gain_max):
+            raise ValueError("gain_min must be positive and smaller than gain_max.")
         if self.use_coord_channels:
             self.gain_net = CoordUNet(base_channels=base_channels, depth=depth)
         else:
@@ -87,7 +98,7 @@ class GainCorrectorUNet(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         raw_gain = self.gain_net(x)
-        gain = 0.05 + 1.95 * raw_gain
+        gain = self.gain_min + (self.gain_max - self.gain_min) * raw_gain
         corrected = x / gain.clamp_min(1e-6)
         return _row_max_normalize_image(corrected).clamp(0.0, 1.0)
 
@@ -102,6 +113,8 @@ def make_scgi_model(cfg: dict) -> UNet:
             base_channels=base_channels,
             depth=depth,
             use_coord_channels=bool(scgi.get("use_coord_channels", False)),
+            gain_min=float(scgi.get("gain_min", 1.0e-4)),
+            gain_max=float(scgi.get("gain_max", 2.0)),
         )
     if bool(scgi.get("use_coord_channels", False)):
         return CoordUNet(base_channels=base_channels, depth=depth)

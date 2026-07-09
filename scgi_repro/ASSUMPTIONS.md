@@ -24,8 +24,9 @@ code or raw data.
    coefficient. In equal-frame M2 scans, Fourier uses `N_frames/4` coefficients
    rather than a full `4P`-frame transform.
 10. Current local verification uses the CUDA conda environment on the RTX 4060
-    Laptop GPU. The `full` profile records the requested paper scale but has not
-    been run to completion yet.
+    Laptop GPU. Colab L4 has run the `full` paper-scale profile for 20 and 100
+    SCGI epochs, but the current training configuration does not converge to the
+    prompt thresholds.
 11. `scgi.use_coord_channels` adds normalized row/column coordinates to the
     SCGI U-Net. This is an engineering aid for small smoke runs because the
     dynamic correction is measurement-index dependent after reshaping the

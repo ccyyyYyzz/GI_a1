@@ -66,6 +66,8 @@ scgi:
   unet_base_channels: 16
   unet_depth: 4
   use_coord_channels: true
+  gain_min: 0.0001
+  gain_max: 2.0
   gamma_sweep: [0.0, 0.1, 1.0, 10.0]
 
 ured:

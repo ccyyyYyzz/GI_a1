@@ -5,10 +5,27 @@ from pathlib import Path
 
 import pandas as pd
 
-from run_mechanism_m1 import make_synthetic_objects, simulate_and_reconstruct
+from run_mechanism_m1 import make_synthetic_objects, reconstruct_observed
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
-from src.mechanisms import reference_anchor_count
+from src.mechanisms import make_multiplicative_channel, reference_anchor_count, simulate_channel_measurements
+
+
+def parse_shard(value: str | None) -> tuple[int, int]:
+    """Parse a zero-based shard spec like ``0/5``."""
+
+    if not value:
+        return 0, 1
+    parts = value.split("/", 1)
+    if len(parts) != 2:
+        raise ValueError("--shard must use the form i/k, for example 0/5.")
+    shard_index = int(parts[0])
+    shard_count = int(parts[1])
+    if shard_count <= 0:
+        raise ValueError("Shard count must be positive.")
+    if shard_index < 0 or shard_index >= shard_count:
+        raise ValueError("Shard index must be zero-based and satisfy 0 <= i < k.")
+    return shard_index, shard_count
 
 
 def main() -> None:
@@ -17,11 +34,13 @@ def main() -> None:
     parser.add_argument("--objects", type=int, default=1)
     parser.add_argument("--seeds", type=int, default=1)
     parser.add_argument("--output-dir", type=Path, default=Path("results/phase_m2"))
+    parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
+    shard_index, shard_count = parse_shard(args.shard)
     mech = cfg.get("mechanism", {})
     h = int(mech.get("image_size", 32))
     p = h * h
@@ -42,6 +61,7 @@ def main() -> None:
         ("srht_paired", {}),
     ]
     rows = []
+    unit_index = 0
     for basis_name, kwargs in basis_specs:
         basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
         corrections = ["none", "oracle", "agc"] + [f"reference_k{k}" for k in reference_periods]
@@ -51,17 +71,33 @@ def main() -> None:
             for sigma_a in sigma_values:
                 for seed_idx in range(args.seeds):
                     for obj_idx, obj in enumerate(objects):
+                        current_unit = unit_index
+                        unit_index += 1
+                        if current_unit % shard_count != shard_index:
+                            continue
+                        ideal = basis.measure(obj)
+                        channel = make_multiplicative_channel(
+                            basis.num_frames,
+                            model="ou",
+                            rho=float(rho),
+                            sigma_a=float(sigma_a),
+                            seed=9000 + seed_idx,
+                            device=str(ideal.device),
+                            dtype=ideal.dtype,
+                        )
+                        observed = simulate_channel_measurements(
+                            ideal,
+                            channel,
+                            read_noise=float(mech.get("read_noise", 0.0)),
+                            seed=9100 + obj_idx,
+                        )
                         for correction in corrections:
-                            metrics = simulate_and_reconstruct(
+                            metrics = reconstruct_observed(
                                 basis=basis,
                                 obj=obj,
+                                observed=observed,
+                                true_gains=channel.gains,
                                 correction=correction,
-                                channel_model="ou",
-                                rho=float(rho),
-                                sigma_a=float(sigma_a),
-                                channel_seed=9000 + seed_idx,
-                                read_noise=float(mech.get("read_noise", 0.0)),
-                                noise_seed=9100 + obj_idx,
                                 agc_window=max(9, int(0.05 * frame_budget)),
                             )
                             reference_period = int(correction.rsplit("k", 1)[1]) if correction.startswith("reference_k") else 0
@@ -80,9 +116,13 @@ def main() -> None:
                                     "total_physical_frames": basis.num_frames + reference_frames,
                                     "num_coefficients": basis.num_coefficients,
                                     "num_pixels": basis.num_pixels,
+                                    "shard": args.shard or "0/1",
+                                    "unit_index": current_unit,
                                     **metrics,
                                 }
                             )
+    if not rows:
+        raise RuntimeError(f"Shard {args.shard} produced no rows.")
     df = pd.DataFrame(rows)
     scan_path = out_dir / "phase_scan.csv"
     df.to_csv(scan_path, index=False)

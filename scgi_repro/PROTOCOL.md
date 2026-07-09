@@ -29,3 +29,9 @@ All basis/channel comparisons in this project follow these rules.
    inserted fixed-reference frame every `K` measurement frames. Scan CSVs must
    report `reference_frames` and `total_physical_frames` so reference-calibrated
    methods can be separated from strict equal-measurement-frame methods.
+11. **Long scans may be sharded.** M2 accepts `--shard i/k` with zero-based
+    shard indices. Sharding is applied to complete `(basis, rho, sigma, seed,
+    object)` units so all corrections for a physical condition remain together.
+    Merge shards with `merge_phase_m2_shards.py`, which recomputes all summary,
+    best-method, reference, equal-frame, and flip-boundary CSVs from the merged
+    `phase_scan.csv`.
