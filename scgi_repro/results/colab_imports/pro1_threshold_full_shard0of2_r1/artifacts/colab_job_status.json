@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_tall_design_threshold.py --output-dir results/tall_design_threshold_full_0of2 --shard 0/2",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 720.01,
+  "end_time_utc": "2026-07-09T22:16:24Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "756e628b52fd1e69e95f8e723d97891838ee7c62",
+  "return_code": 0,
+  "run_id": "pro1_threshold_full_shard0of2_r1",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T22:04:24Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T22:16:24Z",
+  "workdir": "scgi_repro"
+}
