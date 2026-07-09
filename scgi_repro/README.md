@@ -87,6 +87,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_proxy_dense_r1_merged/`: 78,750-row dense 7x5 M2
   output that adds `scgi_proxy` as an equal-frame blind smooth-gain proxy with
   zero reference frames.
+- `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: 101,250-row dense
+  9x5 M2 output extending the prompt rho range to `0.001..10`.
+- `results/m2_boundary_audit_highrho/`: rho-coverage audit, log-rho
+  interpolated flip-boundary fits, and winner-map summaries for the high-rho M2
+  merge.
 - `results/phase_m2_scgi_frozen_smoke/`: frozen-network M2 smoke baseline using
   the returned SCGI checkpoint and explicit `scgi_frozen` correction.
 - `results/phase_m2_scgi_frozen_dense_r1_merged/`: 89,250-row dense M2 run with

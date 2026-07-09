@@ -32,6 +32,18 @@ def parse_shard(value: str | None) -> tuple[int, int]:
     return shard_index, shard_count
 
 
+def parse_float_list(value: str | None) -> list[float] | None:
+    if value is None or not str(value).strip():
+        return None
+    return [float(part) for part in str(value).replace(",", " ").split() if part.strip()]
+
+
+def parse_int_list(value: str | None) -> list[int] | None:
+    if value is None or not str(value).strip():
+        return None
+    return [int(part) for part in str(value).replace(",", " ").split() if part.strip()]
+
+
 def load_frozen_scgi_corrector(
     root: Path,
     cfg: dict,
@@ -72,6 +84,9 @@ def main() -> None:
     parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
     parser.add_argument("--scgi-checkpoint", type=Path, default=None, help="Optional frozen SCGI checkpoint for scgi_frozen correction.")
     parser.add_argument("--scgi-model-kind", default=None, help="Model kind to use when loading --scgi-checkpoint.")
+    parser.add_argument("--rho-values", default="", help="Optional override for mechanism.rho_values, e.g. '0.001 0.01 0.1 1 10'.")
+    parser.add_argument("--sigma-values", default="", help="Optional override for mechanism.sigma_a_values, e.g. '0.05 0.1 0.3'.")
+    parser.add_argument("--reference-periods", default="", help="Optional override for mechanism.reference_periods, e.g. '2 8 32'.")
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
 
@@ -83,9 +98,9 @@ def main() -> None:
     h = int(mech.get("image_size", 32))
     p = h * h
     frame_budget, _ = basis_frame_budget(p)
-    rho_values = list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))
-    sigma_values = list(mech.get("sigma_a_values", [0.05, 0.15, 0.3]))
-    reference_periods = [int(x) for x in mech.get("reference_periods", [2, 8, 32])]
+    rho_values = parse_float_list(args.rho_values) or list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))
+    sigma_values = parse_float_list(args.sigma_values) or list(mech.get("sigma_a_values", [0.05, 0.15, 0.3]))
+    reference_periods = parse_int_list(args.reference_periods) or [int(x) for x in mech.get("reference_periods", [2, 8, 32])]
     objects = make_synthetic_objects(args.objects, h, int(cfg.get("seed", 0)))
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)

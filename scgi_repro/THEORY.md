@@ -119,11 +119,15 @@ The dedicated M4 runner `run_theory_m4.py` now adds fitted-law outputs under
   summaries retain left-censored and not-reached cells instead of discarding
   them. This is a censored-aware accounting layer, not yet a full survival-style
   boundary estimator.
+- `results/m2_boundary_audit_highrho` extends the M2 rho grid to the prompt
+  upper range `rho=10` and recomputes log-rho interpolated boundaries. Five
+  observed boundary fits now have `R2 >= 0.9`, while censored rows distinguish
+  "already better at the smallest rho" from "not reached by rho=10".
 - `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The current
   random/SRHT fits have low-to-moderate R2, so the AGC law should be treated as
   a diagnostic table pending a cleaner bias-variance derivation.
 
 Remaining theory work before publication: derive the AGC window bias-variance
-law analytically, run a denser rho grid for flip boundaries, and connect the
-published figure-level channel anchors to a hardware-calibrated nonideal model
-if raw detector/SLM logs become available.
+law analytically, turn the high-rho boundary audit into paper-ready curves, and
+connect the published figure-level channel anchors to a hardware-calibrated
+nonideal model if raw detector/SLM logs become available.

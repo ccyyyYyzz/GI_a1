@@ -36,8 +36,9 @@ Channels
   SCGI reproduction should be presented as an executable diagnostic prototype
   until the full training setup is redesigned.
 - The dense M2 reference scan supports `srht_paired + pairwise` as the strict
-  equal-frame blind winner across the current 35-cell grid. This is useful
-  evidence for the SRHT design rule, but it is still idealized.
+  equal-frame blind winner. The high-rho merge covers `rho=0.001..10` and keeps
+  `srht_paired + pairwise` as the winner in 45/45 equal-frame cells. This is
+  useful evidence for the SRHT design rule, but it is still idealized.
 - The dense `scgi_proxy` scan shows that a blind smooth-gain proxy improves over
   raw/AGC baselines without reference frames, but it does not displace SRHT
   pairwise as the equal-frame winner and should not be described as a trained
@@ -52,13 +53,13 @@ Channels
   APL/OE figure-level channel anchors now exist, but raw detector/SLM calibration
   is still needed before claiming hardware-calibrated nonideal performance.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
-  with uncertainty, although `run_theory_m4.py` now provides observed-only
-  compact fits as a starting point.
+  with full uncertainty, although `results/m2_boundary_audit_highrho` now gives
+  five prompt-range log-rho boundary fits with `R2 >= 0.9`.
 - M4 paper-r1 theory hooks now support quadratic residual-gain scaling with
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
   pixels, censored flip-boundary accounting, and AGC window diagnostics. The
-  publication version still needs a cleaner analytical AGC law and denser
-  flip-boundary grid.
+  publication version still needs a cleaner analytical AGC law and paper-ready
+  boundary figures/captions.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the implemented frozen dense baseline underperforms.
 - Published-curve calibration is limited to figure-level priors: APL intensity

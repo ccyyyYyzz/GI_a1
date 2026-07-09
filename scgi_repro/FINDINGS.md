@@ -151,8 +151,9 @@ publication use.
 ## M2 Phase Scan
 
 Experiment: M2 scan with equal 2048 measurement-frame budgets plus explicit
-reference-frame overhead accounting, using 10 objects x 5 seeds over the 7 x 5
-rho/sigma grid.
+reference-frame overhead accounting, using 10 objects x 5 seeds. The original
+dense scan used a 7 x 5 rho/sigma grid; the high-rho extension expands this to
+the prompt-range 9 x 5 grid with `rho = 0.001..10`.
 
 Prediction: best blind method should depend on channel drift speed and amplitude.
 
@@ -166,6 +167,15 @@ Follow-up dense Colab-sharded check:
 `scgi_proxy`, a blind smooth-gain SCGI-style proxy. It contributes 10,500 dense
 rows inside a 78,750-row merged scan, uses zero reference frames, and is kept
 separate from claims about a trained SCGI network.
+
+High-rho prompt-range check:
+`results/phase_m2_scgi_proxy_dense_r1_highrho_merged/phase_scan.csv` merges the
+7-rho dense `scgi_proxy` scan with five monitored local high-rho shards for
+`rho=3,10`. The merged table has 101,250 rows and covers all 45 prompt-range
+rho/sigma cells. `results/m2_boundary_audit_highrho` adds log-rho interpolated
+flip-boundary fits; five observed fits reach `R2 >= 0.9`, including
+`scgi_proxy/srht_paired` vs Hadamard with `R2=0.9889`. It also writes
+`m2_psnr_rho_curves_sigma_0p30.png` and `m2_boundary_fit_curves.png`.
 
 Frozen-network smoke check:
 `results/phase_m2_scgi_frozen_smoke/phase_scan.csv` adds `scgi_frozen`, which
@@ -187,17 +197,15 @@ bases in 6.5%.
 
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
-35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best
-reference-calibrated method across all 35 cells but uses 3073 total physical
+45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best
+reference-calibrated method in 43/45 cells but uses 3073 total physical
 frames instead of 2048, so it should be reported as a separate semi-calibrated
 baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
-bases and does not change the best 35-cell equal-frame map. Flip-boundary output
-is now diagnostic rather than a fitted law: 104 rows are `not_reached`, 17
-`left_censored`, and 14 `observed` in the reference protocol. The frozen-network
-results show that directly reusing the SCGI checkpoint is a real but weak
-cross-domain baseline, not a replacement for basis-aware retraining or
-fine-tuning.
+bases and does not change the best equal-frame map. The high-rho boundary audit
+now provides R2-qualified flip-boundary fits, but the frozen-network results
+show that directly reusing the SCGI checkpoint is a real but weak cross-domain
+baseline, not a replacement for basis-aware retraining or fine-tuning.
 
 ## Rendered Figures
 
@@ -221,14 +229,16 @@ Fixed-P random frame scaling gives `num_frames` exponents about -0.71/-0.72 for
 random binary/uniform bases with R2 > 0.998 and bootstrap intervals excluding
 zero. At 4096 pixels, DCT/Fourier/Hadamard top-5% energy is 0.88-0.92, while
 random/SRHT is about 0.28. Censored flip-boundary tables now retain
-left-censored and not-reached cells. AGC best-window fits are present but weak
-for random/SRHT bases, so they are diagnostic rather than a final law.
+left-censored and not-reached cells. The separate high-rho M2 boundary audit
+extends rho coverage to 10 and yields five boundary fits with `R2 >= 0.9`.
+AGC best-window fits are present but weak for random/SRHT bases, so they are
+diagnostic rather than a final law.
 
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
 toward paper-grade closure. It does not yet complete M4 because the AGC
-bias-variance law needs analytical derivation, flip boundaries need a denser rho
-grid, and the figure-level published-channel priors need to be tied to a
-hardware-calibrated nonideal model.
+bias-variance law needs analytical derivation, the high-rho boundary audit needs
+paper-ready figures/captions, and the figure-level published-channel priors need
+to be tied to a hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 

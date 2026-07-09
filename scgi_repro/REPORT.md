@@ -360,6 +360,27 @@ it does not change the 35-cell best-method map. Flip-boundary diagnostics are
 emitted with boundary statuses: 104 `not_reached`, 17 `left_censored`, and 14
 `observed` in the reference protocol.
 
+Prompt-range high-rho M2 extension:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "3,10" --sigma-values "0.05,0.10,0.15,0.30,0.50" --shard i/5 --output-dir results\phase_m2_highrho_o10s5_shardiof5 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_scgi_proxy_dense_r1_merged results\phase_m2_highrho_o10s5_shard0of5 results\phase_m2_highrho_o10s5_shard1of5 results\phase_m2_highrho_o10s5_shard2of5 results\phase_m2_highrho_o10s5_shard3of5 results\phase_m2_highrho_o10s5_shard4of5 --output-dir results\phase_m2_scgi_proxy_dense_r1_highrho_merged
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_boundary_audit.py --phase-dir results\phase_m2_scgi_proxy_dense_r1_highrho_merged --output-dir results\m2_boundary_audit_highrho
+```
+
+The merged high-rho scan has 101,250 rows over 9 rho values
+`0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10` and five amplitudes. It therefore
+covers the prompt range `rho = 10^-3 ... 10`. The boundary audit reports five
+observed log-rho boundary fits with `R2 >= 0.9`: `reference_k8/srht_paired`
+(`R2=0.9995`), `agc/random_binary` (`R2=0.9950`),
+`none/srht_paired` (`R2=0.9921`), `scgi_proxy/srht_paired` (`R2=0.9889`), and
+`reference_k32/srht_paired` (`R2=0.9863`). Under the strict equal-frame blind
+budget, `srht_paired + pairwise` wins all 45 high-rho merged rho/sigma cells.
+Across all non-oracle methods, `srht_paired + reference_k2` wins 43/45 cells and
+`srht_paired + pairwise` wins the two highest-amplitude high-rho cells. The
+audit also writes `m2_psnr_rho_curves_sigma_0p30.png` and
+`m2_boundary_fit_curves.png` for selected-curve and boundary-fit review.
+
 Latest M3 protocol-statistics run:
 
 ```powershell
@@ -401,13 +422,15 @@ Key M4 checks:
 | fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998; bootstrap CIs roughly [-0.75,-0.70] and [-0.77,-0.66] |
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
 | flip-boundary fits | 4 observed-only fits; censored interval tables now retain 22 left-censored and 144 not-reached dense-frozen boundary entries |
+| high-rho M2 boundary audit | prompt rho range now reaches 10; five log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner is SRHT/pairwise in 45/45 cells |
 | AGC window law | best-window scaling is logged, but fits are weak for random/SRHT bases (R2 0.29-0.55), so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
 the main log-linear fits, censored-aware flip-boundary interval tables, and an
 AGC window-law diagnostic. It still needs a cleaner analytical AGC
-bias-variance derivation and a denser rho grid if the flip-boundary law itself
-must be fit with high confidence.
+bias-variance derivation. The M2 boundary grid has now been extended to
+`rho=10`, but the high-rho boundary audit still needs to be converted into
+paper-ready curves and captions.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -485,6 +508,10 @@ Additional checks:
   numeric tolerance.
 - M2 `scgi_proxy` dense run was split into five Colab L4 shards and merged into
   a 78,750-row scan with all five shard labels present.
+- M2 high-rho extension was split into five monitored local CLI shards and
+  merged into `results/phase_m2_scgi_proxy_dense_r1_highrho_merged` with
+  101,250 rows covering `rho=0.001..10`; boundary audit writes
+  `results/m2_boundary_audit_highrho`.
 - Frozen `scgi_frozen` M2 smoke baseline loads the returned SCGI checkpoint and
   writes `results/phase_m2_scgi_frozen_smoke` with 1785 rows; the dense run
   writes `results/phase_m2_scgi_frozen_dense_r1_merged` with 89,250 rows.
@@ -521,6 +548,6 @@ Additional checks:
   anchors now exist; raw detector/SLM hardware calibration remains outside the
   available PDF data.
 - Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC
-  bias-variance derivation and a denser flip-boundary grid.
+  bias-variance derivation and paper-ready boundary figures/captions.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.
