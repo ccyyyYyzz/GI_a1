@@ -542,9 +542,12 @@ the main log-linear fits, censored-aware flip-boundary interval tables, and an
 AGC window-law diagnostic. `results/theory_m4_paper_r2_highrho` reruns these
 hooks against the prompt-range frozen high-rho phase table. `THEORY.md` now
 contains the candidate AGC bias-variance law, and `PAPER_OUTLINE.md` contains
-draft captions for the eight main figures. The remaining publication work is
-final vector plotting plus a targeted AGC sweep that avoids window-grid
-saturation.
+draft captions for the eight main figures. `run_make_paper_figures.py` renders
+the first paper-facing M2/M4 draft set under `results/paper_figures_r1`,
+including prompt-range winner maps, boundary fits, residual-error fits,
+random-frame scaling, energy concentration, and AGC-window diagnostics. The
+remaining publication work is final venue-formatted vector panel polishing plus
+a targeted AGC sweep that avoids window-grid saturation.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -660,6 +663,8 @@ Additional checks:
   `results/phase_m2_scgi_frozen_dense_r1_highrho_merged` and writes
   `results/theory_m4_paper_r2_highrho`; `THEORY.md` and `PAPER_OUTLINE.md`
   now contain the AGC-law sketch and figure-caption drafts.
+- Paper-facing M2/M4 figures are rendered under `results/paper_figures_r1` with
+  `paper_figure_manifest.csv`.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
   comparison tables under `results/nonideal_m2_compact` and
   `results/nonideal_m2_full_r1_merged`.

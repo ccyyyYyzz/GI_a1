@@ -281,6 +281,12 @@ coefficient envelope from channel gain.
 
 Latest figure manifest: `E:/GAN_FCC_WORK/scgi-repro/results/figures/figure_manifest.csv`.
 
+Latest paper-facing M2/M4 figure manifest:
+`results/paper_figures_r1/paper_figure_manifest.csv`. This includes strict
+equal-frame and all-non-oracle M2 winner maps over `rho=0.001..10`, the observed
+M2 boundary-fit table, residual-gain scaling fit table, random-frame scaling
+curve and fit table, top-5% coefficient-energy curve, and AGC window-law table.
+
 ## M4 Theory Hooks
 
 Experiment: dedicated M4 runner over image sizes 16/32/64, residual gain
@@ -304,15 +310,17 @@ random/SRHT is about 0.28. Censored flip-boundary tables now retain
 left-censored and not-reached cells. The separate high-rho M2 boundary audit
 extends rho coverage to 10 and yields five boundary fits with `R2 >= 0.9`.
 AGC best-window fits are present but weak for random/SRHT bases (`R2=0.29-0.55`),
-so they are diagnostic rather than a final law. `THEORY.md` now contains a
-candidate AGC bias-variance law and `PAPER_OUTLINE.md` contains draft captions
-for the eight main figures.
+so they are diagnostic rather than a final law. `results/paper_figures_r1` now
+renders the M2/M4 paper-facing figure draft set from these CSVs. `THEORY.md`
+contains a candidate AGC bias-variance law and `PAPER_OUTLINE.md` contains draft
+captions for the eight main figures.
 
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
 toward paper-grade closure. It still does not fully complete M4 because the AGC
-law needs a targeted validation sweep and the high-rho boundary diagnostics need
-final vector figures; the figure-level published-channel priors also need to be
-tied to a hardware-calibrated nonideal model.
+law needs a targeted validation sweep and the current paper figures are PNG
+drafts rather than final venue-formatted vector panels; the figure-level
+published-channel priors also need to be tied to a hardware-calibrated nonideal
+model.
 
 ## Nonideal Digital Twin
 

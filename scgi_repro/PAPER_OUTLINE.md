@@ -125,9 +125,10 @@ whitening object-dependent coefficient order.
   plotting.
 - M4 high-rho r2 theory hooks now support quadratic residual-gain scaling with
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
-  pixels, censored flip-boundary accounting, and AGC window diagnostics. The
-  publication version still needs final vector plotting and a more targeted AGC
-  validation sweep.
+  pixels, censored flip-boundary accounting, and AGC window diagnostics.
+  `results/paper_figures_r1` now renders the current M2/M4 figure draft set and
+  manifest. The publication version still needs final venue-formatted vector
+  polishing and a more targeted AGC validation sweep.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the frozen dense baseline, current fine-tuned smokes, and
   true-gain predictor smokes underperform overall.
