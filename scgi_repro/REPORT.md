@@ -298,6 +298,16 @@ threshold from 0.1 to 0.9 leaves CNR unchanged because the synthetic stripe is
 binary. The remaining miss is therefore not explained by far-background ROI
 choice or threshold convention.
 
+`results/stage4_postprocess_audit_r1` changes the question from "is the
+continuous URED image already high-CNR?" to "is the target shape present if the
+continuous image is calibrated into a mask?" The answer is yes for stripe: a
+target-free Otsu threshold on the reconstruction histogram raises CNR from 9.365
+to 15.288 and gives IoU 0.987, while a simple mean+standard-deviation threshold
+also reaches CNR 14.121. This should not be counted as the strict APL URED
+reproduction unless the reporting protocol permits thresholded URED outputs, but
+it is strong evidence that the remaining Stage 4 failure is output calibration or
+post-processing, not target localization.
+
 A follow-up target-free proxy audit records `loss`, data/augmentation losses,
 denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
 at every URED step. Among these simple rules, `max_proxy_min` is best by

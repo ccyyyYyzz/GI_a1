@@ -47,6 +47,14 @@ gain fit before a small residual U-Net. A smoke 2-epoch run reaches SCGI CNR
 Colab 2-epoch run reaches SCGI CNR 2.535, validation SCGI KS pass rate 1.0, and
 validation MSE 1.83e-8, matching the analytic exponential/static control.
 
+Stage 4 post-processing diagnostic: the best continuous stripe URED output still
+misses the APL minimum (`9.365 < 10.43`), but `results/stage4_postprocess_audit_r1`
+shows that a target-free Otsu threshold applied to that same reconstruction
+raises CNR to 15.288 with IoU 0.987. This is not yet counted as strict paper
+reproduction because it changes the reported output from continuous URED to a
+thresholded mask, but it localizes the remaining Stage 4 gap to output
+calibration/post-processing rather than object localization.
+
 ## Stage 3 Held-Out Targets
 
 Experiment: load the saved Stage 0 smoke checkpoint and test letter/stripe/ring
