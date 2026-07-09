@@ -148,10 +148,21 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `results/stage4_ured_lr_residual_xi_micro_r1_stripe/`: monitored continuous
   URED micro-sweeps over LR, residual scale, and `xi/x_step`; best stripe
   final/target-aware trace CNR improves to 9.502/9.606 but remains below 10.43.
-- `results/stage4_trace_audit_r5/`: combined final-vs-target-aware trace audit
-  for 12 Stage 4 NLM URED sweeps including patch, capacity, seed, LR,
-  residual-scale, and `xi/x_step` sweeps; stripe remains below the APL URED
-  minimum CNR.
+- `results/stage4_ured_prompt_capacity_micro_r1_stripe/`: monitored retest of
+  prompt-like capacity near the new LR/residual-scale basin. Best stripe CNR is
+  9.670, so capacity alone still does not clear the APL URED gate.
+- `results/stage4_ured_binary_prior_pilot_r1_stripe/`: monitored continuous
+  double-well pilot. It gives a small gain to 9.711 CNR, but remains below
+  10.43.
+- `results/stage4_ured_otsu_soft_pilot_r1_stripe/` and
+  `results/stage4_ured_otsu_soft_fixedstep_r1_stripe/`: monitored target-free
+  soft-Otsu RED pilots. The fixed-step continuous `x-u` stripe output reaches
+  12.350 CNR at 15 steps with `nlm_otsu_soft`, clearing the APL URED minimum
+  for stripe under this modified regularizer.
+- `results/stage4_trace_audit_r6/`: combined final-vs-target-aware trace audit
+  for 16 Stage 4 sweeps. It records 893 detail rows and adds the soft-Otsu RED
+  evidence; all objects have target-aware trace points above 10.43, while
+  all-object fixed-step/final validation remains open.
 - `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
   raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.
   It shows the 9.365 CNR miss is not caused by target threshold or far-background

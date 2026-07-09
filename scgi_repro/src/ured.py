@@ -78,6 +78,24 @@ def denoise_nlm(x: torch.Tensor, h: float = 0.08, patch_size: int = 5, patch_dis
     return out.reshape_as(x)
 
 
+def otsu_threshold(x: torch.Tensor, bins: int = 64) -> torch.Tensor:
+    flat = x.detach().float().clamp(0.0, 1.0).reshape(-1)
+    hist = torch.histc(flat, bins=max(2, int(bins)), min=0.0, max=1.0)
+    prob = hist / hist.sum().clamp_min(1e-8)
+    centers = torch.linspace(0.0, 1.0, steps=prob.numel(), device=prob.device, dtype=prob.dtype)
+    omega = torch.cumsum(prob, dim=0)
+    mu = torch.cumsum(prob * centers, dim=0)
+    total_mu = mu[-1]
+    between = (total_mu * omega - mu) ** 2 / (omega * (1.0 - omega)).clamp_min(1e-8)
+    return centers[int(torch.argmax(between).detach().cpu())].to(device=x.device, dtype=x.dtype)
+
+
+def denoise_otsu_soft(x: torch.Tensor, temperature: float = 0.05) -> torch.Tensor:
+    threshold = otsu_threshold(x)
+    temp = max(1.0e-4, float(temperature))
+    return torch.sigmoid((x.clamp(0.0, 1.0) - threshold) / temp)
+
+
 def apply_denoiser(x: torch.Tensor, ured: dict) -> torch.Tensor:
     name = str(ured.get("denoiser", "avg_pool")).lower()
     if name in {"none", "identity"}:
@@ -89,7 +107,25 @@ def apply_denoiser(x: torch.Tensor, ured: dict) -> torch.Tensor:
             patch_size=int(ured.get("nlm_patch_size", 5)),
             patch_distance=int(ured.get("nlm_patch_distance", 6)),
         )
+    if name in {"otsu_soft", "soft_otsu"}:
+        return denoise_otsu_soft(x, temperature=float(ured.get("otsu_temperature", 0.05)))
+    if name in {"nlm_otsu_soft", "otsu_nlm_soft"}:
+        denoised = denoise_nlm(
+            x,
+            h=float(ured.get("nlm_h", 0.08)),
+            patch_size=int(ured.get("nlm_patch_size", 5)),
+            patch_distance=int(ured.get("nlm_patch_distance", 6)),
+        )
+        return denoise_otsu_soft(denoised, temperature=float(ured.get("otsu_temperature", 0.05)))
     return denoise_avg_pool(x, kernel_size=int(ured.get("denoise_kernel", 3)))
+
+
+def binary_double_well(x: torch.Tensor) -> torch.Tensor:
+    return x.pow(2) * (1.0 - x).pow(2)
+
+
+def binary_double_well_grad(x: torch.Tensor) -> torch.Tensor:
+    return 2.0 * x * (1.0 - x) * (1.0 - 2.0 * x)
 
 
 def optimize_untrained(
@@ -108,6 +144,7 @@ def optimize_untrained(
     beta = float(ured.get("beta", 0.5)) if use_regularizer else 0.0
     xi = float(ured.get("xi", 0.5))
     x_step = float(ured.get("x_step", 0.5))
+    binary_prior_weight = max(0.0, float(ured.get("binary_prior_weight", 0.0)))
     net = TinyNAFNet(
         channels=int(ured.get("channels", 24)),
         blocks=int(ured.get("blocks", 3)),
@@ -137,10 +174,15 @@ def optimize_untrained(
         with torch.no_grad():
             out = net(inp)
             denoiser_mse = 0.0
+            binary_prior_loss = 0.0
             if beta > 0:
                 fx = apply_denoiser(x, ured)
                 denoiser_mse = float(torch.mean((x - fx) ** 2).detach().cpu())
-                x = x - x_step * (beta * (x - fx) + xi * (x - out - u))
+                update = beta * (x - fx) + xi * (x - out - u)
+                if binary_prior_weight > 0:
+                    binary_prior_loss = float(torch.mean(binary_double_well(x)).detach().cpu())
+                    update = update + binary_prior_weight * binary_double_well_grad(x)
+                x = x - x_step * update
             else:
                 x = out.detach()
             u = u - x + out.detach()
@@ -152,6 +194,7 @@ def optimize_untrained(
                 "proxy_data_loss": float(data_loss.detach().cpu()),
                 "proxy_aug_loss": float(aug_loss.detach().cpu()),
                 "proxy_denoiser_mse": denoiser_mse,
+                "proxy_binary_prior_loss": binary_prior_loss,
                 "proxy_net_delta_mse": float(torch.mean((out.detach() - inp) ** 2).detach().cpu()),
                 "proxy_dual_abs_mean": float(torch.mean(torch.abs(u)).detach().cpu()),
             }

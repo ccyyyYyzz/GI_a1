@@ -167,6 +167,19 @@ peak, but still do not clear the APL URED minimum of `10.43`.
 `results/stage4_trace_audit_r5` records the combined final-vs-trace audit across
 12 sweeps and 583 detail rows; stripe remains the only object below the APL URED
 minimum even with target-aware trace selection.
+`results/stage4_ured_prompt_capacity_micro_r1_stripe` then retests the
+prompt-like 32-channel/4-block capacity around the improved LR/residual-scale
+basin; the best stripe CNR rises only to `9.670`, so capacity is still not the
+binding issue. `results/stage4_ured_binary_prior_pilot_r1_stripe` adds a
+continuous double-well prior and gives a small gain to `9.711`. The stronger
+change is `nlm_otsu_soft`, a target-free soft-Otsu RED denoiser that keeps the
+final report image as continuous `x-u`. In
+`results/stage4_ured_otsu_soft_fixedstep_r1_stripe`, a fixed 15-step run reaches
+stripe CNR `12.350` with PSNR `21.522`, clearing the APL URED minimum for stripe
+without hard thresholding the final image. `results/stage4_trace_audit_r6`
+combines 16 sweeps and 893 detail rows; it now records target-aware trace points
+above `10.43` for all four objects, but all-object fixed-step/final validation
+of the modified soft-Otsu RED path is still pending.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
 cropping to the target bounding box lowers it to `7.578`, and sweeping the target

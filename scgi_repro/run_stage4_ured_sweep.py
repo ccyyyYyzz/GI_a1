@@ -61,6 +61,8 @@ def build_grid(args: argparse.Namespace, cfg: dict) -> list[dict[str, object]]:
         "nlm_h": parse_floats(args.nlm_h_values, [float(ured.get("nlm_h", 0.08))]),
         "nlm_patch_size": parse_ints(args.nlm_patch_size_values, [int(ured.get("nlm_patch_size", 5))]),
         "nlm_patch_distance": parse_ints(args.nlm_patch_distance_values, [int(ured.get("nlm_patch_distance", 6))]),
+        "otsu_temperature": parse_floats(args.otsu_temperature_values, [float(ured.get("otsu_temperature", 0.05))]),
+        "binary_prior_weight": parse_floats(args.binary_prior_values, [float(ured.get("binary_prior_weight", 0.0))]),
     }
     if args.fixed_init_seed_values is not None:
         values["fixed_init_seed"] = parse_ints(args.fixed_init_seed_values, [])
@@ -99,6 +101,8 @@ def main() -> None:
     parser.add_argument("--nlm-h-values", default=None)
     parser.add_argument("--nlm-patch-size-values", default=None)
     parser.add_argument("--nlm-patch-distance-values", default=None)
+    parser.add_argument("--otsu-temperature-values", default=None)
+    parser.add_argument("--binary-prior-values", default=None)
     parser.add_argument("--seed-offset", type=int, default=0)
     parser.add_argument("--fixed-init-seed", type=int, default=None)
     parser.add_argument(
@@ -236,6 +240,8 @@ def main() -> None:
                     "nlm_h": float(config["nlm_h"]),
                     "nlm_patch_size": int(config["nlm_patch_size"]),
                     "nlm_patch_distance": int(config["nlm_patch_distance"]),
+                    "otsu_temperature": float(config["otsu_temperature"]),
+                    "binary_prior_weight": float(config["binary_prior_weight"]),
                 }
             )
             target = images[object_index]
