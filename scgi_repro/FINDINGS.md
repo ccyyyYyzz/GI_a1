@@ -104,9 +104,14 @@ paper-threshold reproduction claim for APL URED 10.43.
 configs around the best region and does not improve the target-aware peak
 (`best_trace_cnr=8.520`). `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`
 then converts the observed early peak into a fixed-step sweep; the best
-deployable stripe final CNR improves to `8.932` at 40 steps and `nlm_h=0.06`,
-but remains below the APL URED minimum. `results/stage4_trace_audit_r1` records
-the combined final-vs-trace audit across these sweeps.
+deployable stripe final CNR improves to `8.932` at 40 steps and `nlm_h=0.06`.
+`results/stage4_ured_sweep_nlm_refine_r1_stripe` adds an 81-row local refinement
+and reaches final/trace CNRs `9.024`/`9.214`; the 72-row
+`results/stage4_ured_sweep_nlm_microrefine_r1_stripe` micro-refinement raises the
+best stripe final/trace CNR to `9.365` at 36 steps, `x_step=0.11`, and
+`nlm_h=0.062`, but still remains below the APL URED minimum.
+`results/stage4_trace_audit_r1` records the combined final-vs-trace audit across
+these sweeps.
 
 Stage 4 target-free proxy audit:
 `results/stage4_ured_proxy_audit_r1` adds per-step `proxy_*` traces for losses,
