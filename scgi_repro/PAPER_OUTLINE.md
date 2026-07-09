@@ -151,9 +151,10 @@ estimable.
   ordered Hadamard), but it refutes the prompt's `>=3 dB` fast-drift gate.
   Because `rho=0.1` is already transitional/sub-floor by the default gate and
   `rho>=1` blind reconstructions are at floor, moderate/fast deltas should be
-  presented as sub-floor coincidences, not effects. The direct random-comparator
-  run remains an estimator caveat because random bases use correlation/DGI while
-  orthogonal bases use exact inversion.
+  presented as sub-floor coincidences, not effects. The least-squares random
+  control in `results/m3_random_comparator_fast_ls_r1` narrows the estimator
+  caveat: random binary remains at floor (`rel_mse` 0.963-0.987), and SRHT is
+  only +0.059 to +0.322 dB above the best random basis in fast drift.
 - Flip boundaries are now represented both as observed fits and censored
   intervals. `results/m2_boundary_audit_highrho` gives four above-floor
   prompt-range log-rho boundary fits with `R2 >= 0.9`, while

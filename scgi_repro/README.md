@@ -328,6 +328,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of
   the best random basis but remains slightly below ordered Hadamard, so the
   strong `>=3 dB` constructive gate is still refuted.
+- `results/m3_random_comparator_fast_ls_r1/`: monitored least-squares random
+  control over the same fast-drift grid. Random binary with LS remains at the
+  reconstruction floor (`rel_mse` 0.963-0.987), and SRHT/pairwise is only
+  +0.059 to +0.322 dB above the best random basis, so this narrows the estimator
+  caveat without creating an above-floor fast-drift effect.
 - Current M1 audit figures are under `results/mechanism_m1_protocol_o10s5/`;
   paper-facing M2/M4 and multipanel drafts live under `results/paper_figures_r1/`.
 

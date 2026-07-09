@@ -732,7 +732,14 @@ ordered Hadamard), but those deltas are sub-floor coincidences and are not
 reported as effects. The direct random-comparator follow-up is therefore an
 estimator caveat rather than a ranking proof: orthogonal variants use exact
 inversion, while random baselines use correlation/DGI reconstruction; a
-least-squares random control remains future work.
+least-squares random control now narrows that caveat. The monitored
+`results/m3_random_comparator_fast_ls_r1` reruns the same fast-drift grid with
+random bases reconstructed by least squares. It writes 3,600 raw rows, 72 summary
+rows, and 4 delta rows. Best random is `random_binary`, but it remains at the
+reconstruction floor (`rel_mse` 0.963-0.987); SRHT/pairwise is +0.059 to
++0.322 dB above the best random basis while still slightly below the best
+sign-only/ordered ablation. This confirms that the fast-drift region is
+sub-floor even after removing the DGI/correlation estimator asymmetry.
 
 Latest M4 theory runs:
 

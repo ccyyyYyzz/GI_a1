@@ -1,0 +1,24 @@
+{
+  "raw_rows": 3600,
+  "summary_rows": 72,
+  "delta_rows": 4,
+  "rho_values": [
+    1.0,
+    10.0
+  ],
+  "sigma_a_values": [
+    0.3,
+    0.5
+  ],
+  "variants": [
+    "hadamard_ordered",
+    "random_binary",
+    "random_uniform",
+    "sign_only",
+    "srht_full"
+  ],
+  "srht_minus_ordered_min_db": -0.009418935796363215,
+  "srht_minus_ordered_max_db": -0.0031151519169743125,
+  "srht_minus_best_random_min_db": 0.059056147292562144,
+  "srht_minus_best_random_max_db": 0.3215567949004683
+}

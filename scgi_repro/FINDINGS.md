@@ -457,6 +457,13 @@ alternative `sign_time_interleave` is still best in those fast cells, but its
 `results/m3_random_comparator_fast_r1` adds 3,600 raw rows and 4 delta rows; it
 is retained as an estimator caveat because random baselines use correlation/DGI
 while orthogonal variants use exact inversion.
+`results/m3_random_comparator_fast_ls_r1` closes the smallest version of that
+caveat by rerunning the same fast-drift grid with random least-squares
+reconstruction. It writes 3,600 raw rows, 72 summary rows, and 4 delta rows. The
+best random basis is `random_binary`, but it remains at floor (`rel_mse`
+0.963-0.987); SRHT/pairwise is only +0.059 to +0.322 dB above it. Thus the LS
+control supports the current framing: fast drift is a reconstruction-floor
+region, not a robust SRHT or random-basis effect region.
 
 Supports/refutes: refutes the strong `>=3 dB` fast-drift SRHT gate and updates
 the constructive conclusion. Randomization of the coefficient sequence buys
