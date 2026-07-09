@@ -1,0 +1,21 @@
+{
+  "profile": "smoke",
+  "device": "cuda",
+  "checkpoint": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\m2_scgi_proxyinput_gain1d_smoke_r1\\m2_scgi_checkpoint.pt",
+  "samples": 216,
+  "train_samples": 173,
+  "val_samples": 43,
+  "num_frames": 2048,
+  "padded_side": 46,
+  "model_kind": "gain_predictor_1d",
+  "input_normalize": "none",
+  "input_mode": "scgi_proxy_gain",
+  "target_normalize": "none",
+  "target_mode": "gain",
+  "output_clamp": "none",
+  "start_epoch": 0,
+  "resume_checkpoint": null,
+  "latest_checkpoint": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\m2_scgi_proxyinput_gain1d_smoke_r1\\m2_scgi_checkpoint_latest.pt",
+  "final_train_mse": 0.030694095925851303,
+  "final_val_mse": 0.022475675369302433
+}

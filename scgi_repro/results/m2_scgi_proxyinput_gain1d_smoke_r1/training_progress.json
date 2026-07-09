@@ -1,0 +1,10 @@
+{
+  "checkpoint": "m2_scgi_checkpoint_latest.pt",
+  "epoch": 30,
+  "final_checkpoint": "m2_scgi_checkpoint.pt",
+  "resumed_from": null,
+  "state": "completed",
+  "target_epochs": 30,
+  "train_mse_last": 0.030694095925851303,
+  "val_mse_last": 0.022475675369302433
+}

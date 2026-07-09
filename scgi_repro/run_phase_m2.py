@@ -12,7 +12,13 @@ import torch
 from run_mechanism_m1 import make_synthetic_objects, reconstruct_observed
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
-from src.mechanisms import make_multiplicative_channel, reference_anchor_count, simulate_channel_measurements
+from src.mechanisms import (
+    estimate_agc_gain,
+    estimate_scgi_proxy_gain,
+    make_multiplicative_channel,
+    reference_anchor_count,
+    simulate_channel_measurements,
+)
 from src.run_progress import append_rows, read_completed_unit_indexes, write_json_atomic, write_progress
 from src.scgi_model import make_scgi_model
 from src.train_scgi import correct_measurements_padded
@@ -58,21 +64,38 @@ def load_frozen_scgi_corrector(
     resolved = checkpoint if checkpoint.is_absolute() else root / checkpoint
     if not resolved.exists():
         raise FileNotFoundError(f"SCGI checkpoint not found: {resolved}")
-    model_cfg = copy.deepcopy(cfg)
-    if model_kind:
-        model_cfg.setdefault("scgi", {})["model_kind"] = str(model_kind)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = make_scgi_model(model_cfg).to(device)
     payload = torch.load(resolved, map_location=device)
     state_dict = payload["model_state_dict"] if isinstance(payload, dict) and "model_state_dict" in payload else payload
     metadata = payload.get("corrector_metadata", {}) if isinstance(payload, dict) else {}
+    payload_cfg = payload.get("config") if isinstance(payload, dict) else None
+    model_cfg = copy.deepcopy(payload_cfg if isinstance(payload_cfg, dict) else cfg)
+    if isinstance(metadata, dict) and metadata.get("model_kind") and not model_kind:
+        model_cfg.setdefault("scgi", {})["model_kind"] = str(metadata["model_kind"])
+    if model_kind:
+        model_cfg.setdefault("scgi", {})["model_kind"] = str(model_kind)
+    model = make_scgi_model(model_cfg).to(device)
     model.load_state_dict(state_dict)
     model.eval()
 
     def correct(values: torch.Tensor) -> torch.Tensor:
         source_device = values.device
         source_dtype = values.dtype
-        rows = values.detach().reshape(1, -1).to(device=device, dtype=torch.float32)
+        input_mode = str(metadata.get("input_mode", "raw")).lower() if isinstance(metadata, dict) else "raw"
+        if input_mode == "scgi_proxy_gain":
+            model_values = estimate_scgi_proxy_gain(
+                values.detach().to(dtype=torch.float32),
+                paired=False,
+                window=max(9, int(0.05 * values.numel())),
+            )
+        elif input_mode == "agc_gain":
+            model_values = estimate_agc_gain(
+                values.detach().to(dtype=torch.float32),
+                window=max(9, int(0.05 * values.numel())),
+            )
+        else:
+            model_values = values.detach().to(dtype=torch.float32)
+        rows = model_values.reshape(1, -1).to(device=device, dtype=torch.float32)
         if metadata.get("input_normalize") == "row_max":
             rows = rows / rows.amax(dim=1, keepdim=True).clamp_min(1.0e-8)
         elif metadata.get("input_normalize") == "row_absmax":

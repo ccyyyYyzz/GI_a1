@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader, TensorDataset, random_split
 from run_mechanism_m1 import make_synthetic_objects
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
-from src.mechanisms import make_multiplicative_channel, simulate_channel_measurements
+from src.mechanisms import estimate_agc_gain, estimate_scgi_proxy_gain, make_multiplicative_channel, simulate_channel_measurements
 from src.run_progress import write_json_atomic
 from src.scgi_model import make_scgi_model
 from src.train_scgi import as_images, correct_measurements_padded
@@ -55,7 +55,12 @@ def uses_signed_output(model_kind: str) -> bool:
 
 
 def predicts_gain(model_kind: str, target_mode: str) -> bool:
-    return str(target_mode).lower() == "gain" or str(model_kind).lower() in {"gain_predictor_unet", "log_gain_predictor_unet"}
+    return str(target_mode).lower() == "gain" or str(model_kind).lower() in {
+        "gain_predictor_unet",
+        "log_gain_predictor_unet",
+        "gain_predictor_1d",
+        "log_gain_predictor_1d",
+    }
 
 
 def basis_specs_from_names(names: list[str], frame_budget: int) -> list[tuple[str, dict[str, object]]]:
@@ -107,7 +112,18 @@ def build_training_rows(args: argparse.Namespace, cfg: dict) -> tuple[torch.Tens
                             read_noise=float(mech.get("read_noise", 0.0)),
                             seed=13000 + 53 * object_idx + seed_idx,
                         )
-                        x_rows.append(observed.reshape(1, -1))
+                        input_mode = str(args.input_mode).lower()
+                        if input_mode == "scgi_proxy_gain":
+                            model_input = estimate_scgi_proxy_gain(
+                                observed,
+                                paired=False,
+                                window=max(9, int(0.05 * frame_budget)),
+                            )
+                        elif input_mode == "agc_gain":
+                            model_input = estimate_agc_gain(observed, window=max(9, int(0.05 * frame_budget)))
+                        else:
+                            model_input = observed
+                        x_rows.append(model_input.reshape(1, -1))
                         if args.target_mode == "gain":
                             y_rows.append(channel.gains.reshape(1, -1))
                         else:
@@ -144,6 +160,7 @@ def main() -> None:
     parser.add_argument("--lr", type=float, default=1.0e-3)
     parser.add_argument("--val-frac", type=float, default=0.2)
     parser.add_argument("--input-normalize", default="row_max", choices=["row_max", "row_absmax", "none"])
+    parser.add_argument("--input-mode", default="raw", choices=["raw", "scgi_proxy_gain", "agc_gain"])
     parser.add_argument("--target-normalize", default="row_max", choices=["row_max", "row_absmax", "none"])
     parser.add_argument("--target-mode", default="measurement", choices=["measurement", "gain"])
     parser.add_argument("--output-clamp", default="auto", choices=["auto", "01", "none"])
@@ -203,6 +220,7 @@ def main() -> None:
         return {
             "task": "m2_scgi_finetune",
             "input_normalize": args.input_normalize,
+            "input_mode": args.input_mode,
             "target_normalize": args.target_normalize,
             "target_mode": args.target_mode,
             "output_clamp": output_clamp,
@@ -291,6 +309,7 @@ def main() -> None:
         "padded_side": side,
         "model_kind": args.model_kind,
         "input_normalize": args.input_normalize,
+        "input_mode": args.input_mode,
         "target_normalize": args.target_normalize,
         "target_mode": args.target_mode,
         "output_clamp": output_clamp,

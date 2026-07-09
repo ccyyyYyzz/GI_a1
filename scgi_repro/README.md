@@ -32,6 +32,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_m2_scgi_train.py --profile smoke --model-kind gain_unet --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 20 --output-dir results\m2_scgi_finetune_gain_smoke_r1
 & $py run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint-map results\m2_scgi_basis_specific_smoke_r1\checkpoint_map.json --output-dir results\phase_m2_scgi_basis_specific_heldout_smoke_r1 --no-findings
 & $py run_m2_scgi_train.py --profile smoke --model-kind gain_predictor_unet --target-mode gain --input-normalize row_max --target-normalize none --gain-min 0.05 --gain-max 2.5 --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 30 --output-dir results\m2_scgi_gain_predictor_rawgain_smoke_r1
+& $py run_m2_scgi_train.py --profile smoke --model-kind gain_predictor_1d --target-mode gain --input-mode scgi_proxy_gain --input-normalize none --target-normalize none --gain-min 0.05 --gain-max 2.5 --bases "random_uniform random_binary hadamard_paired dct_paired fourier_fourstep srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 30 --batch-size 16 --output-dir results\m2_scgi_proxyinput_gain1d_smoke_r1
+& $py run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint results\m2_scgi_proxyinput_gain1d_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1 --no-findings
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
@@ -169,6 +171,13 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_gain_predictor_heldout_smoke_r1/` and
   `results/phase_m2_scgi_gain_predictor_rawgain_heldout_smoke_r1/`: held-out
   checks showing the gain-predictor route remains a negative baseline.
+- `results/phase_m2_scgi_gain_predictor_rawgain_heldout_smoke_r2_loaderfix/`:
+  held-out check after fixing checkpoint-metadata loading; raw-gain predictor
+  improves from 12.05 to 14.77 dB mean but remains below `none`.
+- `results/m2_scgi_proxyinput_gain1d_smoke_r1/` and
+  `results/phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1/`: proxy-envelope
+  input plus 1D gain-predictor smoke; held-out `scgi_frozen` reaches 15.72 dB
+  mean, above `none`/`agc` and 0.18 dB below `scgi_proxy`.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.

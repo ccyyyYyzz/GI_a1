@@ -223,6 +223,26 @@ class TestCoreNumerics(unittest.TestCase):
         self.assertLessEqual(float(pred.max()), 4.0)
         self.assertGreater(float(pred.max()), 1.0)
 
+    def test_1d_gain_predictor_outputs_positive_gains(self):
+        scgi_model = importlib.import_module("src.scgi_model")
+        model = scgi_model.make_scgi_model(
+            {
+                "scgi": {
+                    "model_kind": "gain_predictor_1d",
+                    "unet_base_channels": 4,
+                    "unet_depth": 2,
+                    "use_coord_channels": True,
+                    "gain_min": 0.05,
+                    "gain_max": 2.5,
+                }
+            }
+        )
+        pred = model(torch.zeros((2, 1, 8, 8), dtype=torch.float32))
+        self.assertEqual(tuple(pred.shape), (2, 1, 8, 8))
+        self.assertTrue(torch.all(torch.isfinite(pred)))
+        self.assertGreaterEqual(float(pred.min()), 0.05)
+        self.assertLessEqual(float(pred.max()), 2.5)
+
     def test_exponential_residual_model_can_remove_known_decay(self):
         scgi_model = importlib.import_module("src.scgi_model")
         model = scgi_model.make_scgi_model(
@@ -668,6 +688,50 @@ class TestChannelMechanisms(unittest.TestCase):
         self.assertFalse(corrected.values_are_coefficients)
         self.assertIsNone(corrected.gain_hat)
         self.assertTrue(torch.allclose(corrected.values, observed * 0.25))
+
+    def test_frozen_checkpoint_loader_uses_checkpoint_model_metadata(self):
+        run_phase_m2 = importlib.import_module("run_phase_m2")
+        scgi_model = importlib.import_module("src.scgi_model")
+        checkpoint_cfg = {
+            "scgi": {
+                "model_kind": "gain_predictor_unet",
+                "unet_base_channels": 2,
+                "unet_depth": 1,
+                "use_coord_channels": False,
+                "gain_min": 2.0,
+                "gain_max": 2.0 + 1.0e-6,
+            }
+        }
+        model = scgi_model.make_scgi_model(checkpoint_cfg)
+        wrong_runtime_cfg = {
+            "scgi": {
+                "model_kind": "gain_unet",
+                "unet_base_channels": 2,
+                "unet_depth": 1,
+                "use_coord_channels": False,
+                "gain_min": 0.1,
+                "gain_max": 4.0,
+            }
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            checkpoint = Path(tmp) / "gain_predictor.pt"
+            torch.save(
+                {
+                    "model_state_dict": model.state_dict(),
+                    "config": checkpoint_cfg,
+                    "corrector_metadata": {
+                        "model_kind": "gain_predictor_unet",
+                        "input_normalize": "none",
+                        "target_mode": "gain",
+                        "output_clamp": "none",
+                    },
+                },
+                checkpoint,
+            )
+            correct = run_phase_m2.load_frozen_scgi_corrector(ROOT, wrong_runtime_cfg, checkpoint, model_kind=None)
+            observed = torch.linspace(2.0, 10.0, 10)
+            corrected = correct(observed)
+            self.assertTrue(torch.allclose(corrected, observed / 2.0, rtol=1.0e-5, atol=1.0e-5))
 
 
 class TestBasisGeneration(unittest.TestCase):

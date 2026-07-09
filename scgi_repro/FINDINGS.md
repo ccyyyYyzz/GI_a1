@@ -273,6 +273,19 @@ mismatch, but it does not make the network competitive. On the same held-out
 grid, row-max-normalized gain targets give mean `scgi_frozen` PSNR 12.04 dB
 (-3.27 dB versus `none`), and raw gain targets give 12.05 dB (-3.26 dB versus
 `none`, -3.85 dB versus `scgi_proxy`, and -6.19 dB versus paired `pairwise`).
+Fixing frozen-checkpoint loading to honor checkpoint config/metadata raises the
+raw-gain predictor held-out mean to 14.77 dB, confirming a real evaluation bug
+but not solving the representation problem.
+
+Proxy-input trained SCGI smoke:
+`results/m2_scgi_proxyinput_gain1d_smoke_r1` trains `gain_predictor_1d` with the
+blind `scgi_proxy` gain envelope as input and true simulator gains as target.
+`results/phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1` then evaluates the
+same held-out rho/sigma/object grid. Mean `scgi_frozen` PSNR is 15.72 dB, above
+`none` by +0.41 dB and AGC by +0.41 dB, and only -0.18 dB below `scgi_proxy`.
+It beats `none` in 20/36 equal-frame cells and reaches or beats `scgi_proxy` in
+14/36 cells. It remains below paired `pairwise`, so this is a competitive
+trained blind correction smoke, not yet a final dense phase-diagram result.
 
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
@@ -282,12 +295,11 @@ frames instead of 2048, so it should be reported as a separate semi-calibrated
 baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
 bases and does not change the best equal-frame map. The high-rho boundary audit
-now provides R2-qualified flip-boundary fits, but the frozen-network results
-and fine-tuned smoke results show that the current network paths are real but
-weak baselines, not yet a competitive basis-aware SCGI phase diagram. The gain
-predictor result specifically suggests that the next bottleneck is not only the
-output clamp, but the input representation's inability to separate object
-coefficient envelope from channel gain.
+now provides R2-qualified flip-boundary fits. The proxy-input 1D trained network
+shows that a learned blind correction can become competitive with smooth-gain
+proxy baselines, but it has not changed the best equal-frame map and still needs
+a dense prompt-range run before it can support a network-level phase-diagram
+claim.
 
 ## Rendered Figures
 

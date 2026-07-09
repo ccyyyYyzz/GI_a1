@@ -184,6 +184,45 @@ class GainPredictorUNet(nn.Module):
         return self.gain_min + (self.gain_max - self.gain_min) * raw_gain
 
 
+class GainPredictor1D(nn.Module):
+    """Predict a positive gain sequence with convolutions along frame index."""
+
+    def __init__(
+        self,
+        hidden_channels: int = 16,
+        depth: int = 4,
+        use_coord_channels: bool = True,
+        gain_min: float = 1.0e-4,
+        gain_max: float = 4.0,
+    ):
+        super().__init__()
+        self.use_coord_channels = bool(use_coord_channels)
+        self.gain_min = float(gain_min)
+        self.gain_max = float(gain_max)
+        if not (0.0 < self.gain_min < self.gain_max):
+            raise ValueError("gain_min must be positive and smaller than gain_max.")
+        in_channels = 2 if self.use_coord_channels else 1
+        layers: list[nn.Module] = []
+        prev = in_channels
+        for _ in range(max(1, int(depth))):
+            layers.append(nn.Conv1d(prev, hidden_channels, kernel_size=9, padding=4))
+            layers.append(nn.ReLU(inplace=True))
+            prev = hidden_channels
+        layers.append(nn.Conv1d(prev, 1, kernel_size=1))
+        self.net = nn.Sequential(*layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        b, _c, h, w = x.shape
+        rows = x.reshape(b, 1, h * w)
+        if self.use_coord_channels:
+            coord = torch.linspace(-1.0, 1.0, rows.shape[-1], dtype=x.dtype, device=x.device)
+            coord = coord.reshape(1, 1, -1).expand(b, 1, -1)
+            rows = torch.cat([rows, coord], dim=1)
+        raw_gain = torch.sigmoid(self.net(rows))
+        gain = self.gain_min + (self.gain_max - self.gain_min) * raw_gain
+        return gain.reshape(b, 1, h, w)
+
+
 class ExponentialResidualUNet(nn.Module):
     """Physics-informed exponential gain correction with a small U-Net residual."""
 
@@ -258,6 +297,14 @@ def make_scgi_model(cfg: dict) -> UNet:
             base_channels=base_channels,
             depth=depth,
             use_coord_channels=bool(scgi.get("use_coord_channels", False)),
+            gain_min=float(scgi.get("gain_min", 1.0e-4)),
+            gain_max=float(scgi.get("gain_max", 4.0)),
+        )
+    if kind in {"gain_predictor_1d", "log_gain_predictor_1d"}:
+        return GainPredictor1D(
+            hidden_channels=base_channels,
+            depth=depth,
+            use_coord_channels=bool(scgi.get("use_coord_channels", True)),
             gain_min=float(scgi.get("gain_min", 1.0e-4)),
             gain_max=float(scgi.get("gain_max", 4.0)),
         )

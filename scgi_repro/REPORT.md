@@ -498,6 +498,8 @@ Signed/gain-prediction interface check:
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_scgi_train.py --profile smoke --model-kind gain_predictor_unet --target-mode gain --input-normalize row_max --target-normalize none --gain-min 0.05 --gain-max 2.5 --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 30 --output-dir results\m2_scgi_gain_predictor_rawgain_smoke_r1
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint results\m2_scgi_gain_predictor_rawgain_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_gain_predictor_rawgain_heldout_smoke_r1 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_scgi_train.py --profile smoke --model-kind gain_predictor_1d --target-mode gain --input-mode scgi_proxy_gain --input-normalize none --target-normalize none --gain-min 0.05 --gain-max 2.5 --bases "random_uniform random_binary hadamard_paired dct_paired fourier_fourstep srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 30 --batch-size 16 --output-dir results\m2_scgi_proxyinput_gain1d_smoke_r1
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 5 --seeds 3 --rho-values "0.003 0.3 3.0" --sigma-values "0.10 0.50" --reference-periods "2 8" --scgi-checkpoint results\m2_scgi_proxyinput_gain1d_smoke_r1\m2_scgi_checkpoint.pt --output-dir results\phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1 --no-findings
 ```
 
 The implementation now also supports signed-safe U-Net outputs and a
@@ -508,9 +510,18 @@ held-out gain-predictor smokes remain negative. With row-max-normalized gain
 targets, mean `scgi_frozen` PSNR is 12.04 dB, or -3.27 dB versus `none`. With
 raw mean-normalized gain targets, mean `scgi_frozen` PSNR is 12.05 dB, or
 -3.26 dB versus `none`, -3.85 dB versus `scgi_proxy`, and -6.19 dB versus
-paired-basis `pairwise` on matched rows. This rules out the simplest
-"just train on true gain" fix; the remaining bottleneck is likely the
-single-sequence representation and object-envelope/gain identifiability.
+paired-basis `pairwise` on matched rows. A checkpoint-loader fix then raises the
+same raw-gain predictor to 14.77 dB mean by constructing the frozen model from
+checkpoint metadata/config rather than the current `config.yaml`.
+
+The first competitive trained smoke uses the blind `scgi_proxy` gain envelope as
+the network input and a 1D gain predictor along frame index. On the same held-out
+grid, `results/phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1` reaches mean
+`scgi_frozen` PSNR 15.72 dB: +0.41 dB versus `none`, +0.41 dB versus AGC, and
+-0.18 dB versus `scgi_proxy`. It beats `none` in 20/36 equal-frame cells and
+matches or exceeds `scgi_proxy` in 14/36 cells. It still does not displace
+`srht_paired + pairwise` as the strict equal-frame winner, so the dense
+network-level phase diagram remains open.
 
 Latest M3 protocol-statistics run:
 
@@ -753,12 +764,12 @@ Additional checks:
   diagnostic trace CNRs remain below the APL URED target. A first target-free proxy audit finds
   only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.
-- Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
-  SCGI-network correction that is actually competitive if a network-level phase
-  diagram is required. The direct frozen prompt-range dense baseline is
-  implemented but underperforms under cross-domain application. The published-channel figure
-  anchors now exist; raw detector/SLM hardware calibration remains outside the
-  available PDF data.
+- Scale the new competitive smoke-level trained M2 correction into a dense
+  prompt-range phase diagram if a network-level claim is required. The proxy-input
+  1D gain predictor is now above `none`/AGC and close to `scgi_proxy`, but the
+  direct frozen prompt-range dense baseline still underperforms under
+  cross-domain application. The published-channel figure anchors now exist; raw
+  detector/SLM hardware calibration remains outside the available PDF data.
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: the targeted
   and boundary-aware AGC analyses are now present but diagnostic, SVG sidecars
   exist for the current draft figures, and the paper still needs
