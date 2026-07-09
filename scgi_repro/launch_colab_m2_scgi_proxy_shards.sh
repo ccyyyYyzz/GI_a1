@@ -13,6 +13,9 @@ OBJECTS="${OBJECTS:-10}"
 SEEDS="${SEEDS:-5}"
 PROFILE="${PROFILE:-debug}"
 SHARD_LIST="${SHARD_LIST:-0 1 2 3 4}"
+OUTPUT_PREFIX="${OUTPUT_PREFIX:-phase_m2_scgi_proxy}"
+SCGI_CHECKPOINT="${SCGI_CHECKPOINT:-}"
+SCGI_MODEL_KIND="${SCGI_MODEL_KIND:-}"
 
 mkdir -p "$LOG_DIR"
 
@@ -22,10 +25,17 @@ launch_shard() {
   local shard_index="$3"
   local shard_spec="${shard_index}/${SHARDS}"
   local run_id="${account_label}_${BATCH}_shard${shard_index}of${SHARDS}"
-  local output_dir="results/phase_m2_scgi_proxy_${BATCH}_shard${shard_index}of${SHARDS}"
+  local output_dir="results/${OUTPUT_PREFIX}_${BATCH}_shard${shard_index}of${SHARDS}"
   local log_file="$LOG_DIR/${run_id}.log"
   local pid_file="$LOG_DIR/${run_id}.wslpid"
-  local command_text="python run_phase_m2.py --profile ${PROFILE} --objects ${OBJECTS} --seeds ${SEEDS} --shard ${shard_spec} --no-findings --output-dir ${output_dir}"
+  local scgi_args=""
+  if [[ -n "$SCGI_CHECKPOINT" ]]; then
+    scgi_args="${scgi_args} --scgi-checkpoint ${SCGI_CHECKPOINT}"
+  fi
+  if [[ -n "$SCGI_MODEL_KIND" ]]; then
+    scgi_args="${scgi_args} --scgi-model-kind ${SCGI_MODEL_KIND}"
+  fi
+  local command_text="python run_phase_m2.py --profile ${PROFILE} --objects ${OBJECTS} --seeds ${SEEDS} --shard ${shard_spec} --no-findings${scgi_args} --output-dir ${output_dir}"
 
   rm -f "$log_file" "$pid_file"
   nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu L4 --timeout 14400 \

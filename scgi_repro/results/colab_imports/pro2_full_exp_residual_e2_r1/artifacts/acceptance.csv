@@ -1,0 +1,8 @@
+check,target,value,threshold,passed
+dynamic_dgi_cnr_below_static,dynamic_dgi_cnr < static_dgi_cnr,0.018357763066887856,2.5350773334503174,True
+scgi_dgi_cnr_above_dynamic,scgi_dgi_cnr > dynamic_dgi_cnr,2.5352532863616943,0.018357763066887856,True
+scgi_dgi_cnr_ge_3,paper prompt threshold,2.5352532863616943,3.0,False
+static_dgi_psnr_gt_20,paper prompt sanity threshold,8.864147186279297,20.0,False
+sample_scgi_ks_p_gt_0_05,single-sample KS sanity,1.0,0.05,True
+val_scgi_ks_pass_rate_ge_0_9,Stage 2 prompt threshold,1.0,0.9,True
+val_scgi_mse_below_dynamic,corrected measurements closer to static,1.8345303313571647e-08,0.5031942720828083,True
