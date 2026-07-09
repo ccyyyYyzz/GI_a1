@@ -242,6 +242,16 @@ alignment at 64P is much higher, with minimum/mean PSNR 28.152/33.429 dB. Thus
 the information is present at very high sampling, but the strict raw/minmax
 all-object PSNR>20 gate is still not satisfied without calibration.
 
+The local-CUDA high-sampling continuation extends the streaming audit to 128P
+and 256P random patterns under the same monitored wrapper. It writes
+`results/stage3_static_dgi_streaming_highsample_r1/stage3_static_dgi_streaming_audit.csv`
+with 32 rows. At 256P, strict minmax-display PSNR clears the 20 dB gate on all
+eight objects (minimum/mean 21.515/24.366 dB), while affine-aligned PSNR remains
+much higher (minimum/mean 34.500/36.938 dB). This sharpens the diagnosis:
+brute-force sampling can close the static minmax PSNR gate, but the large
+raw/minmax/affine gap still points to calibration and display scaling rather
+than lost object information.
+
 Full-profile SCGI/UNN/URED threshold matrix:
 
 ```powershell
@@ -456,7 +466,7 @@ Outputs:
 Key M1 checks:
 
 - Oracle correction restores Hadamard/SRHT to near-exact reconstruction, which
-  supports H1: deterministic-basis failure under blind correction is mainly gain
+  supports H1: ordered-basis blind degradation is mainly gain
   identifiability/error propagation, not missing measurements.
 - The H3 jitter channel was fixed so adjacent-frame mismatch is controlled by
   `rho`; pairwise normalization now degrades monotonically as `rho` and
@@ -560,16 +570,20 @@ Prompt-range high-rho M2 extension:
 
 The merged high-rho scan has 101,250 rows over 9 rho values
 `0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10` and five amplitudes. It therefore
-covers the prompt range `rho = 10^-3 ... 10`. The boundary audit reports five
-observed log-rho boundary fits with `R2 >= 0.9`: `reference_k8/srht_paired`
-(`R2=0.9995`), `agc/random_binary` (`R2=0.9950`),
+covers the prompt range `rho = 10^-3 ... 10`. With the default
+reconstruction-floor gate (`rel_mse_mean < 0.5` for at least one compared
+method), the boundary audit reports four above-floor log-rho boundary fits with
+`R2 >= 0.9`: `reference_k8/srht_paired` (`R2=0.9995`),
 `none/srht_paired` (`R2=0.9921`), `scgi_proxy/srht_paired` (`R2=0.9889`), and
-`reference_k32/srht_paired` (`R2=0.9863`). Under the strict equal-frame blind
-budget, `srht_paired + pairwise` wins all 45 high-rho merged rho/sigma cells.
-Across all non-oracle methods, `srht_paired + reference_k2` wins 43/45 cells and
-`srht_paired + pairwise` wins the two highest-amplitude high-rho cells. The
-audit also writes `m2_psnr_rho_curves_sigma_0p30.png` and
-`m2_boundary_fit_curves.png` for selected-curve and boundary-fit review.
+`reference_k32/srht_paired` (`R2=0.9916`). The former `agc/random_binary`
+boundary is no longer a headline fit after the floor mask. Under the strict
+equal-frame blind budget, `srht_paired + pairwise` is the above-floor winner in
+29/45 prompt-range rho/sigma cells and 16/45 cells are labelled
+sub-floor/noise-floor. Across all non-oracle methods, `srht_paired +
+reference_k2` is the above-floor winner in 31/45 cells and 14/45 cells are
+sub-floor. The audit also writes an above-floor `flip_boundary.csv`,
+`m2_psnr_rho_curves_sigma_0p30.png`, and `m2_boundary_fit_curves.png` for
+selected-curve and boundary-fit review.
 
 Frozen-network prompt-range high-rho completion:
 
@@ -582,7 +596,7 @@ Frozen-network prompt-range high-rho completion:
 The frozen high-rho merge has 114,750 rows and covers the same 45 rho/sigma
 cells as the proxy high-rho scan. `results/m2_boundary_audit_frozen_highrho`
 again reports `srht_paired + pairwise` as the strict equal-frame non-oracle
-winner in 45/45 cells. The frozen network flattens near 10.6-11.8 dB at
+winner in the pre-floor 45-cell map. The frozen network flattens near 10.6-11.8 dB at
 `rho=3,10`, so the added high-rho coverage reinforces the direct-transfer
 negative result rather than changing the winner map.
 
@@ -657,8 +671,9 @@ matched equal-frame basis/rho/sigma means, it is +0.329 dB versus `none`,
 +0.604 dB versus AGC, and -0.262 dB versus `scgi_proxy`; it beats `none` in
 161/270 cells and matches or exceeds `scgi_proxy` in 118/270 cells.
 `results/m2_boundary_audit_proxyinput_gain1d_dense_r1` confirms full prompt rho
-coverage and keeps `srht_paired + pairwise` as the strict equal-frame winner in
-45/45 cells. Thus the network-level phase diagram is now present and mildly
+coverage and keeps `srht_paired + pairwise` as the strict equal-frame winner
+before applying the reconstruction-floor mask. Thus the network-level phase
+diagram is now present and mildly
 competitive against raw/AGC baselines, but it still supports the SRHT-pairwise
 main conclusion.
 
@@ -680,22 +695,26 @@ Outputs:
 - `results/m3_random_comparator_fast_r1/m3_random_comparator_deltas.csv` (4 rows)
 - `results/m3_random_comparator_fast_r1/m3_random_comparator_report.md`
 
-The high-rho fallback audit makes the M3 conclusion more conservative and also
-closes the prompt's conditional follow-up after SRHT failure. Oracle correction
-has minimum mean PSNR 120.0 dB, confirming that the ordered, signed, full-SRHT,
-time-interleaved, and block-shuffled variants all preserve the underlying
-information when the gain is known. For `rho>=1` under non-oracle corrections,
-however, full SRHT minus ordered Hadamard still ranges from -0.043 to +0.083 dB,
-not the prompt's requested `>=3 dB` advantage. The best fallback is now
-consistently `sign_time_interleave`, but its advantage over ordered Hadamard is
-only +0.027 to +0.141 dB across fast non-oracle cells. M3 therefore remains a
-partial mechanism result rather than a closed SRHT theorem.
+The M3 result is now framed as an identifiability/robustness result, not a
+fast-drift absolute-quality claim. Oracle correction has minimum mean PSNR
+120.0 dB, confirming that the ordered, signed, full-SRHT, time-interleaved, and
+block-shuffled variants all preserve the underlying information when the gain is
+known. Under AGC at `rho=0.001`, full SRHT beats ordered Hadamard by +5.453 dB;
+row permutation alone (+5.394 dB), diagonal signs alone (+5.466 dB), and
+sign-time interleaving (+5.495 dB) recover essentially the same advantage, so
+the constructive mechanism is randomization of the coefficient sequence rather
+than a uniquely additive full-SRHT effect.
 
-The direct random-comparator follow-up closes the "not worse than random" check
-for the sampled fast-drift cells: full SRHT is +0.016 to +0.190 dB above the
-best random basis, but it is -0.009 to -0.003 dB below ordered Hadamard. Thus
-the current M3 evidence supports SRHT/pairwise as a strong conservative
-baseline, not a >=3 dB constructive advance over ordered Hadamard.
+The prompt's `>=3 dB` fast-drift target is not met and is now treated as the
+wrong target for this grid. At `rho>=1`, blind reconstruction quality collapses
+to the noise floor for every variant (roughly 10.8-11.0 dB PSNR and `rel_mse`
+near 0.9), while oracle reconstruction remains exact. The `sign_time_interleave`
+fallback still has the largest fast non-oracle deltas (+0.027 to +0.141 dB over
+ordered Hadamard), but those deltas are sub-floor coincidences and are not
+reported as effects. The direct random-comparator follow-up is therefore an
+estimator caveat rather than a ranking proof: orthogonal variants use exact
+inversion, while random baselines use correlation/DGI reconstruction; a
+least-squares random control remains future work.
 
 Latest M4 theory runs:
 
@@ -731,8 +750,8 @@ Key M4 checks:
 | residual gain law, 16/32/64 | `sigma_delta` exponent 2.001-2.003 across bases, min R2 0.99992; bootstrap 95% CIs tightly bracket 2 |
 | fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998; bootstrap CIs roughly [-0.75,-0.70] and [-0.77,-0.66] |
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
-| flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has five R2-qualified fits |
-| high-rho M2 boundary audit | prompt rho range now reaches 10; five log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner is SRHT/pairwise in 45/45 cells |
+| flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has four above-floor R2-qualified fits |
+| high-rho M2 boundary audit | prompt rho range now reaches 10; after the rel_mse<0.5 above-floor gate, four log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner cells are SRHT/pairwise in 29/45 above-floor cells and 16/45 cells are sub-floor/noise-floor |
 | AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; targeted validation improves fits to R2 0.71-0.82 but still has 42-56% boundary-selected best windows; the censored follow-up reaches interval satisfaction 0.80 for random bases, 0.64 for SRHT, and 0.40 for Hadamard, so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
@@ -824,8 +843,9 @@ The panel-level provenance file is `paper_multipanel_manifest.csv`.
 `run_make_final_figure_pack.py` writes `results/paper_figures_r2_final`, a
 repo-relative final figure-pack draft with four figures and 13 panels. It adds
 Figure 3 AGC diagnostics, Figure 4 fitted error laws, Figure 5 M2
-phase/boundary maps, and Figure 8 SRHT energy/fast-drift ablation. Each figure
-has editable SVG plus PNG/PDF/TIFF exports, and
+phase/boundary maps with grey sub-floor cells, and Figure 8 M3 SRHT
+quality/delta panels with reconstruction-floor shading. Each figure has editable
+SVG plus PNG/PDF/TIFF exports, and
 `figure_assembly_manifest.csv` records panel-level source data.
 
 ## Verification

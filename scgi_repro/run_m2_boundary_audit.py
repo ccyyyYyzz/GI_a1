@@ -12,6 +12,7 @@ from src.config_utils import project_root
 
 
 CHALLENGERS = ["random_uniform", "random_binary", "fourier_fourstep", "dct_paired", "srht_paired"]
+DEFAULT_ABOVE_FLOOR_REL_MSE = 0.5
 
 
 def fit_log_boundary(frame: pd.DataFrame) -> dict[str, object]:
@@ -85,18 +86,50 @@ def load_phase_summary(phase_dir: Path) -> pd.DataFrame:
     )
 
 
-def build_boundary_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def build_boundary_tables(
+    summary: pd.DataFrame,
+    *,
+    above_floor_rel_mse: float = DEFAULT_ABOVE_FLOOR_REL_MSE,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     rows: list[dict[str, object]] = []
+    cell_rows: list[dict[str, object]] = []
     blind = summary[summary["correction"] != "oracle"].copy()
     for (sigma_a, correction), group in blind.groupby(["sigma_a", "correction"]):
         pivot = group.pivot_table(index="rho", columns="basis", values="psnr_mean", aggfunc="mean").sort_index()
+        rel_pivot = group.pivot_table(index="rho", columns="basis", values="rel_mse_mean", aggfunc="mean").sort_index()
         if "hadamard_paired" not in pivot.columns:
             continue
         for challenger in CHALLENGERS:
             if challenger not in pivot.columns:
                 continue
             diff = pivot[challenger] - pivot["hadamard_paired"]
-            rho_star, status = interpolate_boundary(diff.index.to_numpy(dtype=float), diff.to_numpy(dtype=float))
+            challenger_rel = rel_pivot[challenger] if challenger in rel_pivot.columns else pd.Series(np.nan, index=diff.index)
+            baseline_rel = rel_pivot["hadamard_paired"] if "hadamard_paired" in rel_pivot.columns else pd.Series(np.nan, index=diff.index)
+            min_rel = pd.concat([challenger_rel, baseline_rel], axis=1).min(axis=1)
+            above_floor = min_rel < float(above_floor_rel_mse)
+            for rho in diff.index:
+                cell_rows.append(
+                    {
+                        "sigma_a": float(sigma_a),
+                        "correction": correction,
+                        "challenger": challenger,
+                        "baseline": "hadamard_paired",
+                        "rho": float(rho),
+                        "challenger_psnr": float(pivot.loc[rho, challenger]),
+                        "baseline_psnr": float(pivot.loc[rho, "hadamard_paired"]),
+                        "margin_db": float(diff.loc[rho]),
+                        "challenger_rel_mse": float(challenger_rel.loc[rho]) if np.isfinite(challenger_rel.loc[rho]) else np.nan,
+                        "baseline_rel_mse": float(baseline_rel.loc[rho]) if np.isfinite(baseline_rel.loc[rho]) else np.nan,
+                        "min_rel_mse": float(min_rel.loc[rho]) if np.isfinite(min_rel.loc[rho]) else np.nan,
+                        "above_floor": bool(above_floor.loc[rho]),
+                        "above_floor_rel_mse": float(above_floor_rel_mse),
+                    }
+                )
+            above_diff = diff[above_floor.fillna(False)]
+            if above_diff.empty:
+                rho_star, status = None, "sub_floor_only"
+            else:
+                rho_star, status = interpolate_boundary(above_diff.index.to_numpy(dtype=float), above_diff.to_numpy(dtype=float))
             rows.append(
                 {
                     "sigma_a": float(sigma_a),
@@ -107,12 +140,20 @@ def build_boundary_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataF
                     "boundary_status": status,
                     "max_margin_db": float(diff.max()),
                     "min_margin_db": float(diff.min()),
+                    "max_margin_db_above_floor": float(above_diff.max()) if not above_diff.empty else np.nan,
+                    "min_margin_db_above_floor": float(above_diff.min()) if not above_diff.empty else np.nan,
                     "points": int(diff.notna().sum()),
+                    "above_floor_points": int(above_floor.sum()),
+                    "sub_floor_points": int((~above_floor).sum()),
                     "rho_min": float(np.nanmin(diff.index.to_numpy(dtype=float))),
                     "rho_max": float(np.nanmax(diff.index.to_numpy(dtype=float))),
+                    "above_floor_rho_min": float(np.nanmin(above_diff.index.to_numpy(dtype=float))) if not above_diff.empty else np.nan,
+                    "above_floor_rho_max": float(np.nanmax(above_diff.index.to_numpy(dtype=float))) if not above_diff.empty else np.nan,
+                    "above_floor_rel_mse": float(above_floor_rel_mse),
                 }
             )
     boundaries = pd.DataFrame(rows)
+    comparison_cells = pd.DataFrame(cell_rows)
     fit_rows: list[dict[str, object]] = []
     if not boundaries.empty:
         for keys, group in boundaries.groupby(["correction", "challenger", "baseline"]):
@@ -124,50 +165,107 @@ def build_boundary_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataF
                     "observed_points": int((group["boundary_status"] == "observed").sum()),
                     "left_censored_points": int((group["boundary_status"] == "left_censored").sum()),
                     "not_reached_points": int((group["boundary_status"] == "not_reached").sum()),
+                    "sub_floor_only_points": int((group["boundary_status"] == "sub_floor_only").sum()),
+                    "above_floor_points": int(group["above_floor_points"].sum()),
+                    "sub_floor_points": int(group["sub_floor_points"].sum()),
                     "law": "rho_star ~ sigma_a^a",
                     **fit_log_boundary(group),
                 }
             )
-    return boundaries, pd.DataFrame(fit_rows).sort_values(["correction", "challenger"])
+    return boundaries, pd.DataFrame(fit_rows).sort_values(["correction", "challenger"]), comparison_cells
 
 
-def build_winner_tables(summary: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+def build_winner_tables(
+    summary: pd.DataFrame,
+    *,
+    above_floor_rel_mse: float = DEFAULT_ABOVE_FLOOR_REL_MSE,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     blind = summary[summary["correction"] != "oracle"].copy()
     equal_frame = blind[blind["total_physical_frames"] == blind["num_frames"]].copy()
-    winners = {
-        "all_non_oracle": blind.sort_values(["rho", "sigma_a", "psnr_mean"], ascending=[True, True, False])
-        .groupby(["rho", "sigma_a"], as_index=False)
-        .head(1),
-        "equal_frame_non_oracle": equal_frame.sort_values(["rho", "sigma_a", "psnr_mean"], ascending=[True, True, False])
-        .groupby(["rho", "sigma_a"], as_index=False)
-        .head(1),
+    scope_tables = {
+        "all_non_oracle": blind,
+        "equal_frame_non_oracle": equal_frame,
     }
+    winner_rows: list[pd.Series] = []
+    for scope, table in scope_tables.items():
+        for (_rho, _sigma), group in table.groupby(["rho", "sigma_a"], sort=True):
+            above = group[group["rel_mse_mean"] < float(above_floor_rel_mse)].copy()
+            if above.empty:
+                best = group.sort_values("psnr_mean", ascending=False).iloc[0].copy()
+                selected = best.copy()
+                selected["basis"] = "sub_floor"
+                selected["correction"] = "noise_floor"
+                selected["above_floor"] = False
+                selected["above_floor_candidates"] = 0
+                selected["best_sub_floor_basis"] = best["basis"]
+                selected["best_sub_floor_correction"] = best["correction"]
+                selected["best_sub_floor_psnr_mean"] = best["psnr_mean"]
+                selected["best_sub_floor_rel_mse_mean"] = best["rel_mse_mean"]
+            else:
+                selected = above.sort_values("psnr_mean", ascending=False).iloc[0].copy()
+                selected["above_floor"] = True
+                selected["above_floor_candidates"] = int(len(above))
+                selected["best_sub_floor_basis"] = ""
+                selected["best_sub_floor_correction"] = ""
+                selected["best_sub_floor_psnr_mean"] = np.nan
+                selected["best_sub_floor_rel_mse_mean"] = np.nan
+            selected["scope"] = scope
+            selected["candidate_count"] = int(len(group))
+            selected["above_floor_rel_mse"] = float(above_floor_rel_mse)
+            winner_rows.append(selected)
+    winners = pd.DataFrame(winner_rows)
     rows: list[dict[str, object]] = []
-    for scope, table in winners.items():
-        for (basis, correction), group in table.groupby(["basis", "correction"]):
+    if not winners.empty:
+        for (scope, basis, correction, above_floor), group in winners.groupby(["scope", "basis", "correction", "above_floor"]):
             rows.append(
                 {
                     "scope": scope,
                     "basis": basis,
                     "correction": correction,
+                    "above_floor": bool(above_floor),
                     "winning_cells": int(len(group)),
                     "rho_min": float(group["rho"].min()),
                     "rho_max": float(group["rho"].max()),
                     "sigma_min": float(group["sigma_a"].min()),
                     "sigma_max": float(group["sigma_a"].max()),
                     "psnr_mean_over_wins": float(group["psnr_mean"].mean()),
+                    "rel_mse_mean_over_wins": float(group["rel_mse_mean"].mean()),
+                    "above_floor_rel_mse": float(above_floor_rel_mse),
                 }
             )
     winner_summary = pd.DataFrame(rows).sort_values(["scope", "winning_cells"], ascending=[True, False])
-    return pd.concat(winners.values(), ignore_index=True), winner_summary
+    return winners, winner_summary
 
 
-def write_report(out_dir: Path, phase_dir: Path, coverage: dict[str, object], fits: pd.DataFrame, winner_summary: pd.DataFrame) -> None:
+def csv_text(frame: pd.DataFrame) -> str:
+    return frame.to_csv(index=False, lineterminator="\n").strip()
+
+
+def write_report(
+    out_dir: Path,
+    phase_dir: Path,
+    coverage: dict[str, object],
+    fits: pd.DataFrame,
+    winner_summary: pd.DataFrame,
+    comparison_cells: pd.DataFrame,
+    *,
+    above_floor_rel_mse: float,
+) -> None:
     ok_fits = fits[(fits["fit_status"] == "ok") & (fits["r2"] >= 0.9)].copy() if "r2" in fits else pd.DataFrame()
+    total_pair_cells = int(len(comparison_cells))
+    above_pair_cells = int(comparison_cells["above_floor"].sum()) if not comparison_cells.empty else 0
+    sub_pair_cells = total_pair_cells - above_pair_cells
+    total_winner_cells = int(winner_summary["winning_cells"].sum()) if not winner_summary.empty else 0
+    sub_winner_cells = (
+        int(winner_summary.loc[~winner_summary["above_floor"].astype(bool), "winning_cells"].sum())
+        if not winner_summary.empty and "above_floor" in winner_summary
+        else 0
+    )
     lines = [
         "# M2 Boundary Audit",
         "",
         f"Source phase directory: `{phase_dir.as_posix()}`",
+        f"Above-floor reconstruction gate: `rel_mse_mean < {above_floor_rel_mse:g}` for at least one method in a comparison.",
         "",
         "## Rho Coverage",
         "",
@@ -176,21 +274,42 @@ def write_report(out_dir: Path, phase_dir: Path, coverage: dict[str, object], fi
         lines.append(f"- `{key}`: {value}")
     lines.extend(["", "## Boundary Fits With R2 >= 0.9", ""])
     if ok_fits.empty:
-        lines.append("No observed three-point boundary fit reaches R2 >= 0.9. Check censored rows before treating this as a failed trend.")
+        lines.append("No above-floor observed three-point boundary fit reaches R2 >= 0.9. Check censored and sub-floor rows before treating this as a failed trend.")
     else:
-        columns = ["correction", "challenger", "observed_points", "left_censored_points", "not_reached_points", "sigma_a_exponent", "r2"]
-        lines.append(ok_fits[columns].to_csv(index=False))
+        columns = [
+            "correction",
+            "challenger",
+            "observed_points",
+            "left_censored_points",
+            "not_reached_points",
+            "sub_floor_only_points",
+            "above_floor_points",
+            "sigma_a_exponent",
+            "r2",
+        ]
+        lines.append(csv_text(ok_fits[columns]))
     lines.extend(["", "## Winner Summary", ""])
     if not winner_summary.empty:
-        lines.append(winner_summary.to_csv(index=False))
+        lines.append(csv_text(winner_summary))
+    lines.extend(
+        [
+            "",
+            "## Above-Floor Accounting",
+            "",
+            f"- Pairwise challenger-vs-Hadamard cells: {above_pair_cells}/{total_pair_cells} above-floor; {sub_pair_cells} sub-floor.",
+            f"- Winner-map cells across both scopes: {total_winner_cells - sub_winner_cells}/{total_winner_cells} above-floor; {sub_winner_cells} sub-floor.",
+            "- Sub-floor winner cells are retained in CSVs as `sub_floor + noise_floor` placeholders and should be greyed out in headline maps.",
+        ]
+    )
     lines.extend(
         [
             "",
             "## Interpretation Notes",
             "",
-            "- `observed` means the challenger crosses Hadamard within the sampled rho range using log-rho interpolation.",
+            "- `observed` means the challenger crosses Hadamard within the sampled rho range using log-rho interpolation after applying the above-floor gate.",
             "- `left_censored` means the challenger is already >= Hadamard at the smallest sampled rho; this is stronger than an observed boundary for that grid.",
             "- `not_reached` means the challenger remains below Hadamard up to the largest sampled rho.",
+            "- `sub_floor_only` means every sampled rho in that sigma/correction/challenger comparison is at reconstruction noise floor, so PSNR deltas are not reported as effects.",
         ]
     )
     (out_dir / "m2_boundary_audit_report.md").write_text("\n".join(lines), encoding="utf-8")
@@ -271,6 +390,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Audit M2 phase-map rho coverage, flip boundaries, and winner stability.")
     parser.add_argument("--phase-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--above-floor-rel-mse", type=float, default=DEFAULT_ABOVE_FLOOR_REL_MSE)
     args = parser.parse_args()
 
     root = project_root()
@@ -291,11 +411,13 @@ def main() -> None:
         "covers_prompt_rho_upper_10": bool(rhos and max(rhos) >= 10.0),
         "covers_prompt_rho_lower_1e-3": bool(rhos and min(rhos) <= 0.001),
     }
-    boundaries, fits = build_boundary_tables(summary)
-    winners, winner_summary = build_winner_tables(summary)
+    boundaries, fits, comparison_cells = build_boundary_tables(summary, above_floor_rel_mse=args.above_floor_rel_mse)
+    winners, winner_summary = build_winner_tables(summary, above_floor_rel_mse=args.above_floor_rel_mse)
 
     pd.DataFrame([coverage]).to_csv(out_dir / "m2_rho_coverage.csv", index=False)
     boundaries.to_csv(out_dir / "m2_boundary_interpolated.csv", index=False)
+    comparison_cells.to_csv(out_dir / "m2_boundary_comparison_cells.csv", index=False)
+    comparison_cells.to_csv(out_dir / "flip_boundary.csv", index=False)
     fits.to_csv(out_dir / "m2_boundary_fit.csv", index=False)
     winners.to_csv(out_dir / "m2_winner_cells.csv", index=False)
     winner_summary.to_csv(out_dir / "m2_winner_summary.csv", index=False)
@@ -304,6 +426,12 @@ def main() -> None:
         json.dumps(
             {
                 **coverage,
+                "above_floor_rel_mse": float(args.above_floor_rel_mse),
+                "pairwise_comparison_cells": int(len(comparison_cells)),
+                "above_floor_pairwise_comparison_cells": int(comparison_cells["above_floor"].sum()) if not comparison_cells.empty else 0,
+                "sub_floor_pairwise_comparison_cells": int((~comparison_cells["above_floor"]).sum()) if not comparison_cells.empty else 0,
+                "above_floor_winner_cells": int(winners["above_floor"].sum()) if not winners.empty else 0,
+                "sub_floor_winner_cells": int((~winners["above_floor"]).sum()) if not winners.empty else 0,
                 "fit_status_counts": fits["fit_status"].value_counts().to_dict() if not fits.empty else {},
                 "r2_ge_0_9_fits": int(((fits.get("fit_status") == "ok") & (fits.get("r2") >= 0.9)).sum()) if not fits.empty else 0,
                 "figures": figures,
@@ -312,7 +440,15 @@ def main() -> None:
         ),
         encoding="utf-8",
     )
-    write_report(out_dir, phase_dir, coverage, fits, winner_summary)
+    write_report(
+        out_dir,
+        phase_dir,
+        coverage,
+        fits,
+        winner_summary,
+        comparison_cells,
+        above_floor_rel_mse=args.above_floor_rel_mse,
+    )
     print(json.dumps(coverage, indent=2))
     print(f"wrote {out_dir / 'm2_boundary_audit_report.md'}")
 

@@ -117,6 +117,11 @@ to 4P, 8P, 16P, 32P, and 64P random patterns using streaming accumulators. At
 still 16.607 dB on `stripe_target`. Affine-aligned PSNR at 64P is much higher
 (minimum/mean 28.152/33.429 dB), so very high sampling recovers the information
 but leaves a scale/offset calibration problem for strict raw/minmax PSNR gates.
+`results/stage3_static_dgi_streaming_highsample_r1` then extends the same
+streaming audit locally to 128P and 256P. At 256P, strict minmax PSNR clears
+20 dB for all eight audited objects (minimum/mean 21.515/24.366 dB), while
+affine-aligned PSNR is 34.500/36.938 dB minimum/mean. This converts the static
+DGI PSNR gap from "unclosed" to "sampling-closeable but calibration-sensitive."
 
 Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
 adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the
@@ -310,8 +315,9 @@ High-rho prompt-range check:
 `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/phase_scan.csv` merges the
 7-rho dense `scgi_proxy` scan with five monitored local high-rho shards for
 `rho=3,10`. The merged table has 101,250 rows and covers all 45 prompt-range
-rho/sigma cells. `results/m2_boundary_audit_highrho` adds log-rho interpolated
-flip-boundary fits; five observed fits reach `R2 >= 0.9`, including
+rho/sigma cells. `results/m2_boundary_audit_highrho` adds an above-floor
+`flip_boundary.csv` and log-rho interpolated flip-boundary fits. With the
+default `rel_mse<0.5` gate, four observed fits reach `R2 >= 0.9`, including
 `scgi_proxy/srht_paired` vs Hadamard with `R2=0.9889`. It also writes
 `m2_psnr_rho_curves_sigma_0p30.png` and `m2_boundary_fit_curves.png`.
 
@@ -339,7 +345,8 @@ local `rho=3,10` shards to the dense frozen baseline. The merged table has
 114,750 rows, covers all 45 rho/sigma cells from `0.001..10`, and contains
 13,500 `scgi_frozen` rows. `results/m2_boundary_audit_frozen_highrho` again
 selects `srht_paired + pairwise` as the strict equal-frame non-oracle winner in
-45/45 cells. Across matched rows, direct frozen transfer is still not
+the pre-floor 45-cell map; headline winner counts should be re-read through the
+above-floor gate before publication. Across matched rows, direct frozen transfer is still not
 competitive: `scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus
 `scgi_proxy`, and -1.167 dB versus paired-basis `pairwise`.
 
@@ -392,17 +399,21 @@ for paired `pairwise`. On matched equal-frame basis/rho/sigma means,
 versus `scgi_proxy`; it beats `none` in 161/270 cells and reaches or beats
 `scgi_proxy` in 118/270 cells. `results/m2_boundary_audit_proxyinput_gain1d_dense_r1`
 confirms `rho=0.001..10` coverage and keeps `srht_paired + pairwise` as the
-strict equal-frame winner in 45/45 cells.
+strict equal-frame winner in the pre-floor 45-cell map; above-floor winner
+counts should be recomputed before using this trained-network scan as a headline
+phase diagram.
 
 Supports/refutes: supports the current M2 compact conclusion that
-`srht_paired + pairwise` is the best strict equal-frame blind method across all
-45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best
-reference-calibrated method in 43/45 cells but uses 3073 total physical
-frames instead of 2048, so it should be reported as a separate semi-calibrated
-baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
-66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
-bases and does not change the best equal-frame map. The high-rho boundary audit
-now provides R2-qualified flip-boundary fits. The proxy-input 1D trained network
+`srht_paired + pairwise` is the best strict equal-frame blind method in the
+above-floor part of the prompt-range grid: 29/45 strict equal-frame cells are
+above-floor and 16/45 are labelled sub-floor/noise-floor rather than method
+wins. `srht_paired + reference_k2` is the best above-floor all-non-oracle method
+in 31/45 cells but uses 3073 total physical frames instead of 2048, so it should
+be reported as a separate semi-calibrated baseline. Dense `scgi_proxy` improves
+over `none` in 88.6% and over AGC in 66.7% of matched basis/rho/sigma means, but
+it never beats pairwise on paired bases in the above-floor strict map. The
+high-rho boundary audit now provides R2-qualified flip-boundary fits after
+excluding sub-floor cells. The proxy-input 1D trained network
 shows that a learned blind correction can become competitive with raw and AGC
 baselines on the dense prompt grid, but it does not change the best equal-frame
 map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
@@ -418,27 +429,28 @@ followed by `run_m3_srht_audit.py`. A second monitored comparator adds direct
 
 Prediction: the prompt-level constructive claim would require full SRHT to beat
 ordered Hadamard by at least 3 dB in fast drift while not losing to random-like
-alternatives.
+alternatives. The corrected framework additionally requires the compared cells
+to be above the reconstruction floor before treating deltas as effects.
 
 Result: `results/srht_m3_protocol_o10s5_highrho_r2/srht_ablation.csv` has 8,000
 raw rows and `srht_ablation_summary.csv` has 160 rows. The audit output in
 `results/srht_m3_audit_highrho_r2` reports oracle minimum mean PSNR 120.0 dB,
 so all eight measurement variants are information-preserving when the true gain
-is known. Under non-oracle corrections at `rho>=1`, however, full SRHT minus
-ordered Hadamard still ranges only from -0.043 to +0.083 dB, far below the
-requested `>=3 dB` advantage. The prompt's fallback alternatives were also
-tested: `sign_time_interleave` is the best fast non-oracle ablation in all eight
-fast cells, but it beats ordered Hadamard by only +0.027 to +0.141 dB.
-`results/m3_random_comparator_fast_r1` adds 3,600 raw rows and 4 delta rows;
-full SRHT is +0.016 to +0.190 dB above the best random basis in those fast cells,
-but -0.009 to -0.003 dB below ordered Hadamard.
+is known. Under AGC at `rho=0.001`, full SRHT beats ordered Hadamard by
++5.453 dB; row permutation alone (+5.394 dB), diagonal signs alone (+5.466 dB),
+and sign-time interleaving (+5.495 dB) recover essentially the same advantage.
+At `rho>=1`, however, every blind variant collapses to the reconstruction floor
+(`rel_mse` about 0.9, PSNR about 10.8-11.0 dB). The prompt's fallback
+alternative `sign_time_interleave` is still best in those fast cells, but its
++0.027 to +0.141 dB deltas over ordered Hadamard are sub-floor coincidences.
+`results/m3_random_comparator_fast_r1` adds 3,600 raw rows and 4 delta rows; it
+is retained as an estimator caveat because random baselines use correlation/DGI
+while orthogonal variants use exact inversion.
 
-Supports/refutes: refutes the strong M3 SRHT-advantage gate under the current
-fast-drift protocol while closing the direct random-comparator check for the
-sampled cells. The useful design signal is diagonal sign randomization,
-pair-preserving time interleaving, and paired normalization; the extra row
-permutation in full SRHT remains unproven and should be framed as
-partial/ablation-informed rather than a closed constructive theorem.
+Supports/refutes: refutes the strong `>=3 dB` fast-drift SRHT gate and updates
+the constructive conclusion. Randomization of the coefficient sequence buys
+gain identifiability where the gain is estimable, while fast-drift cells should
+not be used as effect-size evidence once the reconstruction floor is applied.
 
 ## Rendered Figures
 
@@ -463,8 +475,9 @@ and links each panel back to its source CSV and caption.
 
 `results/paper_figures_r2_final` adds a final figure-pack draft with four
 figures and 13 panel rows: Figure 3 AGC diagnostics, Figure 4 fitted error
-laws, Figure 5 M2 phase/boundary maps, and Figure 8 SRHT energy/fast-drift
-ablation. Each figure is exported as editable SVG plus PNG/PDF/TIFF, and
+laws, Figure 5 M2 phase/boundary maps with grey sub-floor cells, and Figure 8
+M3 SRHT quality/delta panels with reconstruction-floor shading. Each figure is
+exported as editable SVG plus PNG/PDF/TIFF, and
 `figure_assembly_manifest.csv` records only repo-relative source paths.
 
 ## M4 Theory Hooks

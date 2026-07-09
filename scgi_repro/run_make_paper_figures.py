@@ -31,12 +31,21 @@ def _font() -> ImageFont.ImageFont:
 
 
 def _method_label(row: pd.Series) -> str:
+    if str(row["basis"]) == "sub_floor" or str(row["correction"]) == "noise_floor":
+        return "sub-floor\nnoise"
     basis = str(row["basis"]).replace("_paired", "").replace("_fourstep", "")
     correction = str(row["correction"]).replace("reference_", "ref")
     return f"{basis}\n{correction}"
 
 
 def _winner_map_rows(winner_cells: pd.DataFrame, scope: str) -> pd.DataFrame:
+    if "scope" in winner_cells.columns:
+        scope_name = "equal_frame_non_oracle" if scope == "equal_frame" else scope
+        rows = winner_cells[winner_cells["scope"] == scope_name].copy()
+        if rows.empty:
+            raise ValueError(f"No winner rows found for scope: {scope_name}")
+        return rows.sort_values(["rho", "sigma_a"]).reset_index(drop=True)
+
     rows: list[pd.Series] = []
     for (_rho, _sigma), group in winner_cells.groupby(["rho", "sigma_a"], sort=True):
         if scope == "equal_frame":
@@ -71,6 +80,7 @@ def save_winner_heatmap(path: Path, winner_rows: pd.DataFrame, title: str) -> Pa
         method: DEFAULT_PALETTE[idx % len(DEFAULT_PALETTE)]
         for idx, method in enumerate(methods)
     }
+    color_map["sub_floor+noise_floor"] = (210, 210, 210)
 
     draw.text((left, 10), title, fill=(0, 0, 0), font=font)
     for col, rho in enumerate(rhos):
@@ -86,15 +96,16 @@ def save_winner_heatmap(path: Path, winner_rows: pd.DataFrame, title: str) -> Pa
             item = indexed.loc[(rho, sigma)]
             method = f"{item['basis']}+{item['correction']}"
             color = color_map[method]
+            text_fill = (45, 45, 45) if method == "sub_floor+noise_floor" else (255, 255, 255)
             x0 = left + col * cell_w
             y0 = top + row_idx * cell_h
             draw.rectangle((x0, y0, x0 + cell_w - 2, y0 + cell_h - 2), fill=color, outline=(70, 70, 70))
             label = _method_label(item)
             for line_idx, line in enumerate(label.splitlines()):
-                draw.text((x0 + 6, y0 + 6 + 14 * line_idx), line, fill=(255, 255, 255), font=font)
-            draw.text((x0 + 6, y0 + cell_h - 16), f"{float(item['psnr_mean']):.1f} dB", fill=(255, 255, 255), font=font)
+                draw.text((x0 + 6, y0 + 6 + 14 * line_idx), line, fill=text_fill, font=font)
+            draw.text((x0 + 6, y0 + cell_h - 16), f"{float(item['psnr_mean']):.1f} dB", fill=text_fill, font=font)
 
-    draw.text((left, height - 26), "Cell text: winning basis/correction and mean PSNR.", fill=(0, 0, 0), font=font)
+    draw.text((left, height - 26), "Grey cells are sub-floor: no reconstruction-quality winner is claimed.", fill=(0, 0, 0), font=font)
     path.parent.mkdir(parents=True, exist_ok=True)
     image.save(path)
     return path
@@ -113,6 +124,7 @@ def save_winner_heatmap_svg(path: Path, winner_rows: pd.DataFrame, title: str) -
         method: DEFAULT_PALETTE[idx % len(DEFAULT_PALETTE)]
         for idx, method in enumerate(methods)
     }
+    color_map["sub_floor+noise_floor"] = (210, 210, 210)
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
         f'viewBox="0 0 {width} {height}">',
@@ -132,6 +144,7 @@ def save_winner_heatmap_svg(path: Path, winner_rows: pd.DataFrame, title: str) -
             item = indexed.loc[(rho, sigma)]
             method = f"{item['basis']}+{item['correction']}"
             color = color_map[method]
+            text_fill = "#333333" if method == "sub_floor+noise_floor" else "#ffffff"
             x0 = left + col * cell_w
             y0 = top + row_idx * cell_h
             parts.append(
@@ -139,10 +152,10 @@ def save_winner_heatmap_svg(path: Path, winner_rows: pd.DataFrame, title: str) -
                 f'fill="{color_to_hex(color)}" stroke="#464646" />'
             )
             for line_idx, line in enumerate(_method_label(item).splitlines()):
-                parts.append(_svg_text(x0 + 6, y0 + 18 + 14 * line_idx, line, size=12, fill="#ffffff"))
-            parts.append(_svg_text(x0 + 6, y0 + cell_h - 7, f"{float(item['psnr_mean']):.1f} dB", size=12, fill="#ffffff"))
+                parts.append(_svg_text(x0 + 6, y0 + 18 + 14 * line_idx, line, size=12, fill=text_fill))
+            parts.append(_svg_text(x0 + 6, y0 + cell_h - 7, f"{float(item['psnr_mean']):.1f} dB", size=12, fill=text_fill))
 
-    parts.append(_svg_text(left, height - 12, "Cell text: winning basis/correction and mean PSNR.", size=12))
+    parts.append(_svg_text(left, height - 12, "Grey cells are sub-floor: no reconstruction-quality winner is claimed.", size=12))
     parts.append("</svg>\n")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(parts), encoding="utf-8")
@@ -185,7 +198,7 @@ def make_m2_paper_figures(root: Path, out_dir: Path) -> list[dict[str, str]]:
                 "figure": out.name,
                 "vector_svg": out_svg.name,
                 "source": str(audit_dir / "m2_winner_cells.csv"),
-                "caption": f"{title}. The map covers rho=0.001..10 and sigma_a=0.05..0.50.",
+                "caption": f"{title}. The map covers rho=0.001..10 and sigma_a=0.05..0.50; grey cells fail the rel_mse<0.5 above-floor gate.",
             }
         )
 
@@ -228,7 +241,7 @@ def make_m2_paper_figures(root: Path, out_dir: Path) -> list[dict[str, str]]:
                 "figure": out.name,
                 "vector_svg": out_svg.name,
                 "source": str(audit_dir / "m2_boundary_fit.csv"),
-                "caption": "Observed M2 flip-boundary fits; censored and not-reached crossings are excluded from this compact table.",
+                "caption": "Observed M2 flip-boundary fits after the rel_mse<0.5 above-floor gate; censored, not-reached, and sub-floor-only crossings are excluded from this compact table.",
             }
         )
     return manifest

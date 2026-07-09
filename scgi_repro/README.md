@@ -5,9 +5,11 @@ This repository implements the two requested tasks:
 1. A reproducible numerical framework for Peng and Chen, APL 124, 181104 (2024):
    supervised correction of dynamic scaling factors for ghost imaging (SCGI),
    DGI reconstruction, and SCGI-UNN/SCGI-URED style refinement.
-2. A mechanism-study framework for why i.i.d. random measurement bases can support
-   blind gain correction in time-varying multiplicative channels while deterministic
-   orthogonal bases often fail.
+2. A mechanism-study framework for blind gain identifiability in time-varying
+   multiplicative channels. Random speckles and randomized orthogonal bases
+   supply statistical anchors; ordered deterministic bases lose that anchor
+   under blind correction even though they remain information-preserving under
+   oracle calibration.
 
 The verified local CUDA runtime is `D:\Anacondar\anaconda3\envs\pytorch\python.exe`
 with PyTorch CUDA 12.1 on an RTX 4060 Laptop GPU. The code also keeps internal
@@ -131,6 +133,12 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   audit over 4P, 8P, 16P, 32P, and 64P patterns. At 64P, minmax mean PSNR
   reaches 21.355 dB, but the all-object minimum remains 16.607 dB; affine
   alignment clears 28.152 dB minimum, showing a strong scale/offset component.
+- `results/stage3_static_dgi_streaming_highsample_r1/`: monitored local-CUDA
+  continuation over 128P and 256P random patterns. At 256P, strict minmax PSNR
+  clears 20 dB on all eight objects (minimum/mean 21.515/24.366 dB), while
+  affine-aligned PSNR is much higher (minimum/mean 34.500/36.938 dB), confirming
+  that the remaining static-DGI issue is calibration/sampling rather than lost
+  image information.
 - `results/stage4_ured_sweep_r2_stripe_merged/` and
   `results/stage4_ured_sweep_nlm_r1_stripe/`: stripe-target Stage 4 URED
   denoiser/hyperparameter screens.
@@ -217,9 +225,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   zero reference frames.
 - `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: 101,250-row dense
   9x5 M2 output extending the prompt rho range to `0.001..10`.
-- `results/m2_boundary_audit_highrho/`: rho-coverage audit, log-rho
-  interpolated flip-boundary fits, and winner-map summaries for the high-rho M2
-  merge.
+- `results/m2_boundary_audit_highrho/`: rho-coverage audit, above-floor
+  `flip_boundary.csv`, log-rho interpolated flip-boundary fits, and winner-map
+  summaries for the high-rho M2 merge. With the default `rel_mse<0.5` gate,
+  strict equal-frame winners are above-floor in 29/45 prompt-range cells and
+  16/45 cells are labelled sub-floor/noise-floor.
 - `results/phase_m2_scgi_frozen_dense_r1_highrho_merged/`: 114,750-row dense
   9x5 M2 output with frozen SCGI-network correction over the full prompt rho
   range.
@@ -259,7 +269,7 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `results/m2_boundary_audit_proxyinput_gain1d_dense_r1/`: 114,750-row
   prompt-range dense trained-network scan. `scgi_frozen` averages 15.92 dB,
   above `none`/AGC but below `scgi_proxy`; `srht_paired + pairwise` remains the
-  strict equal-frame winner in 45/45 cells.
+  strict equal-frame winner before applying the reconstruction-floor mask.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.
@@ -297,9 +307,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   raw rows and 160 summary rows over ordered, signed, full-SRHT, time-interleaved,
   and block-shuffled variants.
 - `results/srht_m3_audit_highrho_r2/`: M3 high-rho fallback audit tables, JSON
-  summary, PNG table, and Markdown report. `sign_time_interleave` is the best
-  fast non-oracle alternative, but its gain over ordered Hadamard is only
-  +0.027 to +0.141 dB; full SRHT still misses the prompt's `>=3 dB` gate.
+  summary, PNG table, and Markdown report. Full SRHT gives +5.453 dB over
+  ordered Hadamard at `rho=0.001` under AGC, while row permutation or diagonal
+  signs alone recover essentially the same advantage. At `rho>=1`, all blind
+  variants are at the reconstruction floor; the +0.027 to +0.141 dB fallback
+  deltas are labelled noise-floor coincidences rather than effects.
 - `results/m3_random_comparator_fast_r1/`: monitored fast-drift M3 comparator
   adding direct `random_uniform` and `random_binary` baselines at
   `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of

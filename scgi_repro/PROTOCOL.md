@@ -46,3 +46,12 @@ All basis/channel comparisons in this project follow these rules.
     these parameters are digitized from published experiments or hardware
     datasheets, report them as compact robustness checks rather than calibrated
     experimental predictions.
+14. **Above-floor reconstruction gate.** A `(basis, correction, rho, sigma_a)`
+    reconstruction-quality result is above-floor only if its reconstruction
+    `rel_mse < 0.5` by default. A winner, flip-boundary, or delta claim between
+    two methods requires at least one compared method to be above-floor; otherwise
+    label the cell as sub-floor/noise-floor coincidence and exclude it from
+    headline claims, boundary fits, and best-method maps. Sensitivity thresholds
+    `0.3` and `0.7` should be reported before publication if a conclusion depends
+    on the exact cutoff. This gate applies to reconstruction quality, not to H1
+    gain-identifiability diagnostics such as `gain_rel_mse`.

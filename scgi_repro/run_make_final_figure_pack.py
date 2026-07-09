@@ -11,11 +11,10 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 from src.config_utils import project_root
-from src.plotting import save_metrics_table, save_metrics_table_svg
-
 
 mpl.rcParams.update(
     {
@@ -30,6 +29,25 @@ mpl.rcParams.update(
         "legend.frameon": False,
     }
 )
+
+
+M3_VARIANT_LABELS = {
+    "hadamard_ordered": "ordered H",
+    "perm_only": "row perm.",
+    "sign_only": "sign diag.",
+    "srht_full": "full SRHT",
+    "sign_time_interleave": "sign+time",
+    "sign_block_shuffle": "sign+block",
+}
+
+M3_VARIANT_COLORS = {
+    "hadamard_ordered": "#4c4c4c",
+    "perm_only": "#1f77b4",
+    "sign_only": "#2ca02c",
+    "srht_full": "#d62728",
+    "sign_time_interleave": "#9467bd",
+    "sign_block_shuffle": "#8c564b",
+}
 
 
 @dataclass(frozen=True)
@@ -109,6 +127,11 @@ def wrap_lines(text: str, max_chars: int) -> list[str]:
     return lines
 
 
+def strip_trailing_whitespace(path: Path) -> None:
+    text = path.read_text(encoding="utf-8")
+    path.write_text("\n".join(line.rstrip() for line in text.splitlines()) + "\n", encoding="utf-8")
+
+
 def render_svg_figure(spec: FigureSpec, out_path: Path, root: Path) -> None:
     width = 1800
     margin = 64
@@ -159,6 +182,7 @@ def render_svg_figure(spec: FigureSpec, out_path: Path, root: Path) -> None:
         parts.append(svg_text(margin, caption_y + line_idx * 19, line, size=13, fill="#333333"))
     parts.append("</svg>\n")
     out_path.write_text("\n".join(parts), encoding="utf-8")
+    strip_trailing_whitespace(out_path)
 
 
 def render_raster_figure(spec: FigureSpec, out_base: Path, root: Path, dpi: int) -> None:
@@ -207,32 +231,135 @@ def render_raster_figure(spec: FigureSpec, out_base: Path, root: Path, dpi: int)
     plt.close(fig)
 
 
-def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[str, str, str]:
-    source = root / "results" / "srht_m3_audit_highrho_r2" / "m3_srht_delta_summary.csv"
-    df = pd.read_csv(source)
-    table = df[(df["rho"] >= 1.0) & (df["correction"].isin(["none", "agc", "scgi_proxy", "pairwise"]))][
-        [
-            "rho",
-            "sigma_a",
-            "correction",
-            "srht_minus_ordered_db",
-            "best_alternative_minus_ordered_db",
-            "best_alternative",
-        ]
-    ].copy()
-    table["srht_minus_ordered_db"] = table["srht_minus_ordered_db"].astype(float).round(3)
-    table["best_alternative_minus_ordered_db"] = table["best_alternative_minus_ordered_db"].astype(float).round(3)
+def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[PanelSpec, PanelSpec]:
+    summary_source = root / "results" / "srht_m3_protocol_o10s5_highrho_r2" / "srht_ablation_summary.csv"
+    raw_source = root / "results" / "srht_m3_protocol_o10s5_highrho_r2" / "srht_ablation.csv"
+    summary = pd.read_csv(summary_source)
+    raw = pd.read_csv(raw_source)
+    variants = tuple(M3_VARIANT_LABELS)
+    agc = summary[(summary["correction"] == "agc") & (summary["variant"].isin(variants))].copy()
+    raw_agc = raw[(raw["correction"] == "agc") & (raw["variant"].isin(variants))].copy()
     panel_dir = out_dir / "panel_assets"
     panel_dir.mkdir(parents=True, exist_ok=True)
-    png = panel_dir / "m3_fallback_delta_table.png"
-    svg = panel_dir / "m3_fallback_delta_table.svg"
-    save_metrics_table(png, table, title="M3 fast-drift fallback deltas", max_rows=8)
-    save_metrics_table_svg(svg, table, title="M3 fast-drift fallback deltas", max_rows=8)
-    return rel(svg, root), rel(png, root), rel(source, root)
+
+    quality_base = panel_dir / "m3_agc_quality_floor"
+    fig, ax = plt.subplots(figsize=(4.2, 3.15), dpi=300)
+    ax.axhspan(0.0, 0.5, color="#e6e6e6", alpha=0.75, zorder=0)
+    ax.axhline(1.0, color="#333333", linewidth=1.0, linestyle="--", label="oracle ceiling")
+    ax.axhline(0.10, color="#666666", linewidth=0.9, linestyle=":", label="blind floor")
+    for variant in variants:
+        subset = agc[agc["variant"] == variant].sort_values("rho")
+        if subset.empty:
+            continue
+        x = subset["rho"].to_numpy(dtype=float)
+        y = 1.0 - subset["rel_mse_mean"].to_numpy(dtype=float)
+        yerr = subset["rel_mse_std"].fillna(0.0).to_numpy(dtype=float)
+        ax.errorbar(
+            x,
+            y,
+            yerr=yerr,
+            marker="o",
+            markersize=3.2,
+            linewidth=1.35,
+            capsize=2.0,
+            color=M3_VARIANT_COLORS[variant],
+            label=M3_VARIANT_LABELS[variant],
+        )
+    ax.text(0.00125, 0.36, "sub-floor\nrel_mse >= 0.5", fontsize=6.6, color="#555555")
+    ax.set_xscale("log")
+    ax.set_ylim(0.0, 1.05)
+    ax.set_xlabel("rho = frame time / coherence time")
+    ax.set_ylabel("Signal recovery (1 - rel_mse)")
+    ax.set_title("AGC reconstruction quality")
+    ax.grid(True, which="both", alpha=0.22)
+    ax.legend(fontsize=5.8, ncol=2, loc="lower left")
+    fig.tight_layout()
+    fig.savefig(quality_base.with_suffix(".png"), dpi=300)
+    fig.savefig(quality_base.with_suffix(".svg"))
+    plt.close(fig)
+    strip_trailing_whitespace(quality_base.with_suffix(".svg"))
+
+    delta_base = panel_dir / "m3_agc_delta_floor"
+    pivot = raw_agc.pivot_table(index=["rho", "seed", "object"], columns="variant", values="psnr", aggfunc="mean")
+    delta_rows: list[dict[str, float | str]] = []
+    for variant in variants:
+        if variant == "hadamard_ordered" or variant not in pivot.columns:
+            continue
+        delta = pivot[variant] - pivot["hadamard_ordered"]
+        for (rho, _seed, _object), value in delta.dropna().items():
+            delta_rows.append({"rho": float(rho), "variant": variant, "delta_db": float(value)})
+    delta_df = pd.DataFrame(delta_rows)
+    delta_summary = (
+        delta_df.groupby(["rho", "variant"], as_index=False)
+        .agg(delta_db_mean=("delta_db", "mean"), delta_db_std=("delta_db", "std"))
+        .sort_values(["variant", "rho"])
+    )
+
+    fig, ax = plt.subplots(figsize=(4.2, 3.15), dpi=300)
+    ax.axvspan(1.0, 10.0, color="#e6e6e6", alpha=0.75, zorder=0)
+    ax.axhline(0.0, color="#444444", linewidth=0.9)
+    for variant in [v for v in variants if v != "hadamard_ordered"]:
+        subset = delta_summary[delta_summary["variant"] == variant].sort_values("rho")
+        if subset.empty:
+            continue
+        ax.errorbar(
+            subset["rho"],
+            subset["delta_db_mean"],
+            yerr=subset["delta_db_std"].fillna(0.0),
+            marker="o",
+            markersize=3.2,
+            linewidth=1.35,
+            capsize=2.0,
+            color=M3_VARIANT_COLORS[variant],
+            label=M3_VARIANT_LABELS[variant],
+        )
+    srht_slow = delta_summary[(delta_summary["variant"] == "srht_full") & np.isclose(delta_summary["rho"], 0.001)]
+    if not srht_slow.empty:
+        y = float(srht_slow.iloc[0]["delta_db_mean"])
+        ax.annotate(
+            "+5.4 dB @ rho=1e-3",
+            xy=(0.001, y),
+            xytext=(0.0032, y + 0.45),
+            arrowprops={"arrowstyle": "->", "linewidth": 0.8, "color": "#333333"},
+            fontsize=6.6,
+            color="#333333",
+        )
+    ax.text(1.15, 0.55, "fast-drift\nfloor band", fontsize=6.6, color="#555555")
+    ax.set_xscale("log")
+    ax.set_xlim(0.0008, 12.0)
+    ax.set_xlabel("rho = frame time / coherence time")
+    ax.set_ylabel("Delta PSNR vs ordered H (dB)")
+    ax.set_title("AGC delta against ordered Hadamard")
+    ax.grid(True, which="both", alpha=0.22)
+    ax.legend(fontsize=5.8, ncol=2, loc="upper right")
+    fig.tight_layout()
+    fig.savefig(delta_base.with_suffix(".png"), dpi=300)
+    fig.savefig(delta_base.with_suffix(".svg"))
+    plt.close(fig)
+    strip_trailing_whitespace(delta_base.with_suffix(".svg"))
+
+    return (
+        PanelSpec(
+            "A",
+            "Quality and floor",
+            rel(quality_base.with_suffix(".svg"), root),
+            rel(quality_base.with_suffix(".png"), root),
+            rel(summary_source, root),
+            "AGC mean +/- s.d. signal recovery for ordered, sign/permutation, SRHT, and fallback variants.",
+        ),
+        PanelSpec(
+            "B",
+            "Delta vs ordered",
+            rel(delta_base.with_suffix(".svg"), root),
+            rel(delta_base.with_suffix(".png"), root),
+            rel(raw_source, root),
+            "Per-object/seed AGC delta PSNR versus ordered Hadamard; grey region marks fast-drift floor cells.",
+        ),
+    )
 
 
 def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
-    m3_svg, m3_png, m3_source = make_m3_panel_assets(root, out_dir)
+    m3_panels = make_m3_panel_assets(root, out_dir)
     return (
         FigureSpec(
             figure_id="figure3_agc_diagnostic",
@@ -269,9 +396,10 @@ def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
         FigureSpec(
             figure_id="figure5_m2_phase_boundary",
             title="Figure 5. M2 phase map and flip boundaries",
-            claim="Across the prompt rho/sigma grid, SRHT/Hadamard pairwise correction dominates strict equal-frame blind comparisons.",
+            claim="SRHT/Hadamard pairwise dominates only in above-floor strict equal-frame cells; floor cells are excluded from winner claims.",
             caption=(
-                "Prompt-range M2 phase maps and observed flip-boundary fits. Reference-frame methods are shown separately because they spend extra physical frames."
+                "Prompt-range M2 phase maps and observed flip-boundary fits after the rel_mse<0.5 above-floor gate. "
+                "Reference-frame methods are shown separately because they spend extra physical frames; grey map cells are reconstruction-floor cells."
             ),
             status="compact-protocol complete; final artwork draft",
             panels=(
@@ -282,17 +410,15 @@ def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
         ),
         FigureSpec(
             figure_id="figure8_srht_energy_ablation",
-            title="Figure 8. Signed time interleaving is best, but not by 3 dB",
-            claim="Diagonal randomization plus time interleaving gives the best fast-drift ablation, but current tests refute the strong >=3 dB gate.",
+            title="Figure 8. SRHT gains identifiability above the reconstruction floor",
+            claim="Random sign/permutation restores a stable coefficient anchor where gain is estimable; fast-drift deltas are floor coincidences.",
             caption=(
-                "Energy concentration and fast-drift fallback-ablation evidence. Signed time interleaving is the best fast non-oracle alternative, "
-                "but its advantage over ordered Hadamard remains only about 0.03-0.14 dB."
+                "M3 SRHT ablation under AGC over 10 objects x 5 seeds. Panel A reports signal recovery with an oracle ceiling and a rel_mse>=0.5 sub-floor band. "
+                "Panel B reports delta PSNR relative to ordered Hadamard. SRHT/row permutation/diagonal signs give about +5.4 dB at rho=1e-3, while fast-drift "
+                "rho>=1 collapses every blind variant to the reconstruction floor; the residual 0.03-0.14 dB fast-drift deltas are not interpreted as effects."
             ),
-            status="strong-claim refuted under current protocol",
-            panels=(
-                PanelSpec("A", "Energy spreading", "results/paper_figures_r1/m4_top5_energy_concentration.svg", "results/paper_figures_r1/m4_top5_energy_concentration.png", "results/theory_m4_paper_r2_highrho/m4_energy_concentration_summary.csv", "Energy concentration by basis."),
-                PanelSpec("B", "Fast-drift fallback", m3_svg, m3_png, m3_source, "M3 fast-drift fallback deltas."),
-            ),
+            status="partial; fast >=3 dB gate refuted, estimable-regime randomization result retained",
+            panels=m3_panels,
         ),
     )
 

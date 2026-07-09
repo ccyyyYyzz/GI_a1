@@ -79,14 +79,14 @@
 <text x="780" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="780" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
 <text x="780" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.7 dB</text>
-<rect x="890" y="106" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="896" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="896" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="896" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.9 dB</text>
-<rect x="1006" y="106" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="1012" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="1012" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="1012" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.8 dB</text>
+<rect x="890" y="106" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="896" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="896" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="896" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">12.9 dB</text>
+<rect x="1006" y="106" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="1012" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="1012" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="1012" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">12.8 dB</text>
 <rect x="78" y="164" width="114" height="56" fill="#225ea8" stroke="#464646" />
 <text x="84" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="84" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
@@ -111,18 +111,18 @@
 <text x="664" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="664" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
 <text x="664" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.9 dB</text>
-<rect x="774" y="164" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="780" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="780" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="780" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.3 dB</text>
-<rect x="890" y="164" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="896" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="896" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="896" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.8 dB</text>
-<rect x="1006" y="164" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="1012" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="1012" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="1012" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.7 dB</text>
+<rect x="774" y="164" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="780" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="780" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="780" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">12.3 dB</text>
+<rect x="890" y="164" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="896" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="896" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="896" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.8 dB</text>
+<rect x="1006" y="164" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="1012" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="1012" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="1012" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.7 dB</text>
 <rect x="78" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
 <text x="84" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="84" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
@@ -139,26 +139,26 @@
 <text x="432" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="432" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
 <text x="432" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">16.0 dB</text>
-<rect x="542" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="548" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="548" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="548" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.1 dB</text>
-<rect x="658" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="664" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="664" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="664" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.7 dB</text>
-<rect x="774" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="780" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="780" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="780" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.1 dB</text>
-<rect x="890" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="896" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="896" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="896" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.9 dB</text>
-<rect x="1006" y="222" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="1012" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="1012" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="1012" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.9 dB</text>
+<rect x="542" y="222" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="548" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="548" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="548" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">13.1 dB</text>
+<rect x="658" y="222" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="664" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="664" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="664" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.7 dB</text>
+<rect x="774" y="222" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="780" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="780" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="780" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.1 dB</text>
+<rect x="890" y="222" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="896" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="896" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="896" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">10.9 dB</text>
+<rect x="1006" y="222" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="1012" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="1012" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="1012" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">10.9 dB</text>
 <rect x="78" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
 <text x="84" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="84" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
@@ -171,29 +171,29 @@
 <text x="316" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
 <text x="316" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
 <text x="316" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">16.2 dB</text>
-<rect x="426" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="432" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="432" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="432" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.4 dB</text>
-<rect x="542" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="548" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="548" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="548" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.7 dB</text>
-<rect x="658" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="664" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="664" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="664" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.0 dB</text>
-<rect x="774" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="780" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="780" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="780" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.8 dB</text>
-<rect x="890" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="896" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="896" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="896" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.7 dB</text>
-<rect x="1006" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
-<text x="1012" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
-<text x="1012" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
-<text x="1012" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.7 dB</text>
-<text x="78" y="368" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">Cell text: winning basis/correction and mean PSNR.</text>
+<rect x="426" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="432" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="432" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="432" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">13.4 dB</text>
+<rect x="542" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="548" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="548" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="548" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.7 dB</text>
+<rect x="658" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="664" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="664" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="664" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">11.0 dB</text>
+<rect x="774" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="780" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="780" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="780" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">10.8 dB</text>
+<rect x="890" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="896" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="896" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="896" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">10.7 dB</text>
+<rect x="1006" y="280" width="114" height="56" fill="#d2d2d2" stroke="#464646" />
+<text x="1012" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">sub-floor</text>
+<text x="1012" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">noise</text>
+<text x="1012" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#333333">10.7 dB</text>
+<text x="78" y="368" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">Grey cells are sub-floor: no reconstruction-quality winner is claimed.</text>
 </svg>

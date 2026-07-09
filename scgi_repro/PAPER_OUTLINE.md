@@ -9,12 +9,15 @@ Channels
 
 1. We establish an identifiability view of blind gain correction in single-pixel
    imaging through time-varying multiplicative channels.
-2. We derive complementary error-propagation laws for deterministic orthogonal
-   bases and i.i.d. random bases.
-3. We map the regime where pairwise normalization is sufficient and where blind
-   statistical correction is preferable.
-4. We propose SRHT as a constructive design rule combining orthogonal inversion
-   with randomized coefficient statistics.
+2. We derive complementary error-propagation laws for ordered orthogonal bases,
+   randomized orthogonal bases, and i.i.d. random bases under estimator-matched
+   caveats.
+3. We map the regime where pairwise normalization is sufficient, where blind
+   statistical correction is identifiable, and where reconstructions are at the
+   noise floor.
+4. We propose randomized orthogonal bases as a constructive design rule:
+   randomized coefficient statistics provide a gain anchor while exact inversion
+   preserves the oracle/static ceiling.
 
 ## Main Figures
 
@@ -27,7 +30,7 @@ Channels
    frame overhead (`reference_k2/k8/k32`).
 7. Phase diagram over drift rate and gain amplitude, with separate
    any-budget, equal-total-frame, and reference-only best-method maps.
-8. SRHT ablation: none / permutation / diagonal signs / both.
+8. SRHT ablation: above-floor quality and delta versus ordered Hadamard.
 
 ## Draft Figure Captions
 
@@ -65,39 +68,39 @@ uncorrelated gain errors.
 
 **Figure 5. Flip-boundary curves over drift rate and gain amplitude.** The
 high-rho boundary audit extends the sampled range to `rho=10` and records
-observed, left-censored, and not-reached crossings. Five log-rho boundary fits
-are observed in `results/m2_boundary_audit_highrho`; the M4 r2 censored tables
-retain the unresolved cells so the figure can show both fitted curves and
-interval-qualified regions.
+observed, left-censored, not-reached, and sub-floor cells. After the
+`rel_mse<0.5` above-floor gate, four log-rho boundary fits are observed in
+`results/m2_boundary_audit_highrho`; the M4 r2 censored tables retain unresolved
+cells so the figure can show both fitted curves and interval-qualified regions.
 
 **Figure 6. Reference-frame calibration improves quality at a physical-frame
-cost.** `reference_k2` is the best all-non-oracle method in 43/45 prompt-range
-rho/sigma cells, but it spends 3073 total physical frames for a 2048-frame
-measurement budget. Under strict equal-frame accounting, `srht_paired+pairwise`
-remains the winner in 45/45 cells.
+cost.** `reference_k2` is the best above-floor all-non-oracle method in 31/45
+prompt-range rho/sigma cells, but it spends 3073 total physical frames for a
+2048-frame measurement budget. Under strict equal-frame accounting,
+`srht_paired+pairwise` is the winner in 29/45 above-floor cells; the remaining
+strict cells are shown as sub-floor/noise-floor rather than method wins.
 
 **Figure 7. Prompt-range phase diagram of basis/correction winners.** Dense M2
 scans over nine drift rates (`rho=0.001..10`) and five gain amplitudes show that
-`srht_paired+pairwise` dominates the strict equal-frame blind map. Frozen SCGI
-direct transfer over the same prompt range remains a negative baseline:
+`srht_paired+pairwise` dominates the above-floor strict equal-frame blind map,
+while 16/45 strict cells are excluded from winner claims as sub-floor. Frozen
+SCGI direct transfer over the same prompt range remains a negative baseline:
 `scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus `scgi_proxy`,
 and -1.167 dB versus paired-basis `pairwise`. A proxy-input 1D trained SCGI
 variant improves the network baseline to +0.329 dB versus `none` and -0.262 dB
-versus `scgi_proxy`, but still does not change the 45/45 `srht_paired+pairwise`
-winner map.
+versus `scgi_proxy`, but still does not change the above-floor
+`srht_paired+pairwise` winner map.
 
-**Figure 8. Randomized orthogonal bases whiten object energy, but the 3 dB
-fast-drift advantage is not closed.** At 4096 pixels, the top 5% of
-DCT/Fourier/Hadamard coefficients contain 0.88-0.92 of the object energy,
-whereas random and SRHT bases concentrate only about 0.28 in the top 5% and have
-effective-rank fractions near 0.48. The new high-rho M3 ablation shows full SRHT
-does not beat ordered Hadamard by the prompt-level `>=3 dB` fast-drift gate;
-the prompt-triggered fallback run finds `sign_time_interleave` is best across
-fast non-oracle cells, but only by +0.027 to +0.141 dB over ordered Hadamard. A
-direct random-comparator follow-up shows full SRHT is slightly above the best
-random basis in the sampled fast cells, but still slightly below ordered
-Hadamard. This figure should therefore separate the supported energy-spreading
-observation from the still-open row-ordering benefit claim.
+**Figure 8. Randomized orthogonal bases buy identifiability above the
+reconstruction floor.** The M3 ablation reports AGC signal recovery
+(`1-rel_mse`) and delta PSNR versus ordered Hadamard over
+`rho=0.001,0.1,1,10`. At `rho=0.001`, full SRHT is +5.453 dB over ordered
+Hadamard, while row permutation, diagonal signs, and sign-time interleaving each
+recover essentially the same advantage. At `rho>=1`, all blind variants collapse
+to the reconstruction floor, so the +0.027 to +0.141 dB fast-drift fallback
+deltas are grey-band coincidences rather than effects. The caption should state
+that the prompt's `>=3 dB` fast gate is refuted, but the constructive
+identifiability result is established where gain is estimable.
 
 ## Current Evidence And Gaps
 
@@ -111,10 +114,11 @@ observation from the still-open row-ordering benefit claim.
   A thresholded-trace stop-rule audit now finds fixed target-free stopping rules
   that also clear all four objects, but this still changes the original
   continuous-output reporting protocol.
-- The dense M2 reference scan supports `srht_paired + pairwise` as the strict
-  equal-frame blind winner. The high-rho merge covers `rho=0.001..10` and keeps
-  `srht_paired + pairwise` as the winner in 45/45 equal-frame cells. This is
-  useful evidence for the SRHT design rule, but it is still idealized.
+- The dense M2 reference scan supports `srht_paired + pairwise` as the
+  above-floor strict equal-frame blind winner. The high-rho merge covers
+  `rho=0.001..10`; after the reconstruction-floor gate, 29/45 strict cells are
+  above-floor SRHT/pairwise wins and 16/45 are sub-floor. This is useful
+  evidence for the randomized-orthogonal design rule, but it is still idealized.
 - The dense `scgi_proxy` scan shows that a blind smooth-gain proxy improves over
   raw/AGC baselines without reference frames, but it does not displace SRHT
   pairwise as the equal-frame winner and should not be described as a trained
@@ -139,18 +143,16 @@ observation from the still-open row-ordering benefit claim.
   APL/OE figure-level channel anchors now exist, but raw detector/SLM calibration
   is still needed before claiming hardware-calibrated nonideal performance.
 - M3 now has a monitored 10-object x 5-seed high-rho ablation. It confirms
-  information preservation under oracle correction but does not support a robust
-  full-SRHT advantage: for `rho>=1`, `srht_full - hadamard_ordered` stays between
-  -0.043 and +0.083 dB under non-oracle corrections, far below the requested
-  `>=3 dB` margin. The direct random-comparator run at `rho=1,10` and
-  `sigma_a=0.30,0.50` shows full SRHT is +0.016 to +0.190 dB above the best
-  random basis, so the random-comparator check is closed for this protocol even
-  though the strong constructive advantage is refuted. The manuscript should
-  present this as an ablation-informed limitation unless a broader protocol
-  finds a stable SRHT gain.
+  information preservation under oracle correction and shows a real
+  randomization advantage at `rho=0.001` under AGC (+5.453 dB for full SRHT over
+  ordered Hadamard), but it refutes the prompt's `>=3 dB` fast-drift gate.
+  Because `rho>=1` blind reconstructions are at floor, fast deltas should be
+  presented as sub-floor coincidences, not effects. The direct random-comparator
+  run remains an estimator caveat because random bases use correlation/DGI while
+  orthogonal bases use exact inversion.
 - Flip boundaries are now represented both as observed fits and censored
-  intervals. `results/m2_boundary_audit_highrho` gives five prompt-range
-  log-rho boundary fits with `R2 >= 0.9`, while
+  intervals. `results/m2_boundary_audit_highrho` gives four above-floor
+  prompt-range log-rho boundary fits with `R2 >= 0.9`, while
   `results/theory_m4_paper_r2_highrho` keeps the censored cells for paper
   plotting.
 - M4 high-rho r2 theory hooks now support quadratic residual-gain scaling with

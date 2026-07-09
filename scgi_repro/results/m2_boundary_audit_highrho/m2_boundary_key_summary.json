@@ -23,11 +23,17 @@
   ],
   "covers_prompt_rho_upper_10": true,
   "covers_prompt_rho_lower_1e-3": true,
+  "above_floor_rel_mse": 0.5,
+  "pairwise_comparison_cells": 1440,
+  "above_floor_pairwise_comparison_cells": 914,
+  "sub_floor_pairwise_comparison_cells": 526,
+  "above_floor_winner_cells": 60,
+  "sub_floor_winner_cells": 30,
   "fit_status_counts": {
-    "insufficient_observed_points": 27,
-    "ok": 5
+    "insufficient_observed_points": 28,
+    "ok": 4
   },
-  "r2_ge_0_9_fits": 5,
+  "r2_ge_0_9_fits": 4,
   "figures": [
     "m2_psnr_rho_curves_sigma_0p30.png",
     "m2_boundary_fit_curves.png"

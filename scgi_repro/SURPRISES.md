@@ -70,6 +70,26 @@ Hadamard cannot" story needs sharper wording: the best blind method in this
 implementation is a randomized orthogonal paired basis, not an i.i.d. random
 correlation basis.
 
+The later high-rho audit adds an important qualifier: after applying a
+`rel_mse<0.5` above-floor gate, the prompt-range strict map has 29/45
+above-floor `srht_paired + pairwise` wins and 16/45 sub-floor cells. This does
+not weaken the above-floor winner result; it prevents the fast/high-amplitude
+noise-floor cells from being misreported as method wins.
+
+## 2026-07-09 M3 Fast Drift Is A Reconstruction Floor
+
+The M3 SRHT ablation did not fail in the expected way. The prompt asked for a
+`>=3 dB` fast-drift SRHT advantage, but at `rho>=1` every blind variant has
+`rel_mse` near 0.9 and PSNR around 10.8-11.0 dB. Tiny deltas in that region are
+therefore floor coincidences, not evidence about row order or sign design.
+
+The constructive signal lives at slow drift instead. Under AGC at `rho=0.001`,
+full SRHT is +5.453 dB over ordered Hadamard, while row permutation alone,
+diagonal signs alone, and sign-time interleaving each recover essentially the
+same advantage. The design message is "randomize the coefficient sequence to
+make gain identifiable while preserving exact inversion," not "SRHT beats
+Hadamard by 3 dB in fast drift."
+
 ## 2026-07-09 AGC Window Law Is Weakly Parametric
 
 The paper-r1 M4 run added an empirical best-window AGC law over rho, sigma, and

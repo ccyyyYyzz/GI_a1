@@ -13,16 +13,23 @@ time-varying gain.
 
 ## H1: Identifiability
 
-Blind gain correction needs a statistical anchor. For i.i.d. random patterns,
-`B_n` is a sum of many weakly dependent pixel contributions. Under mild object
-conditions the central-limit theorem makes the sequence approximately stationary
-and near Gaussian. The unknown gain `a_n` then appears as a slow modulation of a
-known-ish distribution.
+Blind gain correction needs a statistical anchor. Under a time-varying
+multiplicative channel `R_n = a_n B_n`, the reconstructable regime is set by
+whether the unknown gain is identifiable from the observed bucket sequence.
+Randomizing pattern structure supplies that anchor: i.i.d. random patterns do so
+through central-limit-like stationary bucket statistics, while randomized
+orthogonal patterns such as SRHT do so through sign and row-order randomization
+while retaining an exact inverse under oracle/static calibration.
 
-For deterministic orthogonal bases, coefficients are object-dependent and
-ordered. Low-frequency or low-sequency coefficients can be much larger than
-others. The observed sequence `R_n` mixes object structure and gain drift, so a
-blind estimator cannot distinguish "large coefficient" from "large gain".
+Ordered deterministic orthogonal bases can lose this anchor. Their coefficients
+are object-dependent and ordered; low-frequency or low-sequency coefficients can
+be much larger than others. The observed sequence `R_n` therefore mixes object
+structure and gain drift, so a blind estimator cannot distinguish "large
+coefficient" from "large gain". This is an identifiability/robustness claim, not
+an absolute-quality claim: under the equal-frame correlation protocol, i.i.d.
+random bases can be worst in absolute PSNR because they use DGI/correlation
+reconstruction while orthogonal bases use exact inversion. The operative design
+variable is sign/phase randomization that stabilizes coefficient statistics.
 
 ## H2: Error Propagation
 
@@ -126,9 +133,12 @@ fast exact inverse in the oracle/static limit.
 
 The working prediction is:
 
-- static/oracle: SRHT is close to Hadamard;
-- fast blind drift: SRHT is close to random bases;
-- residual artifacts are whitened compared with ordered Hadamard.
+- static/oracle: SRHT is close to Hadamard because both are exactly invertible;
+- slow or moderate blind drift: randomization supplies a gain-identifiability
+  anchor while preserving orthogonal inversion;
+- fast blind drift: every blind basis can collapse to the reconstruction floor,
+  so tiny PSNR deltas are floor coincidences unless at least one compared method
+  is above-floor.
 
 ## Current Numerical Hooks
 
@@ -164,9 +174,11 @@ high-rho rerun `results/theory_m4_paper_r2_highrho`:
   This is a censored-aware accounting layer, not yet a full survival-style
   boundary estimator.
 - `results/m2_boundary_audit_highrho` extends the M2 rho grid to the prompt
-  upper range `rho=10` and recomputes log-rho interpolated boundaries. Five
-  observed boundary fits now have `R2 >= 0.9`, while censored rows distinguish
-  "already better at the smallest rho" from "not reached by rho=10".
+  upper range `rho=10` and recomputes log-rho interpolated boundaries under the
+  `rel_mse<0.5` above-floor gate. Four observed boundary fits now have
+  `R2 >= 0.9`; strict equal-frame winner cells are above-floor in 29/45 sampled
+  rho/sigma cells and the remaining 16/45 cells are labelled sub-floor/noise
+  floor rather than headline method wins.
 - `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The paper-r2
   random/SRHT fits have low-to-moderate R2 (`0.29-0.55`).
 - `results/theory_m4_agc_targeted_r1` reruns the AGC validation with a denser
