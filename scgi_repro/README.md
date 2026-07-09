@@ -140,6 +140,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_ured_sweep_naf_capacity_r1_stripe/`: monitored 9-config
   NAFNet capacity check over 24/32/48 channels and 3/4/5 blocks. Prompt-like
   32-channel/4-block capacity does not improve the stripe CNR plateau.
+- `results/stage4_ured_seed_sweep_r1_stripe/`: monitored 24-seed initialization
+  sweep at the best continuous stripe setting. The best stripe final/trace CNR
+  remains 9.365, so the miss is not a single-seed accident.
 - `results/stage4_trace_audit_r3/`: combined final-vs-target-aware trace audit
   for the Stage 4 NLM URED sweeps including the patch and capacity sweeps;
   stripe remains below the APL URED minimum CNR.
@@ -211,9 +214,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_gain_predictor_heldout_smoke_r1/` and
   `results/phase_m2_scgi_gain_predictor_rawgain_heldout_smoke_r1/`: held-out
   checks showing the gain-predictor route remains a negative baseline.
-- `results/phase_m2_scgi_gain_predictor_rawgain_heldout_smoke_r2_loaderfix/`:
-  held-out check after fixing checkpoint-metadata loading; raw-gain predictor
-  improves from 12.05 to 14.77 dB mean but remains below `none`.
+- `results/phase_m2_scgi_gain_predictor_rawgain_fixedloader_r1/`: monitored
+  4,050-row held-out check through the fixed checkpoint-metadata loading path;
+  raw-gain predictor improves from 12.05 to 14.77 dB mean but remains below
+  `none` and `scgi_proxy`, while `srht_paired + pairwise` wins all six strict
+  equal-frame cells.
 - `results/m2_scgi_proxyinput_gain1d_smoke_r1/` and
   `results/phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1/`: proxy-envelope
   input plus 1D gain-predictor smoke; held-out `scgi_frozen` reaches 15.72 dB

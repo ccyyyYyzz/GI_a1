@@ -62,6 +62,8 @@ def build_grid(args: argparse.Namespace, cfg: dict) -> list[dict[str, object]]:
         "nlm_patch_size": parse_ints(args.nlm_patch_size_values, [int(ured.get("nlm_patch_size", 5))]),
         "nlm_patch_distance": parse_ints(args.nlm_patch_distance_values, [int(ured.get("nlm_patch_distance", 6))]),
     }
+    if args.fixed_init_seed_values is not None:
+        values["fixed_init_seed"] = parse_ints(args.fixed_init_seed_values, [])
     keys = list(values.keys())
     grid = []
     for global_index, combo in enumerate(itertools.product(*(values[key] for key in keys))):
@@ -99,6 +101,11 @@ def main() -> None:
     parser.add_argument("--nlm-patch-distance-values", default=None)
     parser.add_argument("--seed-offset", type=int, default=0)
     parser.add_argument("--fixed-init-seed", type=int, default=None)
+    parser.add_argument(
+        "--fixed-init-seed-values",
+        default=None,
+        help="Comma/space separated init seeds to include in the sweep grid.",
+    )
     parser.add_argument("--save-traces", action="store_true")
     args = parser.parse_args()
 
@@ -147,6 +154,7 @@ def main() -> None:
         "object_shard": str(args.object_shard),
         "config_shard": str(args.config_shard),
         "fixed_init_seed": args.fixed_init_seed,
+        "fixed_init_seed_values": args.fixed_init_seed_values,
         "started_unix": started,
     }
     (out_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
@@ -205,7 +213,10 @@ def main() -> None:
         for object_position, object_index in enumerate(selected_indices):
             name, _obj = all_objects[object_index]
             if args.fixed_init_seed is None:
-                init_seed = int(cfg.get("seed", 0)) + int(args.seed_offset) + 1000 * global_config_index + object_index
+                if "fixed_init_seed" in config:
+                    init_seed = int(config["fixed_init_seed"]) + object_index
+                else:
+                    init_seed = int(cfg.get("seed", 0)) + int(args.seed_offset) + 1000 * global_config_index + object_index
             else:
                 init_seed = int(args.fixed_init_seed) + object_index
             seed_everything(init_seed)

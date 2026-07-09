@@ -301,7 +301,12 @@ The monitored 9-config `results/stage4_ured_sweep_naf_capacity_r1_stripe`
 checks whether the NAFNet capacity mismatch is the binding issue by sweeping
 24/32/48 channels and 3/4/5 blocks. It also does not improve the stripe plateau:
 the best row remains the original 24-channel/3-block setting at 9.365 CNR, while
-the prompt-like 32-channel/4-block row reaches 6.091. `results/stage4_trace_audit_r3`
+the prompt-like 32-channel/4-block row reaches 6.091. A monitored 24-seed
+initialization sweep at the same best setting,
+`results/stage4_ured_seed_sweep_r1_stripe`, also leaves the best stripe
+final/trace CNR at 9.365, with the next-best seed at 9.356. This rules out a
+single unlucky TinyNAFNet initialization as the continuous-output bottleneck.
+`results/stage4_trace_audit_r3`
 combines the NLM stripe, all-object, deeper, early-stop, refinement,
 micro-refinement, patch, and capacity sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
@@ -579,7 +584,11 @@ raw mean-normalized gain targets, mean `scgi_frozen` PSNR is 12.05 dB, or
 -3.26 dB versus `none`, -3.85 dB versus `scgi_proxy`, and -6.19 dB versus
 paired-basis `pairwise` on matched rows. A checkpoint-loader fix then raises the
 same raw-gain predictor to 14.77 dB mean by constructing the frozen model from
-checkpoint metadata/config rather than the current `config.yaml`.
+checkpoint metadata/config rather than the current `config.yaml`. The monitored
+fixed-loader rerun in `results/phase_m2_scgi_gain_predictor_rawgain_fixedloader_r1`
+writes 4,050 rows; `scgi_frozen` averages 14.77 dB, compared with 15.31 dB for
+`none` and 15.90 dB for `scgi_proxy`, and `srht_paired + pairwise` remains the
+strict equal-frame winner in all six held-out rho/sigma cells.
 
 The first competitive trained smoke uses the blind `scgi_proxy` gain envelope as
 the network input and a 1D gain predictor along frame index. On the same held-out

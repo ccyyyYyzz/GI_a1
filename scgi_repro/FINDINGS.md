@@ -150,6 +150,11 @@ failure is not explained by the previously fixed NLM patch defaults.
 24/32/48 channels and 3/4/5 blocks at the best stripe setting. It also does not
 improve the gap: the best row is still the 24-channel/3-block configuration at
 `9.365`, while the prompt-like 32-channel/4-block row reaches only `6.091`.
+`results/stage4_ured_seed_sweep_r1_stripe` adds a monitored 24-seed
+initialization sweep at the best continuous stripe setting after extending
+`run_stage4_ured_sweep.py` with `--fixed-init-seed-values`. The best final/trace
+CNR remains `9.365`, with the next seed at `9.356`, so the remaining
+`9.365 < 10.43` gap is not explained by a single unlucky network initialization.
 `results/stage4_trace_audit_r3` records the combined final-vs-trace audit across
 these sweeps and keeps stripe below the APL URED minimum even with target-aware
 trace selection.
@@ -324,9 +329,12 @@ mismatch, but it does not make the network competitive. On the same held-out
 grid, row-max-normalized gain targets give mean `scgi_frozen` PSNR 12.04 dB
 (-3.27 dB versus `none`), and raw gain targets give 12.05 dB (-3.26 dB versus
 `none`, -3.85 dB versus `scgi_proxy`, and -6.19 dB versus paired `pairwise`).
-Fixing frozen-checkpoint loading to honor checkpoint config/metadata raises the
-raw-gain predictor held-out mean to 14.77 dB, confirming a real evaluation bug
-but not solving the representation problem.
+`results/phase_m2_scgi_gain_predictor_rawgain_fixedloader_r1` reruns that
+held-out grid through the fixed checkpoint metadata/config path and writes 4,050
+rows. It raises the raw-gain predictor held-out mean to 14.77 dB, confirming a
+real evaluation bug, but it remains below `none` at 15.31 dB and below
+`scgi_proxy` at 15.90 dB. The strict equal-frame winner remains
+`srht_paired + pairwise` in all six held-out rho/sigma cells.
 
 Proxy-input trained SCGI smoke:
 `results/m2_scgi_proxyinput_gain1d_smoke_r1` trains `gain_predictor_1d` with the
