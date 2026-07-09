@@ -114,3 +114,8 @@ affine-aligned static DGI PSNR is only `15.92` dB, below the prompt's 20 dB
 sanity gate. Static CNR reaches `3.55`, so the random-DGI reconstruction is
 usable for APL-style contrast analysis, but pixelwise PSNR is a poor acceptance
 gate for these noisy random-basis DGI images.
+
+A separate full paired-Hadamard exact inverse ceiling reaches `80.00` dB minimum
+PSNR on the same targets. That means the objects and dimensionality are not the
+blocker; the PSNR gap is specific to random-DGI correlation noise and should not
+be counted as an APL random-DGI protocol pass.

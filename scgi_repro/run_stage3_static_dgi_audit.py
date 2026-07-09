@@ -16,6 +16,24 @@ from src.dgi import dgi_reconstruct
 from src.metrics import cnr, psnr, ssim
 
 
+def fast_hadamard_transform(values: torch.Tensor) -> torch.Tensor:
+    """Apply the Sylvester Hadamard transform along the last axis."""
+
+    out = values.reshape(*values.shape[:-1], -1).clone()
+    n = out.shape[-1]
+    if n <= 0 or n & (n - 1):
+        raise ValueError(f"Hadamard length must be a power of two, got {n}.")
+    step = 1
+    while step < n:
+        view = out.reshape(*out.shape[:-1], -1, 2 * step)
+        left = view[..., :step].clone()
+        right = view[..., step : 2 * step].clone()
+        view[..., :step] = left + right
+        view[..., step : 2 * step] = left - right
+        step *= 2
+    return out.reshape_as(values)
+
+
 def parse_floats(text: str) -> list[float]:
     return [float(part) for part in text.replace(",", " ").split() if part.strip()]
 
@@ -82,6 +100,15 @@ def metric_row(object_name: str, object_source: str, variant: str, recon: torch.
     }
 
 
+def hadamard_exact_reconstruct(target: torch.Tensor) -> torch.Tensor:
+    """Full paired-Hadamard exact inverse ceiling without materializing frames."""
+
+    flat = target.reshape(1, -1).to(dtype=torch.float32)
+    coeffs = fast_hadamard_transform(flat)
+    recon = fast_hadamard_transform(coeffs) / float(flat.shape[-1])
+    return recon.reshape_as(target).clamp(0.0, 1.0)
+
+
 def write_report(out_dir: Path, rows: pd.DataFrame, manifest: dict[str, object]) -> None:
     grouped = (
         rows.groupby(["variant"], as_index=False)
@@ -106,18 +133,26 @@ def write_report(out_dir: Path, rows: pd.DataFrame, manifest: dict[str, object])
     ]
     for key, value in manifest.items():
         lines.append(f"- `{key}`: {value}")
-    lines.extend(["", "## Variant Summary", "", grouped.to_csv(index=False), "", "## Interpretation", ""])
-    affine_best = float(rows["affine_aligned_psnr"].max()) if len(rows) else float("nan")
-    cnr_best = float(rows["cnr"].max()) if len(rows) else float("nan")
+    summary_csv = grouped.to_csv(index=False, lineterminator="\n").strip()
+    lines.extend(["", "## Variant Summary", "", summary_csv, "", "## Interpretation", ""])
+    dgi_rows = rows[rows["variant"].isin(["raw", "minmax"])].copy()
+    affine_best = float(dgi_rows["affine_aligned_psnr"].max()) if len(dgi_rows) else float("nan")
+    affine_mean = float(dgi_rows["affine_aligned_psnr"].mean()) if len(dgi_rows) else float("nan")
+    cnr_best = float(dgi_rows["cnr"].max()) if len(dgi_rows) else float("nan")
+    exact_rows = rows[rows["variant"] == "hadamard_exact"]
+    exact_min = float(exact_rows["psnr"].min()) if len(exact_rows) else float("nan")
     lines.extend(
         [
-            f"- Best affine-aligned static DGI PSNR is `{affine_best:.3f}` dB.",
-            f"- Best static DGI CNR is `{cnr_best:.3f}`.",
+            f"- Best affine-aligned random static DGI PSNR is `{affine_best:.3f}` dB; mean is `{affine_mean:.3f}` dB.",
+            f"- Best random static DGI CNR is `{cnr_best:.3f}`.",
+            f"- Full paired-Hadamard exact inverse sanity PSNR minimum is `{exact_min:.3f}` dB.",
             "- If affine-aligned PSNR remains far below 20 dB, the prompt PSNR gate is not blocked by a simple display-scale offset.",
+            "- If the exact orthogonal ceiling is high, the forward objects are reconstructable and the limiting factor is random-DGI correlation noise.",
+            "- The Hadamard exact row is a 2P-frame orthogonal sanity ceiling, not the APL random-DGI protocol.",
             "- CNR remains the more appropriate paper-facing metric for the APL-style DGI reconstructions.",
         ]
     )
-    (out_dir / "stage3_static_dgi_audit_report.md").write_text("\n".join(lines), encoding="utf-8")
+    (out_dir / "stage3_static_dgi_audit_report.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
 def write_figure(out_dir: Path, rows: pd.DataFrame) -> list[str]:
@@ -125,7 +160,8 @@ def write_figure(out_dir: Path, rows: pd.DataFrame) -> list[str]:
         import matplotlib.pyplot as plt
     except Exception:
         return []
-    pivot = rows.pivot_table(index="object", columns="variant", values="affine_aligned_psnr", aggfunc="mean")
+    plot_rows = rows[rows["variant"].isin(["raw", "minmax"])].copy()
+    pivot = plot_rows.pivot_table(index="object", columns="variant", values="affine_aligned_psnr", aggfunc="mean")
     fig, ax = plt.subplots(figsize=(8.0, 4.8), dpi=160)
     pivot.plot(kind="bar", ax=ax)
     ax.axhline(20.0, color="crimson", linestyle="--", linewidth=1.2, label="20 dB gate")
@@ -186,6 +222,12 @@ def main() -> None:
                 row = metric_row(name, source, variant, recon, target)
                 row["pattern_factor"] = float(factor)
                 row["num_patterns"] = int(n)
+                rows.append(row)
+            if abs(float(factor) - 1.0) < 1.0e-12:
+                recon = hadamard_exact_reconstruct(target)
+                row = metric_row(name, source, "hadamard_exact", recon, target)
+                row["pattern_factor"] = float(factor)
+                row["num_patterns"] = int(2 * h * h)
                 rows.append(row)
     frame = pd.DataFrame(rows)
     frame.to_csv(out_dir / "stage3_static_dgi_audit.csv", index=False)

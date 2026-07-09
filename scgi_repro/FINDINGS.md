@@ -72,10 +72,13 @@ dB in this full held-out setup.
 
 Static DGI upper-bound audit:
 `results/stage3_static_dgi_audit` adds four MNIST held-out targets and recomputes
-static DGI metrics with raw, minmax, scale-aligned, and affine-aligned display
-models. The best affine-aligned static DGI PSNR is 15.92 dB and the mean is
-14.01 dB, still below the 20 dB gate. The best static CNR is 3.55. This refutes
-the hypothesis that the PSNR failure is merely a display-scale or offset bug.
+random static DGI metrics with raw/minmax display and scale/affine post-hoc
+alignment. The best affine-aligned random static DGI PSNR is 15.92 dB and the
+mean is 14.01 dB, still below the 20 dB gate. The best random static CNR is
+3.55. A separate full paired-Hadamard exact inverse sanity row reaches 80.00 dB
+minimum PSNR, proving the targets are reconstructable and narrowing the failure
+to random-DGI correlation noise rather than display scale, offset, or object
+dimensionality.
 
 Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
 adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the

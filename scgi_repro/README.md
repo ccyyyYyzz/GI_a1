@@ -73,7 +73,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   exp-residual checkpoint.
 - `results/stage3_static_dgi_audit/`: full-profile static DGI upper-bound audit
   for handcrafted and MNIST held-out targets, including raw/minmax and
-  affine-aligned PSNR checks.
+  affine-aligned random-DGI PSNR checks plus a paired-Hadamard exact sanity
+  ceiling.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/published_channel_calibration/`: figure-level APL intensity-trace
