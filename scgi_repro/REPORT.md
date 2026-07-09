@@ -625,6 +625,13 @@ Additional checks:
 - `run_nonideal_m2.py --resume` was smoke-tested on a 0/2 shard: first run wrote
   9 rows, the resumed run kept 9 rows and wrote 0 new rows while reporting
   `completed` in `progress.json`.
+- `run_stage0.py --resume-checkpoint` was smoke-tested from epoch 1 to epoch 2:
+  `training_progress.json` reported `completed`, the history had 2 rows, and
+  both `checkpoint_latest.pt` and `model_checkpoint.pt` were present.
+- `run_m2_scgi_train.py --resume-checkpoint` was smoke-tested from epoch 1 to
+  epoch 2: `training_progress.json` reported `completed`, the history had 2
+  rows, and both `m2_scgi_checkpoint_latest.pt` and `m2_scgi_checkpoint.pt`
+  were present.
 - The Colab GitHub runner now writes `colab_job_status.json` in the artifact
   root, records accelerator/CU-rate metadata, and all Colab launch scripts pass
   `COLAB_GPU` plus optional `CU_PER_HOUR` through to the runner.
@@ -707,9 +714,10 @@ Additional checks:
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: targeted AGC
   validation beyond the current weak window-law fits and publication-quality
   vector boundary figures.
-- Extend the new resume/status plumbing to epoch-level Stage 0 and M2 SCGI
-  training checkpoints if another long training run is launched. M2 and
-  nonideal M2 scans now resume by `unit_index`, but Drive persistence and
-  mid-epoch model checkpoint restore are still not complete.
+- Add an external persistence layer for long Colab jobs if the browser/runtime
+  dies before final log extraction. The local runner, Colab status manifest,
+  M2/nonideal scan resume, and Stage0/M2 training checkpoint restore are now
+  implemented, but Google Drive or GitHub upload-style mid-run persistence is
+  still open.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

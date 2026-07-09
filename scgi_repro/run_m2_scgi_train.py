@@ -12,6 +12,7 @@ from run_mechanism_m1 import make_synthetic_objects
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
 from src.mechanisms import make_multiplicative_channel, simulate_channel_measurements
+from src.run_progress import write_json_atomic
 from src.scgi_model import make_scgi_model
 from src.train_scgi import as_images, correct_measurements_padded
 
@@ -149,6 +150,8 @@ def main() -> None:
     parser.add_argument("--gain-min", type=float, default=None)
     parser.add_argument("--gain-max", type=float, default=None)
     parser.add_argument("--seed", type=int, default=20260709)
+    parser.add_argument("--resume-checkpoint", type=Path, default=None, help="Resume from m2_scgi_checkpoint_latest.pt.")
+    parser.add_argument("--checkpoint-every", type=int, default=1, help="Save m2_scgi_checkpoint_latest.pt every N epochs; use 0 to disable.")
     args = parser.parse_args()
 
     root = project_root()
@@ -181,7 +184,64 @@ def main() -> None:
     loader = DataLoader(train_ds, batch_size=int(args.batch_size), shuffle=True, generator=split_gen)
     opt = torch.optim.Adam(model.parameters(), lr=float(args.lr))
     history: list[dict[str, float]] = []
-    for epoch in range(1, int(args.epochs) + 1):
+    start_epoch = 0
+    if args.resume_checkpoint is not None:
+        checkpoint = args.resume_checkpoint if args.resume_checkpoint.is_absolute() else root / args.resume_checkpoint
+        if not checkpoint.exists():
+            raise FileNotFoundError(f"Resume checkpoint not found: {checkpoint}")
+        payload = torch.load(checkpoint, map_location=device)
+        model.load_state_dict(payload["model_state_dict"])
+        if "optimizer_state_dict" in payload:
+            opt.load_state_dict(payload["optimizer_state_dict"])
+        start_epoch = int(payload.get("epoch", 0))
+        history = list(payload.get("history", []))
+        print(f"resuming M2 SCGI training from epoch {start_epoch} at {checkpoint}", flush=True)
+
+    checkpoint_latest = out_dir / "m2_scgi_checkpoint_latest.pt"
+
+    def corrector_metadata() -> dict[str, object]:
+        return {
+            "task": "m2_scgi_finetune",
+            "input_normalize": args.input_normalize,
+            "target_normalize": args.target_normalize,
+            "target_mode": args.target_mode,
+            "output_clamp": output_clamp,
+            "num_frames": frames,
+            "padded_side": side,
+            "model_kind": args.model_kind,
+        }
+
+    def save_epoch_checkpoint(epoch: int) -> None:
+        if int(args.checkpoint_every) <= 0:
+            return
+        if epoch % int(args.checkpoint_every) != 0 and epoch != int(args.epochs):
+            return
+        torch.save(
+            {
+                "model_state_dict": model.state_dict(),
+                "optimizer_state_dict": opt.state_dict(),
+                "config": cfg,
+                "epoch": int(epoch),
+                "target_epochs": int(args.epochs),
+                "history": history,
+                "corrector_metadata": corrector_metadata(),
+            },
+            checkpoint_latest,
+        )
+        write_json_atomic(
+            out_dir / "training_progress.json",
+            {
+                "state": "training",
+                "epoch": int(epoch),
+                "target_epochs": int(args.epochs),
+                "checkpoint": "m2_scgi_checkpoint_latest.pt",
+                "train_mse_last": history[-1]["train_mse"] if history else None,
+                "val_mse_last": history[-1]["val_mse"] if history else None,
+                "resumed_from": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
+            },
+        )
+
+    for epoch in range(start_epoch + 1, int(args.epochs) + 1):
         model.train()
         train_losses = []
         for xb, yb in loader:
@@ -206,22 +266,16 @@ def main() -> None:
             "val_mse": float(sum(val_losses) / max(1, len(val_losses))),
         }
         history.append(row)
+        save_epoch_checkpoint(epoch)
         print(f"epoch={epoch} train_mse={row['train_mse']:.6g} val_mse={row['val_mse']:.6g}", flush=True)
 
     checkpoint = out_dir / "m2_scgi_checkpoint.pt"
     payload = {
         "model_state_dict": model.state_dict(),
         "config": cfg,
-        "corrector_metadata": {
-            "task": "m2_scgi_finetune",
-            "input_normalize": args.input_normalize,
-            "target_normalize": args.target_normalize,
-            "target_mode": args.target_mode,
-            "output_clamp": output_clamp,
-            "num_frames": frames,
-            "padded_side": side,
-            "model_kind": args.model_kind,
-        },
+        "epoch": int(args.epochs),
+        "history": history,
+        "corrector_metadata": corrector_metadata(),
     }
     torch.save(payload, checkpoint)
     pd.DataFrame(history).to_csv(out_dir / "train_history.csv", index=False)
@@ -240,10 +294,26 @@ def main() -> None:
         "target_normalize": args.target_normalize,
         "target_mode": args.target_mode,
         "output_clamp": output_clamp,
+        "start_epoch": int(start_epoch),
+        "resume_checkpoint": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
+        "latest_checkpoint": str(checkpoint_latest),
         "final_train_mse": history[-1]["train_mse"],
         "final_val_mse": history[-1]["val_mse"],
     }
     (out_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    write_json_atomic(
+        out_dir / "training_progress.json",
+        {
+            "state": "completed",
+            "epoch": int(args.epochs),
+            "target_epochs": int(args.epochs),
+            "checkpoint": "m2_scgi_checkpoint_latest.pt",
+            "final_checkpoint": "m2_scgi_checkpoint.pt",
+            "train_mse_last": history[-1]["train_mse"],
+            "val_mse_last": history[-1]["val_mse"],
+            "resumed_from": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
+        },
+    )
     print(json.dumps(manifest, indent=2))
 
 

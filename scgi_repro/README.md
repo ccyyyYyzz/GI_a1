@@ -67,6 +67,9 @@ blocks to their main CSVs and update `progress.json`; rerunning with `--resume`
 skips completed units and recomputes all summary tables at the end. The Colab
 GitHub runner also emits `colab_job_status.json` inside the artifact root, and
 the launch scripts pass `COLAB_GPU`/`CU_PER_HOUR` through to that status record.
+For training jobs, `run_stage0.py` writes `checkpoint_latest.pt` and
+`training_progress.json`, while `run_m2_scgi_train.py` writes
+`m2_scgi_checkpoint_latest.pt`; both support `--resume-checkpoint`.
 
 For a closer-to-prompt debug run, use `--profile debug`. For the paper-scale run, use
 `--profile full` on a GPU machine with torchvision/scipy/skimage/matplotlib installed.

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from collections.abc import Callable
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -13,6 +14,9 @@ from .data_sim import SimulatedData, normalize_rows
 class TrainHistory:
     train_loss: list[float]
     val_mse: list[float]
+
+
+CheckpointCallback = Callable[[int, TrainHistory, torch.optim.Optimizer], None]
 
 
 def as_images(seq: torch.Tensor, image_size: int) -> torch.Tensor:
@@ -99,6 +103,10 @@ def train_scgi(
     batch_size: int,
     lr: float,
     gamma: float,
+    start_epoch: int = 0,
+    history: TrainHistory | None = None,
+    optimizer_state_dict: dict | None = None,
+    checkpoint_callback: CheckpointCallback | None = None,
 ) -> TrainHistory:
     image_size = train.image_size
     x_train = as_images(train.r_dynamic, image_size)
@@ -106,9 +114,11 @@ def train_scgi(
     ds = TensorDataset(x_train, y_train, train.sigma2)
     loader = DataLoader(ds, batch_size=batch_size, shuffle=True)
     opt = torch.optim.Adam(model.parameters(), lr=float(lr))
-    hist = TrainHistory(train_loss=[], val_mse=[])
+    if optimizer_state_dict is not None:
+        opt.load_state_dict(optimizer_state_dict)
+    hist = history or TrainHistory(train_loss=[], val_mse=[])
     model.train()
-    for _epoch in range(int(epochs)):
+    for epoch in range(int(start_epoch) + 1, int(epochs) + 1):
         losses = []
         for xb, yb, sig in loader:
             opt.zero_grad(set_to_none=True)
@@ -124,6 +134,8 @@ def train_scgi(
             mse = torch.mean((pred - as_images(val.b_static, image_size)) ** 2)
             hist.val_mse.append(float(mse.detach().cpu()))
             model.train()
+        if checkpoint_callback is not None:
+            checkpoint_callback(epoch, hist, opt)
     return hist
 
 

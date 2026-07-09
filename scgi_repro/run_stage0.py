@@ -13,8 +13,9 @@ from src.config_utils import load_config, project_root
 from src.data_sim import simulate_scgi_dataset, train_val_split
 from src.dgi import dgi_reconstruct
 from src.metrics import bundle, cnr, normal_ks_test, slope_vs_index
+from src.run_progress import write_json_atomic
 from src.scgi_model import make_scgi_model
-from src.train_scgi import analytic_gain_correct, correct_measurements, oracle_gain_correct, train_scgi
+from src.train_scgi import TrainHistory, analytic_gain_correct, correct_measurements, oracle_gain_correct, train_scgi
 from src.ured import optimize_untrained
 
 
@@ -133,6 +134,8 @@ def main() -> None:
     parser.add_argument("--model-kind", default=None, help="Override scgi.model_kind for one run.")
     parser.add_argument("--skip-ured", action="store_true")
     parser.add_argument("--append-report", action="store_true", help="Append a short run block to REPORT.md.")
+    parser.add_argument("--resume-checkpoint", type=Path, default=None, help="Resume Stage 0 training from checkpoint_latest.pt.")
+    parser.add_argument("--checkpoint-every", type=int, default=1, help="Save checkpoint_latest.pt every N epochs; use 0 to disable.")
     args = parser.parse_args()
 
     root = project_root()
@@ -147,14 +150,71 @@ def main() -> None:
     data = simulate_scgi_dataset(cfg)
     train, val = train_val_split(data, int(active["train_samples"]))
     model = make_scgi_model(cfg).to(data.images.device)
+    total_epochs = int(args.epochs or active["scgi_epochs"])
+    start_epoch = 0
+    resume_history = None
+    optimizer_state_dict = None
+    if args.resume_checkpoint is not None:
+        checkpoint = args.resume_checkpoint if args.resume_checkpoint.is_absolute() else root / args.resume_checkpoint
+        if not checkpoint.exists():
+            raise FileNotFoundError(f"Resume checkpoint not found: {checkpoint}")
+        payload = torch.load(checkpoint, map_location=data.images.device)
+        state_dict = payload["model_state_dict"] if isinstance(payload, dict) and "model_state_dict" in payload else payload
+        model.load_state_dict(state_dict)
+        if isinstance(payload, dict):
+            start_epoch = int(payload.get("epoch", 0))
+            hist_payload = payload.get("history", {})
+            resume_history = TrainHistory(
+                train_loss=list(hist_payload.get("train_loss", [])),
+                val_mse=list(hist_payload.get("val_mse", [])),
+            )
+            optimizer_state_dict = payload.get("optimizer_state_dict")
+        print(f"resuming Stage 0 from epoch {start_epoch} at {checkpoint}", flush=True)
+
+    latest_checkpoint = out_dir / "checkpoint_latest.pt"
+
+    def save_epoch_checkpoint(epoch: int, hist: TrainHistory, optimizer: torch.optim.Optimizer) -> None:
+        if int(args.checkpoint_every) <= 0:
+            return
+        if epoch % int(args.checkpoint_every) != 0 and epoch != total_epochs:
+            return
+        payload = {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "epoch": int(epoch),
+            "target_epochs": int(total_epochs),
+            "profile": cfg["profile"],
+            "tag": result_name,
+            "active_config": active,
+            "scgi_config": cfg.get("scgi", {}),
+            "history": {"train_loss": hist.train_loss, "val_mse": hist.val_mse},
+        }
+        torch.save(payload, latest_checkpoint)
+        write_json_atomic(
+            out_dir / "training_progress.json",
+            {
+                "state": "training",
+                "epoch": int(epoch),
+                "target_epochs": int(total_epochs),
+                "checkpoint": "checkpoint_latest.pt",
+                "train_loss_last": hist.train_loss[-1] if hist.train_loss else None,
+                "val_mse_last": hist.val_mse[-1] if hist.val_mse else None,
+                "resumed_from": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
+            },
+        )
+
     hist = train_scgi(
         model,
         train,
         val,
-        epochs=int(args.epochs or active["scgi_epochs"]),
+        epochs=total_epochs,
         batch_size=int(active["batch_size"]),
         lr=float(active["lr"]),
         gamma=float(active.get("gamma", cfg.get("scgi", {}).get("gamma", 1.0))),
+        start_epoch=start_epoch,
+        history=resume_history,
+        optimizer_state_dict=optimizer_state_dict,
+        checkpoint_callback=save_epoch_checkpoint,
     )
     y_corr = correct_measurements(model, val.r_dynamic, val.image_size)
     normalize_mode = str(cfg.get("data", {}).get("normalize", "max"))
@@ -180,7 +240,9 @@ def main() -> None:
         "device": str(data.images.device),
         "image_size": val.image_size,
         "num_patterns": int(val.patterns.shape[0]),
-        "epochs": int(args.epochs or active["scgi_epochs"]),
+        "epochs": total_epochs,
+        "start_epoch": int(start_epoch),
+        "resumed_from": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
         "train_loss_last": hist.train_loss[-1],
         "val_mse_last": hist.val_mse[-1],
         "slope_dynamic": slope_vs_index(val.r_dynamic[idx]),
@@ -238,8 +300,10 @@ def main() -> None:
                     "val_diagnostics": "val_diagnostics.csv",
                     "acceptance": "acceptance.csv",
                     "checkpoint": "model_checkpoint.pt",
+                    "latest_checkpoint": "checkpoint_latest.pt",
                     "figure": "stage0_recon_grid.png",
                 },
+                "resume_checkpoint": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
                 "acceptance_passed": bool(pd.read_csv(out_dir / "acceptance.csv")["passed"].all()),
             },
             f,
@@ -253,8 +317,22 @@ def main() -> None:
             "active_config": active,
             "scgi_config": cfg.get("scgi", {}),
             "metrics": metrics,
+            "history": {"train_loss": hist.train_loss, "val_mse": hist.val_mse},
         },
         out_dir / "model_checkpoint.pt",
+    )
+    write_json_atomic(
+        out_dir / "training_progress.json",
+        {
+            "state": "completed",
+            "epoch": total_epochs,
+            "target_epochs": total_epochs,
+            "checkpoint": "checkpoint_latest.pt",
+            "final_checkpoint": "model_checkpoint.pt",
+            "train_loss_last": hist.train_loss[-1],
+            "val_mse_last": hist.val_mse[-1],
+            "resumed_from": None if args.resume_checkpoint is None else str(args.resume_checkpoint),
+        },
     )
 
     try_plot_grid(
