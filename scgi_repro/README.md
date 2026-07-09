@@ -71,6 +71,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage3_threshold_matrix_full_r2_authoritative/`: full-profile
   SCGI/UNN/URED threshold matrix for four held-out targets using the returned
   exp-residual checkpoint.
+- `results/stage3_static_dgi_audit/`: full-profile static DGI upper-bound audit
+  for handcrafted and MNIST held-out targets, including raw/minmax and
+  affine-aligned PSNR checks.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/published_channel_calibration/`: figure-level APL intensity-trace

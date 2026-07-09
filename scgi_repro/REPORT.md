@@ -193,6 +193,26 @@ for all four targets: `letter_A` 3.3095, `letter_L` 3.5481, `ring` 2.9819, and
 all-target CNR>=3 and static PSNR>20 gates still fail because the static DGI
 upper bounds for `ring`, `stripe_target`, and PSNR are below those thresholds.
 
+Static DGI upper-bound audit:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_static_dgi_audit.py --profile full --output-dir results\stage3_static_dgi_audit
+```
+
+Outputs:
+
+- `results/stage3_static_dgi_audit/stage3_static_dgi_audit.csv`
+- `results/stage3_static_dgi_audit/stage3_static_dgi_audit_report.md`
+- `results/stage3_static_dgi_audit/stage3_static_dgi_affine_psnr.png`
+
+This audit adds four MNIST held-out targets to the four handcrafted targets and
+compares raw, min-max displayed, scale-aligned, and affine-aligned static DGI.
+Even after optimal affine alignment, the best static DGI PSNR is only 15.92 dB
+and the mean affine-aligned PSNR is 14.01 dB. The best static DGI CNR is 3.55.
+This shows that the `static PSNR > 20 dB` gate is not blocked by a simple
+display-scale offset; for the APL-style random DGI reconstructions, CNR/ROI is
+the defensible paper-facing metric.
+
 Full-profile SCGI/UNN/URED threshold matrix:
 
 ```powershell
@@ -524,6 +544,8 @@ Additional checks:
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
 - Stage 3 full threshold matrix writes SCGI/UNN/URED metrics and acceptance under
   `results/stage3_threshold_matrix_full_r2_authoritative`.
+- Stage 3 static DGI upper-bound audit writes raw/minmax/scale/affine metrics
+  and an affine-PSNR figure under `results/stage3_static_dgi_audit`.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -540,7 +562,8 @@ Additional checks:
 
 - Redesign the `full` SCGI/UNN/URED path. The authoritative full matrix now
   exists, but its mean/min CNRs remain far below APL thresholds, especially for
-  UNN/URED.
+  UNN/URED. Static DGI PSNR has now been audited and remains below 20 dB even
+  after affine alignment, so CNR/ROI and URED fidelity are the practical levers.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
   diagram is required. The direct frozen dense baseline is implemented but

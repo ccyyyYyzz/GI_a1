@@ -105,3 +105,12 @@ stable by centerline standard deviation, but their band-width proxy is still
 about 0.104. This suggests the paper-level CNR gap is not solved by simply
 making the exponential decay stronger; ROI definition, denoiser architecture,
 and reconstruction details matter.
+
+## 2026-07-09 Static DGI PSNR Gate Is Not A Display Bug
+
+The full Stage 3 static DGI audit added MNIST held-out targets and compared raw,
+minmax, scale-aligned, and affine-aligned reconstructions. Even the best
+affine-aligned static DGI PSNR is only `15.92` dB, below the prompt's 20 dB
+sanity gate. Static CNR reaches `3.55`, so the random-DGI reconstruction is
+usable for APL-style contrast analysis, but pixelwise PSNR is a poor acceptance
+gate for these noisy random-basis DGI images.

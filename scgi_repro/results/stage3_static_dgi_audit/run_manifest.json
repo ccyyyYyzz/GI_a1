@@ -1,0 +1,14 @@
+{
+  "profile": "full",
+  "image_size": 128,
+  "active_num_patterns": 16384,
+  "pattern_factors": [
+    1.0
+  ],
+  "objects": 8,
+  "requested_dataset_source": "mnist",
+  "device": "cuda",
+  "figures": [
+    "stage3_static_dgi_affine_psnr.png"
+  ]
+}
