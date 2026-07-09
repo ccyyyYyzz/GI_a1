@@ -76,6 +76,11 @@ ured:
   beta: 0.5
   xi: 0.5
   x_step: 0.5
+  residual_scale: 0.1
+  denoise_kernel: 3
+  nlm_h: 0.08
+  nlm_patch_size: 5
+  nlm_patch_distance: 6
   denoiser: gaussian_blur_fallback
   final_output: residual_x_minus_u
 

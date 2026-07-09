@@ -63,12 +63,13 @@ class NAFBlock(nn.Module):
 
 
 class TinyNAFNet(nn.Module):
-    def __init__(self, channels: int = 24, blocks: int = 3):
+    def __init__(self, channels: int = 24, blocks: int = 3, residual_scale: float = 0.1):
         super().__init__()
+        self.residual_scale = float(residual_scale)
         self.intro = nn.Conv2d(1, channels, 3, padding=1)
         self.blocks = nn.Sequential(*[NAFBlock(channels) for _ in range(blocks)])
         self.ending = nn.Conv2d(channels, 1, 3, padding=1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         y = self.ending(self.blocks(self.intro(x)))
-        return (x + 0.1 * torch.tanh(y)).clamp(0.0, 1.0)
+        return (x + self.residual_scale * torch.tanh(y)).clamp(0.0, 1.0)
