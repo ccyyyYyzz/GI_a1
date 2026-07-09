@@ -1,0 +1,32 @@
+{
+  "utc_timestamp": "2026-07-09T22:36:28.557628+00:00",
+  "git_commit": "3382ee9bd95103893a24d9ca5dfeefe69b065852",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\paper_fig3_gain_error_e12_local_r1",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 20,
+    "seed": 20240708,
+    "rho": [
+      0.001,
+      0.01
+    ],
+    "sigma_a": 0.1,
+    "bases": [
+      "random_uniform",
+      "random_binary",
+      "hadamard_ordered",
+      "hadamard_shuffled",
+      "srht_paired",
+      "hadamard_raw_ordered",
+      "hadamard_raw_shuffled"
+    ],
+    "min_window": 4
+  },
+  "rows": 24400,
+  "runtime_seconds": 49.948
+}
