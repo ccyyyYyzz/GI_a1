@@ -27,7 +27,7 @@ baselines.
 
 | Requirement | Status | Current evidence |
 |---|---|---|
-| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 18 unit tests pass |
+| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 21 unit tests pass |
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
@@ -49,9 +49,9 @@ baselines.
 | M2 includes SCGI-network blind correction | Partial | `scgi_proxy` is implemented and dense-tested as an equal-frame blind SCGI-style smooth-gain proxy with 10,500 rows and zero reference frames; a trained SCGI network correction is still not implemented |
 | M3 SRHT constructive method and ablations | Partial | `results/srht_m3_protocol_o10s5` exists; M3 full claim thresholds are not all proven |
 | M4 theory with fitted laws and notebook-level verification | Partial | `run_theory_m4.py` and `results/theory_m4_compact` provide compact N/frame-sweep fitted laws; larger N sweep, bootstrap intervals, AGC window law, and censored flip-boundary model remain open |
-| Published-channel calibration and nonideal detector/SLM model | Partial | `run_nonideal_m2.py` and `results/nonideal_m2_compact` implement shot/read noise, 8-bit SLM quantization, finite contrast, timing jitter, and noisy references at compact scale; WebPlotDigitizer-derived APL/OE calibration and full nonideal main scan remain open |
+| Published-channel calibration and nonideal detector/SLM model | Partial | `run_nonideal_m2.py`, `results/nonideal_m2_compact`, and `results/nonideal_m2_full_r1_merged` implement shot/read noise, 8-bit SLM quantization, finite contrast, timing jitter, and noisy references through a full 157,500-row main scan; WebPlotDigitizer-derived APL/OE calibration remains open |
 | Paper outline and conservative positioning | Partial | `PAPER_OUTLINE.md` exists, but needs updating with dense M2 and remaining limitations |
-| Sharded Colab scanning and merge | Done for M2 | `run_phase_m2.py --shard i/k`; `merge_phase_m2_shards.py`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows |
+| Sharded Colab scanning and merge | Done for M2 and nonideal M2 | `run_phase_m2.py --shard i/k`; `merge_phase_m2_shards.py`; `run_nonideal_m2.py --shard i/k`; `merge_nonideal_m2_shards.py`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows and `results/nonideal_m2_full_r1_merged` with 157,500 rows |
 
 ## Current Verified Commands
 
@@ -67,6 +67,7 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --output-dir results\stage_3_exp_residual_colab_full --model-kind exponential_residual_unet
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --output-dir results\nonideal_m2_compact
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 ```
 
 ## Completion Decision
@@ -74,5 +75,5 @@ baselines.
 The goal is not yet fully complete under the original prompt scope. The current
 state is a strong executable prototype plus several completed compact protocol
 experiments, but the full paper-level SCGI thresholds, a true trained M2
-SCGI-network correction, paper-grade M4 theory closure, and published/nonideal
+SCGI-network correction, paper-grade M4 theory closure, and published-curve
 calibration remain open.

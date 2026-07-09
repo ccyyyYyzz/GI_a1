@@ -185,25 +185,32 @@ complete the paper-grade theory requirement because flip-boundary fits are still
 mostly censored or insufficiently sampled, and bootstrap uncertainty intervals
 and nonideal calibration are still open.
 
-## Compact Nonideal Digital Twin
+## Nonideal Digital Twin
 
-Experiment: compact M2 ideal/nonideal comparison over random uniform,
-Hadamard-paired, and SRHT-paired bases with none/oracle/AGC/scgi_proxy/reference
-and pairwise corrections.
+Experiment: M2 ideal/nonideal comparison with SLM quantization, finite contrast,
+detector noise, reference-sample noise, and frame timing jitter. The compact
+smoke run covers random uniform, Hadamard-paired, and SRHT-paired bases. The
+full run covers the dense 7-rho x 5-sigma grid, 10 objects, 5 seeds, and the
+same basis/correction family as the dense M2 scan.
 
 Prediction: if the SRHT/pairwise conclusion is not only an artifact of perfect
 patterns and noiseless reference samples, the equal-frame winner should remain
 stable under moderate SLM quantization, finite contrast, detector noise,
 reference-sample noise, and frame timing jitter.
 
-Result: output written to `results/nonideal_m2_compact`. The scan has 1224 rows,
-split evenly between ideal and nonideal conditions. The equal-frame winner is
-pairwise in all six compact rho/sigma cells for both conditions. Under the
-nonideal condition, SRHT is the winning equal-frame basis in 5/6 cells and
-Hadamard in 1/6. Oracle mean PSNR falls from 85.3 dB to 33.4 dB, confirming that
-the nonideal perturbations are active rather than decorative.
+Result: compact output is written to `results/nonideal_m2_compact`; full output
+is written to `results/nonideal_m2_full_r1_merged`. The full merged scan has
+157,500 rows, split evenly between ideal and nonideal conditions, with all five
+Colab shard labels present. The equal-frame winner is pairwise in all 35
+rho/sigma cells for both ideal and nonideal conditions. The winning equal-frame
+basis shifts from 16 Hadamard / 19 SRHT cells under ideal conditions to 23
+Hadamard / 12 SRHT cells under nonideal conditions. Oracle mean PSNR falls from
+65.36 dB to 28.35 dB, confirming that the nonideal perturbations are active.
+Pairwise mean PSNR drops only 0.17 dB. Under nonideal matched comparisons,
+`scgi_proxy` improves over `none` in 83.6% of cases and over AGC in 65.8%, but
+beats pairwise on paired bases only 7.6% of the time.
 
-Supports/refutes: supports the robustness direction at compact scale. It does
-not yet satisfy the prompt's full nonideal main-scan requirement because the
-parameters are normalized placeholders, not calibrated from published curves or
-hardware measurements.
+Supports/refutes: supports the robustness direction at full scan scale and
+satisfies the uncalibrated full nonideal main-scan requirement. It still does
+not satisfy published-channel calibration because the parameters are normalized
+placeholders, not digitized from APL/OE curves or hardware measurements.

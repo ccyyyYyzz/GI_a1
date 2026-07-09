@@ -43,8 +43,10 @@ Channels
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
-  samples. A compact nonideal digital-twin runner now exists, but a full
-  calibrated nonideal main scan is still needed.
+  samples. Compact and full nonideal digital-twin scans now exist, and the full
+  scan preserves the pairwise winner under detector/SLM perturbations; published
+  curve calibration is still needed before claiming hardware-calibrated
+  nonideal performance.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty, although `run_theory_m4.py` now provides observed-only
   compact fits as a starting point.

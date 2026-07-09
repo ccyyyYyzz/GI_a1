@@ -27,6 +27,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
+& $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 & $py run_make_figures.py --output-dir results\figures
 & $py -m unittest discover tests -v
 ```
@@ -79,6 +80,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.
+- `results/nonideal_m2_full_r1_merged/`: 157,500-row full ideal/nonideal M2
+  digital-twin scan over the dense 7x5 grid, merged from five Colab L4 shards.
 - `results/mechanism_m1_protocol_o10s5/`,
   `results/phase_m2_reference_protocol_o10s5/`, and
   `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used

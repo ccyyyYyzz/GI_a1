@@ -1,0 +1,69 @@
+{
+  "rows": 157500,
+  "conditions": {
+    "ideal": 78750,
+    "nonideal": 78750
+  },
+  "shards": [
+    "0/5",
+    "1/5",
+    "2/5",
+    "3/5",
+    "4/5"
+  ],
+  "best_equal_counts": {
+    "ideal": {
+      "pairwise": 35
+    },
+    "nonideal": {
+      "pairwise": 35
+    }
+  },
+  "best_equal_basis_counts": {
+    "ideal": {
+      "hadamard_paired": 16,
+      "srht_paired": 19
+    },
+    "nonideal": {
+      "hadamard_paired": 23,
+      "srht_paired": 12
+    }
+  },
+  "mean_psnr_by_condition_correction": {
+    "ideal": {
+      "agc": 16.349,
+      "none": 16.4221,
+      "oracle": 65.3627,
+      "pairwise": 21.4734,
+      "reference_k2": 19.2977,
+      "reference_k32": 17.5182,
+      "reference_k8": 17.945,
+      "scgi_proxy": 17.4396
+    },
+    "nonideal": {
+      "agc": 16.3554,
+      "none": 16.4123,
+      "oracle": 28.3513,
+      "pairwise": 21.3055,
+      "reference_k2": 18.4667,
+      "reference_k32": 17.4159,
+      "reference_k8": 17.7972,
+      "scgi_proxy": 17.4346
+    }
+  },
+  "delta_by_correction_mean": {
+    "agc": 0.0064,
+    "none": -0.0098,
+    "oracle": -37.0114,
+    "pairwise": -0.1679,
+    "reference_k2": -0.831,
+    "reference_k32": -0.1022,
+    "reference_k8": -0.1477,
+    "scgi_proxy": -0.005
+  },
+  "reference_frames": [
+    65,
+    257,
+    1025
+  ]
+}

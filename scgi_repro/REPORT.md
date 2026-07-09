@@ -331,15 +331,17 @@ spreading. It is still not a publication-grade theory closure because the large
 16/32/64 sweep, bootstrap intervals, AGC window bias-variance law, and censored
 flip-boundary model remain open.
 
-Latest compact nonideal M2 digital-twin run:
+Latest nonideal M2 digital-twin runs:
 
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --output-dir results\nonideal_m2_compact
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
 ```
 
 Outputs:
 
-- `nonideal_phase_scan.csv` (1224 rows; 612 ideal and 612 nonideal)
+- `results/nonideal_m2_compact/nonideal_phase_scan.csv` (1224 rows; 612 ideal and 612 nonideal)
+- `results/nonideal_m2_full_r1_merged/nonideal_phase_scan.csv` (157,500 rows; 78,750 ideal and 78,750 nonideal)
 - `nonideal_summary.csv`
 - `nonideal_best_equal_frame_blind_methods.csv`
 - `nonideal_best_reference_methods.csv`
@@ -347,12 +349,19 @@ Outputs:
 
 The nonideal condition uses 8-bit SLM quantization, finite contrast ratio
 1000:1, shot noise with photon count `1e4`, read noise `0.002` times mean
-signal, timing jitter `0.05` frame, and noisy `reference_k8` samples. In this
-compact 3-basis/3-rho/2-sigma check, strict equal-frame blind winners remain
-`pairwise` in all six rho/sigma cells; SRHT is the winning basis in 5/6 nonideal
-cells and Hadamard in 1/6. The nonideal oracle mean PSNR drops from near-exact
-85.3 dB to 33.4 dB, confirming that detector/SLM perturbations are active. This
-is a robustness entry point, not the requested full nonideal main scan.
+signal, timing jitter `0.05` frame, and noisy reference samples. The compact
+3-basis/3-rho/2-sigma check remains a smoke-scale robustness entry point. The
+full 7-rho x 5-sigma x 10-object x 5-seed run was split into five Colab L4
+shards and merged with all shard labels `0/5` through `4/5` present. In the
+full merged scan, strict equal-frame blind winners remain `pairwise` in all 35
+rho/sigma cells for both ideal and nonideal conditions. The winning equal-frame
+basis shifts from 16 Hadamard / 19 SRHT cells under ideal conditions to 23
+Hadamard / 12 SRHT cells under nonideal conditions. The nonideal oracle mean
+PSNR drops sharply from 65.36 dB to 28.35 dB, confirming active detector/SLM
+perturbations, while `pairwise` drops only 0.17 dB on average. `scgi_proxy`
+improves over raw `none` in 83.6% of nonideal matched comparisons and over AGC
+in 65.8%, but still rarely beats `pairwise` on paired bases. These are
+normalized digital-twin robustness results, not hardware-calibrated claims.
 
 ## Figures
 
@@ -396,14 +405,18 @@ Additional checks:
   numeric tolerance.
 - M2 `scgi_proxy` dense run was split into five Colab L4 shards and merged into
   a 78,750-row scan with all five shard labels present.
+- Full nonideal M2 was split into five Colab L4 shards and merged into
+  `results/nonideal_m2_full_r1_merged` with 157,500 rows and all five shard
+  labels present.
 - Stage 0 smoke now writes `val_diagnostics.csv` and `acceptance.csv`.
 - Stage 1 smoke diagnostics write histogram, dynamic-curve, gain-curve, and
   lambda-distribution figures.
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
 - M4 compact theory runner writes residual-error, random-frame, energy
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
-- Compact nonideal M2 runner writes ideal/nonideal digital-twin comparison tables
-  under `results/nonideal_m2_compact`.
+- Nonideal M2 runners write compact and full ideal/nonideal digital-twin
+  comparison tables under `results/nonideal_m2_compact` and
+  `results/nonideal_m2_full_r1_merged`.
 
 ## Remaining Work Before Full Paper-Level Completion
 
