@@ -11,7 +11,7 @@ import pandas as pd
 from src.config_utils import project_root
 
 
-CHALLENGERS = ["random_uniform", "random_binary", "fourier_fourstep", "dct_paired", "srht_paired"]
+CHALLENGERS = ["random_uniform", "random_binary", "random_gaussian", "fourier_fourstep", "dct_paired", "srht_paired"]
 DEFAULT_ABOVE_FLOOR_REL_MSE = 0.5
 
 

@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_stage0.py --profile debug --epochs 10 --tag stage0_debug_prompt_exact_colab_r1 --checkpoint-every 1",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 60.003,
+  "end_time_utc": "2026-07-09T17:57:35Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "5c499e84ae52bb1fc099744a82a373d2ce581f30",
+  "return_code": 0,
+  "run_id": "pro1_stage0_debug_prompt_exact_colab_r1",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T17:56:35Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T17:57:35Z",
+  "workdir": "scgi_repro"
+}

@@ -1,0 +1,9 @@
+scope,seed_rule,seed_or_formula,notes
+global_config,config.seed,20240708,Base seed shared by compact mechanism/profile runners.
+object_generation,"make_synthetic_objects(count, image_size, seed=config.seed)",20240708,Deterministic synthetic digit/shape/line objects; no external MNIST/natural-image split in M1 audit.
+basis_random_uniform,"make_basis(..., seed=config.seed)",20240708,I.i.d. random pattern matrix seed.
+basis_random_binary,M1 uses config.seed + 17; protocol audit uses explicit requested basis row.,20240708 or 20240725,The protocol table records the concrete seed used for each audited basis.
+basis_random_gaussian,M1 uses config.seed + 31 when constructed through make_bases.,20240708 or 20240739,"Signed mathematical control, not an amplitude-only optical frame family."
+basis_srht,M1/M2 use config.seed + 47 for SRHT sign/row randomness in compact runners.,20240755,The protocol table records the concrete seed used for the audited SRHT basis.
+channel_oracle_agc,1000 + 97 * seed_idx,1000 + 97 * seed_idx,See run_mechanism_m1.py for oracle/AGC channel seeds.
+channel_pairwise_failure,4000 + 89 * seed_idx,4000 + 89 * seed_idx,See run_mechanism_m1.py for adjacent-frame jitter channel seeds.

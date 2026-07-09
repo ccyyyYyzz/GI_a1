@@ -1,0 +1,10 @@
+{
+  "checkpoint": "checkpoint_latest.pt",
+  "epoch": 10,
+  "final_checkpoint": "model_checkpoint.pt",
+  "resumed_from": null,
+  "state": "completed",
+  "target_epochs": 10,
+  "train_loss_last": 19.801340103149414,
+  "val_mse_last": 0.02177811972796917
+}

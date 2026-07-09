@@ -19,6 +19,9 @@ All basis/channel comparisons in this project follow these rules.
 7. **Declare reconstruction path.** Random bases use correlation/DGI-style
    reconstruction. Orthogonal bases use paired measurements and exact inverse
    transforms when possible.
+   `random_gaussian` is treated as a signed mathematical control because it
+   contains negative entries; it should be separated from non-negative
+   amplitude-only SLM frame families in headline optical claims.
 8. **Oracle is mandatory.** Every basis comparison includes oracle correction
    `R_n / a_n`; if oracle fails, do not interpret blind-correction failures as
    identifiability failures.

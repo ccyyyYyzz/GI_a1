@@ -1,0 +1,2 @@
+profile,device,samples,image_size,patterns,sampled_for_plots,ks_pass_rate_plotted,lambda_min,lambda_max,outputs
+full,cuda:0,5000,128,16384,10,1.0,0.9995001554489136,1.0,/tmp/scgi_colab_c1xkm8cz/repo/scgi_repro/results/stage_1_prompt_full_colab_r1/full

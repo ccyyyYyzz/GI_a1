@@ -202,6 +202,7 @@ def main() -> None:
     basis_specs = [
         ("random_uniform", {"num_frames": frame_budget, "reconstruction": "correlation"}),
         ("random_binary", {"num_frames": frame_budget, "reconstruction": "correlation"}),
+        ("random_gaussian", {"num_frames": frame_budget, "reconstruction": "correlation"}),
         *hadamard_specs,
         ("dct_paired", {}),
         ("fourier_fourstep", {"num_frames": frame_budget}),

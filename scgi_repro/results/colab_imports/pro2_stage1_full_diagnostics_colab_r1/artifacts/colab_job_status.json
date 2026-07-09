@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_stage1_diagnostics.py --profile full --samples 10 --output-dir results/stage_1_prompt_full_colab_r1",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 60.003,
+  "end_time_utc": "2026-07-09T17:57:49Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "5c499e84ae52bb1fc099744a82a373d2ce581f30",
+  "return_code": 0,
+  "run_id": "pro2_stage1_full_diagnostics_colab_r1",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T17:56:49Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T17:57:49Z",
+  "workdir": "scgi_repro"
+}

@@ -3,3 +3,12 @@ __pycache__/
 .pytest_cache/
 data/
 results/cli_runs/
+results/colab_runs/*.log
+results/colab_runs/*.wslpid
+results/colab_runs/*.launch.log
+results/colab_runs/*.new.log
+results/colab_imports/**/text_outputs/
+results/colab_imports/**/colab_artifacts.zip
+results/colab_imports/**/colab_text_outputs.json
+results/colab_imports/**/colab_zip_info.json
+results/colab_imports/**/*.pt

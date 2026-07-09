@@ -1,0 +1,17 @@
+{
+  "amplitude_invalid_bases": [
+    "random_gaussian"
+  ],
+  "basis_rows": 40,
+  "max_total_physical_frames": 3073,
+  "min_total_physical_frames": 2048,
+  "object_rows": 10,
+  "reference_periods": [
+    0,
+    2,
+    8,
+    32
+  ],
+  "seed_rows": 8,
+  "strict_basis_count": 10
+}

@@ -1,0 +1,17 @@
+{
+  "profile": "debug",
+  "tag": "stage0_debug_prompt_exact_colab_r1",
+  "device": "cuda:0",
+  "outputs": {
+    "metrics": "metrics.json",
+    "metrics_csv": "metrics.csv",
+    "train_history": "train_history.csv",
+    "val_diagnostics": "val_diagnostics.csv",
+    "acceptance": "acceptance.csv",
+    "checkpoint": "model_checkpoint.pt",
+    "latest_checkpoint": "checkpoint_latest.pt",
+    "figure": "stage0_recon_grid.png"
+  },
+  "resume_checkpoint": null,
+  "acceptance_passed": false
+}

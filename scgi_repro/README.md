@@ -16,6 +16,11 @@ with PyTorch CUDA 12.1 on an RTX 4060 Laptop GPU. The code also keeps internal
 fallbacks for synthetic MNIST-like objects, KS testing, simple SSIM, and PIL-based
 figures so the smoke tests remain portable.
 
+Current completion status for external review is summarized in
+`GOAL_REQUIREMENTS_AUDIT.md`. In short: the framework and diagnostic evidence are
+substantial, but the original strict paper-scale reproduction is still not
+complete.
+
 ## Quick Start
 
 ```powershell
@@ -111,8 +116,15 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `FINDINGS.md`: mechanism-study results in experiment-prediction-result format.
 - `PAPER_OUTLINE.md`: theory/numerics paper outline and target venues.
 - `results/stage_0/`: SCGI smoke run figures and metrics.
+- `results/colab_imports/pro1_stage0_debug_prompt_exact_colab_r1/`:
+  prompt-exact Colab L4 debug run at 64x64, N=4096, M=200, 10 epochs. It is
+  direct negative evidence: directionality improves over dynamic DGI, but strict
+  SCGI CNR, static PSNR, and KS gates fail.
 - `results/stage_1/smoke/`: Stage 1 B histogram, dynamic curve, gain curve, and
   lambda distribution diagnostics.
+- `results/colab_imports/pro2_stage1_full_diagnostics_colab_r1/`: prompt-scale
+  Colab L4 Stage 1 diagnostic run with 5000 samples, 128x128 images, 16384
+  patterns, and plotted KS pass rate 1.0.
 - `results/stage_3/smoke/`: held-out target reconstructions and Stage 3
   acceptance checks using the saved Stage 0 checkpoint.
 - `results/colab_imports/pro2_full_exp_residual_e2_r1/`: full-profile
@@ -249,6 +261,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   relay; rendered PDF pages and overlay QA PNGs stay local-only.
 - `results/mechanism_m1_basis_expanded_quick/`: compact M1 output with random,
   Hadamard, DCT, Fourier, and SRHT bases.
+- `results/protocol_audit_r1/`: auditable protocol tables for measurement-basis
+  comparisons, including 40 basis/reference rows, 10 synthetic-object rows, and
+  seed-convention rows. `random_gaussian` is labelled as a signed mathematical
+  control rather than an amplitude-only optical frame family.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with
   frame-count audit columns.
 - `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: retained
