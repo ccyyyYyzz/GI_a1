@@ -86,6 +86,15 @@ returned exp-residual checkpoint. Mean/min CNRs are SCGI 3.083/2.492, SCGI-UNN
 2.446/2.254, and SCGI-URED 5.084/2.270. URED is consistently above UNN, but the
 compact URED proxy still fails APL minima: SCGI 3.39, UNN 7.93, and URED 10.43.
 
+Stage 4 stripe-target sweeps:
+`results/stage4_ured_sweep_r2_stripe_merged` shows a 40-config avg-pool
+RED/UNN screen cannot rescue the binding stripe target: best final CNR is 2.916
+and best target-aware trace CNR is 3.831. `results/stage4_ured_sweep_nlm_r1_stripe`
+then replaces the fallback denoiser with non-local means and improves stripe to
+final CNR 5.131 and best trace CNR 8.913. This supports the diagnosis that the
+denoiser and stopping rule are the Stage 4 bottleneck, but it still refutes a
+paper-threshold reproduction claim for APL URED 10.43.
+
 Published calibration: `results/published_calibration` encodes the APL Fig. 6
 and Fig. 9 CNR targets plus OE PSNR/SSIM target values. Current APL comparison
 has 16 rows and all are below the relevant published minima.

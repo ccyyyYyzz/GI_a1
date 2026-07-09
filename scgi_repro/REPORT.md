@@ -236,6 +236,21 @@ consistently above UNN, but this compact TinyNAFNet/average-pool URED proxy does
 not reproduce the APL CNR ranges: SCGI 3.39-4.04, UNN 7.93-14.20, and URED
 10.43-38.28.
 
+Stage 4 URED stripe-target sweeps:
+
+- `results/stage4_ured_sweep_r2_stripe_merged`
+- `results/stage4_ured_sweep_nlm_r1_stripe`
+
+The stripe target is the binding full-profile APL threshold failure. A 40-config
+avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
+that the average-pool proxy is not enough: the best final stripe CNR is 2.916 and
+the best target-aware trace CNR is 3.831. Replacing the fallback denoiser with
+non-local means is much stronger: a 48-config stripe sweep reaches final CNR
+5.131 and best trace CNR 8.913. This is a real improvement over the SCGI/static
+bound of 2.492 and approaches the APL UNN minimum, but it still misses the APL
+URED minimum of 10.43. The best trace is target-aware diagnostic evidence, not a
+deployable stopping rule.
+
 Published target calibration:
 
 - `results/published_calibration/published_targets.csv`
@@ -550,6 +565,9 @@ Additional checks:
 - Stage 3 static DGI upper-bound audit writes raw/minmax/scale/affine random-DGI
   metrics, a paired-Hadamard exact ceiling, and an affine-PSNR figure under
   `results/stage3_static_dgi_audit`.
+- Stage 4 URED stripe sweeps write avg-pool and NLM denoiser hyperparameter
+  screens under `results/stage4_ured_sweep_r2_stripe_merged` and
+  `results/stage4_ured_sweep_nlm_r1_stripe`.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -569,7 +587,10 @@ Additional checks:
   UNN/URED. Random static DGI PSNR has now been audited and remains below 20 dB
   even after affine alignment, while paired-Hadamard exact inversion reaches 80
   dB, so CNR/ROI, reconstruction-basis choice, and URED fidelity are the
-  practical levers.
+  practical levers. NLM-based URED is materially better than the average-pool
+  fallback on the binding stripe target, but the best final/trace CNRs
+  `5.131/8.913` still miss the APL URED target and require a non-target-aware
+  stopping rule before they can be claimed as a method result.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
   diagram is required. The direct frozen dense baseline is implemented but

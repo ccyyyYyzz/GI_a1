@@ -96,6 +96,13 @@ dynamic factors makes every shard reuse the first lambda draw. `run_stage3_tests
 now draws the full object set first and only then filters the shard, so sharded
 and non-sharded runs share the same per-object dynamic factors.
 
+Follow-up stripe sweeps narrowed the failure mode. A 40-config avg-pool RED
+screen tops out at final CNR `2.916` and target-aware trace CNR `3.831`, while
+switching the denoiser to non-local means raises the same stripe target to final
+CNR `5.131` and trace CNR `8.913`. This is a large implementation sensitivity,
+but not a solved reproduction: the trace peak uses ground truth for diagnosis,
+and even that remains below the APL URED minimum `10.43`.
+
 ## 2026-07-09 Published Curves Are Gentler Than The Prompt Prior
 
 Figure-level APL digitization gives collected-trace

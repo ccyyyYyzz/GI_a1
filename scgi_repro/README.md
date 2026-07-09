@@ -75,6 +75,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   for handcrafted and MNIST held-out targets, including raw/minmax and
   affine-aligned random-DGI PSNR checks plus a paired-Hadamard exact sanity
   ceiling.
+- `results/stage4_ured_sweep_r2_stripe_merged/` and
+  `results/stage4_ured_sweep_nlm_r1_stripe/`: stripe-target Stage 4 URED
+  denoiser/hyperparameter screens.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/published_channel_calibration/`: figure-level APL intensity-trace
