@@ -1,0 +1,12 @@
+{
+  "completed_patterns": 1048576,
+  "max_patterns": 1048576,
+  "completed_factors": [
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0
+  ],
+  "elapsed_seconds": 150.438
+}

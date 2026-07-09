@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
+import shutil
 import subprocess
 import sys
-import tempfile
 import time
+import zipfile
 from pathlib import Path
 
 
@@ -27,6 +29,26 @@ def print_file_marker(label: str, path: Path) -> None:
     else:
         print(f"MISSING {path}", flush=True)
     print(f"{label}_END", flush=True)
+
+
+def make_workspace(run_id: str) -> Path:
+    content = Path("/content")
+    root = content if content.exists() else Path.cwd()
+    workspace = root / f"{run_id}_workspace"
+    if workspace.exists():
+        shutil.rmtree(workspace)
+    workspace.mkdir(parents=True, exist_ok=True)
+    return workspace
+
+
+def zip_tree(source: Path, archive_path: Path) -> int:
+    if archive_path.exists():
+        archive_path.unlink()
+    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path in source.rglob("*"):
+            if path.is_file():
+                zf.write(path, path.relative_to(source).as_posix())
+    return archive_path.stat().st_size
 
 
 def main() -> None:
@@ -51,48 +73,57 @@ def main() -> None:
         print("TORCH_IMPORT_ERROR", repr(exc), flush=True)
 
     started = time.time()
-    with tempfile.TemporaryDirectory(prefix="gi_a1_stage3_") as tmp:
-        repo_dir = Path(tmp) / "repo"
-        run(["git", "clone", "--depth", "1", args.repo, str(repo_dir)])
-        run(["git", "fetch", "--depth", "1", "origin", args.ref], cwd=repo_dir)
-        run(["git", "checkout", "--detach", "FETCH_HEAD"], cwd=repo_dir)
-        run(["git", "rev-parse", "--short", "HEAD"], cwd=repo_dir)
-        workdir = repo_dir / "scgi_repro"
-        run([sys.executable, "-m", "pip", "install", "-q", "-r", "requirements-colab.txt"], cwd=workdir)
-        output_dir = Path("results/stage3_static_dgi_streaming_colab_r1")
-        run(
-            [
-                sys.executable,
-                "run_stage3_static_dgi_streaming_audit.py",
-                "--profile",
-                "full",
-                "--heldout-count",
-                "4",
-                "--pattern-factors",
-                args.pattern_factors,
-                "--chunk-patterns",
-                args.chunk_patterns,
-                "--output-dir",
-                str(output_dir),
-            ],
-            cwd=workdir,
-        )
-        result_root = workdir / output_dir
-        summary = {
-            "run_id": args.run_id,
-            "ref": args.ref,
-            "elapsed_seconds": round(time.time() - started, 3),
-            "result_root": str(output_dir),
-            "pattern_factors": args.pattern_factors,
-            "chunk_patterns": int(args.chunk_patterns),
-        }
-        print("COLAB_STAGE3_STREAMING_SUMMARY_BEGIN", flush=True)
-        print(json.dumps(summary, indent=2), flush=True)
-        print("COLAB_STAGE3_STREAMING_SUMMARY_END", flush=True)
-        print_file_marker("COLAB_STAGE3_STREAMING_CSV", result_root / "stage3_static_dgi_streaming_audit.csv")
-        print_file_marker("COLAB_STAGE3_STREAMING_REPORT", result_root / "stage3_static_dgi_audit_report.md")
-        print_file_marker("COLAB_STAGE3_STREAMING_MANIFEST", result_root / "run_manifest.json")
-        print_file_marker("COLAB_STAGE3_STREAMING_PROGRESS", result_root / "progress.json")
+    workspace = make_workspace(args.run_id)
+    repo_dir = workspace / "repo"
+    run(["git", "clone", "--depth", "1", args.repo, str(repo_dir)])
+    run(["git", "fetch", "--depth", "1", "origin", args.ref], cwd=repo_dir)
+    run(["git", "checkout", "--detach", "FETCH_HEAD"], cwd=repo_dir)
+    run(["git", "rev-parse", "--short", "HEAD"], cwd=repo_dir)
+    workdir = repo_dir / "scgi_repro"
+    run([sys.executable, "-m", "pip", "install", "-q", "-r", "requirements-colab.txt"], cwd=workdir)
+    output_dir = Path("results/stage3_static_dgi_streaming_colab_r1")
+    run(
+        [
+            sys.executable,
+            "run_stage3_static_dgi_streaming_audit.py",
+            "--profile",
+            "full",
+            "--heldout-count",
+            "4",
+            "--pattern-factors",
+            args.pattern_factors,
+            "--chunk-patterns",
+            args.chunk_patterns,
+            "--output-dir",
+            str(output_dir),
+        ],
+        cwd=workdir,
+    )
+    result_root = workdir / output_dir
+    archive_path = workspace / f"{args.run_id}_stage3_results.zip"
+    archive_bytes = zip_tree(result_root, archive_path)
+    summary = {
+        "run_id": args.run_id,
+        "ref": args.ref,
+        "elapsed_seconds": round(time.time() - started, 3),
+        "workspace": str(workspace),
+        "result_root": str(result_root),
+        "archive_path": str(archive_path),
+        "archive_bytes": archive_bytes,
+        "pattern_factors": args.pattern_factors,
+        "chunk_patterns": int(args.chunk_patterns),
+    }
+    print("COLAB_STAGE3_STREAMING_SUMMARY_BEGIN", flush=True)
+    print(json.dumps(summary, indent=2), flush=True)
+    print("COLAB_STAGE3_STREAMING_SUMMARY_END", flush=True)
+    print_file_marker("COLAB_STAGE3_STREAMING_CSV", result_root / "stage3_static_dgi_streaming_audit.csv")
+    print_file_marker("COLAB_STAGE3_STREAMING_REPORT", result_root / "stage3_static_dgi_audit_report.md")
+    print_file_marker("COLAB_STAGE3_STREAMING_MANIFEST", result_root / "run_manifest.json")
+    print_file_marker("COLAB_STAGE3_STREAMING_PROGRESS", result_root / "progress.json")
+    if archive_bytes <= 8 * 1024 * 1024:
+        print("COLAB_STAGE3_STREAMING_ZIP_BASE64_BEGIN", flush=True)
+        print(base64.b64encode(archive_path.read_bytes()).decode("ascii"), flush=True)
+        print("COLAB_STAGE3_STREAMING_ZIP_BASE64_END", flush=True)
     print("COLAB_STAGE3_STREAMING_END", args.run_id, flush=True)
 
 

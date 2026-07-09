@@ -111,6 +111,13 @@ mean PSNR rises from 11.58 to 16.13 dB and best-case PSNR from 13.55 to
 with sampling but remains below 20 dB even at twice the paper random-pattern
 budget.
 
+`results/stage3_static_dgi_streaming_colab_r2` extends that audit on Colab L4
+to 4P, 8P, 16P, 32P, and 64P random patterns using streaming accumulators. At
+64P, minmax-display mean PSNR reaches 21.355 dB, but the all-object minimum is
+still 16.607 dB on `stripe_target`. Affine-aligned PSNR at 64P is much higher
+(minimum/mean 28.152/33.429 dB), so very high sampling recovers the information
+but leaves a scale/offset calibration problem for strict raw/minmax PSNR gates.
+
 Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
 adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the
 returned exp-residual checkpoint. Mean/min CNRs are SCGI 3.083/2.492, SCGI-UNN
@@ -183,6 +190,10 @@ then validates the fixed 15-step `nlm_otsu_soft` setting on Colab pro2/L4 at
 commit `0b6e86e`: final continuous CNRs are `91.762` for A, `12.341` for
 stripe, `54.443` for L, and `16.577` for ring. This clears the APL URED minimum
 for all four objects under the modified soft-Otsu RED regularizer.
+`results/stage4_ured_otsu_soft_seed_robust_colab_r1` repeats the same
+configuration over five initialization seeds on Colab L4. All 20 object/seed
+rows remain above the 10.43 APL URED minimum; the worst final CNR is
+`11.237` on `stripe_target`, with best-trace CNR `11.620`.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
 cropping to the target bounding box lowers it to `7.578`, and sweeping the target

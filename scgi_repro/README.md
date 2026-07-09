@@ -81,6 +81,10 @@ blocks to their main CSVs and update `progress.json`; rerunning with `--resume`
 skips completed units and recomputes all summary tables at the end. The Colab
 GitHub runner also emits `colab_job_status.json` inside the artifact root, and
 the launch scripts pass `COLAB_GPU`/`CU_PER_HOUR` through to that status record.
+For Colab CLI sessions that lose their websocket during `colab run`,
+`colab/background_command_launcher.py` can attach to a kept session, start a
+detached background job, and leave `/content/<run_id>.log`, status JSON, and a
+zip archive for later `colab download`.
 For training jobs, `run_stage0.py` writes `checkpoint_latest.pt` and
 `training_progress.json`, while `run_m2_scgi_train.py` writes
 `m2_scgi_checkpoint_latest.pt`; both support `--resume-checkpoint`.
@@ -123,6 +127,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   sampling-factor audit over 0.25P, 0.5P, 1P, and 2P random patterns. It shows
   affine-aligned PSNR improving with more random patterns but still below 20 dB
   at 2P.
+- `results/stage3_static_dgi_streaming_colab_r2/`: Colab L4 streaming random-DGI
+  audit over 4P, 8P, 16P, 32P, and 64P patterns. At 64P, minmax mean PSNR
+  reaches 21.355 dB, but the all-object minimum remains 16.607 dB; affine
+  alignment clears 28.152 dB minimum, showing a strong scale/offset component.
 - `results/stage4_ured_sweep_r2_stripe_merged/` and
   `results/stage4_ured_sweep_nlm_r1_stripe/`: stripe-target Stage 4 URED
   denoiser/hyperparameter screens.
@@ -163,6 +171,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   all-object fixed-step validation of the same modified soft-Otsu RED path at
   commit `0b6e86e`. All four continuous `x-u` outputs clear the 10.43 CNR gate
   with minimum CNR 12.341.
+- `results/stage4_ured_otsu_soft_seed_robust_colab_r1/`: Colab L4 five-seed
+  robustness check for the same modified soft-Otsu RED configuration. The
+  all-object minimum CNR remains above the APL URED gate, with worst stripe
+  final CNR 11.237 across 20 object/seed rows.
 - `results/stage4_trace_audit_r6/`: combined final-vs-target-aware trace audit
   for 16 Stage 4 sweeps. It records 893 detail rows and adds the soft-Otsu RED
   evidence; all objects have target-aware trace points above 10.43.

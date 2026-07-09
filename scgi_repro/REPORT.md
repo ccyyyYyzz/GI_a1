@@ -212,6 +212,8 @@ Outputs:
 - `results/stage3_static_dgi_audit/stage3_static_dgi_affine_psnr.png`
 - `results/stage3_static_dgi_sampling_r1/stage3_static_dgi_audit.csv`
 - `results/stage3_static_dgi_sampling_r1/stage3_static_dgi_audit_report.md`
+- `results/stage3_static_dgi_streaming_colab_r2/stage3_static_dgi_streaming_audit.csv`
+- `results/stage3_static_dgi_streaming_colab_r2/stage3_static_dgi_audit_report.md`
 
 This audit adds four MNIST held-out targets to the four handcrafted targets and
 compares raw/min-max random static DGI, post-hoc scale/affine alignment, and a
@@ -231,6 +233,14 @@ pattern budget doubles beyond the paper value, while mean CNR rises from 1.49
 to 3.91. This supports a sampling-noise interpretation: more random patterns
 help, but even 2P random patterns do not reach the prompt's 20 dB static PSNR
 gate.
+
+The Colab L4 streaming follow-up extends the same audit to 4P, 8P, 16P, 32P,
+and 64P random patterns without materializing all masks at once. At 64P
+(`1,048,576` patterns), minmax-display mean PSNR reaches 21.355 dB, but the
+all-object minimum remains 16.607 dB on `stripe_target`. Post-hoc affine
+alignment at 64P is much higher, with minimum/mean PSNR 28.152/33.429 dB. Thus
+the information is present at very high sampling, but the strict raw/minmax
+all-object PSNR>20 gate is still not satisfied without calibration.
 
 Full-profile SCGI/UNN/URED threshold matrix:
 
@@ -266,6 +276,7 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_image_audit_r1`
 - `results/stage4_ured_proxy_audit_r1`
 - `results/stage4_trace_audit_r4`
+- `results/stage4_ured_otsu_soft_seed_robust_colab_r1`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
@@ -339,6 +350,10 @@ That validation was then run on Colab pro2/L4 at commit `0b6e86e` in
 `x-u` outputs: `letter_A=91.762`, `stripe_target=12.341`, `letter_L=54.443`,
 and `ring=16.577`. This is a modified RED regularizer, so it should be reported
 separately from the original NLM URED reproduction.
+`results/stage4_ured_otsu_soft_seed_robust_colab_r1` then repeats this
+configuration over five initialization seeds on Colab L4. All 20 object/seed
+rows remain above the 10.43 APL URED minimum; the worst final CNR is the stripe
+case at 11.237, and the best-trace value for that row is 11.620.
 `results/stage4_image_audit_r1` then regenerates the best final/trace stripe
 images and audits metric sensitivity. The best standard CNR remains 9.365;
 cropping to the target bounding box lowers it to 7.578, and sweeping the target
@@ -846,6 +861,10 @@ Additional checks:
   `PERSIST_ROOT` and periodically copy the artifact root to that mounted path
   every `SYNC_SECONDS` seconds. This is a persistence hook, not an automatic
   Drive authorization flow.
+- `colab/background_command_launcher.py` and `colab/stage3_background_launcher.py`
+  now provide a kept-session fallback for Colab CLI websocket drops: they start
+  detached jobs in `/content`, leave remote logs/status JSON, and zip artifacts
+  for later `colab download`.
 - Colab L4 via GitHub transfer completed debug 160 epoch + Stage 3, full
   20-epoch probe, gamma sweep, and full 100-epoch SCGI-only probe. Artifacts
   were extracted locally from Colab logs with `extract_colab_artifacts.py`.
@@ -881,6 +900,8 @@ Additional checks:
 - Stage 3 static DGI upper-bound audit writes raw/minmax/scale/affine random-DGI
   metrics, a paired-Hadamard exact ceiling, and an affine-PSNR figure under
   `results/stage3_static_dgi_audit`.
+- Stage 3 streaming random-DGI Colab audit writes 4P..64P metrics, progress, and
+  an affine-PSNR figure under `results/stage3_static_dgi_streaming_colab_r2`.
 - Stage 4 URED stripe sweeps write avg-pool and NLM denoiser hyperparameter
   screens under `results/stage4_ured_sweep_r2_stripe_merged` and
   `results/stage4_ured_sweep_nlm_r1_stripe`, plus the authoritative all-object
@@ -895,6 +916,8 @@ Additional checks:
   the NAFNet capacity check writes `results/stage4_ured_sweep_naf_capacity_r1_stripe`,
   and both confirm the previous 9.365 stripe CNR plateau. `results/stage4_image_audit_r1`
   adds regenerated best-output images and an ROI/threshold diagnostic.
+- Stage 4 modified soft-Otsu RED Colab robustness writes five-seed all-object
+  metrics under `results/stage4_ured_otsu_soft_seed_robust_colab_r1`.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -933,8 +956,11 @@ Additional checks:
   144 nearby stripe configurations leaves the best value unchanged; a 9-config
   NAFNet capacity check also fails to improve it. The best stripe final and
   target-aware diagnostic trace CNRs therefore remain below the APL URED target.
-  A regenerated-image audit shows this miss is not an artifact of target
-  threshold or far-background ROI choice.
+  The modified soft-Otsu RED path clears the all-object continuous-output CNR
+  gate and remains above 10.43 across five Colab L4 initialization seeds, but it
+  should be positioned separately from the original NLM-only URED protocol. A
+  regenerated-image audit shows the original NLM miss is not an artifact of
+  target threshold or far-background ROI choice.
   A first target-free proxy audit finds
   only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.

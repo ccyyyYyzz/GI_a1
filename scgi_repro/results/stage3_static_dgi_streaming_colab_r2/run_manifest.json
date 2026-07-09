@@ -1,0 +1,27 @@
+{
+  "profile": "full",
+  "image_size": 128,
+  "active_num_patterns": 16384,
+  "pattern_factors": [
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0
+  ],
+  "pattern_counts": [
+    65536,
+    131072,
+    262144,
+    524288,
+    1048576
+  ],
+  "objects": 8,
+  "requested_dataset_source": "mnist",
+  "device": "cuda",
+  "chunk_patterns": 1024,
+  "elapsed_seconds": 151.725,
+  "figures": [
+    "stage3_static_dgi_affine_psnr.png"
+  ]
+}
