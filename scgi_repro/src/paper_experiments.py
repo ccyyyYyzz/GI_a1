@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import datetime
 import math
+import platform
+import subprocess
+import sys
 from pathlib import Path
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import numpy as np
 import torch
@@ -205,3 +209,82 @@ def write_caption(path: Path, title: str, lines: Iterable[str]) -> None:
     body.extend(str(line) for line in lines)
     body.append("")
     path.write_text("\n".join(body), encoding="utf-8")
+
+
+def git_commit(root: Optional[Path] = None) -> Optional[str]:
+    """Return the current git HEAD commit, or None if unavailable."""
+
+    try:
+        cwd = str(root) if root is not None else None
+        out = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=cwd, stderr=subprocess.DEVNULL
+        )
+        return out.decode("utf-8").strip()
+    except Exception:
+        return None
+
+
+def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] = None) -> dict:
+    """Provenance manifest: UTC timestamp, git commit, host, versions, full args."""
+
+    manifest = {
+        "utc_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "git_commit": git_commit(root),
+        "hostname": platform.node(),
+        "python_version": sys.version.split()[0],
+        "torch_version": torch.__version__,
+        "numpy_version": np.__version__,
+        "args": vars(args) if hasattr(args, "__dict__") else dict(args),
+    }
+    if extra:
+        manifest.update(extra)
+    return manifest
+
+
+def _rect_shape_for_pixels(num_pixels: int) -> tuple[int, int]:
+    """Factor a power-of-two pixel count into a near-square (height, width)."""
+
+    p = int(num_pixels)
+    side = int(math.isqrt(p))
+    if side * side == p:
+        return side, side
+    k = int(round(math.log2(p)))
+    if 2 ** k != p:
+        raise ValueError(f"num_pixels must be a power of two, got {p}.")
+    hk = k // 2
+    wk = k - hk
+    return 2 ** hk, 2 ** wk
+
+
+def make_paper_objects_pixels(count: int, num_pixels: int, seed: int) -> List[PaperObject]:
+    """Objects of an exact (power-of-two) pixel count for orthogonal N-sweeps.
+
+    Perfect-square pixel counts delegate to :func:`make_paper_objects` so the
+    N=1024 (32x32) and N=4096 (64x64) arms reproduce the square-image objects
+    used elsewhere. Non-square power-of-two counts (e.g. 2048 -> 32x64) resize
+    square renders onto a near-square rectangular canvas.
+    """
+
+    height, width = _rect_shape_for_pixels(num_pixels)
+    if height == width:
+        return make_paper_objects(count, image_size=height, seed=seed)
+
+    base = make_paper_objects(count, image_size=width, seed=seed)
+    out: List[PaperObject] = []
+    for obj in base:
+        square = obj.vector.reshape(width, width).cpu().numpy()
+        image = Image.fromarray((_normalize_image(square) * 255.0).astype(np.uint8), mode="L").resize(
+            (width, height), Image.Resampling.BILINEAR
+        )
+        vector = torch.from_numpy(_normalize_image(np.asarray(image, dtype=np.float32))).reshape(-1)
+        vector = vector.to(dtype=torch.float32).clamp_min(0.0)
+        out.append(
+            PaperObject(
+                name=obj.name,
+                family=obj.family,
+                vector=vector,
+                image_size=int(width),
+                k_eff=effective_support(vector),
+            )
+        )
+    return out
