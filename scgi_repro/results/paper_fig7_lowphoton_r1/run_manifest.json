@@ -1,0 +1,15 @@
+{
+  "args": {
+    "output_dir": "results/paper_fig7_lowphoton_r1",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "sigma_a": 0.1,
+    "window": 64,
+    "alpha": 0.5,
+    "photon_budgets": "0.25,0.5,1,2,4,8,16,32,64,128"
+  },
+  "rows": 1500
+}

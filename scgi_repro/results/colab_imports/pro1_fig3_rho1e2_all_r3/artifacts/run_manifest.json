@@ -1,0 +1,24 @@
+{
+  "args": {
+    "output_dir": "results/paper_fig3_gain_error_r1/rho_1e2_all",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": [
+      0.01
+    ],
+    "sigma_a": 0.1,
+    "bases": [
+      "random_uniform",
+      "random_binary",
+      "hadamard_ordered",
+      "hadamard_shuffled",
+      "srht_paired"
+    ],
+    "min_window": 4,
+    "slope_max_window": 0
+  },
+  "rows": 2250,
+  "runtime_seconds": 3.349
+}

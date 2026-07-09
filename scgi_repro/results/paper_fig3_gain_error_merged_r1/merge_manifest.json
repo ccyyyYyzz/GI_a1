@@ -1,0 +1,11 @@
+{
+  "rows": 4500,
+  "sources": [
+    "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\colab_imports\\pro1_fig3_rho1e3_random_r2\\artifacts\\fig3_gain_est_error.csv",
+    "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\colab_imports\\pro2_fig3_rho1e3_hadamard_r1_retry4\\artifacts\\fig3_gain_est_error.csv",
+    "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\colab_imports\\pro1_fig3_rho1e2_all_r3\\artifacts\\fig3_gain_est_error.csv"
+  ],
+  "expected_rows": 4500,
+  "slope_max_window": 32,
+  "runtime_seconds": 7.678
+}

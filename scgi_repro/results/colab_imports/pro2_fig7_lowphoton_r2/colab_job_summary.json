@@ -1,0 +1,13 @@
+{
+  "run_id": "pro2_fig7_lowphoton_r2",
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "command": "python run_paper_fig7_lowphoton.py --objects 10 --seeds 5 --output-dir results/paper_fig7_lowphoton_r1",
+  "exit_code": 0,
+  "elapsed_seconds": 78.249,
+  "command_elapsed_seconds": 60.163,
+  "accelerator": "L4",
+  "cu_per_hour": 0.0,
+  "estimated_cu_hours": null,
+  "status_path": "results/paper_fig7_lowphoton_r1/colab_job_status.json",
+  "workdir": "scgi_repro"
+}

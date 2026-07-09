@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_paper_fig4_bridge.py --objects 10 --seeds 5 --output-dir results/paper_fig4_bridge_r1\r",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 60.003,
+  "end_time_utc": "2026-07-09T18:23:45Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "return_code": 0,
+  "run_id": "pro2_fig4_bridge_r3",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T18:22:45Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T18:23:45Z",
+  "workdir": "scgi_repro"
+}

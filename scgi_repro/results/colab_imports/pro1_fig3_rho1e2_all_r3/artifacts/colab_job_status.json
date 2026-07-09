@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_paper_fig3_gain_error.py --rho 0.01 --bases random_uniform random_binary hadamard_ordered hadamard_shuffled srht_paired --objects 10 --seeds 5 --output-dir results/paper_fig3_gain_error_r1/rho_1e2_all",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 60.003,
+  "end_time_utc": "2026-07-09T18:23:13Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "return_code": 0,
+  "run_id": "pro1_fig3_rho1e2_all_r3",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T18:22:13Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T18:23:13Z",
+  "workdir": "scgi_repro"
+}

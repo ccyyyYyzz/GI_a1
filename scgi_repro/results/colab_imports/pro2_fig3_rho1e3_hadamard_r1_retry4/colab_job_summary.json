@@ -1,0 +1,13 @@
+{
+  "run_id": "pro2_fig3_rho1e3_hadamard_r1_retry4",
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "command": "python run_paper_fig3_gain_error.py --rho 0.001 --bases hadamard_ordered hadamard_shuffled --objects 10 --seeds 5 --output-dir results/paper_fig3_gain_error_r1/rho_1e3_hadamard",
+  "exit_code": 0,
+  "elapsed_seconds": 77.345,
+  "command_elapsed_seconds": 60.003,
+  "accelerator": "L4",
+  "cu_per_hour": 0.0,
+  "estimated_cu_hours": null,
+  "status_path": "results/paper_fig3_gain_error_r1/rho_1e3_hadamard/colab_job_status.json",
+  "workdir": "scgi_repro"
+}

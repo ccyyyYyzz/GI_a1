@@ -14,13 +14,21 @@ mkdir -p "$LOG_DIR"
 
 launch_job() {
   local account_home="$1"
-  local run_id="$2"
+  local base_run_id="$2"
+  local run_id="${base_run_id}${RUN_ID_SUFFIX:-}"
   local timeout_seconds="$3"
   local artifact_root="$4"
   local max_zip_mb="$5"
   local command_text="$6"
   local log_file="$LOG_DIR/${run_id}.log"
   local pid_file="$LOG_DIR/${run_id}.wslpid"
+
+  if [[ -n "${RUN_ONLY:-}" ]]; then
+    case ",${RUN_ONLY}," in
+      *,"$base_run_id",*|*,"$run_id",*) ;;
+      *) echo "skip $run_id"; return 0 ;;
+    esac
+  fi
 
   rm -f "$log_file" "$pid_file"
   nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --session "$run_id" --gpu "$COLAB_GPU" --timeout "$timeout_seconds" \

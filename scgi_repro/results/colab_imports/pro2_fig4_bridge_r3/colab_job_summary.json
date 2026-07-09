@@ -1,0 +1,13 @@
+{
+  "run_id": "pro2_fig4_bridge_r3",
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "command": "python run_paper_fig4_bridge.py --objects 10 --seeds 5 --output-dir results/paper_fig4_bridge_r1\r",
+  "exit_code": 0,
+  "elapsed_seconds": 78.924,
+  "command_elapsed_seconds": 60.003,
+  "accelerator": "L4",
+  "cu_per_hour": 0.0,
+  "estimated_cu_hours": null,
+  "status_path": "results/paper_fig4_bridge_r1/colab_job_status.json",
+  "workdir": "scgi_repro"
+}

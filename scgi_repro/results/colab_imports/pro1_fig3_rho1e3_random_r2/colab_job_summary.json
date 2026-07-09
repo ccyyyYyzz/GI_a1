@@ -1,0 +1,13 @@
+{
+  "run_id": "pro1_fig3_rho1e3_random_r2",
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "command": "python run_paper_fig3_gain_error.py --rho 0.001 --bases random_uniform random_binary srht_paired --objects 10 --seeds 5 --output-dir results/paper_fig3_gain_error_r1/rho_1e3_random",
+  "exit_code": 0,
+  "elapsed_seconds": 79.004,
+  "command_elapsed_seconds": 60.003,
+  "accelerator": "L4",
+  "cu_per_hour": 0.0,
+  "estimated_cu_hours": null,
+  "status_path": "results/paper_fig3_gain_error_r1/rho_1e3_random/colab_job_status.json",
+  "workdir": "scgi_repro"
+}

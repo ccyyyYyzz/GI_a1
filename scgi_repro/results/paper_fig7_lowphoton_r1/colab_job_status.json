@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_paper_fig7_lowphoton.py --objects 10 --seeds 5 --output-dir results/paper_fig7_lowphoton_r1",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 60.163,
+  "end_time_utc": "2026-07-09T18:20:08Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "scgi-ceiling-diagnostic-r1",
+  "return_code": 0,
+  "run_id": "pro2_fig7_lowphoton_r2",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T18:19:07Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T18:20:08Z",
+  "workdir": "scgi_repro"
+}
