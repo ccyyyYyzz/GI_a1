@@ -104,6 +104,13 @@ minimum PSNR, proving the targets are reconstructable and narrowing the failure
 to random-DGI correlation noise rather than display scale, offset, or object
 dimensionality.
 
+`results/stage3_static_dgi_sampling_r1` then sweeps random pattern budgets
+0.25P, 0.5P, 1P, and 2P under the same full-profile object set. Affine-aligned
+mean PSNR rises from 11.58 to 16.13 dB and best-case PSNR from 13.55 to
+18.11 dB; mean CNR rises from 1.49 to 3.91. Thus the static PSNR gap improves
+with sampling but remains below 20 dB even at twice the paper random-pattern
+budget.
+
 Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
 adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the
 returned exp-residual checkpoint. Mean/min CNRs are SCGI 3.083/2.492, SCGI-UNN

@@ -119,6 +119,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   for handcrafted and MNIST held-out targets, including raw/minmax and
   affine-aligned random-DGI PSNR checks plus a paired-Hadamard exact sanity
   ceiling.
+- `results/stage3_static_dgi_sampling_r1/`: monitored full-profile static DGI
+  sampling-factor audit over 0.25P, 0.5P, 1P, and 2P random patterns. It shows
+  affine-aligned PSNR improving with more random patterns but still below 20 dB
+  at 2P.
 - `results/stage4_ured_sweep_r2_stripe_merged/` and
   `results/stage4_ured_sweep_nlm_r1_stripe/`: stripe-target Stage 4 URED
   denoiser/hyperparameter screens.

@@ -202,6 +202,7 @@ Static DGI upper-bound audit:
 
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_static_dgi_audit.py --profile full --output-dir results\stage3_static_dgi_audit
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id stage3_static_sampling_r1 --output-dir results\cli_runs\stage3_static_sampling_r1 --heartbeat-seconds 30 --accelerator local_cuda -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_stage3_static_dgi_audit.py --profile full --heldout-count 4 --pattern-factors "0.25,0.5,1.0,2.0" --output-dir results\stage3_static_dgi_sampling_r1
 ```
 
 Outputs:
@@ -209,6 +210,8 @@ Outputs:
 - `results/stage3_static_dgi_audit/stage3_static_dgi_audit.csv`
 - `results/stage3_static_dgi_audit/stage3_static_dgi_audit_report.md`
 - `results/stage3_static_dgi_audit/stage3_static_dgi_affine_psnr.png`
+- `results/stage3_static_dgi_sampling_r1/stage3_static_dgi_audit.csv`
+- `results/stage3_static_dgi_sampling_r1/stage3_static_dgi_audit_report.md`
 
 This audit adds four MNIST held-out targets to the four handcrafted targets and
 compares raw/min-max random static DGI, post-hoc scale/affine alignment, and a
@@ -220,6 +223,14 @@ measurement dimensionality are reconstructable; the failure is specific to
 random-DGI correlation noise. This shows that the `static PSNR > 20 dB` gate is
 not blocked by a simple display-scale offset; for the APL-style random DGI
 reconstructions, CNR/ROI is the defensible paper-facing metric.
+
+The sampling-factor follow-up repeats the full-profile random static DGI audit
+at 0.25P, 0.5P, 1P, and 2P random patterns. Affine-aligned mean PSNR rises from
+11.58 to 16.13 dB and the best case rises from 13.55 to 18.11 dB as the random
+pattern budget doubles beyond the paper value, while mean CNR rises from 1.49
+to 3.91. This supports a sampling-noise interpretation: more random patterns
+help, but even 2P random patterns do not reach the prompt's 20 dB static PSNR
+gate.
 
 Full-profile SCGI/UNN/URED threshold matrix:
 
