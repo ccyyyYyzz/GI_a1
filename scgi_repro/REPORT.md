@@ -364,6 +364,18 @@ separately from the original NLM URED reproduction.
 configuration over five initialization seeds on Colab L4. All 20 object/seed
 rows remain above the 10.43 APL URED minimum; the worst final CNR is the stripe
 case at 11.237, and the best-trace value for that row is 11.620.
+Two follow-up audits keep that result separated from the original NLM-only URED
+claim. `results/stage4_trace_audit_nlm_only_r1` isolates the pre-soft-Otsu NLM
+sweeps and confirms that `stripe_target` remains below the APL minimum: the best
+historical NLM-only stripe trace is 9.670. A monitored matched control,
+`results/stage4_ured_nlm_matched_soft_control_r1`, then reruns the same
+15-step/low-residual/soft-basin settings over five fixed seeds but with
+`denoiser=nlm` and no soft-Otsu regularizer. It writes 20 object-level metric
+rows and 300 trace rows; `letter_L` passes, `ring` only barely passes as a trace
+diagnostic, and `letter_A` plus `stripe_target` fail. The binding stripe result
+is 7.337 final / 7.677 best-trace CNR. Therefore the all-object continuous pass
+belongs to the modified soft-Otsu RED regularizer, not to the original NLM-only
+URED protocol or the shared optimizer basin alone.
 `results/stage4_image_audit_r1` then regenerates the best final/trace stripe
 images and audits metric sensitivity. The best standard CNR remains 9.365;
 cropping to the target bounding box lowers it to 7.578, and sweeping the target
@@ -541,15 +553,16 @@ Frame audit for M2 reference protocol:
 | reference_k8 | 2048 | 257 | 2305 |
 | reference_k2 | 2048 | 1025 | 3073 |
 
-Dense M2 winner summary:
+Dense M2 pre-floor diagnostic best-map summary:
 
-| Budget rule | Winner across 35 rho/sigma cells | PSNR mean range |
+| Budget rule | Pre-floor best map across 35 rho/sigma cells | PSNR mean range |
 |---|---|---:|
 | strict equal-total-frame blind, 2048 frames | `srht_paired + pairwise` in 35/35 cells | 10.76-44.69 dB |
 | any-budget blind/reference | `srht_paired + reference_k2` in 35/35 cells | 10.79-47.68 dB |
 
 Interpretation: under the strict 2048-frame blind budget, SRHT paired
-measurements with pairwise normalization dominate this compact M2 grid. The
+measurements with pairwise normalization dominate the pre-floor compact M2
+diagnostic map. The
 reference-calibrated `reference_k2` variant improves PSNR but spends 3073 total
 physical frames, so it is a separate semi-calibrated baseline rather than a
 fair blind winner. In the dense `scgi_proxy` run, `scgi_proxy` improves over raw
@@ -614,8 +627,9 @@ map. A direct-output U-Net smoke is strongly negative: mean `scgi_frozen` PSNR i
 destructive but still weak: 14.71 dB mean and -3.37 dB versus `none`. The
 basis-specific `gain_unet` smoke is the first network result with local signal:
 on the in-distribution small grid, mean `scgi_frozen` PSNR rises to 16.34 dB and
-`srht_paired + scgi_frozen` wins 2/6 strict equal-frame cells. On the held-out
-grid, it again wins 2/6 cells at `rho=0.3`, but overall it remains below the
+`srht_paired + scgi_frozen` is selected in 2/6 pre-floor strict equal-frame
+diagnostic cells. On the held-out grid, it is again selected in 2/6 cells at
+`rho=0.3`, but overall it remains below the
 non-network baselines (-0.90 dB versus `none`, -1.03 dB versus `agc`, -1.69 dB
 versus `scgi_proxy`, and -2.48 dB versus paired-basis `pairwise` on matched
 rows). This is a useful routing/training prototype, not yet a competitive
@@ -644,7 +658,8 @@ checkpoint metadata/config rather than the current `config.yaml`. The monitored
 fixed-loader rerun in `results/phase_m2_scgi_gain_predictor_rawgain_fixedloader_r1`
 writes 4,050 rows; `scgi_frozen` averages 14.77 dB, compared with 15.31 dB for
 `none` and 15.90 dB for `scgi_proxy`, and `srht_paired + pairwise` remains the
-strict equal-frame winner in all six held-out rho/sigma cells.
+pre-floor strict equal-frame winner in the six held-out rho/sigma diagnostic
+cells.
 
 The first competitive trained smoke uses the blind `scgi_proxy` gain envelope as
 the network input and a 1D gain predictor along frame index. On the same held-out
@@ -704,6 +719,9 @@ row permutation alone (+5.394 dB), diagonal signs alone (+5.466 dB), and
 sign-time interleaving (+5.495 dB) recover essentially the same advantage, so
 the constructive mechanism is randomization of the coefficient sequence rather
 than a uniquely additive full-SRHT effect.
+At `rho=0.1`, the AGC rows are already transitional/sub-floor by the default
+`rel_mse<0.5` gate (`rel_mse` about 0.57-0.67), so the +0.48 dB SRHT delta is
+kept as context rather than a headline effect.
 
 The prompt's `>=3 dB` fast-drift target is not met and is now treated as the
 wrong target for this grid. At `rho>=1`, blind reconstruction quality collapses
@@ -800,10 +818,10 @@ signal, timing jitter `0.05` frame, and noisy reference samples. The compact
 3-basis/3-rho/2-sigma check remains a smoke-scale robustness entry point. The
 full 7-rho x 5-sigma x 10-object x 5-seed run was split into five Colab L4
 shards and merged with all shard labels `0/5` through `4/5` present. In the
-full merged scan, strict equal-frame blind winners remain `pairwise` in all 35
-rho/sigma cells for both ideal and nonideal conditions. The winning equal-frame
-basis shifts from 16 Hadamard / 19 SRHT cells under ideal conditions to 23
-Hadamard / 12 SRHT cells under nonideal conditions. The nonideal oracle mean
+full merged scan, the pre-floor strict equal-frame blind best map remains
+`pairwise` in all 35 rho/sigma cells for both ideal and nonideal conditions. The
+selected equal-frame basis shifts from 16 Hadamard / 19 SRHT cells under ideal
+conditions to 23 Hadamard / 12 SRHT cells under nonideal conditions. The nonideal oracle mean
 PSNR drops sharply from 65.36 dB to 28.35 dB, confirming active detector/SLM
 perturbations, while `pairwise` drops only 0.17 dB on average. `scgi_proxy`
 improves over raw `none` in 83.6% of nonideal matched comparisons and over AGC

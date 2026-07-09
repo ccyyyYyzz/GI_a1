@@ -44,8 +44,9 @@ mix object-dependent low-order coefficients with gain drift.
 **Figure 2. Oracle correction separates information loss from gain-estimation
 failure.** M1 oracle runs divide each bucket by the true gain sequence before
 reconstruction. Deterministic bases recover their static advantage under oracle
-or pairwise-common-gain conditions, showing that their blind failure is mainly an
-identifiability/calibration problem rather than irreversible information loss.
+or pairwise-common-gain conditions, showing that their blind degradation is
+mainly an identifiability/calibration problem rather than irreversible
+information loss.
 
 **Figure 3. Blind AGC has a window bias-variance tradeoff.** Local-mean AGC
 reduces random bucket fluctuation as the window grows but increasingly smooths
@@ -96,11 +97,13 @@ reconstruction floor.** The M3 ablation reports AGC signal recovery
 (`1-rel_mse`) and delta PSNR versus ordered Hadamard over
 `rho=0.001,0.1,1,10`. At `rho=0.001`, full SRHT is +5.453 dB over ordered
 Hadamard, while row permutation, diagonal signs, and sign-time interleaving each
-recover essentially the same advantage. At `rho>=1`, all blind variants collapse
-to the reconstruction floor, so the +0.027 to +0.141 dB fast-drift fallback
-deltas are grey-band coincidences rather than effects. The caption should state
-that the prompt's `>=3 dB` fast gate is refuted, but the constructive
-identifiability result is established where gain is estimable.
+recover essentially the same advantage. At `rho=0.1`, AGC reconstructions are
+already transitional/sub-floor by the default gate (`rel_mse` about 0.57-0.67),
+and at `rho>=1` all blind variants collapse to the reconstruction floor, so the
+sub-dB moderate/fast-drift deltas are grey-band coincidences rather than
+effects. The caption should state that the prompt's `>=3 dB` fast gate is
+refuted, but the constructive identifiability result is established where gain is
+estimable.
 
 ## Current Evidence And Gaps
 
@@ -129,9 +132,9 @@ identifiability result is established where gain is estimable.
   basis-aware retraining, fine-tuning, or a different sequence representation.
 - A supervised M2 fine-tuning path now exists. Direct-output and single
   `gain_unet` smokes are negative, while basis-specific `gain_unet` routing has
-  local held-out signal (`srht_paired + scgi_frozen` wins 2/6 cells at
-  `rho=0.3`) but remains below `none`, `scgi_proxy`, and paired `pairwise` on
-  average.
+  local held-out signal (`srht_paired + scgi_frozen` is selected in 2/6
+  pre-floor diagnostic cells at `rho=0.3`) but remains below `none`,
+  `scgi_proxy`, and paired `pairwise` on average.
 - Signed-safe outputs and true-gain prediction have also been tested. Raw-bucket
   `gain_predictor_unet` remains negative, but fixing checkpoint metadata loading
   and feeding a blind proxy-gain envelope into a 1D gain predictor yields a
@@ -146,7 +149,8 @@ identifiability result is established where gain is estimable.
   information preservation under oracle correction and shows a real
   randomization advantage at `rho=0.001` under AGC (+5.453 dB for full SRHT over
   ordered Hadamard), but it refutes the prompt's `>=3 dB` fast-drift gate.
-  Because `rho>=1` blind reconstructions are at floor, fast deltas should be
+  Because `rho=0.1` is already transitional/sub-floor by the default gate and
+  `rho>=1` blind reconstructions are at floor, moderate/fast deltas should be
   presented as sub-floor coincidences, not effects. The direct random-comparator
   run remains an estimator caveat because random bases use correlation/DGI while
   orthogonal bases use exact inversion.

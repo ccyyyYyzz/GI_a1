@@ -59,16 +59,16 @@ learned full-profile correction is the failing component.
 ## 2026-07-09 Dense M2 SRHT Dominance
 
 The dense M2 reference protocol over 10 objects x 5 seeds produced a cleaner
-winner structure than expected. Under strict 2048-frame blind comparison,
-`srht_paired + pairwise` wins all 35 rho/sigma cells. Under any-budget
-reference-calibrated comparison, `srht_paired + reference_k2` wins all 35 cells
-but spends 3073 total physical frames.
+pre-floor diagnostic best-map structure than expected. Under strict 2048-frame
+blind comparison, `srht_paired + pairwise` is selected in all 35 rho/sigma
+cells. Under any-budget reference-calibrated comparison,
+`srht_paired + reference_k2` is selected in all 35 cells but spends 3073 total
+physical frames.
 
 This supports SRHT as the strongest compact construction in the current ideal
-simulator, but it also means the original "random bases can blind-correct while
-Hadamard cannot" story needs sharper wording: the best blind method in this
-implementation is a randomized orthogonal paired basis, not an i.i.d. random
-correlation basis.
+simulator, but it also supersedes the earlier random-versus-Hadamard shorthand:
+the best blind method in this implementation is a randomized orthogonal paired
+basis, not an i.i.d. random correlation basis.
 
 The later high-rho audit adds an important qualifier: after applying a
 `rel_mse<0.5` above-floor gate, the prompt-range strict map has 29/45
@@ -86,9 +86,11 @@ therefore floor coincidences, not evidence about row order or sign design.
 The constructive signal lives at slow drift instead. Under AGC at `rho=0.001`,
 full SRHT is +5.453 dB over ordered Hadamard, while row permutation alone,
 diagonal signs alone, and sign-time interleaving each recover essentially the
-same advantage. The design message is "randomize the coefficient sequence to
-make gain identifiable while preserving exact inversion," not "SRHT beats
-Hadamard by 3 dB in fast drift."
+same advantage. At `rho=0.1`, the AGC rows are already transitional/sub-floor by
+the default gate (`rel_mse` about 0.57-0.67), so their sub-dB deltas should not
+be reported as a robust effect. The design message is "randomize the coefficient
+sequence to make gain identifiable while preserving exact inversion," not "SRHT
+beats Hadamard by 3 dB in fast drift."
 
 ## 2026-07-09 AGC Window Law Is Weakly Parametric
 
@@ -139,6 +141,16 @@ has max regret `12.766` versus ground-truth trace peaks. Loss minimization is a
 poor stop signal (`min=2.858`). The surprising part is that a visible proxy
 correlation exists, especially for `proxy_min`, but it is not yet reliable
 enough to claim a method.
+
+## 2026-07-09 Soft-Otsu Success Is Not The NLM Basin
+
+The modified soft-Otsu RED path clears the APL URED CNR gate on all four
+continuous outputs, but a matched NLM-only control does not. The isolated
+NLM-only trace audit leaves `stripe_target` below threshold with best historical
+trace CNR `9.670`; rerunning the same 15-step, low-residual, five-seed basin
+with `denoiser=nlm` reaches only `7.337/7.677` final/trace CNR on stripe.
+Therefore the pass should be reported as a modified soft-Otsu regularizer, not
+as closure of the original NLM-only URED reproduction.
 
 ## 2026-07-09 Published Curves Are Gentler Than The Prompt Prior
 

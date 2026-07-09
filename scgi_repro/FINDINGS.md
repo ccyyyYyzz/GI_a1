@@ -199,6 +199,13 @@ for all four objects under the modified soft-Otsu RED regularizer.
 configuration over five initialization seeds on Colab L4. All 20 object/seed
 rows remain above the 10.43 APL URED minimum; the worst final CNR is
 `11.237` on `stripe_target`, with best-trace CNR `11.620`.
+`results/stage4_trace_audit_nlm_only_r1` and the monitored
+`results/stage4_ured_nlm_matched_soft_control_r1` control keep the conclusion
+honest: original NLM-only URED still does not clear the stripe gate. The best
+historical NLM-only stripe trace is `9.670`, while the matched five-seed
+NLM-only control at the same 15-step/low-residual basin reaches only
+`7.337/7.677` final/trace CNR on `stripe_target`. Thus the all-object pass is a
+modified soft-Otsu RED result, not an original NLM-only reproduction.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
 cropping to the target bounding box lowers it to `7.578`, and sweeping the target
@@ -332,8 +339,8 @@ including 210 `scgi_frozen` rows. Mean equal-frame blind PSNR is 12.75 dB for
 Dense frozen-network check:
 `results/phase_m2_scgi_frozen_dense_r1_merged/phase_scan.csv` has 89,250 rows,
 all five shard labels, and 10,500 `scgi_frozen` rows. The 35-cell strict
-equal-frame best map is unchanged: `srht_paired + pairwise` wins in 35/35
-rho/sigma cells. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
+equal-frame pre-floor diagnostic best map is unchanged: `srht_paired + pairwise`
+is selected in 35/35 rho/sigma cells. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
 16.64 dB for `none`, 17.40 dB for `scgi_proxy`, and 21.43 dB for `pairwise`.
 `scgi_frozen` beats `none` in 60.3% of matched comparisons but by only
 +0.0047 dB on average, beats `scgi_proxy` in 18.8%, and beats pairwise on paired
@@ -358,7 +365,8 @@ strongly negative: mean `scgi_frozen` PSNR is 11.08 dB, or -6.99 dB versus
 raw `none`. A single `gain_unet` checkpoint is less destructive but still weak:
 14.71 dB mean and -3.37 dB versus `none`. The basis-specific `gain_unet` smoke
 shows local signal on a held-out rho/sigma/object grid, where
-`srht_paired + scgi_frozen` wins 2/6 strict equal-frame cells at `rho=0.3`.
+`srht_paired + scgi_frozen` is selected in 2/6 pre-floor strict equal-frame
+diagnostic cells at `rho=0.3`.
 Overall, however, it remains below non-network baselines on matched rows:
 -0.90 dB versus `none`, -1.69 dB versus `scgi_proxy`, and -2.48 dB versus
 paired-basis `pairwise`.
@@ -439,6 +447,9 @@ so all eight measurement variants are information-preserving when the true gain
 is known. Under AGC at `rho=0.001`, full SRHT beats ordered Hadamard by
 +5.453 dB; row permutation alone (+5.394 dB), diagonal signs alone (+5.466 dB),
 and sign-time interleaving (+5.495 dB) recover essentially the same advantage.
+At `rho=0.1`, AGC reconstructions are already transitional/sub-floor by the
+default `rel_mse<0.5` gate (`rel_mse` about 0.57-0.67), so the +0.48 dB SRHT
+delta is kept as context rather than a headline effect.
 At `rho>=1`, however, every blind variant collapses to the reconstruction floor
 (`rel_mse` about 0.9, PSNR about 10.8-11.0 dB). The prompt's fallback
 alternative `sign_time_interleave` is still best in those fast cells, but its

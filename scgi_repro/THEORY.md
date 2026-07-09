@@ -24,9 +24,9 @@ while retaining an exact inverse under oracle/static calibration.
 Ordered deterministic orthogonal bases can lose this anchor. Their coefficients
 are object-dependent and ordered; low-frequency or low-sequency coefficients can
 be much larger than others. The observed sequence `R_n` therefore mixes object
-structure and gain drift, so a blind estimator cannot distinguish "large
-coefficient" from "large gain". This is an identifiability/robustness claim, not
-an absolute-quality claim: under the equal-frame correlation protocol, i.i.d.
+structure and gain drift, so a blind estimator can struggle to distinguish
+"large coefficient" from "large gain". This is an identifiability/robustness
+claim, not an absolute-quality claim: under the equal-frame correlation protocol, i.i.d.
 random bases can be worst in absolute PSNR because they use DGI/correlation
 reconstruction while orthogonal bases use exact inversion. The operative design
 variable is sign/phase randomization that stabilizes coefficient statistics.

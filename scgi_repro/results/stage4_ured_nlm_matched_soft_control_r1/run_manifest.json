@@ -1,0 +1,28 @@
+{
+  "profile": "full",
+  "checkpoint": "results\\colab_imports\\pro2_full_exp_residual_e2_r1\\artifacts\\model_checkpoint.pt",
+  "model_kind": "exponential_residual_unet",
+  "device": "cuda",
+  "image_size": 128,
+  "num_patterns": 16384,
+  "objects": [
+    "letter_A",
+    "stripe_target",
+    "letter_L",
+    "ring"
+  ],
+  "selected_object_indices": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "num_configs": 5,
+  "object_shard": "None",
+  "config_shard": "None",
+  "fixed_init_seed": null,
+  "fixed_init_seed_values": "20240709 20240710 20240711 20240712 20240713",
+  "started_unix": 1783603839.587319,
+  "elapsed_seconds": 26.8238742351532,
+  "completed": true
+}

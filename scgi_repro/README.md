@@ -7,7 +7,7 @@ This repository implements the two requested tasks:
    DGI reconstruction, and SCGI-UNN/SCGI-URED style refinement.
 2. A mechanism-study framework for blind gain identifiability in time-varying
    multiplicative channels. Random speckles and randomized orthogonal bases
-   supply statistical anchors; ordered deterministic bases lose that anchor
+   supply statistical anchors; ordered deterministic bases can lose that anchor
    under blind correction even though they remain information-preserving under
    oracle calibration.
 
@@ -186,6 +186,15 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_trace_audit_r6/`: combined final-vs-target-aware trace audit
   for 16 Stage 4 sweeps. It records 893 detail rows and adds the soft-Otsu RED
   evidence; all objects have target-aware trace points above 10.43.
+- `results/stage4_trace_audit_nlm_only_r1/`: original NLM-only trace audit
+  separated from the modified soft-Otsu path. Historical NLM-only sweeps still
+  leave `stripe_target` below the APL URED minimum; best trace CNR is 9.670.
+- `results/stage4_ured_nlm_matched_soft_control_r1/` and
+  `results/stage4_trace_audit_nlm_matched_soft_control_r1/`: monitored matched
+  NLM-only control at the soft-Otsu hyperparameter basin over five seeds. It
+  writes 20 object-level metric rows and 300 trace rows; `stripe_target` reaches
+  only 7.337 final / 7.677 trace CNR, so soft-Otsu's all-object pass is not
+  explained by the shared 15-step low-residual setting alone.
 - `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
   raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.
   It shows the 9.365 CNR miss is not caused by target threshold or far-background
@@ -259,8 +268,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_gain_predictor_rawgain_fixedloader_r1/`: monitored
   4,050-row held-out check through the fixed checkpoint-metadata loading path;
   raw-gain predictor improves from 12.05 to 14.77 dB mean but remains below
-  `none` and `scgi_proxy`, while `srht_paired + pairwise` wins all six strict
-  equal-frame cells.
+  `none` and `scgi_proxy`; the paired SRHT/pairwise baseline remains the
+  pre-floor strict equal-frame winner in the six-cell diagnostic map.
 - `results/m2_scgi_proxyinput_gain1d_smoke_r1/` and
   `results/phase_m2_scgi_proxyinput_gain1d_heldout_smoke_r1/`: proxy-envelope
   input plus 1D gain-predictor smoke; held-out `scgi_frozen` reaches 15.72 dB
@@ -309,9 +318,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/srht_m3_audit_highrho_r2/`: M3 high-rho fallback audit tables, JSON
   summary, PNG table, and Markdown report. Full SRHT gives +5.453 dB over
   ordered Hadamard at `rho=0.001` under AGC, while row permutation or diagonal
-  signs alone recover essentially the same advantage. At `rho>=1`, all blind
-  variants are at the reconstruction floor; the +0.027 to +0.141 dB fallback
-  deltas are labelled noise-floor coincidences rather than effects.
+  signs alone recover essentially the same advantage. At `rho=0.1`, AGC variants
+  are already transitional/sub-floor by the default `rel_mse<0.5` gate
+  (`rel_mse` about 0.57-0.67), and at `rho>=1` all blind variants are at the
+  reconstruction floor; the high-rho fallback deltas are labelled noise-floor
+  coincidences rather than effects.
 - `results/m3_random_comparator_fast_r1/`: monitored fast-drift M3 comparator
   adding direct `random_uniform` and `random_binary` baselines at
   `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of
