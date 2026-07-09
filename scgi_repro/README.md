@@ -48,6 +48,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_make_paper_multipanels.py --output-dir results\paper_figures_r1\multipanels
 & $py run_stage4_postprocess_audit.py --arrays results\stage4_image_audit_r1\stage4_image_audit_arrays.npz --output-dir results\stage4_postprocess_audit_r1
 & $py run_monitored_job.py --run-id stage4_postprocess_allobjects_r1 --output-dir results\cli_runs\stage4_postprocess_allobjects_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage4_postprocess_allobjects.py --output-dir results\stage4_postprocess_allobjects_r1
+& $py run_monitored_job.py --run-id stage4_threshold_trace_audit_r1 --output-dir results\cli_runs\stage4_threshold_trace_audit_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage4_threshold_trace_audit.py --output-dir results\stage4_threshold_trace_audit_r1
 & $py -m unittest discover tests -v
 ```
 
@@ -148,9 +149,14 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   APL URED CNR gate on all four held-out objects (minimum 15.288), while
   best-final target-free masks still miss for ring (9.332), so fully deployable
   continuous/final Stage 4 remains open.
-- `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
-  Its target-aware trace peaks are diagnostic only, and no tested proxy is a
-  deployable stopping rule.
+- `results/stage4_threshold_trace_audit_r1/`: monitored thresholded-trace
+  stopping audit. `minmax_otsu_binary + fixed_step_117` clears the APL URED CNR
+  gate on all four audited objects with minimum CNR 15.211; fixed-step rules use
+  the nearest available recorded step, so short traces fall back to their final
+  recorded step.
+- `results/stage4_ured_proxy_audit_r1/`: earlier target-free continuous-output
+  URED trace-proxy audit. It did not validate a stopping rule for continuous CNR,
+  motivating the thresholded-trace audit above.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/published_channel_calibration/`: figure-level APL intensity-trace

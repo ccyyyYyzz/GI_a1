@@ -317,6 +317,16 @@ post-processing is weaker: `ring` remains below the gate at 9.332. Therefore the
 current evidence supports "shape present, calibration/stopping unresolved",
 rather than a fully deployable Stage 4 reproduction.
 
+`results/stage4_threshold_trace_audit_r1` adds the missing stopping-rule check by
+rerunning the best-trace configurations and evaluating thresholded images at
+every step. The strongest target-free rule is
+`minmax_otsu_binary + fixed_step_117`, where fixed steps select the nearest
+available recorded step for shorter traces. It clears the APL URED CNR gate on
+all four objects with minimum CNR 15.211. A simpler `fixed_step_40` Otsu rule
+also clears all four with minimum CNR 12.757. This narrows the remaining Stage 4
+gap to whether a thresholded-output protocol is acceptable relative to the
+paper's continuous URED figures.
+
 A follow-up target-free proxy audit records `loss`, data/augmentation losses,
 denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
 at every URED step. Among these simple rules, `max_proxy_min` is best by

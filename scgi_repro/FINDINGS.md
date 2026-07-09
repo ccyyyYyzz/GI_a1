@@ -62,6 +62,13 @@ masks clear the APL URED CNR gate for all four held-out objects, with minimum CN
 misses on `ring` (9.332), so the fully deployable Stage 4 protocol remains
 partial.
 
+`results/stage4_threshold_trace_audit_r1` then audits target-free stopping rules
+on the thresholded traces. A fixed-step rule with min-max Otsu thresholding
+(`minmax_otsu_binary + fixed_step_117`; nearest available recorded step for
+shorter traces) clears the APL URED gate on all four audited objects with minimum
+CNR 15.211. This is the strongest deployable Stage 4 diagnostic so far, although
+it still changes the original continuous-output URED reporting protocol.
+
 ## Stage 3 Held-Out Targets
 
 Experiment: load the saved Stage 0 smoke checkpoint and test letter/stripe/ring

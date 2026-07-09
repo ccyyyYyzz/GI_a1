@@ -1,0 +1,35 @@
+{
+  "apl_min_cnr": 10.43,
+  "metric_rows": 3185,
+  "detail_rows": 736,
+  "summary_rows": 184,
+  "objects": [
+    "letter_A",
+    "letter_L",
+    "ring",
+    "stripe_target"
+  ],
+  "all_hit_rule_count": 9,
+  "best_all_hit_rule": {
+    "postprocess_method": "minmax_otsu_binary",
+    "rule": "fixed_step_117",
+    "observations": 4,
+    "mean_selected_cnr": 23.866270303726196,
+    "min_selected_cnr": 15.211417198181152,
+    "all_hit_apl_min": true,
+    "mean_regret_to_peak": 11.561651468276978,
+    "max_regret_to_peak": 30.49734115600586,
+    "mean_selected_step": 97.0
+  },
+  "best_overall_rule": {
+    "postprocess_method": "minmax_otsu_binary",
+    "rule": "fixed_step_117",
+    "observations": 4,
+    "mean_selected_cnr": 23.866270303726196,
+    "min_selected_cnr": 15.211417198181152,
+    "all_hit_apl_min": true,
+    "mean_regret_to_peak": 11.561651468276978,
+    "max_regret_to_peak": 30.49734115600586,
+    "mean_selected_step": 97.0
+  }
+}
