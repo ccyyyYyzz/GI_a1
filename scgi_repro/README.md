@@ -72,6 +72,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_proxy_dense_r1_merged/`: 78,750-row dense 7x5 M2
   output that adds `scgi_proxy` as an equal-frame blind smooth-gain proxy with
   zero reference frames.
+- `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
+  scaling, random frame scaling, coefficient energy concentration, and observed
+  flip-boundary fits.
 - `results/mechanism_m1_protocol_o10s5/`,
   `results/phase_m2_reference_protocol_o10s5/`, and
   `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used

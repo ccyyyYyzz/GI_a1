@@ -48,7 +48,7 @@ baselines.
 | M2 outputs: best methods, selected curves, flip boundary | Partial | Tables/figures generated; flip boundary is diagnostic, not R2-fitted law |
 | M2 includes SCGI-network blind correction | Partial | `scgi_proxy` is implemented and dense-tested as an equal-frame blind SCGI-style smooth-gain proxy with 10,500 rows and zero reference frames; a trained SCGI network correction is still not implemented |
 | M3 SRHT constructive method and ablations | Partial | `results/srht_m3_protocol_o10s5` exists; M3 full claim thresholds are not all proven |
-| M4 theory with fitted laws and notebook-level verification | Partial | `THEORY.md` has derivations and hooks; no dedicated N-sweep/R2 theory notebook yet |
+| M4 theory with fitted laws and notebook-level verification | Partial | `run_theory_m4.py` and `results/theory_m4_compact` provide compact N/frame-sweep fitted laws; larger N sweep, bootstrap intervals, AGC window law, and censored flip-boundary model remain open |
 | Published-channel calibration and nonideal detector/SLM model | Not done | No WebPlotDigitizer-derived APL/OE calibration; no shot/read/SLM quantization main scan |
 | Paper outline and conservative positioning | Partial | `PAPER_OUTLINE.md` exists, but needs updating with dense M2 and remaining limitations |
 | Sharded Colab scanning and merge | Done for M2 | `run_phase_m2.py --shard i/k`; `merge_phase_m2_shards.py`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows |
@@ -65,6 +65,7 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\colab_imports\pro1_dense_r1_shard0of5\artifacts results\colab_imports\pro1_dense_r1_shard1of5\artifacts results\colab_imports\pro2_dense_r1_shard2of5\artifacts results\colab_imports\pro2_dense_r1_shard3of5\artifacts results\colab_imports\pro2_dense_r1_shard4of5\artifacts --output-dir results\phase_m2_scgi_proxy_dense_r1_merged
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage0.py --profile smoke --epochs 2 --tag smoke_exp_residual_e2_skipured --model-kind exponential_residual_unet --skip-ured
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --output-dir results\stage_3_exp_residual_colab_full --model-kind exponential_residual_unet
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
 ```
 
 ## Completion Decision
@@ -72,5 +73,5 @@ baselines.
 The goal is not yet fully complete under the original prompt scope. The current
 state is a strong executable prototype plus several completed compact protocol
 experiments, but the full paper-level SCGI thresholds, a true trained M2
-SCGI-network correction, M4 fitted theory, and published/nonideal calibration
-remain open.
+SCGI-network correction, paper-grade M4 theory closure, and published/nonideal
+calibration remain open.

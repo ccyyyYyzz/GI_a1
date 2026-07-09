@@ -45,7 +45,12 @@ Channels
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples; a non-ideal detector/reference-noise section is still needed.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
-  with uncertainty.
+  with uncertainty, although `run_theory_m4.py` now provides observed-only
+  compact fits as a starting point.
+- M4 compact theory hooks support quadratic residual-gain scaling and
+  random/SRHT coefficient spreading, but the publication version still needs a
+  larger N sweep, bootstrap confidence intervals, AGC window law, and censored
+  flip-boundary treatment.
 - A true pretrained/frozen SCGI-network correction is not yet part of the M2
   phase diagram.
 

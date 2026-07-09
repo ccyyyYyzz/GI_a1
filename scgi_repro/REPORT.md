@@ -300,6 +300,37 @@ Outputs:
 - `srht_ablation.csv` (3200 rows)
 - `srht_ablation_summary.csv` (64 rows)
 
+Latest M4 compact theory run:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
+```
+
+Outputs:
+
+- `m4_error_scaling.csv`, `m4_error_scaling_summary.csv`,
+  `m4_error_scaling_fit.csv`
+- `m4_random_frame_scaling.csv`, `m4_random_frame_scaling_summary.csv`,
+  `m4_random_frame_scaling_fit.csv`
+- `m4_energy_concentration.csv`, `m4_energy_concentration_summary.csv`
+- `m4_flip_boundary_fit.csv`
+- `m4_key_summary.json`
+
+Key M4 checks:
+
+| Check | Result |
+|---|---|
+| residual gain law | `sigma_delta` exponent 1.98-2.00 across bases, min R2 0.991 |
+| fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998 |
+| H4 energy concentration at 1024 pixels | DCT/Fourier/Hadamard top-5% energy 0.81-0.86; random/SRHT about 0.28 |
+| flip-boundary fits | 4 observed-only fits; 28 challenger/correction pairs still insufficiently sampled |
+
+Interpretation: M4 now has an executable compact N/frame-sweep and fitted-law
+evidence supporting quadratic residual-gain error and random/SRHT energy
+spreading. It is still not a publication-grade theory closure because the large
+16/32/64 sweep, bootstrap intervals, AGC window bias-variance law, and censored
+flip-boundary model remain open.
+
 ## Figures
 
 `run_make_figures.py` now prefers the protocol-statistics result directories and
@@ -346,6 +377,8 @@ Additional checks:
 - Stage 1 smoke diagnostics write histogram, dynamic-curve, gain-curve, and
   lambda-distribution figures.
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
+- M4 compact theory runner writes residual-error, random-frame, energy
+  concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
 
 ## Remaining Work Before Full Paper-Level Completion
 
@@ -354,7 +387,8 @@ Additional checks:
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction if a network-level phase diagram is required, and add
   published-channel/non-ideal detector calibration.
-- Fit and report M2 flip-boundary laws with R2, then update `THEORY.md` with
-  quantitative curves rather than smoke-level diagnostics.
+- Extend M4 from compact fitted-law hooks to paper-grade theory: larger N sweep,
+  bootstrap intervals, AGC window law, censored flip-boundary fitting, and
+  non-ideal detector/SLM calibration.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

@@ -90,13 +90,35 @@ The working prediction is:
 
 ## Current Numerical Hooks
 
-The compact M1 runner now emits two quantitative hooks for turning these notes
-into a paper-ready theory section:
+The compact M1 runner emits two quantitative hooks for turning these notes into
+a paper-ready theory section:
 
 - `mechanism_m1_agc_window_sweep.csv` tests the gain-estimation variance versus
   AGC window length.
 - `mechanism_m1_error_scaling_fit.csv` fits residual-gain error propagation.
 
-These quick fits are diagnostics only. The required M4 version should rerun the
-same measurements over a dedicated N sweep, attach uncertainty bars, and report
-the flip-boundary law used by the M2 phase diagram.
+The dedicated M4 runner `run_theory_m4.py` now adds compact fitted-law outputs
+under `results/theory_m4_compact`:
+
+- `m4_error_scaling_fit.csv` sweeps image sizes 8/16/32 and residual gain
+  amplitudes. The fitted residual-error exponent for `sigma_delta` is 1.98-2.00
+  across bases with minimum R2 0.991, matching the expected quadratic dependence
+  on residual gain amplitude.
+- `m4_random_frame_scaling_fit.csv` fixes the object size at 32x32 and varies
+  random measurement frames. Random uniform/binary bases give
+  `delta_rel_mse ~ sigma_delta^1.995 * num_frames^-0.71` with R2 > 0.998. This
+  supports the random-basis averaging mechanism, though the exponent is a compact
+  empirical fit rather than an asymptotic theorem.
+- `m4_energy_concentration_summary.csv` measures H4 directly. At 1024 pixels,
+  the top 5% of coefficients contain about 0.81-0.86 of DCT/Fourier/Hadamard
+  energy, but only about 0.28 for random/SRHT bases; SRHT's effective-rank
+  fraction is about 0.487, close to random bases.
+- `m4_flip_boundary_fit.csv` fits only observed, non-censored flip-boundary
+  points. Most challenger/correction pairs remain insufficiently sampled; the
+  successful fits are therefore diagnostic, not yet paper-grade phase-boundary
+  laws.
+
+Remaining theory work before publication: extend the N sweep to at least
+16/32/64 with more seeds, add bootstrap confidence intervals, model AGC window
+bias-variance explicitly, and fit censored flip boundaries rather than ignoring
+left-censored/not-reached cells.
