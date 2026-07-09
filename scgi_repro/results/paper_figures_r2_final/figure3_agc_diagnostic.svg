@@ -1,0 +1,277 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1198" viewBox="0 0 1800 1198">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="64.0" y="42.0" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="bold" fill="#111111">Figure 3. AGC remains diagnostic</text>
+<text x="64.0" y="74.0" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#333333">Best-window AGC follows a partial bias-variance pattern, but boundary pressure prevents theorem-level closure.</text>
+<text x="64.0" y="102.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#666666">Status: diagnostic; not a final quantitative theorem</text>
+<rect x="64.0" y="128.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
+<text x="78.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">A</text>
+<text x="122.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Original window-law fit</text>
+<g transform="translate(80.00,245.22) scale(1.91707)">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 AGC best-window law fits</text>
+<rect x="0" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="98" y="24" width="82" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="106" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho_exponent</text>
+<rect x="180" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="188" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a_exponent</text>
+<rect x="284" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="292" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">r2</text>
+<rect x="338" y="24" width="70" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="346" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rmse_log10</text>
+<rect x="0" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="98" y="44" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.2265e-16</text>
+<rect x="180" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">2.3494e-17</text>
+<rect x="284" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
+<rect x="338" y="44" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">2.3738e-16</text>
+<rect x="0" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="98" y="64" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.12418</text>
+<rect x="180" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.31575</text>
+<rect x="284" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.55037</text>
+<rect x="338" y="64" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.15503</text>
+<rect x="0" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="98" y="84" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.064788</text>
+<rect x="180" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.18087</text>
+<rect x="284" y="84" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.43544</text>
+<rect x="338" y="84" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.10676</text>
+<rect x="0" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="98" y="104" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.026909</text>
+<rect x="180" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.086348</text>
+<rect x="284" y="104" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.29466</text>
+<rect x="338" y="104" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.065111</text>
+</g>
+<rect x="918.0" y="128.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
+<text x="932.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">B</text>
+<text x="976.0" y="158.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Targeted saturation</text>
+<g transform="translate(934.00,259.74) scale(1.68670)">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 targeted AGC best-window saturation</text>
+<rect x="0" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="98" y="24" width="78" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="106" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">lower_bound</text>
+<rect x="176" y="24" width="51" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="184" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">interior</text>
+<rect x="227" y="24" width="81" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="235" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">upper_bound</text>
+<rect x="308" y="24" width="73" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="316" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">interior_frac</text>
+<rect x="381" y="24" width="83" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="389" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">boundary_frac</text>
+<rect x="0" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="98" y="44" width="78" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="176" y="44" width="51" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="184" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="227" y="44" width="81" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="235" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0</text>
+<rect x="308" y="44" width="73" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="316" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.44444</text>
+<rect x="381" y="44" width="83" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="389" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.55556</text>
+<rect x="0" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="98" y="64" width="78" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">19</text>
+<rect x="176" y="64" width="51" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="184" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">26</text>
+<rect x="227" y="64" width="81" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="235" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0</text>
+<rect x="308" y="64" width="73" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="316" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.57778</text>
+<rect x="381" y="64" width="83" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="389" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.42222</text>
+<rect x="0" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="98" y="84" width="78" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="176" y="84" width="51" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="184" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="227" y="84" width="81" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="235" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0</text>
+<rect x="308" y="84" width="73" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="316" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.44444</text>
+<rect x="381" y="84" width="83" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="389" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.55556</text>
+<rect x="0" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="98" y="104" width="78" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="176" y="104" width="51" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="184" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="227" y="104" width="81" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="235" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0</text>
+<rect x="308" y="104" width="73" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="316" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.44444</text>
+<rect x="381" y="104" width="83" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="389" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.55556</text>
+</g>
+<rect x="64.0" y="594.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
+<text x="78.0" y="624.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">C</text>
+<text x="122.0" y="624.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Targeted fit</text>
+<g transform="translate(80.00,718.95) scale(1.79452)">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 targeted AGC window-law fits</text>
+<rect x="0" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="98" y="24" width="82" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="106" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho_exponent</text>
+<rect x="180" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="188" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a_exponent</text>
+<rect x="284" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="292" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">r2</text>
+<rect x="338" y="24" width="70" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="346" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rmse_log10</text>
+<rect x="408" y="24" width="28" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="416" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">n</text>
+<rect x="0" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="98" y="44" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.066542</text>
+<rect x="180" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.098988</text>
+<rect x="284" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.70679</text>
+<rect x="338" y="44" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.059692</text>
+<rect x="408" y="44" width="28" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="416" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">45</text>
+<rect x="0" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="98" y="64" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.29553</text>
+<rect x="180" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.64081</text>
+<rect x="284" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.82086</text>
+<rect x="338" y="64" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.20694</text>
+<rect x="408" y="64" width="28" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="416" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">45</text>
+<rect x="0" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="98" y="84" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.23064</text>
+<rect x="180" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.48469</text>
+<rect x="284" y="84" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.74867</text>
+<rect x="338" y="84" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.19873</text>
+<rect x="408" y="84" width="28" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="416" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">45</text>
+<rect x="0" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="98" y="104" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.17862</text>
+<rect x="180" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.33459</text>
+<rect x="284" y="104" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.7866</text>
+<rect x="338" y="104" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.13481</text>
+<rect x="408" y="104" width="28" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="416" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">45</text>
+</g>
+<rect x="918.0" y="594.0" width="818.0" height="430.0" fill="#ffffff" stroke="#d0d0d0" />
+<text x="932.0" y="624.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#111111">D</text>
+<text x="976.0" y="624.0" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="normal" fill="#333333">Boundary-aware fit</text>
+<g transform="translate(934.00,758.75) scale(1.16272)">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 boundary-aware AGC window fits</text>
+<rect x="0" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="98" y="24" width="52" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="106" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">n_exact</text>
+<rect x="150" y="24" width="105" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="158" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">n_upper_bounded</text>
+<rect x="255" y="24" width="82" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="263" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho_exponent</text>
+<rect x="337" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="345" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a_exponent</text>
+<rect x="441" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="449" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hinge_rmse_log10</text>
+<rect x="545" y="24" width="129" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="553" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">interval_satisfaction_frac</text>
+<rect x="0" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="98" y="44" width="52" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="150" y="44" width="105" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="158" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="255" y="44" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="263" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.076542</text>
+<rect x="337" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="345" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.11899</text>
+<rect x="441" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="449" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.054044</text>
+<rect x="545" y="44" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="553" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.4</text>
+<rect x="0" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="98" y="64" width="52" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">26</text>
+<rect x="150" y="64" width="105" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="158" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">19</text>
+<rect x="255" y="64" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="263" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.43714</text>
+<rect x="337" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="345" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.0243</text>
+<rect x="441" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="449" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.10055</text>
+<rect x="545" y="64" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="553" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.8</text>
+<rect x="0" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="98" y="84" width="52" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="150" y="84" width="105" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="158" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="255" y="84" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="263" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.47896</text>
+<rect x="337" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="345" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.99675</text>
+<rect x="441" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="449" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.028644</text>
+<rect x="545" y="84" width="129" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="553" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.8</text>
+<rect x="0" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="98" y="104" width="52" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">20</text>
+<rect x="150" y="104" width="105" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="158" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">25</text>
+<rect x="255" y="104" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="263" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.3145</text>
+<rect x="337" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="345" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.59973</text>
+<rect x="441" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="449" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.042365</text>
+<rect x="545" y="104" width="129" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="553" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.64444</text>
+</g>
+<line x1="64" y1="1078" x2="1736" y2="1078" stroke="#d9d9d9" />
+<text x="64.0" y="1096.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">AGC window-law evidence across the original, targeted, and boundary-aware fits. The figure is intentionally labelled diagnostic because many best windows remain at</text>
+<text x="64.0" y="1115.0" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="normal" fill="#333333">the grid boundary.</text>
+</svg>

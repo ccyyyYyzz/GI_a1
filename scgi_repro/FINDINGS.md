@@ -155,8 +155,17 @@ initialization sweep at the best continuous stripe setting after extending
 `run_stage4_ured_sweep.py` with `--fixed-init-seed-values`. The best final/trace
 CNR remains `9.365`, with the next seed at `9.356`, so the remaining
 `9.365 < 10.43` gap is not explained by a single unlucky network initialization.
-`results/stage4_trace_audit_r4` records the combined final-vs-trace audit across
-these sweeps, now including the seed sweep, and keeps stripe below the APL URED
+Three further monitored continuous-output micro-sweeps then cover the remaining
+low-risk URED degrees of freedom: LR, residual scale at the best LR, and
+`xi/x_step` coupling at the best LR/residual-scale point. These write
+`results/stage4_ured_lr_micro_r1_stripe`,
+`results/stage4_ured_lr_residual_micro_r1_stripe`, and
+`results/stage4_ured_lr_residual_xi_micro_r1_stripe`. They improve the best
+stripe final/target-aware trace CNRs to `9.502`/`9.606` with
+`lr=0.0005`, `residual_scale=0.18`, `xi=0.5`, and `x_step=0.14` for the trace
+peak, but still do not clear the APL URED minimum of `10.43`.
+`results/stage4_trace_audit_r5` records the combined final-vs-trace audit across
+12 sweeps and 583 detail rows; stripe remains the only object below the APL URED
 minimum even with target-aware trace selection.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
@@ -422,6 +431,12 @@ the audited single-panel assets into 300-dpi PNG/PDF/SVG layouts for Figure 3
 (`figure3_agc_diagnostics`), Figure 4 (`figure4_error_scaling`), and Figure 7
 (`figure7_phase_diagram`). `paper_multipanel_manifest.csv` records 11 panel rows
 and links each panel back to its source CSV and caption.
+
+`results/paper_figures_r2_final` adds a final figure-pack draft with four
+figures and 13 panel rows: Figure 3 AGC diagnostics, Figure 4 fitted error
+laws, Figure 5 M2 phase/boundary maps, and Figure 8 SRHT energy/fast-drift
+ablation. Each figure is exported as editable SVG plus PNG/PDF/TIFF, and
+`figure_assembly_manifest.csv` records only repo-relative source paths.
 
 ## M4 Theory Hooks
 

@@ -306,12 +306,21 @@ initialization sweep at the same best setting,
 `results/stage4_ured_seed_sweep_r1_stripe`, also leaves the best stripe
 final/trace CNR at 9.365, with the next-best seed at 9.356. This rules out a
 single unlucky TinyNAFNet initialization as the continuous-output bottleneck.
-`results/stage4_trace_audit_r4`
+The remaining low-risk continuous-output degrees of freedom were then swept in
+three monitored follow-ups: LR, residual scale at the best LR, and `xi/x_step`
+coupling at the best LR/residual-scale point. These write
+`results/stage4_ured_lr_micro_r1_stripe`,
+`results/stage4_ured_lr_residual_micro_r1_stripe`, and
+`results/stage4_ured_lr_residual_xi_micro_r1_stripe`. The best stripe
+final/target-aware trace CNRs rise to 9.502/9.606 with `lr=0.0005`,
+`residual_scale=0.18`, and trace `x_step=0.14`, but the result remains below the
+APL URED minimum of 10.43. `results/stage4_trace_audit_r5`
 combines the NLM stripe, all-object, deeper, early-stop, refinement,
-micro-refinement, patch, capacity, and seed sweeps. It
+micro-refinement, patch, capacity, seed, LR, residual-scale, and `xi/x_step`
+sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
 `letter_L`, and `ring`, but not for `stripe_target`
-(`best_final_cnr=best_trace_cnr=9.365`).
+(`best_final_cnr=9.502`, `best_trace_cnr=9.606`).
 `results/stage4_image_audit_r1` then regenerates the best final/trace stripe
 images and audits metric sensitivity. The best standard CNR remains 9.365;
 cropping to the target bounding box lowers it to 7.578, and sweeping the target
@@ -777,6 +786,13 @@ matching SVG sidecars under `results/paper_figures_r1`. The raster manifest is
 under `results/paper_figures_r1/multipanels`: `figure3_agc_diagnostics`,
 `figure4_error_scaling`, and `figure7_phase_diagram`, each as PNG, PDF, and SVG.
 The panel-level provenance file is `paper_multipanel_manifest.csv`.
+
+`run_make_final_figure_pack.py` writes `results/paper_figures_r2_final`, a
+repo-relative final figure-pack draft with four figures and 13 panels. It adds
+Figure 3 AGC diagnostics, Figure 4 fitted error laws, Figure 5 M2
+phase/boundary maps, and Figure 8 SRHT energy/fast-drift ablation. Each figure
+has editable SVG plus PNG/PDF/TIFF exports, and
+`figure_assembly_manifest.csv` records panel-level source data.
 
 ## Verification
 

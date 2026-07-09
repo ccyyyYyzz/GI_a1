@@ -1,0 +1,13 @@
+{
+  "figures": 4,
+  "panels": 13,
+  "outputs_per_figure": [
+    "svg",
+    "png",
+    "pdf",
+    "tiff"
+  ],
+  "svg_mode": "source SVG panels embedded as editable vector groups",
+  "raster_mode": "matplotlib preview/export from audited PNG panels",
+  "all_paths_relative_to_repo": true
+}

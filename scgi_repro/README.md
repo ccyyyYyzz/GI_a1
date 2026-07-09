@@ -143,9 +143,15 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_ured_seed_sweep_r1_stripe/`: monitored 24-seed initialization
   sweep at the best continuous stripe setting. The best stripe final/trace CNR
   remains 9.365, so the miss is not a single-seed accident.
-- `results/stage4_trace_audit_r4/`: combined final-vs-target-aware trace audit
-  for the Stage 4 NLM URED sweeps including patch, capacity, and seed sweeps;
-  stripe remains below the APL URED minimum CNR.
+- `results/stage4_ured_lr_micro_r1_stripe/`,
+  `results/stage4_ured_lr_residual_micro_r1_stripe/`, and
+  `results/stage4_ured_lr_residual_xi_micro_r1_stripe/`: monitored continuous
+  URED micro-sweeps over LR, residual scale, and `xi/x_step`; best stripe
+  final/target-aware trace CNR improves to 9.502/9.606 but remains below 10.43.
+- `results/stage4_trace_audit_r5/`: combined final-vs-target-aware trace audit
+  for 12 Stage 4 NLM URED sweeps including patch, capacity, seed, LR,
+  residual-scale, and `xi/x_step` sweeps; stripe remains below the APL URED
+  minimum CNR.
 - `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
   raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.
   It shows the 9.365 CNR miss is not caused by target threshold or far-background
@@ -246,6 +252,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/paper_figures_r1/multipanels/`: draft 300-dpi multipanel PNG/PDF/SVG
   assemblies for Figures 3, 4, and 7 plus `paper_multipanel_manifest.csv`
   linking each panel to its audited source CSV.
+- `results/paper_figures_r2_final/`: final figure-pack draft with four figures
+  and 13 panel rows, exported as editable SVG plus PNG/PDF/TIFF with
+  repo-relative `figure_assembly_manifest.csv`.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.
