@@ -193,6 +193,36 @@ for all four targets: `letter_A` 3.3095, `letter_L` 3.5481, `ring` 2.9819, and
 all-target CNR>=3 and static PSNR>20 gates still fail because the static DGI
 upper bounds for `ring`, `stripe_target`, and PSNR are below those thresholds.
 
+Full-profile SCGI/UNN/URED threshold matrix:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
+```
+
+Outputs:
+
+- `results/stage3_threshold_matrix_full_r2_authoritative/full/stage3_metrics.csv`
+- `results/stage3_threshold_matrix_full_r2_authoritative/full/stage3_acceptance.csv`
+- `results/stage3_threshold_matrix_full_r2_authoritative/full/stage3_recon_grid.png`
+
+This is the current authoritative Fig. 6/Fig. 9-style proxy matrix. It confirms
+the negative result: SCGI still improves over dynamic DGI for all four objects,
+but the full-profile all-target gates remain unmet. Mean/min CNRs are SCGI
+3.083/2.492, SCGI-UNN 2.446/2.254, and SCGI-URED 5.084/2.270. URED is
+consistently above UNN, but this compact TinyNAFNet/average-pool URED proxy does
+not reproduce the APL CNR ranges: SCGI 3.39-4.04, UNN 7.93-14.20, and URED
+10.43-38.28.
+
+Published target calibration:
+
+- `results/published_calibration/published_targets.csv`
+- `results/published_calibration/current_scgi_cnr_results.csv`
+- `results/published_calibration/published_calibration_summary.csv`
+- `results/published_calibration/published_calibration_report.md`
+
+These tables encode the APL Fig. 6/Fig. 9 CNR targets and OE PSNR/SSIM targets
+from the PDFs. The current APL comparison has 16 rows and all are `below_min`.
+
 ## Task 2: Measurement-Basis Mechanism Study
 
 The mechanism framework now includes random uniform/binary/gaussian bases,
@@ -427,6 +457,8 @@ Additional checks:
 - Colab L4 via GitHub transfer completed debug 160 epoch + Stage 3, full
   20-epoch probe, gamma sweep, and full 100-epoch SCGI-only probe. Artifacts
   were extracted locally from Colab logs with `extract_colab_artifacts.py`.
+- Full Stage 3 SCGI/UNN/URED threshold matrix ran with the returned full
+  exp-residual checkpoint and local CUDA in 104.5 seconds.
 - DCT and Fourier static round-trip MSE are below `1e-12` in unit tests.
 - M2 fair-frame audit confirms measurement-frame equality and records reference
   overhead in `reference_frames` and `total_physical_frames`.
@@ -445,6 +477,10 @@ Additional checks:
 - Stage 1 smoke diagnostics write histogram, dynamic-curve, gain-curve, and
   lambda-distribution figures.
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
+- Stage 3 full threshold matrix writes SCGI/UNN/URED metrics and acceptance under
+  `results/stage3_threshold_matrix_full_r2_authoritative`.
+- Published calibration writes APL/OE target tables under
+  `results/published_calibration`.
 - M4 compact theory runner writes residual-error, random-frame, energy
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
 - M4 paper-r1 theory runner writes larger-N, bootstrap, censored-boundary, and
@@ -455,15 +491,16 @@ Additional checks:
 
 ## Remaining Work Before Full Paper-Level Completion
 
-- Redesign the `full` SCGI training profile. Colab has now run both 20 and
-  100 epochs at 128x128/N=16384; both remain far below the SCGI thresholds.
+- Redesign the `full` SCGI/UNN/URED path. The authoritative full matrix now
+  exists, but its mean/min CNRs remain far below APL thresholds, especially for
+  UNN/URED.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
   diagram is required. The direct frozen dense baseline is implemented but
   underperforms under cross-domain application. Add published-channel/non-ideal
   detector calibration.
 - Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC
-  bias-variance derivation, denser flip-boundary grid, and published-channel
-  calibration.
+  bias-variance derivation, denser flip-boundary grid, and APL/OE
+  intensity-curve channel calibration.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

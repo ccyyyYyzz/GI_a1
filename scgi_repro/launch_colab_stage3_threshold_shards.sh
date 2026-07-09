@@ -14,6 +14,18 @@ URED_STEPS="${URED_STEPS:-500}"
 PROFILE="${PROFILE:-full}"
 CHECKPOINT="${CHECKPOINT:-results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt}"
 MODEL_KIND="${MODEL_KIND:-exponential_residual_unet}"
+PRO1_HOME="${PRO1_HOME:-/var/tmp/codex-colab-accounts/pro1}"
+PRO2_HOME="${PRO2_HOME:-/var/tmp/codex-colab-accounts/pro2}"
+SHARD_0_HOME="${SHARD_0_HOME:-$PRO1_HOME}"
+SHARD_1_HOME="${SHARD_1_HOME:-$PRO1_HOME}"
+SHARD_2_HOME="${SHARD_2_HOME:-$PRO2_HOME}"
+SHARD_3_HOME="${SHARD_3_HOME:-$PRO2_HOME}"
+SHARD_4_HOME="${SHARD_4_HOME:-$PRO2_HOME}"
+SHARD_0_LABEL="${SHARD_0_LABEL:-pro1}"
+SHARD_1_LABEL="${SHARD_1_LABEL:-pro1}"
+SHARD_2_LABEL="${SHARD_2_LABEL:-pro2}"
+SHARD_3_LABEL="${SHARD_3_LABEL:-pro2}"
+SHARD_4_LABEL="${SHARD_4_LABEL:-pro2}"
 
 mkdir -p "$LOG_DIR"
 
@@ -47,11 +59,20 @@ launch_shard() {
 
 for shard_index in $SHARD_LIST; do
   case "$shard_index" in
-    0|1)
-      launch_shard "/var/tmp/codex-colab-accounts/pro1" "pro1" "$shard_index"
+    0)
+      launch_shard "$SHARD_0_HOME" "$SHARD_0_LABEL" "$shard_index"
       ;;
-    2|3|4)
-      launch_shard "/var/tmp/codex-colab-accounts/pro2" "pro2" "$shard_index"
+    1)
+      launch_shard "$SHARD_1_HOME" "$SHARD_1_LABEL" "$shard_index"
+      ;;
+    2)
+      launch_shard "$SHARD_2_HOME" "$SHARD_2_LABEL" "$shard_index"
+      ;;
+    3)
+      launch_shard "$SHARD_3_HOME" "$SHARD_3_LABEL" "$shard_index"
+      ;;
+    4)
+      launch_shard "$SHARD_4_HOME" "$SHARD_4_LABEL" "$shard_index"
       ;;
     *)
       echo "Unsupported shard index: $shard_index" >&2

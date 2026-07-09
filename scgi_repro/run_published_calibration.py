@@ -465,15 +465,36 @@ def load_current_scgi_results(root: Path) -> pd.DataFrame:
                 }
             )
 
-    stage3 = root / "results" / "stage_3_exp_residual_colab_full" / "full" / "stage3_metrics.csv"
-    if stage3.exists():
+    stage3_paths = [
+        (
+            "full_exp_residual_stage3_colab",
+            root / "results" / "stage_3_exp_residual_colab_full" / "full" / "stage3_metrics.csv",
+        ),
+        (
+            "stage3_threshold_matrix_full_r2_authoritative",
+            root / "results" / "stage3_threshold_matrix_full_r2_authoritative" / "full" / "stage3_metrics.csv",
+        ),
+    ]
+    method_names = {
+        "dynamic": "GI",
+        "scgi": "SCGI",
+        "scgi_unn": "SCGI-UNN",
+        "scgi_ured": "SCGI-URED",
+        "static": "STATIC",
+        "analytic": "ANALYTIC",
+        "oracle": "ORACLE",
+    }
+    for result_label, stage3 in stage3_paths:
+        if not stage3.exists():
+            continue
         df = pd.read_csv(stage3)
         for method, group in df.groupby("method"):
+            canonical = method_names.get(str(method), str(method).upper())
             rows.append(
                 {
-                    "result_set": "full_exp_residual_stage3_colab_mean",
+                    "result_set": f"{result_label}_mean",
                     "scope": "held-out target mean",
-                    "method": "SCGI" if method == "scgi" else method.upper(),
+                    "method": canonical,
                     "metric": "CNR",
                     "value": float(group["cnr"].mean()),
                     "source_path": _relpath(stage3),
@@ -481,9 +502,9 @@ def load_current_scgi_results(root: Path) -> pd.DataFrame:
             )
             rows.append(
                 {
-                    "result_set": "full_exp_residual_stage3_colab_min",
+                    "result_set": f"{result_label}_min",
                     "scope": "held-out target minimum",
-                    "method": "SCGI" if method == "scgi" else method.upper(),
+                    "method": canonical,
                     "metric": "CNR",
                     "value": float(group["cnr"].min()),
                     "source_path": _relpath(stage3),

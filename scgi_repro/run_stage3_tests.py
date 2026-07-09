@@ -113,10 +113,11 @@ def main() -> None:
     generator = seed_everything(int(cfg.get("seed", 0)))
     patterns = generate_patterns(n, h, generator, cfg.get("data", {}).get("pattern_distribution", "uniform"), device=device)
     objects = make_stage3_objects(h)
+    selected_indices = list(range(len(objects)))
     if args.object_shard is not None:
         shard_index, shard_total = args.object_shard
-        objects = [obj for idx, obj in enumerate(objects) if idx % shard_total == shard_index]
-        if not objects:
+        selected_indices = [idx for idx in selected_indices if idx % shard_total == shard_index]
+        if not selected_indices:
             raise ValueError(f"No Stage 3 objects selected by shard {shard_index}/{shard_total}")
     images = torch.stack([obj for _name, obj in objects], dim=0).unsqueeze(1).to(device)
     flat = images.reshape(images.shape[0], h * h)
@@ -140,7 +141,8 @@ def main() -> None:
     rows = []
     grid_images = []
     grid_labels = []
-    for idx, (name, _obj) in enumerate(objects):
+    for idx in selected_indices:
+        name, _obj = objects[idx]
         target = images[idx]
         reconstructions = {
             "static": (dgi_reconstruct(b_static[idx], patterns, h), b_static[idx]),

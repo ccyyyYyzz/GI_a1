@@ -81,3 +81,17 @@ This means the AGC bias-variance behavior is not captured well by a simple
 `best_window ~ rho^a sigma_a^b` fit on the current grid. Treat AGC window
 selection as a protocol parameter or derive a richer bias-variance model before
 using it as a theoretical claim.
+
+## 2026-07-09 Full URED Proxy Is Not Paper URED
+
+The authoritative full Stage 3 threshold matrix now runs SCGI, SCGI-UNN, and
+SCGI-URED on all four held-out targets with the returned exp-residual checkpoint.
+The result is a useful negative control: SCGI has mean/min CNR `3.083/2.492`,
+SCGI-UNN has `2.446/2.254`, and SCGI-URED has `5.084/2.270`. URED is above UNN
+for every target, but it is far below the APL URED minimum of `10.43` and does
+not rescue the stripe target.
+
+One implementation trap also surfaced: sharding Stage 3 objects before drawing
+dynamic factors makes every shard reuse the first lambda draw. `run_stage3_tests.py`
+now draws the full object set first and only then filters the shard, so sharded
+and non-sharded runs share the same per-object dynamic factors.

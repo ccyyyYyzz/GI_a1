@@ -1,0 +1,8 @@
+check,value,passed
+scgi_cnr_above_dynamic_all,True,True
+scgi_cnr_ge_3_all,False,False
+static_psnr_gt_20_all,False,False
+scgi_unn_cnr_above_scgi_all,False,False
+scgi_ured_cnr_above_scgi_unn_all,True,True
+scgi_unn_cnr_ge_apl_min_all,False,False
+scgi_ured_cnr_ge_apl_min_all,False,False

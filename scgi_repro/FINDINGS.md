@@ -70,6 +70,16 @@ fails because the static upper bound is below 3 for `ring` and `stripe_target`;
 the static PSNR>20 gate also fails because static DGI PSNR is only about 7.46-8.76
 dB in this full held-out setup.
 
+Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
+adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the
+returned exp-residual checkpoint. Mean/min CNRs are SCGI 3.083/2.492, SCGI-UNN
+2.446/2.254, and SCGI-URED 5.084/2.270. URED is consistently above UNN, but the
+compact URED proxy still fails APL minima: SCGI 3.39, UNN 7.93, and URED 10.43.
+
+Published calibration: `results/published_calibration` encodes the APL Fig. 6
+and Fig. 9 CNR targets plus OE PSNR/SSIM target values. Current APL comparison
+has 16 rows and all are below the relevant published minima.
+
 ## Stage 1 Diagnostics
 
 Experiment: standalone Stage 1 data-simulation diagnostics for three smoke
@@ -239,4 +249,4 @@ beats pairwise on paired bases only 7.6% of the time.
 Supports/refutes: supports the robustness direction at full scan scale and
 satisfies the uncalibrated full nonideal main-scan requirement. It still does
 not satisfy published-channel calibration because the parameters are normalized
-placeholders, not digitized from APL/OE curves or hardware measurements.
+placeholders, not fitted from APL/OE intensity traces or hardware measurements.

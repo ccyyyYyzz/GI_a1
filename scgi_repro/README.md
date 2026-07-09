@@ -22,6 +22,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_stage0.py --profile smoke
 & $py run_stage1_diagnostics.py --profile smoke --samples 3
 & $py run_stage3_tests.py --profile smoke
+& $py run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
+& $py run_published_calibration.py --output-dir results\published_calibration
 & $py run_gamma_sweep.py --profile smoke --epochs 2
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
@@ -65,6 +67,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   physics-informed SCGI candidate with returned checkpoint and artifacts.
 - `results/stage_3_exp_residual_colab_full/`: held-out full-profile Stage 3
   validation using that checkpoint.
+- `results/stage3_threshold_matrix_full_r2_authoritative/`: full-profile
+  SCGI/UNN/URED threshold matrix for four held-out targets using the returned
+  exp-residual checkpoint.
+- `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
+  targets, OE PSNR/SSIM targets, and current gap summary.
 - `results/mechanism_m1_basis_expanded_quick/`: compact M1 output with random,
   Hadamard, DCT, Fourier, and SRHT bases.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with
