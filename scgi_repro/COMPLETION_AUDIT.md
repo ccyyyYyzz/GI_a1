@@ -27,7 +27,7 @@ baselines.
 
 | Requirement | Status | Current evidence |
 |---|---|---|
-| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 14 unit tests pass |
+| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 17 unit tests pass |
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
@@ -46,7 +46,7 @@ baselines.
 | M1 oracle/AGC/error/pairwise mechanism experiments | Partial to done | `results/mechanism_m1_protocol_o10s5` has oracle, AGC window, error propagation, pairwise failure CSVs |
 | M2 phase scan over rho/sigma grid with equal frame accounting | Done for compact protocol | `results/phase_m2_reference_protocol_o10s5/phase_scan.csv` has 68,250 rows |
 | M2 outputs: best methods, selected curves, flip boundary | Partial | Tables/figures generated; flip boundary is diagnostic, not R2-fitted law |
-| M2 includes SCGI-network blind correction | Not done | Current M2 corrections are none/oracle/AGC/pairwise/reference |
+| M2 includes SCGI-network blind correction | Partial | `scgi_proxy` is implemented and smoke-tested as an equal-frame blind SCGI-style smooth-gain proxy; a trained SCGI network correction is still not implemented |
 | M3 SRHT constructive method and ablations | Partial | `results/srht_m3_protocol_o10s5` exists; M3 full claim thresholds are not all proven |
 | M4 theory with fitted laws and notebook-level verification | Partial | `THEORY.md` has derivations and hooks; no dedicated N-sweep/R2 theory notebook yet |
 | Published-channel calibration and nonideal detector/SLM model | Not done | No WebPlotDigitizer-derived APL/OE calibration; no shot/read/SLM quantization main scan |
@@ -61,11 +61,13 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --no-findings --output-dir results\phase_m2_shardcheck_0of2
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --no-findings --output-dir results\phase_m2_shardcheck_1of2
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_shardcheck_0of2 results\phase_m2_shardcheck_1of2 --output-dir results\phase_m2_shardcheck_merged
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --output-dir results\phase_m2_scgi_proxy_smoke --no-findings
 ```
 
 ## Completion Decision
 
 The goal is not yet fully complete under the original prompt scope. The current
 state is a strong executable prototype plus several completed compact protocol
-experiments, but the full paper-level SCGI thresholds, M2 SCGI-network
-correction, M4 fitted theory, and published/nonideal calibration remain open.
+experiments, but the full paper-level SCGI thresholds, a true trained M2
+SCGI-network correction, M4 fitted theory, and published/nonideal calibration
+remain open.

@@ -130,6 +130,11 @@ Result: `results/phase_m2_reference_protocol_o10s5/phase_scan.csv` records
 `best_equal_frame_blind_methods.csv`, so extra-reference-frame methods are not
 silently compared as if they used the same physical budget.
 
+Follow-up smoke check: `results/phase_m2_scgi_proxy_smoke/phase_scan.csv`
+adds `scgi_proxy`, a blind smooth-gain SCGI-style proxy. It contributes 210
+smoke rows, uses zero reference frames, and is kept separate from claims about a
+trained SCGI network.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best

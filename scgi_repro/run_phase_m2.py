@@ -64,7 +64,7 @@ def main() -> None:
     unit_index = 0
     for basis_name, kwargs in basis_specs:
         basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
-        corrections = ["none", "oracle", "agc"] + [f"reference_k{k}" for k in reference_periods]
+        corrections = ["none", "oracle", "agc", "scgi_proxy"] + [f"reference_k{k}" for k in reference_periods]
         if basis.paired:
             corrections.append("pairwise")
         for rho in rho_values:

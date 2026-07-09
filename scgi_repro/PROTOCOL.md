@@ -35,3 +35,7 @@ All basis/channel comparisons in this project follow these rules.
     Merge shards with `merge_phase_m2_shards.py`, which recomputes all summary,
     best-method, reference, equal-frame, and flip-boundary CSVs from the merged
     `phase_scan.csv`.
+12. **SCGI-style blind proxies must be labeled as proxies.** `scgi_proxy`
+    estimates a smooth gain envelope from observed measurements only and adds no
+    reference frames. It is an equal-frame blind correction, not a trained SCGI
+    network, and should not be reported as a paper-level SCGI-network result.

@@ -185,6 +185,48 @@ def estimate_pair_gain_from_sums(
     return frame_gain / frame_gain.mean().clamp_min(eps)
 
 
+def estimate_scgi_proxy_gain(
+    measurements: torch.Tensor,
+    paired: bool = False,
+    window: Optional[int] = None,
+    eps: float = 1.0e-8,
+    clip_min: float = 0.05,
+    clip_max: float = 20.0,
+) -> torch.Tensor:
+    """Estimate a slow blind gain envelope with an SCGI-style smooth prior.
+
+    This proxy is intentionally lighter than a trained SCGI network: it uses
+    only the observed bucket sequence and the paired-frame acquisition structure
+    when available. It never reads the simulator's true gains or reference
+    anchors, so it remains a blind equal-frame correction for M2.
+    """
+
+    values = measurements.reshape(-1)
+    frames = values.numel()
+    if frames == 0:
+        raise ValueError("measurements must be non-empty.")
+    if window is None:
+        window = max(9, int(round(0.05 * frames)))
+    if window % 2 == 0:
+        window += 1
+
+    if paired and frames % 2 == 0 and frames >= 4:
+        envelope_source = (values[0::2] + values[1::2]).abs().clamp_min(eps)
+        pair_window = max(3, int(round(0.5 * window)))
+        if pair_window % 2 == 0:
+            pair_window += 1
+        smooth_log = moving_average_1d(torch.log(envelope_source), pair_window)
+        pair_gain = torch.exp(smooth_log - smooth_log.median()).clamp(float(clip_min), float(clip_max))
+        gain_hat = torch.empty_like(values)
+        gain_hat[0::2] = pair_gain
+        gain_hat[1::2] = pair_gain
+    else:
+        magnitude = values.abs().clamp_min(eps)
+        smooth_log = moving_average_1d(torch.log(magnitude), window)
+        gain_hat = torch.exp(smooth_log - smooth_log.median()).clamp(float(clip_min), float(clip_max))
+    return gain_hat / gain_hat.mean().clamp_min(eps)
+
+
 def _parse_reference_period(correction: str, default: int = 8) -> Optional[int]:
     key = correction.lower()
     if not (key.startswith("reference") or key.startswith("ref")):
@@ -253,7 +295,7 @@ def apply_correction(
     agc_window: Optional[int] = None,
     eps: float = 1.0e-8,
 ) -> CorrectedMeasurements:
-    """Apply oracle, none, blind AGC, or paired-ratio correction.
+    """Apply oracle, none, blind gain corrections, or paired-ratio correction.
 
     For paired-ratio correction the returned ``values`` are signed coefficients,
     not frame measurements, because the ratio directly estimates
@@ -282,6 +324,15 @@ def apply_correction(
 
     if key == "agc":
         gain_hat = estimate_agc_gain(values, window=agc_window, eps=eps)
+        return CorrectedMeasurements(
+            values=values / gain_hat.clamp_min(eps),
+            values_are_coefficients=False,
+            gain_hat=gain_hat,
+            correction=key,
+        )
+
+    if key in {"scgi_proxy", "scgi_smooth"}:
+        gain_hat = estimate_scgi_proxy_gain(values, paired=paired, window=agc_window, eps=eps)
         return CorrectedMeasurements(
             values=values / gain_hat.clamp_min(eps),
             values_are_coefficients=False,

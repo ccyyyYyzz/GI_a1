@@ -217,6 +217,11 @@ Outputs:
   `best_equal_frame_blind_methods.csv`, `best_reference_methods.csv`
 - `flip_boundary.csv` (135 rows)
 
+An additional M2 smoke validation at `results/phase_m2_scgi_proxy_smoke`
+confirms the new `scgi_proxy` correction is present in the scan output. It is a
+blind smooth-gain SCGI-style proxy with zero reference frames, not a trained
+SCGI network. The smoke CSV has 1575 rows overall and 210 `scgi_proxy` rows.
+
 Frame audit for M2 reference protocol:
 
 | Correction | Measurement frames | Reference frames | Total physical frames |

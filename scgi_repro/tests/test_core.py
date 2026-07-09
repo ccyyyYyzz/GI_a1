@@ -407,6 +407,27 @@ class TestChannelMechanisms(unittest.TestCase):
         self.assertEqual(self.mechanisms.reference_anchor_count(2048, 32), 65)
         self.assertEqual(self.mechanisms.reference_anchor_count(2049, 8), 257)
 
+    def test_scgi_proxy_gain_is_blind_positive_and_tracks_slow_channel(self):
+        gains = self.mechanisms.make_multiplicative_channel(
+            256, model="ou", rho=0.005, sigma_a=0.2, seed=456
+        ).gains
+        observed = 3.0 * gains
+        estimated = self.mechanisms.estimate_scgi_proxy_gain(observed, window=33)
+        rel_mse = torch.mean((estimated - gains) ** 2) / torch.mean(gains ** 2).clamp_min(1.0e-8)
+        self.assertEqual(tuple(estimated.shape), tuple(gains.shape))
+        self.assertTrue(torch.all(torch.isfinite(estimated)))
+        self.assertTrue(torch.all(estimated > 0))
+        self.assertAlmostEqual(float(estimated.mean()), 1.0, places=5)
+        self.assertLess(float(rel_mse), 0.05)
+
+    def test_scgi_proxy_apply_correction_does_not_require_true_gains(self):
+        observed = torch.linspace(0.5, 2.0, 64)
+        corrected = self.mechanisms.apply_correction(observed, correction="scgi_proxy", true_gains=None)
+        self.assertFalse(corrected.values_are_coefficients)
+        self.assertIsNotNone(corrected.gain_hat)
+        self.assertEqual(tuple(corrected.values.shape), tuple(observed.shape))
+        self.assertTrue(torch.all(torch.isfinite(corrected.values)))
+
 
 class TestBasisGeneration(unittest.TestCase):
     def setUp(self):
