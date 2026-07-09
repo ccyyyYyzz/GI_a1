@@ -217,6 +217,18 @@ class TestCoreNumerics(unittest.TestCase):
         pred = model(gains)
         self.assertLess(float(torch.mean((pred - torch.ones_like(pred)) ** 2)), 1.0e-6)
 
+    def test_padded_scgi_correction_preserves_sequence_length(self):
+        train_scgi = importlib.import_module("src.train_scgi")
+
+        class ScaleModel(torch.nn.Module):
+            def forward(self, x):
+                return 0.5 * x
+
+        seq = torch.linspace(0.0, 1.0, 10).reshape(1, 10)
+        corrected = train_scgi.correct_measurements_padded(ScaleModel(), seq)
+        self.assertEqual(tuple(corrected.shape), tuple(seq.shape))
+        self.assertTrue(torch.allclose(corrected, 0.5 * seq))
+
     def test_dgi_output_shape_matches_object_shape(self):
         func = _find_function(
             [
@@ -483,6 +495,18 @@ class TestChannelMechanisms(unittest.TestCase):
         self.assertIsNotNone(corrected.gain_hat)
         self.assertEqual(tuple(corrected.values.shape), tuple(observed.shape))
         self.assertTrue(torch.all(torch.isfinite(corrected.values)))
+
+    def test_scgi_frozen_apply_correction_uses_callable(self):
+        observed = torch.linspace(0.2, 1.0, 10)
+        corrected = self.mechanisms.apply_correction(
+            observed,
+            correction="scgi_frozen",
+            true_gains=None,
+            scgi_corrector=lambda values: values * 0.25,
+        )
+        self.assertFalse(corrected.values_are_coefficients)
+        self.assertIsNone(corrected.gain_hat)
+        self.assertTrue(torch.allclose(corrected.values, observed * 0.25))
 
 
 class TestBasisGeneration(unittest.TestCase):

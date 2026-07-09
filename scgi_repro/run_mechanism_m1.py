@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import math
 from pathlib import Path
-from typing import Dict, Iterable, List
+from typing import Callable, Dict, Iterable, List
 
 import numpy as np
 import pandas as pd
@@ -136,6 +136,7 @@ def reconstruct_observed(
     true_gains: torch.Tensor,
     correction: str,
     agc_window: int,
+    scgi_corrector: Callable[[torch.Tensor], torch.Tensor] | None = None,
 ) -> Dict[str, float]:
     corrected = apply_correction(
         observed,
@@ -143,6 +144,7 @@ def reconstruct_observed(
         true_gains=true_gains,
         paired=basis.paired,
         agc_window=agc_window,
+        scgi_corrector=scgi_corrector,
     )
     recon = basis.reconstruct(corrected.values, values_are_coefficients=corrected.values_are_coefficients)
     metrics = object_metrics(recon, obj)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 import torch
 from torch.utils.data import DataLoader, TensorDataset
@@ -131,3 +132,27 @@ def correct_measurements(model: torch.nn.Module, r_dynamic: torch.Tensor, image_
     model.eval()
     y = model(as_images(r_dynamic, image_size)).reshape(r_dynamic.shape)
     return y.clamp(0.0, 1.0)
+
+
+@torch.no_grad()
+def correct_measurements_padded(model: torch.nn.Module, r_dynamic: torch.Tensor) -> torch.Tensor:
+    """Apply a fully convolutional SCGI model to any sequence length.
+
+    The original SCGI training data uses square measurement maps. M2 mechanism
+    scans often use frame budgets such as 2048, so this helper pads each row to
+    the nearest square with its row mean, applies the frozen model, and crops
+    back to the original frame count.
+    """
+
+    rows, original_shape = _as_rows(r_dynamic)
+    frames = int(rows.shape[-1])
+    side = int(math.ceil(math.sqrt(frames)))
+    padded_frames = side * side
+    if padded_frames == frames:
+        padded = rows
+    else:
+        pad = rows.mean(dim=1, keepdim=True).expand(rows.shape[0], padded_frames - frames)
+        padded = torch.cat([rows, pad], dim=1)
+    model.eval()
+    y = model(as_images(padded, side)).reshape(rows.shape[0], padded_frames)[:, :frames]
+    return y.clamp(0.0, 1.0).reshape(original_shape)

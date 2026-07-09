@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import re
-from typing import Optional
+from typing import Callable, Optional
 
 import torch
 import torch.nn.functional as torch_f
@@ -396,6 +396,7 @@ def apply_correction(
     reference_photons: float = 0.0,
     reference_read_noise: float = 0.0,
     reference_seed: int = 0,
+    scgi_corrector: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
 ) -> CorrectedMeasurements:
     """Apply oracle, none, blind gain corrections, or paired-ratio correction.
 
@@ -439,6 +440,19 @@ def apply_correction(
             values=values / gain_hat.clamp_min(eps),
             values_are_coefficients=False,
             gain_hat=gain_hat,
+            correction=key,
+        )
+
+    if key in {"scgi_frozen", "scgi_network", "scgi_checkpoint"}:
+        if scgi_corrector is None:
+            raise ValueError(f"{key} correction requires a frozen SCGI corrector.")
+        corrected = scgi_corrector(values).reshape(-1).to(device=values.device, dtype=values.dtype)
+        if corrected.numel() != values.numel():
+            raise ValueError(f"SCGI corrector returned {corrected.numel()} values for {values.numel()} measurements.")
+        return CorrectedMeasurements(
+            values=corrected,
+            values_are_coefficients=False,
+            gain_hat=None,
             correction=key,
         )
 

@@ -49,3 +49,9 @@ code or raw data.
     `0.05` frame. These settings now include both compact and full M2 scans, but
     remain engineering placeholders until published-curve or hardware-calibrated
     parameters are digitized.
+15. The `scgi_frozen` M2 smoke baseline loads a saved SCGI checkpoint and applies
+    it to M2 measurement sequences. Because the SCGI model was trained on square
+    measurement maps while M2 uses 2048-frame sequences, the implementation pads
+    each row to the nearest square with its row mean, applies the frozen model,
+    and crops back to the original frame count. This is an explicit cross-domain
+    adaptation, not a claim that the paper trained on M2 bases.

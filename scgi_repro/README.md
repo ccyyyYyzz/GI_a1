@@ -25,6 +25,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_gamma_sweep.py --profile smoke --epochs 2
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
+& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --scgi-checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --scgi-model-kind exponential_residual_unet --output-dir results\phase_m2_scgi_frozen_smoke
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
 & $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py merge_nonideal_m2_shards.py --inputs results\colab_imports\pro1_nonideal_m2_full_r1_shard0of5\artifacts results\colab_imports\pro1_nonideal_m2_full_r1_shard1of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard2of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard3of5\artifacts results\colab_imports\pro2_nonideal_m2_full_r1_shard4of5\artifacts --output-dir results\nonideal_m2_full_r1_merged
@@ -74,6 +75,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_scgi_proxy_dense_r1_merged/`: 78,750-row dense 7x5 M2
   output that adds `scgi_proxy` as an equal-frame blind smooth-gain proxy with
   zero reference frames.
+- `results/phase_m2_scgi_frozen_smoke/`: frozen-network M2 smoke baseline using
+  the returned SCGI checkpoint and explicit `scgi_frozen` correction.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.

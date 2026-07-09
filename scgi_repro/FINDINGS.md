@@ -149,6 +149,14 @@ Follow-up dense Colab-sharded check:
 rows inside a 78,750-row merged scan, uses zero reference frames, and is kept
 separate from claims about a trained SCGI network.
 
+Frozen-network smoke check:
+`results/phase_m2_scgi_frozen_smoke/phase_scan.csv` adds `scgi_frozen`, which
+loads the returned SCGI checkpoint and applies the frozen network to M2
+measurement sequences with square-padding/cropping. The smoke run has 1785 rows,
+including 210 `scgi_frozen` rows. Mean equal-frame blind PSNR is 12.75 dB for
+`scgi_frozen`, below `none` at 16.87 dB, `scgi_proxy` at 17.94 dB, and
+`pairwise` at 22.25 dB.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best
@@ -158,7 +166,10 @@ baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
 bases and does not change the best 35-cell equal-frame map. Flip-boundary output
 is now diagnostic rather than a fitted law: 104 rows are `not_reached`, 17
-`left_censored`, and 14 `observed` in the reference protocol.
+`left_censored`, and 14 `observed` in the reference protocol. The frozen-network
+smoke result shows that directly reusing the SCGI checkpoint is a real but weak
+cross-domain baseline, not a replacement for basis-aware retraining or
+fine-tuning.
 
 ## Rendered Figures
 

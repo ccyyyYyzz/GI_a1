@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from pathlib import Path
 
 import pandas as pd
+import torch
 
 from run_mechanism_m1 import make_synthetic_objects, reconstruct_observed
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
 from src.mechanisms import make_multiplicative_channel, reference_anchor_count, simulate_channel_measurements
+from src.scgi_model import make_scgi_model
+from src.train_scgi import correct_measurements_padded
 
 
 def parse_shard(value: str | None) -> tuple[int, int]:
@@ -28,6 +32,37 @@ def parse_shard(value: str | None) -> tuple[int, int]:
     return shard_index, shard_count
 
 
+def load_frozen_scgi_corrector(
+    root: Path,
+    cfg: dict,
+    checkpoint: Path | None,
+    model_kind: str | None,
+):
+    if checkpoint is None:
+        return None
+    resolved = checkpoint if checkpoint.is_absolute() else root / checkpoint
+    if not resolved.exists():
+        raise FileNotFoundError(f"SCGI checkpoint not found: {resolved}")
+    model_cfg = copy.deepcopy(cfg)
+    if model_kind:
+        model_cfg.setdefault("scgi", {})["model_kind"] = str(model_kind)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = make_scgi_model(model_cfg).to(device)
+    payload = torch.load(resolved, map_location=device)
+    state_dict = payload["model_state_dict"] if isinstance(payload, dict) and "model_state_dict" in payload else payload
+    model.load_state_dict(state_dict)
+    model.eval()
+
+    def correct(values: torch.Tensor) -> torch.Tensor:
+        source_device = values.device
+        source_dtype = values.dtype
+        rows = values.detach().reshape(1, -1).to(device=device, dtype=torch.float32)
+        corrected = correct_measurements_padded(model, rows).reshape(-1)
+        return corrected.to(device=source_device, dtype=source_dtype)
+
+    return correct
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="M2 phase scan with fair frame accounting.")
     parser.add_argument("--profile", default="smoke")
@@ -35,11 +70,14 @@ def main() -> None:
     parser.add_argument("--seeds", type=int, default=1)
     parser.add_argument("--output-dir", type=Path, default=Path("results/phase_m2"))
     parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
+    parser.add_argument("--scgi-checkpoint", type=Path, default=None, help="Optional frozen SCGI checkpoint for scgi_frozen correction.")
+    parser.add_argument("--scgi-model-kind", default=None, help="Model kind to use when loading --scgi-checkpoint.")
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
+    scgi_corrector = load_frozen_scgi_corrector(root, cfg, args.scgi_checkpoint, args.scgi_model_kind)
     shard_index, shard_count = parse_shard(args.shard)
     mech = cfg.get("mechanism", {})
     h = int(mech.get("image_size", 32))
@@ -64,7 +102,10 @@ def main() -> None:
     unit_index = 0
     for basis_name, kwargs in basis_specs:
         basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
-        corrections = ["none", "oracle", "agc", "scgi_proxy"] + [f"reference_k{k}" for k in reference_periods]
+        corrections = ["none", "oracle", "agc", "scgi_proxy"]
+        if scgi_corrector is not None:
+            corrections.append("scgi_frozen")
+        corrections += [f"reference_k{k}" for k in reference_periods]
         if basis.paired:
             corrections.append("pairwise")
         for rho in rho_values:
@@ -99,6 +140,7 @@ def main() -> None:
                                 true_gains=channel.gains,
                                 correction=correction,
                                 agc_window=max(9, int(0.05 * frame_budget)),
+                                scgi_corrector=scgi_corrector,
                             )
                             reference_period = int(correction.rsplit("k", 1)[1]) if correction.startswith("reference_k") else 0
                             reference_frames = reference_anchor_count(basis.num_frames, reference_period) if reference_period else 0

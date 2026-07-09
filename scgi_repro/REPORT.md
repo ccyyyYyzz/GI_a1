@@ -261,6 +261,24 @@ Outputs:
 not a trained SCGI network. The dense run has 10,500 `scgi_proxy` rows; all have
 `reference_frames=0` and `total_physical_frames=num_frames`.
 
+Frozen SCGI-network M2 smoke baseline:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --scgi-checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --scgi-model-kind exponential_residual_unet --output-dir results\phase_m2_scgi_frozen_smoke
+```
+
+This adds an explicit `scgi_frozen` correction that loads a saved SCGI
+checkpoint, applies the frozen fully convolutional network to each M2 measurement
+sequence, and keeps `gain_hat` undefined because it is not a gain-estimator
+proxy. Non-square 2048-frame M2 sequences are padded to the nearest square,
+processed by the network, and cropped back to the original frame count. The
+smoke run writes 1785 rows, including 210 `scgi_frozen` rows. Direct
+cross-domain application of the full-profile `exponential_residual_unet`
+checkpoint underperforms in this smoke setting: mean equal-frame blind PSNR is
+12.75 dB for `scgi_frozen`, compared with 16.87 dB for `none`, 17.94 dB for
+`scgi_proxy`, and 22.25 dB for `pairwise`. This is now a true frozen-network
+baseline, but not yet a successful network-level M2 phase diagram.
+
 Frame audit for M2 reference protocol:
 
 | Correction | Measurement frames | Reference frames | Total physical frames |
@@ -405,6 +423,8 @@ Additional checks:
   numeric tolerance.
 - M2 `scgi_proxy` dense run was split into five Colab L4 shards and merged into
   a 78,750-row scan with all five shard labels present.
+- Frozen `scgi_frozen` M2 smoke baseline loads the returned SCGI checkpoint and
+  writes `results/phase_m2_scgi_frozen_smoke` with 1785 rows.
 - Full nonideal M2 was split into five Colab L4 shards and merged into
   `results/nonideal_m2_full_r1_merged` with 157,500 rows and all five shard
   labels present.
@@ -423,8 +443,9 @@ Additional checks:
 - Redesign the `full` SCGI training profile. Colab has now run both 20 and
   100 epochs at 128x128/N=16384; both remain far below the SCGI thresholds.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
-  SCGI-network correction if a network-level phase diagram is required, and add
-  published-channel/non-ideal detector calibration.
+  SCGI-network correction at dense scale if a network-level phase diagram is
+  required. The smoke baseline is implemented but underperforms under direct
+  cross-domain application. Add published-channel/non-ideal detector calibration.
 - Extend M4 from compact fitted-law hooks to paper-grade theory: larger N sweep,
   bootstrap intervals, AGC window law, censored flip-boundary fitting, and
   non-ideal detector/SLM calibration.
