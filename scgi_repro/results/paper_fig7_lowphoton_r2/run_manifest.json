@@ -1,0 +1,26 @@
+{
+  "utc_timestamp": "2026-07-09T19:10:58.065153+00:00",
+  "git_commit": "71573be692b8008e3f2417bc815b98a9f9763614",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\paper_fig7_lowphoton_r2",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "sigma_a": 0.1,
+    "window": 64,
+    "alpha": 0.5,
+    "photon_budgets": "0.25,0.5,1,2,4,8,16,32,64,128",
+    "floor_probe_rho": 0.0001
+  },
+  "rows": 1500,
+  "soft_log_fisher_slope_lam_2_32": -0.9102827891709506,
+  "soft_log_fisher_slope_lam_1_16": -0.7296179591704631,
+  "soft_log_mse_peak_budget": 1.0,
+  "slope_recompute_note": "Recomputed 2026-07-09 directly from the committed fig7_lowphoton.csv (no rerun of simulate()). The original slopes were fit by filtering on lambda_bar_mean (<=32, <=16), but lambda_bar_mean drifts a hair above the nominal photon_budget (e.g. 32.00035 at budget=32, 16.000175 at budget=16) due to carrier-mean normalization, so that filter silently dropped the budget=32 and budget=16 endpoints from their respective fits. Refit by filtering directly on photon_budget in [2,32] and [1,16] (soft_log arm, log10(gain_rel_mse mean per budget) vs log10(photon_budget)); values above replace the stale -0.889/-0.647."
+}

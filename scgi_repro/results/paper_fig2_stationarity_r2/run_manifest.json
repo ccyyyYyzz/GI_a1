@@ -1,0 +1,25 @@
+{
+  "utc_timestamp": "2026-07-09T19:08:10.594097+00:00",
+  "git_commit": "71573be692b8008e3f2417bc815b98a9f9763614",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\paper_fig2_stationarity_r2",
+    "image_size": 32,
+    "objects": 10,
+    "seed": 20240708,
+    "window": 64,
+    "chunks": 8,
+    "transient": 128,
+    "bases": [
+      "random_uniform",
+      "random_binary",
+      "hadamard_ordered",
+      "hadamard_shuffled",
+      "srht_paired"
+    ]
+  },
+  "rows": 50
+}

@@ -65,3 +65,27 @@ The rho=1e-3 early-window regime shows the intended diagnostic separation: rando
 This status closes the new paper-driven mechanism-figure target, not the earlier strict SCGI reproduction target. The earlier strict reproduction remains partial/blocked because learned SCGI/UNN/URED thresholds did not match the original paper gates.
 
 The Fig. 4 Colab command finished, but the runner zip omitted the CSV/figures. The main Fig. 4 result therefore comes from a local rerun of the same runner parameters, which completed in 7.18 seconds and produced the expected 1250 rows.
+
+## r2 revision round (2026-07-09, post-verification)
+
+Adversarial numerical verification of the r1 figure sets led to an r2 revision implementing:
+Fig. 3: honest arm renaming (hadamard_paired / hadamard_random_paired) + two NEW raw non-paired
+Hadamard arms (raw_ordered error ~0.96 non-decaying = the chronology failure; raw_shuffled ~0.86),
+theory-floor-normalized collapse (err/floor collapses across objects to +/-5-7%), adaptive
+variance-segment slope fits (random_binary -0.39, srht -0.60, hadamard_random_paired -0.61),
+per-seed drift resampling. VERDICT: PASS (results/paper_fig3_gain_error_r2, 6100 rows).
+Fig. 2: variance-sensitive stationarity metrics (Brown-Forsythe levene_p, KS on |B-local mean|,
+std-envelope CV), DC-transient exclusion (frames>=128). r2b power increase (8192 frames):
+ordered arm rejects 7/10 at p<1e-3 (min 1e-20) vs 0/10 for iid random arms; permuted arms 2/10
+(probabilistic permutation whitening, theory-consistent). (paper_fig2_stationarity_r2 + _r2b)
+Fig. 4: control-arm N sweep + v=0 rows + C0_measured; r2b seed increase (15 seeds, 8100 rows):
+orthogonal max per-v |slope|=0.074 (<0.1), srht 0.014, random_dgi ~ -1.0; leverage*N 7.4-7.7e5.
+DGI's correct constant is leverage*N (v=0 floor is identically 0 by residual construction).
+(paper_fig4_bridge_r2 + _r2b)
+Fig. 7: manifest/caption Fisher slopes recomputed from committed CSV (-0.910 for lambda in
+[2,32], -0.730 for [1,16]; root cause: endpoint-dropping filter bug); ratio claims split
+(soft-log 23-46x, Anscombe 19.5-30x); floorprobe confirms drift-limited high-photon floor
+(2.78e-4 -> 1.73e-4 at rho=1e-4). (paper_fig7_lowphoton_r2)
+
+Paper draft: paper_draft/MANUSCRIPT_DRAFT.md (sections 1-8+10 assembled; section 9 + abstract
+pending, to be written from the verified numbers) + paper_draft/REVIEW_FLAGS.md.

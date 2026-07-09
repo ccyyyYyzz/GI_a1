@@ -1,0 +1,19 @@
+{
+  "utc_timestamp": "2026-07-09T19:11:17.774996+00:00",
+  "git_commit": "71573be692b8008e3f2417bc815b98a9f9763614",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\paper_fig4_bridge_r2",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "v_values": "1e-4,3e-4,1e-3,3e-3,1e-2",
+    "n_factors": "1,2,4",
+    "orthogonal_pixels": "1024,2048,4096"
+  },
+  "rows": 2700
+}
