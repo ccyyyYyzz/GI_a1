@@ -155,9 +155,9 @@ initialization sweep at the best continuous stripe setting after extending
 `run_stage4_ured_sweep.py` with `--fixed-init-seed-values`. The best final/trace
 CNR remains `9.365`, with the next seed at `9.356`, so the remaining
 `9.365 < 10.43` gap is not explained by a single unlucky network initialization.
-`results/stage4_trace_audit_r3` records the combined final-vs-trace audit across
-these sweeps and keeps stripe below the APL URED minimum even with target-aware
-trace selection.
+`results/stage4_trace_audit_r4` records the combined final-vs-trace audit across
+these sweeps, now including the seed sweep, and keeps stripe below the APL URED
+minimum even with target-aware trace selection.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
 cropping to the target bounding box lowers it to `7.578`, and sweeping the target

@@ -143,8 +143,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_ured_seed_sweep_r1_stripe/`: monitored 24-seed initialization
   sweep at the best continuous stripe setting. The best stripe final/trace CNR
   remains 9.365, so the miss is not a single-seed accident.
-- `results/stage4_trace_audit_r3/`: combined final-vs-target-aware trace audit
-  for the Stage 4 NLM URED sweeps including the patch and capacity sweeps;
+- `results/stage4_trace_audit_r4/`: combined final-vs-target-aware trace audit
+  for the Stage 4 NLM URED sweeps including patch, capacity, and seed sweeps;
   stripe remains below the APL URED minimum CNR.
 - `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
   raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.

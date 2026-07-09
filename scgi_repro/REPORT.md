@@ -265,7 +265,7 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_sweep_naf_capacity_r1_stripe`
 - `results/stage4_image_audit_r1`
 - `results/stage4_ured_proxy_audit_r1`
-- `results/stage4_trace_audit_r3`
+- `results/stage4_trace_audit_r4`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
@@ -306,9 +306,9 @@ initialization sweep at the same best setting,
 `results/stage4_ured_seed_sweep_r1_stripe`, also leaves the best stripe
 final/trace CNR at 9.365, with the next-best seed at 9.356. This rules out a
 single unlucky TinyNAFNet initialization as the continuous-output bottleneck.
-`results/stage4_trace_audit_r3`
+`results/stage4_trace_audit_r4`
 combines the NLM stripe, all-object, deeper, early-stop, refinement,
-micro-refinement, patch, and capacity sweeps. It
+micro-refinement, patch, capacity, and seed sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
 `letter_L`, and `ring`, but not for `stripe_target`
 (`best_final_cnr=best_trace_cnr=9.365`).
@@ -856,7 +856,7 @@ Additional checks:
   `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`, refinement screens under
   `results/stage4_ured_sweep_nlm_refine_r1_stripe` and
   `results/stage4_ured_sweep_nlm_microrefine_r1_stripe`, and a combined trace
-  audit under `results/stage4_trace_audit_r3`; the follow-up NLM
+  audit under `results/stage4_trace_audit_r4`; the follow-up NLM
   patch-size/distance sweep writes `results/stage4_ured_sweep_nlm_patch_r1_stripe`,
   the NAFNet capacity check writes `results/stage4_ured_sweep_naf_capacity_r1_stripe`,
   and both confirm the previous 9.365 stripe CNR plateau. `results/stage4_image_audit_r1`
