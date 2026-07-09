@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="723" height="86" viewBox="0 0 723 86"><rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 random frame scaling fits</text>
+<rect x="0" y="24" width="95" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="95" y="24" width="122" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="103" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_delta_exponent</text>
+<rect x="217" y="24" width="125" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="225" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">num_frames_exponent</text>
+<rect x="342" y="24" width="159" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="350" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">num_frames_exponent_ci_low</text>
+<rect x="501" y="24" width="166" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="509" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">num_frames_exponent_ci_high</text>
+<rect x="667" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="675" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">r2</text>
+<rect x="0" y="44" width="95" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="95" y="44" width="122" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="103" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1.9982</text>
+<rect x="217" y="44" width="125" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="225" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.70985</text>
+<rect x="342" y="44" width="159" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="350" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.77224</text>
+<rect x="501" y="44" width="166" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="509" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.65886</text>
+<rect x="667" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="675" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.99872</text>
+<rect x="0" y="64" width="95" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="95" y="64" width="122" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="103" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1.9993</text>
+<rect x="217" y="64" width="125" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="225" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.72216</text>
+<rect x="342" y="64" width="159" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="350" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.74877</text>
+<rect x="501" y="64" width="166" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="509" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.69518</text>
+<rect x="667" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="675" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.99964</text>
+</svg>

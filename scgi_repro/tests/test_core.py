@@ -113,12 +113,16 @@ class TestPlottingHelpers(unittest.TestCase):
             tmp_path = Path(tmp)
             grid = plotting.save_image_grid(tmp_path / "grid.png", images, labels=["eye", "flat"])
             line = plotting.save_series_plot(tmp_path / "series.png", series)
+            line_svg = plotting.save_series_plot_svg(tmp_path / "series.svg", series)
             table = plotting.save_metrics_table(tmp_path / "metrics.png", metrics)
+            table_svg = plotting.save_metrics_table_svg(tmp_path / "metrics.svg", metrics)
             csv = plotting.save_metrics_csv(tmp_path / "metrics.csv", metrics)
 
-            for path in (grid, line, table, csv):
+            for path in (grid, line, line_svg, table, table_svg, csv):
                 self.assertTrue(path.exists(), path)
                 self.assertGreater(path.stat().st_size, 0, path)
+            self.assertIn("<svg", line_svg.read_text(encoding="utf-8"))
+            self.assertIn("<svg", table_svg.read_text(encoding="utf-8"))
 
     def test_dynamic_uint8_scaling_handles_tiny_positive_values(self):
         plotting = importlib.import_module("src.plotting")

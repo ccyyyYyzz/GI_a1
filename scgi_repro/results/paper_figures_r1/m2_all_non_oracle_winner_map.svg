@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1140" height="380" viewBox="0 0 1140 380">
+<rect width="100%" height="100%" fill="#ffffff" />
+<text x="78" y="20" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M2 all-non-oracle winners with reference overhead</text>
+<text x="86" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.001</text>
+<text x="202" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.003</text>
+<text x="318" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.01</text>
+<text x="434" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.03</text>
+<text x="550" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.1</text>
+<text x="666" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=0.3</text>
+<text x="782" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=1</text>
+<text x="898" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=3</text>
+<text x="1014" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho=10</text>
+<text x="8" y="82" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma=0.05</text>
+<text x="8" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma=0.1</text>
+<text x="8" y="198" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma=0.15</text>
+<text x="8" y="256" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma=0.3</text>
+<text x="8" y="314" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma=0.5</text>
+<rect x="78" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="84" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="84" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="84" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">47.7 dB</text>
+<rect x="194" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="200" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="200" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="200" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">42.9 dB</text>
+<rect x="310" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="316" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="316" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="316" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">37.7 dB</text>
+<rect x="426" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="432" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="432" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="432" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">32.9 dB</text>
+<rect x="542" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="548" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="548" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="548" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">27.8 dB</text>
+<rect x="658" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="664" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="664" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="664" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">23.3 dB</text>
+<rect x="774" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="780" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="780" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="780" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">19.2 dB</text>
+<rect x="890" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="896" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="896" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="896" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">17.3 dB</text>
+<rect x="1006" y="48" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="1012" y="66" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="1012" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="1012" y="99" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">17.1 dB</text>
+<rect x="78" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="84" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="84" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="84" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">41.7 dB</text>
+<rect x="194" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="200" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="200" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="200" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">36.9 dB</text>
+<rect x="310" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="316" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="316" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="316" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">31.7 dB</text>
+<rect x="426" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="432" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="432" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="432" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">27.0 dB</text>
+<rect x="542" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="548" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="548" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="548" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">22.0 dB</text>
+<rect x="658" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="664" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="664" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="664" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">17.9 dB</text>
+<rect x="774" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="780" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="780" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="780" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">14.7 dB</text>
+<rect x="890" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="896" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="896" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="896" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.4 dB</text>
+<rect x="1006" y="106" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="1012" y="124" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="1012" y="138" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="1012" y="157" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">13.3 dB</text>
+<rect x="78" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="84" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="84" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="84" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">38.1 dB</text>
+<rect x="194" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="200" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="200" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="200" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">33.4 dB</text>
+<rect x="310" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="316" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="316" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="316" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">28.2 dB</text>
+<rect x="426" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="432" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="432" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="432" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">23.6 dB</text>
+<rect x="542" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="548" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="548" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="548" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">18.9 dB</text>
+<rect x="658" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="664" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="664" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="664" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">15.3 dB</text>
+<rect x="774" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="780" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="780" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="780" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.9 dB</text>
+<rect x="890" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="896" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="896" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="896" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.1 dB</text>
+<rect x="1006" y="164" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="1012" y="182" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="1012" y="196" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="1012" y="215" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.0 dB</text>
+<rect x="78" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="84" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="84" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="84" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">32.2 dB</text>
+<rect x="194" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="200" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="200" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="200" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">27.5 dB</text>
+<rect x="310" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="316" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="316" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="316" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">22.4 dB</text>
+<rect x="426" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="432" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="432" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="432" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">18.2 dB</text>
+<rect x="542" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="548" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="548" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="548" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">14.5 dB</text>
+<rect x="658" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="664" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="664" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="664" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.3 dB</text>
+<rect x="774" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="780" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="780" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="780" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.3 dB</text>
+<rect x="890" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="896" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="896" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="896" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.0 dB</text>
+<rect x="1006" y="222" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="1012" y="240" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="1012" y="254" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="1012" y="273" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.9 dB</text>
+<rect x="78" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="84" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="84" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="84" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">27.8 dB</text>
+<rect x="194" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="200" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="200" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="200" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">23.2 dB</text>
+<rect x="310" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="316" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="316" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="316" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">18.5 dB</text>
+<rect x="426" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="432" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="432" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="432" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">15.0 dB</text>
+<rect x="542" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="548" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="548" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="548" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">12.4 dB</text>
+<rect x="658" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="664" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="664" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="664" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">11.3 dB</text>
+<rect x="774" y="280" width="114" height="56" fill="#d65928" stroke="#464646" />
+<text x="780" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="780" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">refk2</text>
+<text x="780" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.8 dB</text>
+<rect x="890" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
+<text x="896" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="896" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
+<text x="896" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.7 dB</text>
+<rect x="1006" y="280" width="114" height="56" fill="#225ea8" stroke="#464646" />
+<text x="1012" y="298" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">srht</text>
+<text x="1012" y="312" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">pairwise</text>
+<text x="1012" y="331" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#ffffff">10.7 dB</text>
+<text x="78" y="368" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">Cell text: winning basis/correction and mean PSNR.</text>
+</svg>

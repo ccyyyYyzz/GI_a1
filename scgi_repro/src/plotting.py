@@ -7,6 +7,7 @@ grids, compact line plots, and metric tables.
 
 from __future__ import annotations
 
+from html import escape as html_escape
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
 
@@ -252,6 +253,98 @@ def save_series_plot(path: str | Path, series: object, **kwargs: object) -> Path
     return out
 
 
+def save_series_plot_svg(
+    path: str | Path,
+    series: object,
+    *,
+    width: int = 720,
+    height: int = 360,
+    title: str | None = None,
+    x_label: str | None = None,
+    y_label: str | None = None,
+    y_range: tuple[float, float] | None = None,
+    colors: Sequence[Color] = DEFAULT_PALETTE,
+    background: Color = (255, 255, 255),
+) -> Path:
+    """Save one or more numeric series as a lightweight SVG line plot."""
+
+    frame = _coerce_series_frame(series)
+    if frame.empty:
+        raise ValueError("series must contain at least one numeric value")
+
+    margin_left, margin_right = 58, 18
+    margin_top = 34 if title else 18
+    margin_bottom = 42
+    plot_w = max(1, width - margin_left - margin_right)
+    plot_h = max(1, height - margin_top - margin_bottom)
+    values = frame.to_numpy(dtype=np.float64)
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        y_min, y_max = 0.0, 1.0
+    elif y_range is None:
+        y_min, y_max = float(finite.min()), float(finite.max())
+        if y_max - y_min <= np.finfo(np.float64).eps:
+            pad = max(1.0, abs(y_min) * 0.05)
+            y_min -= pad
+            y_max += pad
+    else:
+        y_min, y_max = float(y_range[0]), float(y_range[1])
+        if y_max <= y_min:
+            raise ValueError("y_range must satisfy min < max")
+
+    x0, y0 = margin_left, margin_top + plot_h
+    x1, y1 = margin_left + plot_w, margin_top
+    parts = [_svg_open(width, height, background)]
+    parts.append(_svg_line(x0, y0, x1, y0, (80, 80, 80), 1))
+    parts.append(_svg_line(x0, y0, x0, y1, (80, 80, 80), 1))
+    for i in range(5):
+        frac = i / 4
+        y = y0 - int(round((y0 - y1) * frac))
+        value = y_min + (y_max - y_min) * frac
+        parts.append(_svg_line(x0 - 4, y, x1, y, (225, 225, 225), 1))
+        parts.append(_svg_text(4, y + 4, f"{value:.3g}", size=12, fill=(55, 55, 55)))
+
+    x_count = max(1, len(frame.index) - 1)
+    for col_idx, column in enumerate(frame.columns):
+        color = colors[col_idx % len(colors)]
+        points: list[tuple[int, int]] = []
+        for i, value in enumerate(frame[column].to_numpy(dtype=np.float64)):
+            if not np.isfinite(value):
+                continue
+            x = x0 + int(round(plot_w * (i / x_count if x_count else 0.0)))
+            y_frac = (value - y_min) / (y_max - y_min)
+            y = y0 - int(round(plot_h * np.clip(y_frac, 0.0, 1.0)))
+            points.append((x, y))
+        if len(points) == 1:
+            x, y = points[0]
+            parts.append(
+                f'<circle cx="{x}" cy="{y}" r="2.5" fill="{color_to_hex(color)}" />'
+            )
+        elif len(points) > 1:
+            point_text = " ".join(f"{x},{y}" for x, y in points)
+            parts.append(
+                f'<polyline points="{point_text}" fill="none" '
+                f'stroke="{color_to_hex(color)}" stroke-width="2" />'
+            )
+
+    if title:
+        parts.append(_svg_text(margin_left, 18, title, size=13, weight="bold"))
+    if x_label:
+        parts.append(_svg_text(margin_left, height - 10, x_label, size=12))
+    if y_label:
+        parts.append(_svg_text(8, margin_top + 8, y_label, size=12))
+    legend_x, legend_y = margin_left + 8, margin_top + 8
+    for idx, label in enumerate(frame.columns):
+        y = legend_y + 16 * idx
+        color = colors[idx % len(colors)]
+        parts.append(_svg_line(legend_x, y, legend_x + 18, y, color, 2))
+        parts.append(_svg_text(legend_x + 24, y + 4, str(label), size=12))
+    parts.append("</svg>\n")
+    out = ensure_parent(path)
+    out.write_text("\n".join(parts), encoding="utf-8")
+    return out
+
+
 def make_metrics_table(
     metrics: pd.DataFrame | Mapping[str, object] | Sequence[Mapping[str, object]],
     *,
@@ -308,6 +401,60 @@ def save_metrics_table(path: str | Path, metrics: object, **kwargs: object) -> P
 
     out = ensure_parent(path)
     make_metrics_table(metrics, **kwargs).save(out)
+    return out
+
+
+def save_metrics_table_svg(
+    path: str | Path,
+    metrics: object,
+    *,
+    title: str | None = None,
+    max_rows: int = 20,
+    background: Color = (255, 255, 255),
+) -> Path:
+    """Save a small metrics table as SVG for paper-facing vector assets."""
+
+    frame = _coerce_metrics_frame(metrics).head(max_rows)
+    font = _default_font()
+    headers = [str(c) for c in frame.columns]
+    rows = [[_format_cell(v) for v in row] for row in frame.to_numpy(dtype=object)]
+
+    padding_x, padding_y = 8, 5
+    title_h = 24 if title else 0
+    col_widths = []
+    for idx, header in enumerate(headers):
+        cells = [header] + [row[idx] for row in rows]
+        col_widths.append(max(_text_width(font, cell) for cell in cells) + 2 * padding_x)
+    row_h = max(18, _text_height(font, "Ag") + 2 * padding_y)
+    width = max(220, sum(col_widths) + 2)
+    height = title_h + row_h * (len(rows) + 1) + 2
+    parts = [_svg_open(width, height, background)]
+
+    y = 0
+    if title:
+        parts.append(_svg_text(padding_x, 16, title, size=13, weight="bold"))
+        y += title_h
+
+    x = 0
+    for col_idx, header in enumerate(headers):
+        w = col_widths[col_idx]
+        parts.append(_svg_rect(x, y, w, row_h, (235, 238, 242), (180, 180, 180)))
+        parts.append(_svg_text(x + padding_x, y + padding_y + 11, header, size=12))
+        x += w
+    y += row_h
+
+    for row_idx, row in enumerate(rows):
+        x = 0
+        fill = (255, 255, 255) if row_idx % 2 == 0 else (247, 248, 250)
+        for col_idx, cell in enumerate(row):
+            w = col_widths[col_idx]
+            parts.append(_svg_rect(x, y, w, row_h, fill, (215, 215, 215)))
+            parts.append(_svg_text(x + padding_x, y + padding_y + 11, cell, size=12))
+            x += w
+        y += row_h
+    parts.append("</svg>\n")
+    out = ensure_parent(path)
+    out.write_text("\n".join(parts), encoding="utf-8")
     return out
 
 
@@ -420,3 +567,60 @@ def _text_width(font: ImageFont.ImageFont, text: str) -> int:
 def _text_height(font: ImageFont.ImageFont, text: str) -> int:
     bbox = font.getbbox(text)
     return int(bbox[3] - bbox[1])
+
+
+def color_to_hex(color: Color) -> str:
+    return f"#{int(color[0]):02x}{int(color[1]):02x}{int(color[2]):02x}"
+
+
+def _svg_open(width: int, height: int, background: Color) -> str:
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{int(width)}" '
+        f'height="{int(height)}" viewBox="0 0 {int(width)} {int(height)}">'
+        f'<rect width="100%" height="100%" fill="{color_to_hex(background)}" />'
+    )
+
+
+def _svg_rect(
+    x: int | float,
+    y: int | float,
+    width: int | float,
+    height: int | float,
+    fill: Color,
+    stroke: Color | None = None,
+) -> str:
+    stroke_attr = f' stroke="{color_to_hex(stroke)}"' if stroke is not None else ""
+    return (
+        f'<rect x="{x}" y="{y}" width="{width}" height="{height}" '
+        f'fill="{color_to_hex(fill)}"{stroke_attr} />'
+    )
+
+
+def _svg_line(
+    x0: int | float,
+    y0: int | float,
+    x1: int | float,
+    y1: int | float,
+    color: Color,
+    width: int | float,
+) -> str:
+    return (
+        f'<line x1="{x0}" y1="{y0}" x2="{x1}" y2="{y1}" '
+        f'stroke="{color_to_hex(color)}" stroke-width="{width}" />'
+    )
+
+
+def _svg_text(
+    x: int | float,
+    y: int | float,
+    text: str,
+    *,
+    size: int = 12,
+    fill: Color = (0, 0, 0),
+    weight: str = "normal",
+) -> str:
+    safe = html_escape(str(text), quote=True)
+    return (
+        f'<text x="{x}" y="{y}" font-family="Arial, Helvetica, sans-serif" '
+        f'font-size="{size}" font-weight="{weight}" fill="{color_to_hex(fill)}">{safe}</text>'
+    )

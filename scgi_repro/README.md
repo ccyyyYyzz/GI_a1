@@ -174,7 +174,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/theory_m4_agc_boundary_aware_r1/`: censored AGC window-selection
   analysis with four basis fits and 180 interval-satisfaction rows.
 - `results/paper_figures_r1/`: paper-facing M2/M4 winner maps, boundary-fit
-  tables, fitted-law plots, captions, and `paper_figure_manifest.csv`.
+  tables, fitted-law plots, SVG vector sidecars, captions, and
+  `paper_figure_manifest.csv` / `paper_figure_manifest_vectors.csv`.
 - `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
   with SLM quantization, finite contrast, detector noise, timing jitter, and
   noisy reference samples.

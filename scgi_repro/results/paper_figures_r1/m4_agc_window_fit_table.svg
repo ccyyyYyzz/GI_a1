@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="410" height="126" viewBox="0 0 410 126"><rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 AGC best-window law fits</text>
+<rect x="0" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">basis</text>
+<rect x="98" y="24" width="82" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="106" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rho_exponent</text>
+<rect x="180" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="188" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a_exponent</text>
+<rect x="284" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="292" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">r2</text>
+<rect x="338" y="24" width="70" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="346" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rmse_log10</text>
+<rect x="0" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="98" y="44" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.2265e-16</text>
+<rect x="180" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">2.3494e-17</text>
+<rect x="284" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">1</text>
+<rect x="338" y="44" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">2.3738e-16</text>
+<rect x="0" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="98" y="64" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.12418</text>
+<rect x="180" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.31575</text>
+<rect x="284" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.55037</text>
+<rect x="338" y="64" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.15503</text>
+<rect x="0" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<rect x="98" y="84" width="82" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="106" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.064788</text>
+<rect x="180" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="188" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.18087</text>
+<rect x="284" y="84" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="292" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.43544</text>
+<rect x="338" y="84" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="346" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.10676</text>
+<rect x="0" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="98" y="104" width="82" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="106" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.026909</text>
+<rect x="180" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="188" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.086348</text>
+<rect x="284" y="104" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="292" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.29466</text>
+<rect x="338" y="104" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="346" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.065111</text>
+</svg>

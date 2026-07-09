@@ -286,6 +286,8 @@ Latest paper-facing M2/M4 figure manifest:
 equal-frame and all-non-oracle M2 winner maps over `rho=0.001..10`, the observed
 M2 boundary-fit table, residual-gain scaling fit table, random-frame scaling
 curve and fit table, top-5% coefficient-energy curve, and AGC window-law table.
+Each manifest row now has a `vector_svg` sidecar, and
+`paper_figure_manifest_vectors.csv` lists the 11 SVG assets directly.
 
 ## M4 Theory Hooks
 
@@ -317,18 +319,18 @@ best-window cells still select a grid boundary. The boundary-aware rerun in
 upper-bounded intervals and reaches interval satisfaction 0.80 for random
 binary/uniform, 0.64 for SRHT, and 0.40 for Hadamard. The AGC law is therefore
 diagnostic rather than final. `results/paper_figures_r1` now renders the M2/M4
-paper-facing figure draft set from these CSVs. `THEORY.md` contains a candidate
-AGC bias-variance law and `PAPER_OUTLINE.md` contains draft captions for the
-eight main figures.
+paper-facing figure draft set from these CSVs with PNG previews and SVG vector
+sidecars. `THEORY.md` contains a candidate AGC bias-variance law and
+`PAPER_OUTLINE.md` contains draft captions for the eight main figures.
 
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
 toward paper-grade closure. The targeted AGC sweep is now complete and shows the
 simple window law is still too boundary-sensitive for a final quantitative
 claim; the censored model is a useful interpretation layer but not a replacement
 for a stronger AGC estimator. M4 remains short of full publication closure
-because the current paper figures are PNG drafts rather than final
-venue-formatted vector panels, and the figure-level published-channel priors
-still need to be tied to a hardware-calibrated nonideal model.
+because the current paper figures are individual SVG sidecars rather than final
+venue-formatted multi-panel layouts, and the figure-level published-channel
+priors still need to be tied to a hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 

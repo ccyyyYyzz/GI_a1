@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="593" height="146" viewBox="0 0 593 146"><rect width="100%" height="100%" fill="#ffffff" />
+<text x="8" y="16" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M2 observed log-rho boundary fits</text>
+<rect x="0" y="24" width="86" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="8" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">correction</text>
+<rect x="86" y="24" width="88" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="94" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">challenger</text>
+<rect x="174" y="24" width="98" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="182" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">baseline</text>
+<rect x="272" y="24" width="91" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="280" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">observed_points</text>
+<rect x="363" y="24" width="104" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="371" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">sigma_a_exponent</text>
+<rect x="467" y="24" width="54" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="475" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">r2</text>
+<rect x="521" y="24" width="70" height="20" fill="#ebeef2" stroke="#b4b4b4" />
+<text x="529" y="40" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">rmse_log10</text>
+<rect x="0" y="44" width="86" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">reference_k8</text>
+<rect x="86" y="44" width="88" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="174" y="44" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="182" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="272" y="44" width="91" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="280" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">5</text>
+<rect x="363" y="44" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="371" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.9285</text>
+<rect x="467" y="44" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="475" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.99951</text>
+<rect x="521" y="44" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="529" y="60" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.015015</text>
+<rect x="0" y="64" width="86" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">agc</text>
+<rect x="86" y="64" width="88" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<rect x="174" y="64" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="182" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="272" y="64" width="91" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="280" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">3</text>
+<rect x="363" y="64" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="371" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.35267</text>
+<rect x="467" y="64" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="475" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.99501</text>
+<rect x="521" y="64" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="529" y="80" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.0053538</text>
+<rect x="0" y="84" width="86" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">none</text>
+<rect x="86" y="84" width="88" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="174" y="84" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="182" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="272" y="84" width="91" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="280" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">3</text>
+<rect x="363" y="84" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="371" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-0.94178</text>
+<rect x="467" y="84" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="475" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.99213</text>
+<rect x="521" y="84" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="529" y="100" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.016523</text>
+<rect x="0" y="104" width="86" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="8" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">scgi_proxy</text>
+<rect x="86" y="104" width="88" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="94" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="174" y="104" width="98" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="182" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="272" y="104" width="91" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="280" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">5</text>
+<rect x="363" y="104" width="104" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="371" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.5899</text>
+<rect x="467" y="104" width="54" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="475" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.9889</text>
+<rect x="521" y="104" width="70" height="20" fill="#f7f8fa" stroke="#d7d7d7" />
+<text x="529" y="120" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.05916</text>
+<rect x="0" y="124" width="86" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="8" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">reference_k32</text>
+<rect x="86" y="124" width="88" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="94" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+<rect x="174" y="124" width="98" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="182" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<rect x="272" y="124" width="91" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="280" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">5</text>
+<rect x="363" y="124" width="104" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="371" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">-1.4256</text>
+<rect x="467" y="124" width="54" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="475" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.98628</text>
+<rect x="521" y="124" width="70" height="20" fill="#ffffff" stroke="#d7d7d7" />
+<text x="529" y="140" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">0.059047</text>
+</svg>

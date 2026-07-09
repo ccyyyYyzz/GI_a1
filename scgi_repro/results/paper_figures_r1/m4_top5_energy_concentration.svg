@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360"><rect width="100%" height="100%" fill="#ffffff" />
+<line x1="58" y1="318" x2="702" y2="318" stroke="#505050" stroke-width="1" />
+<line x1="58" y1="318" x2="58" y2="34" stroke="#505050" stroke-width="1" />
+<line x1="54" y1="318" x2="702" y2="318" stroke="#e1e1e1" stroke-width="1" />
+<text x="4" y="322" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#373737">0</text>
+<line x1="54" y1="247" x2="702" y2="247" stroke="#e1e1e1" stroke-width="1" />
+<text x="4" y="251" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#373737">0.25</text>
+<line x1="54" y1="176" x2="702" y2="176" stroke="#e1e1e1" stroke-width="1" />
+<text x="4" y="180" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#373737">0.5</text>
+<line x1="54" y1="105" x2="702" y2="105" stroke="#e1e1e1" stroke-width="1" />
+<text x="4" y="109" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#373737">0.75</text>
+<line x1="54" y1="34" x2="702" y2="34" stroke="#e1e1e1" stroke-width="1" />
+<text x="4" y="38" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#373737">1</text>
+<polyline points="58,76 380,73 702,56" fill="none" stroke="#225ea8" stroke-width="2" />
+<polyline points="58,83 380,81 702,62" fill="none" stroke="#d65928" stroke-width="2" />
+<polyline points="58,98 380,87 702,67" fill="none" stroke="#2e8b57" stroke-width="2" />
+<polyline points="58,238 380,239 702,239" fill="none" stroke="#835da5" stroke-width="2" />
+<polyline points="58,237 380,237 702,239" fill="none" stroke="#be8620" stroke-width="2" />
+<polyline points="58,244 380,239 702,238" fill="none" stroke="#2f797f" stroke-width="2" />
+<text x="58" y="18" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="bold" fill="#000000">M4 top-5% coefficient energy</text>
+<text x="58" y="350" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">num_pixels index</text>
+<text x="8" y="42" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">energy fraction</text>
+<line x1="66" y1="42" x2="84" y2="42" stroke="#225ea8" stroke-width="2" />
+<text x="90" y="46" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">dct_paired</text>
+<line x1="66" y1="58" x2="84" y2="58" stroke="#d65928" stroke-width="2" />
+<text x="90" y="62" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">fourier_fourstep</text>
+<line x1="66" y1="74" x2="84" y2="74" stroke="#2e8b57" stroke-width="2" />
+<text x="90" y="78" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">hadamard_paired</text>
+<line x1="66" y1="90" x2="84" y2="90" stroke="#835da5" stroke-width="2" />
+<text x="90" y="94" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_binary</text>
+<line x1="66" y1="106" x2="84" y2="106" stroke="#be8620" stroke-width="2" />
+<text x="90" y="110" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">random_uniform</text>
+<line x1="66" y1="122" x2="84" y2="122" stroke="#2f797f" stroke-width="2" />
+<text x="90" y="126" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="normal" fill="#000000">srht_paired</text>
+</svg>

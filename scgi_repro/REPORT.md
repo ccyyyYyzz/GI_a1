@@ -549,7 +549,9 @@ contains the candidate AGC bias-variance law, and `PAPER_OUTLINE.md` contains
 draft captions for the eight main figures. `run_make_paper_figures.py` renders
 the first paper-facing M2/M4 draft set under `results/paper_figures_r1`,
 including prompt-range winner maps, boundary fits, residual-error fits,
-random-frame scaling, energy concentration, and AGC-window diagnostics. The
+random-frame scaling, energy concentration, and AGC-window diagnostics. These
+draft assets now include PNG previews plus SVG sidecars recorded in
+`paper_figure_manifest.csv` and `paper_figure_manifest_vectors.csv`. The
 targeted AGC validation in `results/theory_m4_agc_targeted_r1` adds 86,400 raw
 rows, a denser window grid, best-window saturation statistics, and fit tables.
 It improves fit R2 to 0.71-0.82 but still leaves 42-56% of best-window cells at
@@ -557,8 +559,8 @@ the grid boundary. `results/theory_m4_agc_boundary_aware_r1` then treats those
 boundary selections as censored intervals and writes four basis fits plus 180
 interval rows; random binary/uniform reach 0.80 interval satisfaction, SRHT 0.64,
 and Hadamard 0.40. The candidate AGC law therefore remains diagnostic. The
-remaining publication work is final venue-formatted vector panel polishing plus
-a stronger AGC estimator or tighter censored-law validation.
+remaining publication work is final venue-formatted multi-panel assembly plus a
+stronger AGC estimator or tighter censored-law validation.
 
 Latest nonideal M2 digital-twin runs:
 
@@ -611,6 +613,11 @@ writes:
 - `m2_flip_boundary_table.png`
 - `m3_srht_ablation_psnr.png`
 - `m3_srht_ablation_table.png`
+
+`run_make_paper_figures.py` writes 11 paper-facing M2/M4 PNG previews and 11
+matching SVG sidecars under `results/paper_figures_r1`. The raster manifest is
+`paper_figure_manifest.csv`; the vector-only manifest is
+`paper_figure_manifest_vectors.csv`.
 
 ## Verification
 
@@ -701,7 +708,8 @@ Additional checks:
   interval diagnostics under `results/theory_m4_agc_targeted_r1` and
   `results/theory_m4_agc_boundary_aware_r1`.
 - Paper-facing M2/M4 figures are rendered under `results/paper_figures_r1` with
-  `paper_figure_manifest.csv`.
+  `paper_figure_manifest.csv`, SVG sidecars, and
+  `paper_figure_manifest_vectors.csv`.
 - Nonideal M2 runners write compact and full ideal/nonideal digital-twin
   comparison tables under `results/nonideal_m2_compact` and
   `results/nonideal_m2_full_r1_merged`.
@@ -726,8 +734,9 @@ Additional checks:
   anchors now exist; raw detector/SLM hardware calibration remains outside the
   available PDF data.
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: the targeted
-  and boundary-aware AGC analyses are now present but diagnostic, and the paper
-  still needs publication-quality vector boundary figures.
+  and boundary-aware AGC analyses are now present but diagnostic, SVG sidecars
+  exist for the current draft figures, and the paper still needs
+  publication-quality multi-panel figure assembly.
 - Configure an authenticated mounted persistence target before future long
   Colab runs if mid-run copies are required. The code path now supports
   `PERSIST_ROOT`, but it does not perform Google Drive authorization or GitHub
