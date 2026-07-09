@@ -95,3 +95,13 @@ One implementation trap also surfaced: sharding Stage 3 objects before drawing
 dynamic factors makes every shard reuse the first lambda draw. `run_stage3_tests.py`
 now draws the full object set first and only then filters the shard, so sharded
 and non-sharded runs share the same per-object dynamic factors.
+
+## 2026-07-09 Published Curves Are Gentler Than The Prompt Prior
+
+Figure-level APL digitization gives collected-trace
+`lambda_per_measurement = 0.999897-0.999921`, which is much closer to unity than
+the lower end of the prompt simulator range. The corrected traces are visually
+stable by centerline standard deviation, but their band-width proxy is still
+about 0.104. This suggests the paper-level CNR gap is not solved by simply
+making the exponential decay stronger; ROI definition, denoiser architecture,
+and reconstruction details matter.

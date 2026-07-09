@@ -1,0 +1,15 @@
+{
+  "apl_collected_traces": 4,
+  "apl_corrected_traces": 4,
+  "apl_lambda_per_measurement_min": 0.9998971724993071,
+  "apl_lambda_per_measurement_max": 0.9999206709468165,
+  "apl_corrected_std_mean": 0.012573531837762124,
+  "apl_corrected_visual_sigma_proxy_mean": 0.10376605776559561,
+  "oe_curve_points": 104,
+  "oe_fit_rows": 10,
+  "oe_fig6_fixed_ref_psnr30_beta_x1e2": 1.8996551724137931,
+  "source_images": [
+    "results\\paper_figures\\apl_pages\\apl-5.png",
+    "results\\paper_figures\\apl_pages\\apl-6.png"
+  ]
+}

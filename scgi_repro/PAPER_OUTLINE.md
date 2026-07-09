@@ -48,9 +48,9 @@ Channels
   retraining, fine-tuning, or a different sequence representation.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples. Compact and full nonideal digital-twin scans now exist, and the full
-  scan preserves the pairwise winner under detector/SLM perturbations; published
-  curve calibration is still needed before claiming hardware-calibrated
-  nonideal performance.
+  scan preserves the pairwise winner under detector/SLM perturbations. Published
+  APL/OE figure-level channel anchors now exist, but raw detector/SLM calibration
+  is still needed before claiming hardware-calibrated nonideal performance.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty, although `run_theory_m4.py` now provides observed-only
   compact fits as a starting point.
@@ -61,8 +61,10 @@ Channels
   flip-boundary grid.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the implemented frozen dense baseline underperforms.
-- Published-curve calibration is still missing: APL intensity traces and OE
-  attenuation ranges have not yet been digitized into OU/channel parameters.
+- Published-curve calibration is limited to figure-level priors: APL intensity
+  traces fit `lambda_per_measurement = 0.999897-0.999921`, and OE Fig. 6
+  fixed-reference PSNR crosses 30 dB near `beta = 1.90 x 10^-2 mm^-1`.
+  Hardware-calibrated OU/channel parameters remain unavailable without raw logs.
 
 ## Venue Positioning
 

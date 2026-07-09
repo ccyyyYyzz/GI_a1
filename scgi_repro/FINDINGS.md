@@ -80,6 +80,14 @@ Published calibration: `results/published_calibration` encodes the APL Fig. 6
 and Fig. 9 CNR targets plus OE PSNR/SSIM target values. Current APL comparison
 has 16 rows and all are below the relevant published minima.
 
+Published channel anchors: `results/published_channel_calibration` digitizes APL
+Fig. 5/Fig. 7 intensity traces and compacts OE attenuation/distance curves into
+machine-readable priors. APL collected traces fit
+`lambda_per_measurement = 0.999897-0.999921`; corrected traces have mean
+centerline standard deviation 0.0126 and mean visual band sigma proxy 0.104.
+OE Fig. 6 fixed-reference PSNR crosses 30 dB near
+`beta = 1.90 x 10^-2 mm^-1`, while no-reference PSNR stays below 30 dB.
+
 ## Stage 1 Diagnostics
 
 Experiment: standalone Stage 1 data-simulation diagnostics for three smoke
@@ -219,7 +227,8 @@ for random/SRHT bases, so they are diagnostic rather than a final law.
 Supports/refutes: strongly supports H2/H4 fitted-law evidence and moves M4
 toward paper-grade closure. It does not yet complete M4 because the AGC
 bias-variance law needs analytical derivation, flip boundaries need a denser rho
-grid, and published-channel calibration is still open.
+grid, and the figure-level published-channel priors need to be tied to a
+hardware-calibrated nonideal model.
 
 ## Nonideal Digital Twin
 
@@ -248,5 +257,7 @@ beats pairwise on paired bases only 7.6% of the time.
 
 Supports/refutes: supports the robustness direction at full scan scale and
 satisfies the uncalibrated full nonideal main-scan requirement. It still does
-not satisfy published-channel calibration because the parameters are normalized
-placeholders, not fitted from APL/OE intensity traces or hardware measurements.
+not satisfy hardware-level calibration because the perturbation parameters are
+normalized placeholders. Published APL/OE figure-level anchors now exist under
+`results/published_channel_calibration`, but raw hardware measurements are not
+available from the papers.

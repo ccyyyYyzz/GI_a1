@@ -24,6 +24,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_stage3_tests.py --profile smoke
 & $py run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
 & $py run_published_calibration.py --output-dir results\published_calibration
+& $py run_published_channel_calibration.py --output-dir results\published_channel_calibration
 & $py run_gamma_sweep.py --profile smoke --epochs 2
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
@@ -72,6 +73,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   exp-residual checkpoint.
 - `results/published_calibration/`: machine-readable APL Fig. 6/Fig. 9 CNR
   targets, OE PSNR/SSIM targets, and current gap summary.
+- `results/published_channel_calibration/`: figure-level APL intensity-trace
+  digitization and OE channel-anchor fits. These are published-figure priors,
+  not raw detector or hardware calibration logs. The numeric tables are safe to
+  relay; rendered PDF pages and overlay QA PNGs stay local-only.
 - `results/mechanism_m1_basis_expanded_quick/`: compact M1 output with random,
   Hadamard, DCT, Fourier, and SRHT bases.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with

@@ -223,6 +223,24 @@ Published target calibration:
 These tables encode the APL Fig. 6/Fig. 9 CNR targets and OE PSNR/SSIM targets
 from the PDFs. The current APL comparison has 16 rows and all are `below_min`.
 
+Published channel calibration anchors:
+
+- `results/published_channel_calibration/apl_intensity_traces_digitized.csv`
+- `results/published_channel_calibration/apl_channel_fit_summary.csv`
+- `results/published_channel_calibration/oe_curve_points.csv`
+- `results/published_channel_calibration/oe_channel_fit_summary.csv`
+- `results/published_channel_calibration/published_channel_calibration_report.md`
+
+`run_published_channel_calibration.py` digitizes APL Fig. 5/Fig. 7 intensity
+traces from rendered PDF pages and fits compact channel summaries from the OE
+published target table. The APL collected traces give figure-level
+`lambda_per_measurement` values from 0.999897 to 0.999921. Corrected traces have
+mean normalized centerline standard deviation 0.0126 and mean visual band sigma
+proxy 0.104. For the OE around-corner case, the fixed-reference Fig. 6 PSNR=30
+dB crossing occurs at attenuation `beta = 1.90 x 10^-2 mm^-1`; without the
+reference frame, the digitized PSNR curves stay well below 30 dB. These outputs
+are useful published-channel priors, not raw hardware calibration logs.
+
 ## Task 2: Measurement-Basis Mechanism Study
 
 The mechanism framework now includes random uniform/binary/gaussian bases,
@@ -481,6 +499,8 @@ Additional checks:
   `results/stage3_threshold_matrix_full_r2_authoritative`.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
+- Published channel calibration writes APL trace digitizations and OE
+  attenuation/distance anchors under `results/published_channel_calibration`.
 - M4 compact theory runner writes residual-error, random-frame, energy
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
 - M4 paper-r1 theory runner writes larger-N, bootstrap, censored-boundary, and
@@ -497,10 +517,10 @@ Additional checks:
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
   diagram is required. The direct frozen dense baseline is implemented but
-  underperforms under cross-domain application. Add published-channel/non-ideal
-  detector calibration.
+  underperforms under cross-domain application. The published-channel figure
+  anchors now exist; raw detector/SLM hardware calibration remains outside the
+  available PDF data.
 - Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC
-  bias-variance derivation, denser flip-boundary grid, and APL/OE
-  intensity-curve channel calibration.
+  bias-variance derivation and a denser flip-boundary grid.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

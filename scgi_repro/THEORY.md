@@ -124,5 +124,6 @@ The dedicated M4 runner `run_theory_m4.py` now adds fitted-law outputs under
   a diagnostic table pending a cleaner bias-variance derivation.
 
 Remaining theory work before publication: derive the AGC window bias-variance
-law analytically, run a denser rho grid for flip boundaries, and calibrate the
-channel model from published intensity traces.
+law analytically, run a denser rho grid for flip boundaries, and connect the
+published figure-level channel anchors to a hardware-calibrated nonideal model
+if raw detector/SLM logs become available.

@@ -48,8 +48,8 @@ baselines.
 | M2 outputs: best methods, selected curves, flip boundary | Partial | Tables/figures generated; flip boundary is diagnostic, not R2-fitted law |
 | M2 includes SCGI-network blind correction | Partial | `scgi_proxy` is dense-tested as an equal-frame blind smooth-gain proxy; `scgi_frozen` now loads a saved SCGI checkpoint and is dense-tested in `results/phase_m2_scgi_frozen_dense_r1_merged` with 10,500 frozen-network rows, but the direct cross-domain baseline underperforms and a competitive fine-tuned network phase diagram remains open |
 | M3 SRHT constructive method and ablations | Partial | `results/srht_m3_protocol_o10s5` exists; M3 full claim thresholds are not all proven |
-| M4 theory with fitted laws and notebook-level verification | Partial | `run_theory_m4.py`, `results/theory_m4_compact`, and `results/theory_m4_paper_r1` now provide 16/32/64 fitted laws, bootstrap intervals, AGC window diagnostics, and censored flip-boundary interval accounting; analytical AGC law, denser boundary grid, and published-channel calibration remain open |
-| Published-channel calibration and nonideal detector/SLM model | Partial | `run_nonideal_m2.py`, `results/nonideal_m2_compact`, and `results/nonideal_m2_full_r1_merged` implement shot/read noise, 8-bit SLM quantization, finite contrast, timing jitter, and noisy references through a full 157,500-row main scan; `results/published_calibration` records APL/OE target values, but APL/OE intensity-trace digitization and channel-parameter fitting remain open |
+| M4 theory with fitted laws and notebook-level verification | Partial | `run_theory_m4.py`, `results/theory_m4_compact`, and `results/theory_m4_paper_r1` now provide 16/32/64 fitted laws, bootstrap intervals, AGC window diagnostics, and censored flip-boundary interval accounting; analytical AGC law and denser boundary grid remain open |
+| Published-channel calibration and nonideal detector/SLM model | Partial | `run_nonideal_m2.py`, `results/nonideal_m2_compact`, and `results/nonideal_m2_full_r1_merged` implement shot/read noise, 8-bit SLM quantization, finite contrast, timing jitter, and noisy references through a full 157,500-row main scan; `results/published_calibration` records APL/OE target values, and `results/published_channel_calibration` now records APL trace digitizations plus OE channel anchors. Raw detector/SLM hardware calibration remains unavailable from the PDFs |
 | Paper outline and conservative positioning | Partial | `PAPER_OUTLINE.md` exists, but needs updating with dense M2 and remaining limitations |
 | Sharded Colab scanning and merge | Done for M2 and nonideal M2 | `run_phase_m2.py --shard i/k`; `merge_phase_m2_shards.py`; `run_nonideal_m2.py --shard i/k`; `merge_nonideal_m2_shards.py`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows and `results/nonideal_m2_full_r1_merged` with 157,500 rows |
 
@@ -69,6 +69,7 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\colab_imports\pro1_m2_scgi_frozen_dense_r1_shard0of5\artifacts results\colab_imports\pro1_m2_scgi_frozen_dense_r1_shard1of5\artifacts results\colab_imports\pro2_m2_scgi_frozen_dense_r1_shard2of5\artifacts results\colab_imports\pro2_m2_scgi_frozen_dense_r1_shard3of5\artifacts results\colab_imports\pro2_m2_scgi_frozen_dense_r1_shard4of5\artifacts --output-dir results\phase_m2_scgi_frozen_dense_r1_merged
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_published_calibration.py --output-dir results\published_calibration
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_published_channel_calibration.py --output-dir results\published_channel_calibration
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --output-dir results\theory_m4_compact
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_theory_m4.py --sizes "16 32 64" --objects 5 --seeds 4 --sigmas "0.01 0.02 0.05 0.10" --frame-sweep-size 32 --frame-factors "1 2 4 8" --bootstrap 200 --agc-size 32 --agc-rhos "0.001 0.003 0.01 0.03 0.1 0.3 1.0" --agc-sigmas "0.05 0.15 0.30 0.50" --agc-window-fracs "0.005 0.01 0.02 0.05 0.10 0.20" --phase-dir results\phase_m2_scgi_frozen_dense_r1_merged --output-dir results\theory_m4_paper_r1
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --output-dir results\nonideal_m2_compact
@@ -80,5 +81,5 @@ baselines.
 The goal is not yet fully complete under the original prompt scope. The current
 state is a strong executable prototype plus several completed compact protocol
 experiments, but the full paper-level SCGI thresholds, a true trained M2
-SCGI-network correction, paper-grade M4 theory closure, and published-curve
+SCGI-network correction, paper-grade M4 theory closure, and raw hardware
 calibration remain open.
