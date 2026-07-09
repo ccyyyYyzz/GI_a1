@@ -611,11 +611,23 @@ writes:
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
 ```
 
-Result: 23 tests passed.
+Result: 29 tests passed.
 
 Additional checks:
 
 - `py_compile` passed for runner scripts, `src/*.py`, and `tests/*.py`.
+- `run_monitored_job.py` smoke-tested successfully and writes `status.json`,
+  `run_manifest.json`, `stdout.log`, `stderr.log`, git state, CUDA device
+  metadata, elapsed time, and estimated CU-hours when a CU rate is known.
+- `run_phase_m2.py --resume` was smoke-tested on a 0/2 shard: first run wrote
+  16 rows, the resumed run kept 16 rows and wrote 0 new rows while reporting
+  `completed` in `progress.json`.
+- `run_nonideal_m2.py --resume` was smoke-tested on a 0/2 shard: first run wrote
+  9 rows, the resumed run kept 9 rows and wrote 0 new rows while reporting
+  `completed` in `progress.json`.
+- The Colab GitHub runner now writes `colab_job_status.json` in the artifact
+  root, records accelerator/CU-rate metadata, and all Colab launch scripts pass
+  `COLAB_GPU` plus optional `CU_PER_HOUR` through to the runner.
 - Colab L4 via GitHub transfer completed debug 160 epoch + Stage 3, full
   20-epoch probe, gamma sweep, and full 100-epoch SCGI-only probe. Artifacts
   were extracted locally from Colab logs with `extract_colab_artifacts.py`.
@@ -695,5 +707,9 @@ Additional checks:
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: targeted AGC
   validation beyond the current weak window-law fits and publication-quality
   vector boundary figures.
+- Extend the new resume/status plumbing to epoch-level Stage 0 and M2 SCGI
+  training checkpoints if another long training run is launched. M2 and
+  nonideal M2 scans now resume by `unit_index`, but Drive persistence and
+  mid-epoch model checkpoint restore are still not complete.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

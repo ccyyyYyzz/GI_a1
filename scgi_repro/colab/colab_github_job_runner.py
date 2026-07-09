@@ -9,8 +9,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import zipfile
+from datetime import datetime, timezone
 
 
 def run(cmd: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -24,7 +26,24 @@ def run(cmd: list[str], cwd: Path | None = None) -> subprocess.CompletedProcess[
     return proc
 
 
-def stream_shell(command: str, cwd: Path) -> int:
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def estimate_cu_hours(elapsed_seconds: float, cu_per_hour: float) -> float | None:
+    if cu_per_hour <= 0.0:
+        return None
+    return elapsed_seconds / 3600.0 * cu_per_hour
+
+
+def write_json_atomic(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f"{path.name}.tmp")
+    tmp.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    tmp.replace(path)
+
+
+def stream_shell(command: str, cwd: Path, status_path: Path, status_base: dict, heartbeat_seconds: float, cu_per_hour: float) -> int:
     print("RUN_SHELL", command, flush=True)
     proc = subprocess.Popen(
         command,
@@ -36,9 +55,33 @@ def stream_shell(command: str, cwd: Path) -> int:
         bufsize=1,
     )
     assert proc.stdout is not None
-    for line in proc.stdout:
-        print(line.rstrip(), flush=True)
-    return proc.wait()
+    start = time.time()
+
+    def forward_output() -> None:
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            print(line.rstrip(), flush=True)
+
+    thread = threading.Thread(target=forward_output, daemon=True)
+    thread.start()
+    while proc.poll() is None:
+        elapsed = time.time() - start
+        write_json_atomic(
+            status_path,
+            {
+                **status_base,
+                "state": "running",
+                "pid": proc.pid,
+                "updated_time_utc": utc_now(),
+                "elapsed_seconds": round(elapsed, 3),
+                "estimated_cu_hours": None
+                if estimate_cu_hours(elapsed, cu_per_hour) is None
+                else round(float(estimate_cu_hours(elapsed, cu_per_hour)), 6),
+            },
+        )
+        time.sleep(max(1.0, float(heartbeat_seconds)))
+    thread.join(timeout=5.0)
+    return int(proc.returncode)
 
 
 def collect_text_outputs(root: Path, limit_bytes: int) -> dict[str, str]:
@@ -49,6 +92,7 @@ def collect_text_outputs(root: Path, limit_bytes: int) -> dict[str, str]:
         "stage3_acceptance.csv",
         "stage3_metrics.csv",
         "run_manifest.json",
+        "colab_job_status.json",
         "progress.json",
         "baseline_metrics.csv",
         "ured_sweep_metrics.csv",
@@ -94,6 +138,9 @@ def main() -> None:
     parser.add_argument("--emit-zip", action="store_true")
     parser.add_argument("--max-zip-mb", type=float, default=8.0)
     parser.add_argument("--text-limit-kb", type=int, default=256)
+    parser.add_argument("--accelerator", default="unknown")
+    parser.add_argument("--cu-per-hour", type=float, default=0.0)
+    parser.add_argument("--heartbeat-seconds", type=float, default=60.0)
     args = parser.parse_args()
 
     print("COLAB_JOB_BEGIN", args.run_id, flush=True)
@@ -121,15 +168,57 @@ def main() -> None:
             raise FileNotFoundError(workdir)
         if args.install_requirements and (workdir / "requirements-colab.txt").exists():
             run([sys.executable, "-m", "pip", "install", "-q", "-r", "requirements-colab.txt"], cwd=workdir)
-        exit_code = stream_shell(args.command, cwd=workdir)
+        status_root = workdir / args.artifact_root if args.artifact_root else workdir / "results" / "colab_runs" / args.run_id
+        status_root.mkdir(parents=True, exist_ok=True)
+        status_path = status_root / "colab_job_status.json"
+        status_base = {
+            "schema_version": 1,
+            "run_id": args.run_id,
+            "ref": args.ref,
+            "command": args.command,
+            "workdir": args.workdir,
+            "accelerator": args.accelerator,
+            "cu_per_hour": args.cu_per_hour,
+            "start_time_utc": utc_now(),
+        }
+        write_json_atomic(status_path, {**status_base, "state": "starting", "updated_time_utc": utc_now()})
+        command_start = time.time()
+        exit_code = stream_shell(
+            args.command,
+            cwd=workdir,
+            status_path=status_path,
+            status_base=status_base,
+            heartbeat_seconds=float(args.heartbeat_seconds),
+            cu_per_hour=float(args.cu_per_hour),
+        )
+        command_elapsed = time.time() - command_start
         summary = {
             "run_id": args.run_id,
             "ref": args.ref,
             "command": args.command,
             "exit_code": exit_code,
             "elapsed_seconds": round(time.time() - start, 3),
+            "command_elapsed_seconds": round(command_elapsed, 3),
+            "accelerator": args.accelerator,
+            "cu_per_hour": args.cu_per_hour,
+            "estimated_cu_hours": None
+            if estimate_cu_hours(command_elapsed, float(args.cu_per_hour)) is None
+            else round(float(estimate_cu_hours(command_elapsed, float(args.cu_per_hour))), 6),
+            "status_path": str(status_path.relative_to(workdir)),
             "workdir": args.workdir,
         }
+        write_json_atomic(
+            status_path,
+            {
+                **status_base,
+                "state": "success" if exit_code == 0 else "failed",
+                "return_code": exit_code,
+                "updated_time_utc": utc_now(),
+                "end_time_utc": utc_now(),
+                "elapsed_seconds": round(command_elapsed, 3),
+                "estimated_cu_hours": summary["estimated_cu_hours"],
+            },
+        )
         print("COLAB_JOB_SUMMARY_BEGIN", flush=True)
         print(json.dumps(summary, indent=2), flush=True)
         print("COLAB_JOB_SUMMARY_END", flush=True)

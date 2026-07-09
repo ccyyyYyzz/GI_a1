@@ -27,7 +27,7 @@ baselines.
 
 | Requirement | Status | Current evidence |
 |---|---|---|
-| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 21 unit tests pass |
+| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 29 unit tests pass |
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
@@ -36,7 +36,7 @@ baselines.
 | Stage 4 SCGI-UNN and SCGI-URED | Partial | Full 500-step matrix now includes SCGI-UNN and SCGI-URED for four held-out targets; URED is above UNN on all four, but mean/min CNRs are only 5.084/2.270 vs APL URED minimum 10.43. Follow-up stripe screens show avg-pool RED final/target-aware trace CNR 2.916/3.831 and NLM RED final/target-aware trace CNR 5.131/8.913. The repaired all-object NLM audit reaches final CNRs 8.453/6.033/10.270/7.842 for A/stripe/L/ring, still below the all-target APL URED gate; `results/stage4_ured_proxy_audit_r1` finds no validated target-free stopping rule |
 | Full paper-scale profile, 128x128/N=16384/M=5000/100 epochs | Partial | Colab full e100 gain-U-Net now reaches SCGI CNR 1.1705 after gain-range fix; full exp-residual e2 reaches analytic/static CNR 2.5353 and KS pass 1.0 |
 | Paper-threshold reproduction: SCGI CNR 3-4, UNN 8-14, URED 10-38 | Not achieved | `results/published_calibration` encodes APL Fig. 6/Fig. 9 targets; authoritative full matrix remains below all APL minima: SCGI min 2.492 vs 3.39, UNN min 2.254 vs 7.93, URED min 2.270 vs 10.43 |
-| Colab durability: checkpoint resume, Drive persistence, CU accounting | Partial | GitHub/Colab runners and local artifact extraction work; Drive/checkpoint resume and CU accounting are not implemented |
+| Colab durability: checkpoint resume, Drive persistence, CU accounting | Partial | `run_monitored_job.py` adds durable local/Colab CLI logs, `status.json`, git/CUDA metadata, and CU estimates when a rate is supplied; `colab/colab_github_job_runner.py` writes `colab_job_status.json`; `run_phase_m2.py --resume` and `run_nonideal_m2.py --resume` append completed units and skip them on rerun. Drive persistence and epoch-level Stage 0/M2-training checkpoint restore remain open |
 
 ## Task 2: Measurement-Basis Mechanism Study
 
@@ -51,12 +51,18 @@ baselines.
 | M4 theory with fitted laws and notebook-level verification | Partial to done | `run_theory_m4.py`, `results/theory_m4_compact`, `results/theory_m4_paper_r1`, and `results/theory_m4_paper_r2_highrho` now provide 16/32/64 fitted laws, bootstrap intervals, AGC window diagnostics, and censored flip-boundary interval accounting against the prompt-range high-rho phase table; `THEORY.md` contains a candidate AGC bias-variance law and `PAPER_OUTLINE.md` now has eight draft main-figure captions. `results/theory_m4_agc_targeted_r1` adds a targeted AGC validation with 86,400 raw rows; fits improve to R2 0.71-0.82 but 42-56% of best windows remain boundary-selected, so the simple AGC law is diagnostic rather than final. `run_make_paper_figures.py` renders paper-facing M4 residual-error, random-frame, energy-concentration, and AGC-window draft panels under `results/paper_figures_r1`. Final venue-formatted vector polishing and a better/boundary-aware AGC model remain open |
 | Published-channel calibration and nonideal detector/SLM model | Partial | `run_nonideal_m2.py`, `results/nonideal_m2_compact`, and `results/nonideal_m2_full_r1_merged` implement shot/read noise, 8-bit SLM quantization, finite contrast, timing jitter, and noisy references through a full 157,500-row main scan; `results/published_calibration` records APL/OE target values, and `results/published_channel_calibration` now records APL trace digitizations plus OE channel anchors. Raw detector/SLM hardware calibration remains unavailable from the PDFs |
 | Paper outline and conservative positioning | Partial to done | `PAPER_OUTLINE.md` now reflects dense/high-rho M2, frozen SCGI limitations, M4 high-rho r2 hooks, and draft captions for the eight planned main figures; `results/paper_figures_r1/paper_figure_manifest.csv` maps current M2/M4 draft figures to source CSVs and captions. Final journal-specific figure assembly remains open |
-| Sharded Colab scanning and merge | Done for M2 and nonideal M2 | `run_phase_m2.py --shard i/k`; `merge_phase_m2_shards.py`; `run_nonideal_m2.py --shard i/k`; `merge_nonideal_m2_shards.py`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows and `results/nonideal_m2_full_r1_merged` with 157,500 rows |
+| Sharded Colab scanning and merge | Done for M2 and nonideal M2 | `run_phase_m2.py --shard i/k --resume`; `merge_phase_m2_shards.py`; `run_nonideal_m2.py --shard i/k --resume`; `merge_nonideal_m2_shards.py`; both scanners now write `progress.json`; five Colab L4 shards merged into `results/phase_m2_scgi_proxy_dense_r1_merged` with 78,750 rows and `results/nonideal_m2_full_r1_merged` with 157,500 rows |
 
 ## Current Verified Commands
 
 ```powershell
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m py_compile run_monitored_job.py colab\colab_github_job_runner.py run_phase_m2.py run_nonideal_m2.py src\run_progress.py
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id wrapper_smoke --output-dir results\cli_runs\wrapper_smoke --heartbeat-seconds 1 --accelerator t4 -- 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -c "print('wrapper smoke ok')"
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --rho-values "0.001" --sigma-values "0.05" --reference-periods "2" --shard 0/2 --output-dir results\phase_m2_resume_smoke --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --rho-values "0.001" --sigma-values "0.05" --reference-periods "2" --shard 0/2 --output-dir results\phase_m2_resume_smoke --resume --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --profile smoke --objects 1 --seeds 1 --rho "0.001" --sigma-a "0.05" --bases "random_uniform hadamard_paired" --corrections "none oracle agc reference_k8" --shard 0/2 --output-dir results\nonideal_m2_resume_smoke
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --profile smoke --objects 1 --seeds 1 --rho "0.001" --sigma-a "0.05" --bases "random_uniform hadamard_paired" --corrections "none oracle agc reference_k8" --shard 0/2 --output-dir results\nonideal_m2_resume_smoke --resume
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_make_figures.py
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --no-findings --output-dir results\phase_m2_shardcheck_0of2
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --no-findings --output-dir results\phase_m2_shardcheck_1of2

@@ -55,3 +55,7 @@ code or raw data.
     each row to the nearest square with its row mean, applies the frozen model,
     and crops back to the original frame count. This is an explicit cross-domain
     adaptation, not a claim that the paper trained on M2 bases.
+16. Long-run CU accounting is estimated from wall-clock runtime and an explicit
+    accelerator rate. T4 and A100 defaults follow the prompt; L4 and future Colab
+    rates should be passed with `--cu-per-hour` or `CU_PER_HOUR` rather than
+    inferred.

@@ -7,6 +7,8 @@ LOG_DIR="$ROOT/results/colab_runs"
 COLAB="/var/tmp/codex-colab-tools/colab-cli-venv/bin/colab"
 REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
+COLAB_GPU="${COLAB_GPU:-L4}"
+CU_PER_HOUR="${CU_PER_HOUR:-0}"
 BATCH="${BATCH:-stage3_threshold_full_$(date +%Y%m%d_%H%M%S)}"
 SHARDS="${SHARDS:-4}"
 SHARD_LIST="${SHARD_LIST:-0 1 2 3}"
@@ -41,12 +43,14 @@ launch_shard() {
   local command_text="python run_stage3_tests.py --profile ${PROFILE} --checkpoint ${CHECKPOINT} --model-kind ${MODEL_KIND} --include-unn-ured --ured-steps ${URED_STEPS} --object-shard ${shard_spec} --output-dir ${output_dir}"
 
   rm -f "$log_file" "$pid_file"
-  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu L4 --timeout 14400 \
+  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu "$COLAB_GPU" --timeout 14400 \
     "$RUNNER" \
     --repo "$REPO" \
     --ref "$REF" \
     --workdir scgi_repro \
     --run-id "$run_id" \
+    --accelerator "$COLAB_GPU" \
+    --cu-per-hour "$CU_PER_HOUR" \
     --install-requirements \
     --command "$command_text" \
     --artifact-root "$output_dir" \

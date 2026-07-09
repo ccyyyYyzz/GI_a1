@@ -7,6 +7,8 @@ LOG_DIR="$ROOT/results/colab_runs"
 COLAB="/var/tmp/codex-colab-tools/colab-cli-venv/bin/colab"
 REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
+COLAB_GPU="${COLAB_GPU:-L4}"
+CU_PER_HOUR="${CU_PER_HOUR:-0}"
 BATCH="${BATCH:-nonideal_m2_full_$(date +%Y%m%d_%H%M%S)}"
 SHARDS="${SHARDS:-5}"
 SHARD_LIST="${SHARD_LIST:-0 1 2 3 4}"
@@ -29,15 +31,17 @@ launch_shard() {
   local output_dir="results/nonideal_m2_${BATCH}_shard${shard_index}of${SHARDS}"
   local log_file="$LOG_DIR/${run_id}.log"
   local pid_file="$LOG_DIR/${run_id}.wslpid"
-  local command_text="python run_nonideal_m2.py --profile ${PROFILE} --objects ${OBJECTS} --seeds ${SEEDS} --rho '${RHO_VALUES}' --sigma-a '${SIGMA_VALUES}' --bases '${BASES}' --corrections '${CORRECTIONS}' --shard ${shard_spec} --output-dir ${output_dir}"
+  local command_text="python run_nonideal_m2.py --profile ${PROFILE} --objects ${OBJECTS} --seeds ${SEEDS} --rho '${RHO_VALUES}' --sigma-a '${SIGMA_VALUES}' --bases '${BASES}' --corrections '${CORRECTIONS}' --shard ${shard_spec} --resume --output-dir ${output_dir}"
 
   rm -f "$log_file" "$pid_file"
-  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu L4 --timeout 14400 \
+  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu "$COLAB_GPU" --timeout 14400 \
     "$RUNNER" \
     --repo "$REPO" \
     --ref "$REF" \
     --workdir scgi_repro \
     --run-id "$run_id" \
+    --accelerator "$COLAB_GPU" \
+    --cu-per-hour "$CU_PER_HOUR" \
     --install-requirements \
     --command "$command_text" \
     --artifact-root "$output_dir" \

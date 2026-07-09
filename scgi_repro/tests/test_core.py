@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import importlib
 import inspect
+import json
 import math
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -475,6 +477,72 @@ class TestUredProxyTrace(unittest.TestCase):
         self.assertGreater(proxies["proxy_otsu_score"], 0.0)
         self.assertGreater(proxies["proxy_otsu_fg_fraction"], 0.0)
         self.assertLess(proxies["proxy_otsu_fg_fraction"], 1.0)
+
+
+class TestMonitoredJob(unittest.TestCase):
+    def test_cu_estimate_uses_prompt_rates_when_known(self):
+        runner = importlib.import_module("run_monitored_job")
+        self.assertAlmostEqual(runner.cu_rate_for_accelerator("t4", None), 1.76)
+        self.assertAlmostEqual(runner.cu_rate_for_accelerator("A100", None), 15.0)
+        self.assertIsNone(runner.cu_rate_for_accelerator("l4", None))
+        self.assertAlmostEqual(runner.cu_rate_for_accelerator("l4", 4.0), 4.0)
+        self.assertAlmostEqual(runner.estimate_cu_hours(1800.0, 1.76), 0.88)
+
+    def test_wrapper_writes_success_status_and_logs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            code = "import sys; print('hello stdout'); print('hello stderr', file=sys.stderr)"
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "run_monitored_job.py"),
+                    "--run-id",
+                    "unit",
+                    "--output-dir",
+                    str(tmp_path),
+                    "--heartbeat-seconds",
+                    "1",
+                    "--accelerator",
+                    "t4",
+                    "--",
+                    sys.executable,
+                    "-c",
+                    code,
+                ],
+                cwd=ROOT,
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+            status = json.loads((tmp_path / "status.json").read_text(encoding="utf-8"))
+            self.assertEqual(status["state"], "success")
+            self.assertEqual(status["return_code"], 0)
+            self.assertEqual(status["accelerator"], "t4")
+            self.assertIsNotNone(status["estimated_cu_hours"])
+            self.assertIn("hello stdout", (tmp_path / "stdout.log").read_text(encoding="utf-8"))
+            self.assertIn("hello stderr", (tmp_path / "stderr.log").read_text(encoding="utf-8"))
+
+    def test_run_progress_helpers_track_completed_units(self):
+        progress = importlib.import_module("src.run_progress")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            scan = tmp_path / "scan.csv"
+            progress.append_rows(scan, [{"unit_index": 3, "value": 1.0}, {"unit_index": 4, "value": 2.0}])
+            progress.append_rows(scan, [{"unit_index": 4, "value": 3.0}])
+            self.assertEqual(progress.read_completed_unit_indexes(scan), {3, 4})
+            progress.write_progress(
+                tmp_path,
+                state="running",
+                start_time=0.0,
+                completed_units=1,
+                selected_units=2,
+                total_units=4,
+                last_unit_index=3,
+            )
+            payload = json.loads((tmp_path / "progress.json").read_text(encoding="utf-8"))
+            self.assertEqual(payload["state"], "running")
+            self.assertEqual(payload["completed_units"], 1)
 
 
 class TestChannelMechanisms(unittest.TestCase):

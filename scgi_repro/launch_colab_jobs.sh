@@ -7,6 +7,8 @@ LOG_DIR="$ROOT/results/colab_runs"
 COLAB="/var/tmp/codex-colab-tools/colab-cli-venv/bin/colab"
 REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
+COLAB_GPU="${COLAB_GPU:-L4}"
+CU_PER_HOUR="${CU_PER_HOUR:-0}"
 
 mkdir -p "$LOG_DIR"
 
@@ -21,12 +23,14 @@ launch_job() {
   local pid_file="$LOG_DIR/${run_id}.wslpid"
   rm -f "$log_file" "$pid_file"
 
-  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu L4 --timeout "$timeout_seconds" \
+  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu "$COLAB_GPU" --timeout "$timeout_seconds" \
     "$RUNNER" \
     --repo "$REPO" \
     --ref "$REF" \
     --workdir scgi_repro \
     --run-id "$run_id" \
+    --accelerator "$COLAB_GPU" \
+    --cu-per-hour "$CU_PER_HOUR" \
     --install-requirements \
     --command "$command_text" \
     --artifact-root "$artifact_root" \

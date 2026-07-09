@@ -4,6 +4,7 @@ import argparse
 import copy
 import json
 from pathlib import Path
+import time
 
 import pandas as pd
 import torch
@@ -12,6 +13,7 @@ from run_mechanism_m1 import make_synthetic_objects, reconstruct_observed
 from src.basis import basis_frame_budget, make_basis
 from src.config_utils import load_config, project_root
 from src.mechanisms import make_multiplicative_channel, reference_anchor_count, simulate_channel_measurements
+from src.run_progress import append_rows, read_completed_unit_indexes, write_json_atomic, write_progress
 from src.scgi_model import make_scgi_model
 from src.train_scgi import correct_measurements_padded
 
@@ -122,6 +124,7 @@ def main() -> None:
     parser.add_argument("--rho-values", default="", help="Optional override for mechanism.rho_values, e.g. '0.001 0.01 0.1 1 10'.")
     parser.add_argument("--sigma-values", default="", help="Optional override for mechanism.sigma_a_values, e.g. '0.05 0.1 0.3'.")
     parser.add_argument("--reference-periods", default="", help="Optional override for mechanism.reference_periods, e.g. '2 8 32'.")
+    parser.add_argument("--resume", action="store_true", help="Resume from an existing phase_scan.csv by skipping completed unit_index values.")
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
 
@@ -140,6 +143,7 @@ def main() -> None:
     objects = make_synthetic_objects(args.objects, h, int(cfg.get("seed", 0)))
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
+    scan_path = out_dir / "phase_scan.csv"
 
     basis_specs = [
         ("random_uniform", {"num_frames": frame_budget, "reconstruction": "correlation"}),
@@ -149,7 +153,47 @@ def main() -> None:
         ("fourier_fourstep", {"num_frames": frame_budget}),
         ("srht_paired", {}),
     ]
-    rows = []
+    if scan_path.exists() and not args.resume:
+        scan_path.unlink()
+    start_time = time.time()
+    total_units = len(basis_specs) * len(rho_values) * len(sigma_values) * int(args.seeds) * len(objects)
+    selected_units = sum(1 for index in range(total_units) if index % shard_count == shard_index)
+    completed_units = read_completed_unit_indexes(scan_path) if args.resume else set()
+    write_json_atomic(
+        out_dir / "run_manifest.json",
+        {
+            "profile": args.profile,
+            "objects": int(args.objects),
+            "seeds": int(args.seeds),
+            "shard": args.shard or "0/1",
+            "resume": bool(args.resume),
+            "rho_values": rho_values,
+            "sigma_values": sigma_values,
+            "reference_periods": reference_periods,
+            "scgi_checkpoint": None if args.scgi_checkpoint is None else str(args.scgi_checkpoint),
+            "scgi_checkpoint_map": None if args.scgi_checkpoint_map is None else str(args.scgi_checkpoint_map),
+            "scgi_model_kind": args.scgi_model_kind,
+            "outputs": {
+                "scan": "phase_scan.csv",
+                "progress": "progress.json",
+                "summary": "phase_summary.csv",
+                "best_equal_frame_blind": "best_equal_frame_blind_methods.csv",
+                "flip_boundary": "flip_boundary.csv",
+            },
+        },
+    )
+    write_progress(
+        out_dir,
+        state="running",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=max(completed_units) if completed_units else None,
+        extra={"rows_written_this_run": 0, "resume": bool(args.resume)},
+    )
+    rows_written_this_run = 0
+    last_unit_index: int | None = max(completed_units) if completed_units else None
     unit_index = 0
     for basis_name, kwargs in basis_specs:
         basis = make_basis(basis_name, num_pixels=p, seed=int(cfg.get("seed", 0)), **kwargs)
@@ -168,6 +212,8 @@ def main() -> None:
                         unit_index += 1
                         if current_unit % shard_count != shard_index:
                             continue
+                        if current_unit in completed_units:
+                            continue
                         ideal = basis.measure(obj)
                         channel = make_multiplicative_channel(
                             basis.num_frames,
@@ -184,6 +230,7 @@ def main() -> None:
                             read_noise=float(mech.get("read_noise", 0.0)),
                             seed=9100 + obj_idx,
                         )
+                        unit_rows = []
                         for correction in corrections:
                             metrics = reconstruct_observed(
                                 basis=basis,
@@ -196,7 +243,7 @@ def main() -> None:
                             )
                             reference_period = int(correction.rsplit("k", 1)[1]) if correction.startswith("reference_k") else 0
                             reference_frames = reference_anchor_count(basis.num_frames, reference_period) if reference_period else 0
-                            rows.append(
+                            unit_rows.append(
                                 {
                                     "basis": basis.name,
                                     "correction": correction,
@@ -215,11 +262,35 @@ def main() -> None:
                                     **metrics,
                                 }
                             )
-    if not rows:
+                        append_rows(scan_path, unit_rows)
+                        completed_units.add(current_unit)
+                        rows_written_this_run += len(unit_rows)
+                        last_unit_index = current_unit
+                        write_progress(
+                            out_dir,
+                            state="running",
+                            start_time=start_time,
+                            completed_units=len(completed_units),
+                            selected_units=selected_units,
+                            total_units=total_units,
+                            last_unit_index=last_unit_index,
+                            extra={"rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+                        )
+    if not scan_path.exists():
         raise RuntimeError(f"Shard {args.shard} produced no rows.")
-    df = pd.DataFrame(rows)
-    scan_path = out_dir / "phase_scan.csv"
-    df.to_csv(scan_path, index=False)
+    df = pd.read_csv(scan_path)
+    if df.empty:
+        raise RuntimeError(f"Shard {args.shard} produced an empty phase_scan.csv.")
+    write_progress(
+        out_dir,
+        state="summarizing",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=last_unit_index,
+        extra={"rows": int(len(df)), "rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+    )
     summary = (
         df.groupby(["rho", "sigma_a", "basis", "correction"], as_index=False)
         .agg(
@@ -280,6 +351,16 @@ def main() -> None:
         with (root / "FINDINGS.md").open("a", encoding="utf-8") as f:
             f.write("\n## M2 Compact Phase Scan\n\n")
             f.write(f"Wrote `{scan_path.as_posix()}` and best-method table for smoke-scale phase-map plumbing.\n")
+    write_progress(
+        out_dir,
+        state="completed",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=last_unit_index,
+        extra={"rows": int(len(df)), "rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+    )
     print(f"wrote {scan_path}")
     print(f"wrote {out_dir / 'best_methods.csv'}")
     print(f"wrote {out_dir / 'best_blind_methods.csv'}")

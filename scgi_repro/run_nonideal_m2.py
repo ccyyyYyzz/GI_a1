@@ -4,6 +4,7 @@ import argparse
 from dataclasses import replace
 import json
 from pathlib import Path
+import time
 
 import pandas as pd
 
@@ -17,6 +18,7 @@ from src.mechanisms import (
     reference_anchor_count,
     simulate_nonideal_measurements,
 )
+from src.run_progress import append_rows, read_completed_unit_indexes, write_json_atomic, write_progress
 
 
 def parse_floats(text: str) -> list[float]:
@@ -159,6 +161,7 @@ def main() -> None:
     parser.add_argument("--contrast-ratio", type=float, default=1000.0)
     parser.add_argument("--timing-jitter-std", type=float, default=0.05)
     parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
+    parser.add_argument("--resume", action="store_true", help="Resume from an existing nonideal_phase_scan.csv by skipping completed unit_index values.")
     parser.add_argument("--output-dir", type=Path, default=Path("results/nonideal_m2_compact"))
     args = parser.parse_args()
 
@@ -171,7 +174,12 @@ def main() -> None:
     objects = make_synthetic_objects(args.objects, image_size, int(cfg.get("seed", 0)))
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
+    scan_path = out_dir / "nonideal_phase_scan.csv"
     shard_index, shard_count = parse_shard(args.shard)
+    basis_names = parse_items(args.bases)
+    rho_values = parse_floats(args.rho)
+    sigma_values = parse_floats(args.sigma_a)
+    correction_names = parse_items(args.corrections)
 
     conditions = [
         {
@@ -196,11 +204,57 @@ def main() -> None:
         },
     ]
 
-    rows = []
+    if scan_path.exists() and not args.resume:
+        scan_path.unlink()
+    start_time = time.time()
+    total_units = len(basis_names) * len(conditions) * len(rho_values) * len(sigma_values) * int(args.seeds) * len(objects)
+    selected_units = sum(1 for index in range(total_units) if index % shard_count == shard_index)
+    completed_units = read_completed_unit_indexes(scan_path) if args.resume else set()
+    write_json_atomic(
+        out_dir / "run_manifest.json",
+        {
+            "profile": args.profile,
+            "objects": int(args.objects),
+            "seeds": int(args.seeds),
+            "shard": args.shard or "0/1",
+            "resume": bool(args.resume),
+            "rho_values": rho_values,
+            "sigma_a_values": sigma_values,
+            "bases": basis_names,
+            "corrections": correction_names,
+            "nonideal": {
+                "photon_count": float(args.photon_count),
+                "read_noise": float(args.read_noise),
+                "reference_photons": float(args.reference_photons),
+                "reference_read_noise": float(args.reference_read_noise),
+                "slm_levels": int(args.slm_levels),
+                "contrast_ratio": float(args.contrast_ratio),
+                "timing_jitter_std": float(args.timing_jitter_std),
+            },
+            "outputs": {
+                "scan": "nonideal_phase_scan.csv",
+                "progress": "progress.json",
+                "summary": "nonideal_summary.csv",
+                "key_summary": "nonideal_key_summary.json",
+            },
+        },
+    )
+    write_progress(
+        out_dir,
+        state="running",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=max(completed_units) if completed_units else None,
+        extra={"rows_written_this_run": 0, "resume": bool(args.resume)},
+    )
+    rows_written_this_run = 0
+    last_unit_index: int | None = max(completed_units) if completed_units else None
     unit_index = 0
-    for basis_index, basis_name in enumerate(parse_items(args.bases)):
+    for basis_index, basis_name in enumerate(basis_names):
         nominal_basis = make_basis_for_scan(basis_name, num_pixels, frame_budget, int(cfg.get("seed", 0)) + basis_index * 101)
-        corrections = parse_items(args.corrections)
+        corrections = list(correction_names)
         if nominal_basis.paired and "pairwise" not in corrections:
             corrections.append("pairwise")
         for condition in conditions:
@@ -210,13 +264,15 @@ def main() -> None:
                 contrast_ratio=float(condition["contrast_ratio"]),
             )
             agc_window = max(9, int(0.05 * basis.num_frames))
-            for rho in parse_floats(args.rho):
-                for sigma_a in parse_floats(args.sigma_a):
+            for rho in rho_values:
+                for sigma_a in sigma_values:
                     for seed_idx in range(args.seeds):
                         for obj_idx, obj in enumerate(objects):
                             current_unit = unit_index
                             unit_index += 1
                             if current_unit % shard_count != shard_index:
+                                continue
+                            if current_unit in completed_units:
                                 continue
                             ideal = basis.measure(obj)
                             channel = make_multiplicative_channel(
@@ -236,6 +292,7 @@ def main() -> None:
                                 timing_jitter_std=float(condition["timing_jitter_std"]),
                                 seed=21000 + 53 * obj_idx + seed_idx,
                             )
+                            unit_rows = []
                             for correction in corrections:
                                 if correction == "pairwise" and not basis.paired:
                                     continue
@@ -252,7 +309,7 @@ def main() -> None:
                                     reference_read_noise=float(condition["reference_read_noise"]),
                                     seed=22000 + seed_idx,
                                 )
-                                rows.append(
+                                unit_rows.append(
                                     {
                                         **condition,
                                         "basis": basis.name,
@@ -272,14 +329,49 @@ def main() -> None:
                                         **metrics,
                                     }
                                 )
+                            append_rows(scan_path, unit_rows)
+                            completed_units.add(current_unit)
+                            rows_written_this_run += len(unit_rows)
+                            last_unit_index = current_unit
+                            write_progress(
+                                out_dir,
+                                state="running",
+                                start_time=start_time,
+                                completed_units=len(completed_units),
+                                selected_units=selected_units,
+                                total_units=total_units,
+                                last_unit_index=last_unit_index,
+                                extra={"rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+                            )
 
-    if not rows:
+    if not scan_path.exists():
         raise RuntimeError(f"Shard {args.shard} produced no rows.")
-    df = pd.DataFrame(rows)
-    df.to_csv(out_dir / "nonideal_phase_scan.csv", index=False)
+    df = pd.read_csv(scan_path)
+    if df.empty:
+        raise RuntimeError(f"Shard {args.shard} produced an empty nonideal_phase_scan.csv.")
+    write_progress(
+        out_dir,
+        state="summarizing",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=last_unit_index,
+        extra={"rows": int(len(df)), "rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+    )
     summarize(df, out_dir)
     write_key_summary(df, out_dir)
-    print(f"wrote {out_dir / 'nonideal_phase_scan.csv'}")
+    write_progress(
+        out_dir,
+        state="completed",
+        start_time=start_time,
+        completed_units=len(completed_units),
+        selected_units=selected_units,
+        total_units=total_units,
+        last_unit_index=last_unit_index,
+        extra={"rows": int(len(df)), "rows_written_this_run": rows_written_this_run, "resume": bool(args.resume)},
+    )
+    print(f"wrote {scan_path}")
     print(f"rows={len(df)}")
 
 

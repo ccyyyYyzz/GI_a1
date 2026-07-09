@@ -7,6 +7,8 @@ LOG_DIR="$ROOT/results/colab_runs"
 COLAB="/var/tmp/codex-colab-tools/colab-cli-venv/bin/colab"
 REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
+COLAB_GPU="${COLAB_GPU:-L4}"
+CU_PER_HOUR="${CU_PER_HOUR:-0}"
 BATCH="${BATCH:-stage4_ured_sweep_$(date +%Y%m%d_%H%M%S)}"
 SHARDS="${SHARDS:-5}"
 SHARD_LIST="${SHARD_LIST:-0 1 2 3 4}"
@@ -54,12 +56,14 @@ launch_shard() {
   local command_text="python run_stage4_ured_sweep.py --profile ${PROFILE} --checkpoint ${CHECKPOINT} --model-kind ${MODEL_KIND} --object-names ${OBJECT_NAMES} --config-shard ${shard_spec} --steps-values '${STEPS_VALUES}' --lr-values '${LR_VALUES}' --beta-values '${BETA_VALUES}' --xi-values '${XI_VALUES}' --x-step-values '${X_STEP_VALUES}' --channels-values '${CHANNELS_VALUES}' --blocks-values '${BLOCKS_VALUES}' --residual-scale-values '${RESIDUAL_SCALE_VALUES}' --denoiser-values '${DENOISER_VALUES}' --denoise-kernel-values '${DENOISE_KERNEL_VALUES}' --nlm-h-values '${NLM_H_VALUES}' --fixed-init-seed ${FIXED_INIT_SEED} --output-dir ${output_dir} --save-traces"
 
   rm -f "$log_file" "$pid_file"
-  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu L4 --timeout "$TIMEOUT_SECONDS" \
+  nohup env HOME="$account_home" "$COLAB" --auth oauth2 run --gpu "$COLAB_GPU" --timeout "$TIMEOUT_SECONDS" \
     "$RUNNER" \
     --repo "$REPO" \
     --ref "$REF" \
     --workdir scgi_repro \
     --run-id "$run_id" \
+    --accelerator "$COLAB_GPU" \
+    --cu-per-hour "$CU_PER_HOUR" \
     --install-requirements \
     --command "$command_text" \
     --artifact-root "$output_dir" \

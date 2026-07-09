@@ -44,10 +44,29 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 M2 scans can be split across Colab or local workers:
 
 ```powershell
-& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --no-findings --output-dir results\phase_m2_shard_0of2
-& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --no-findings --output-dir results\phase_m2_shard_1of2
+& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --resume --no-findings --output-dir results\phase_m2_shard_0of2
+& $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --resume --no-findings --output-dir results\phase_m2_shard_1of2
 & $py merge_phase_m2_shards.py --inputs results\phase_m2_shard_0of2 results\phase_m2_shard_1of2 --output-dir results\phase_m2_shard_merged
 ```
+
+## Durable Long Runs
+
+Use `run_monitored_job.py` as the local or Colab entry wrapper for long CLI jobs.
+It writes `status.json`, `run_manifest.json`, `stdout.log`, `stderr.log`, git
+state, CUDA device metadata, elapsed time, and optional estimated Colab compute
+units. Known prompt rates are built in for T4 and A100; pass `--cu-per-hour` or
+`CU_PER_HOUR` for L4 or future Colab rates.
+
+```powershell
+& $py run_monitored_job.py --run-id m2_shard0 --accelerator t4 --resume-skip-success -- `
+  $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 0/2 --resume --no-findings --output-dir results\phase_m2_shard_0of2
+```
+
+`run_phase_m2.py` and `run_nonideal_m2.py` now append completed `unit_index`
+blocks to their main CSVs and update `progress.json`; rerunning with `--resume`
+skips completed units and recomputes all summary tables at the end. The Colab
+GitHub runner also emits `colab_job_status.json` inside the artifact root, and
+the launch scripts pass `COLAB_GPU`/`CU_PER_HOUR` through to that status record.
 
 For a closer-to-prompt debug run, use `--profile debug`. For the paper-scale run, use
 `--profile full` on a GPU machine with torchvision/scipy/skimage/matplotlib installed.
@@ -166,5 +185,5 @@ on this machine:
 
 ```powershell
 cd E:\GAN_FCC_WORK\scgi-repro
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover tests -v
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
 ```
