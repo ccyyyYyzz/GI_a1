@@ -122,6 +122,12 @@ improve the gap: the best row is still the 24-channel/3-block configuration at
 `results/stage4_trace_audit_r3` records the combined final-vs-trace audit across
 these sweeps and keeps stripe below the APL URED minimum even with target-aware
 trace selection.
+`results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
+as image arrays and a visual grid. The best standard CNR remains `9.365`;
+cropping to the target bounding box lowers it to `7.578`, and sweeping the target
+threshold from 0.1 to 0.9 leaves CNR unchanged because the stripe target is
+binary. This rules out a simple ROI/threshold-accounting explanation for the
+remaining Stage 4 miss.
 
 Stage 4 target-free proxy audit:
 `results/stage4_ured_proxy_audit_r1` adds per-step `proxy_*` traces for losses,

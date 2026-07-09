@@ -131,6 +131,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_trace_audit_r3/`: combined final-vs-target-aware trace audit
   for the Stage 4 NLM URED sweeps including the patch and capacity sweeps;
   stripe remains below the APL URED minimum CNR.
+- `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
+  raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.
+  It shows the 9.365 CNR miss is not caused by target threshold or far-background
+  mask choice.
 - `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
   Its target-aware trace peaks are diagnostic only, and no tested proxy is a
   deployable stopping rule.

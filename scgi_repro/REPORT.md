@@ -247,6 +247,7 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_sweep_nlm_microrefine_r1_stripe`
 - `results/stage4_ured_sweep_nlm_patch_r1_stripe`
 - `results/stage4_ured_sweep_naf_capacity_r1_stripe`
+- `results/stage4_image_audit_r1`
 - `results/stage4_ured_proxy_audit_r1`
 - `results/stage4_trace_audit_r3`
 
@@ -290,6 +291,12 @@ micro-refinement, patch, and capacity sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
 `letter_L`, and `ring`, but not for `stripe_target`
 (`best_final_cnr=best_trace_cnr=9.365`).
+`results/stage4_image_audit_r1` then regenerates the best final/trace stripe
+images and audits metric sensitivity. The best standard CNR remains 9.365;
+cropping to the target bounding box lowers it to 7.578, and sweeping the target
+threshold from 0.1 to 0.9 leaves CNR unchanged because the synthetic stripe is
+binary. The remaining miss is therefore not explained by far-background ROI
+choice or threshold convention.
 
 A follow-up target-free proxy audit records `loss`, data/augmentation losses,
 denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
@@ -772,7 +779,8 @@ Additional checks:
   audit under `results/stage4_trace_audit_r3`; the follow-up NLM
   patch-size/distance sweep writes `results/stage4_ured_sweep_nlm_patch_r1_stripe`,
   the NAFNet capacity check writes `results/stage4_ured_sweep_naf_capacity_r1_stripe`,
-  and both confirm the previous 9.365 stripe CNR plateau.
+  and both confirm the previous 9.365 stripe CNR plateau. `results/stage4_image_audit_r1`
+  adds regenerated best-output images and an ROI/threshold diagnostic.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -811,6 +819,8 @@ Additional checks:
   144 nearby stripe configurations leaves the best value unchanged; a 9-config
   NAFNet capacity check also fails to improve it. The best stripe final and
   target-aware diagnostic trace CNRs therefore remain below the APL URED target.
+  A regenerated-image audit shows this miss is not an artifact of target
+  threshold or far-background ROI choice.
   A first target-free proxy audit finds
   only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.
