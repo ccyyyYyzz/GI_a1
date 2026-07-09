@@ -116,11 +116,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   acceptance checks using the saved Stage 0 checkpoint.
 - `results/colab_imports/pro2_full_exp_residual_e2_r1/`: full-profile
   physics-informed SCGI candidate with returned checkpoint and artifacts.
-- `results/stage_3_exp_residual_colab_full/`: held-out full-profile Stage 3
-  validation using that checkpoint.
 - `results/stage3_threshold_matrix_full_r2_authoritative/`: full-profile
   SCGI/UNN/URED threshold matrix for four held-out targets using the returned
-  exp-residual checkpoint.
+  exp-residual checkpoint; this is the retained full-profile validation path.
 - `results/stage3_static_dgi_audit/`: full-profile static DGI upper-bound audit
   for handcrafted and MNIST held-out targets, including raw/minmax and
   affine-aligned random-DGI PSNR checks plus a paired-Hadamard exact sanity
@@ -226,14 +224,10 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   Hadamard, DCT, Fourier, and SRHT bases.
 - `results/phase_m2_basis_expanded_quick/`: compact fair-frame M2 output with
   frame-count audit columns.
-- `results/phase_m2_reference_protocol_o10s5/`: 68,250-row dense 7x5 M2
-  protocol output with `reference_k2/k8/k32` calibration, equal-frame blind
-  summaries, and flip-boundary diagnostics.
-- `results/phase_m2_scgi_proxy_dense_r1_merged/`: 78,750-row dense 7x5 M2
-  output that adds `scgi_proxy` as an equal-frame blind smooth-gain proxy with
-  zero reference frames.
-- `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: 101,250-row dense
-  9x5 M2 output extending the prompt rho range to `0.001..10`.
+- `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: retained
+  101,250-row dense 9x5 M2 output extending the prompt rho range to
+  `0.001..10` and including `scgi_proxy`; it supersedes earlier 7x5 reference
+  and `scgi_proxy` merged directories that are not present in this checkout.
 - `results/m2_hadamard_order_smoke_r1/`: monitored M2 smoke including natural,
   sequency, cake-cutting-proxy, and random Hadamard row orders via
   `run_phase_m2.py --hadamard-orders`. It writes 1,836 scan rows and verifies
@@ -248,8 +242,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/m2_boundary_audit_hadamard_order_dense_r1/`: rho-coverage audit,
   above-floor `flip_boundary.csv`, winner maps, and boundary fits for the
   Hadamard-order dense run. With `rel_mse<0.5`, strict equal-frame winners are
-  above-floor in 29/45 prompt-range cells, 16/45 cells are sub-floor, and one
-  above-floor strict cell selects `hadamard_random_paired + scgi_proxy`.
+  above-floor in 29/45 prompt-range cells: 28 select `srht_paired + pairwise`,
+  one selects `hadamard_random_paired + scgi_proxy`, and 16/45 cells are
+  sub-floor.
 - `results/m2_boundary_audit_highrho/`: rho-coverage audit, above-floor
   `flip_boundary.csv`, log-rho interpolated flip-boundary fits, and winner-map
   summaries for the high-rho M2 merge. With the default `rel_mse<0.5` gate,
@@ -325,8 +320,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   M1 mechanism run with 4,200 oracle/AGC rows, 1,750 AGC-window rows,
   1,750 residual-error rows, 5,400 pairwise rows, plus
   `m1_mechanism_audit_report.md`, summary JSON, and compact PNG audit tables.
-- `results/phase_m2_reference_protocol_o10s5/`: 10-object x 5-seed M2
-  mechanism output used by the latest figure rendering.
+- `results/m2_hadamard_order_dense_r1_merged/` and
+  `results/m2_boundary_audit_hadamard_order_dense_r1/`: current M2 source
+  tables used by the latest paper-facing phase-map rendering.
 - `results/srht_m3_protocol_o10s5_highrho_r2/`: monitored 10-object x 5-seed
   M3 fallback ablation at `rho=0.001,0.1,1,10` and `sigma_a=0.30`, with 8,000
   raw rows and 160 summary rows over ordered, signed, full-SRHT, time-interleaved,

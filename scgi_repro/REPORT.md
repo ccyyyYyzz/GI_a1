@@ -191,8 +191,10 @@ SCGI CNRs are 8.54 for `letter_A`, 2.18 for `stripe_target`, 2.77 for
 misses the all-target
 CNR >= 3 requirement.
 
-The full-profile exp-residual checkpoint was also tested on held-out targets in
-`results/stage_3_exp_residual_colab_full/full`. SCGI matches analytic/static CNRs
+The full-profile exp-residual checkpoint is retained in the authoritative
+held-out matrix at
+`results/stage3_threshold_matrix_full_r2_authoritative/full`. SCGI matches
+analytic/static CNRs
 for all four targets: `letter_A` 3.3095, `letter_L` 3.5481, `ring` 2.9819, and
 `stripe_target` 2.4919. Thus directionality and KS behavior pass, while the
 all-target CNR>=3 and static PSNR>20 gates still fail because the static DGI
@@ -486,38 +488,20 @@ Key M1 checks:
 - AGC window sweeps and residual-gain log-log fits are now emitted as CSVs and
   figures, giving direct hooks for H1/H2 quantitative follow-up.
 
-Latest M2 reference protocol run:
+Current retained M2 prompt-range source:
 
-```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile debug --objects 10 --seeds 5 --no-findings --output-dir results\phase_m2_reference_protocol_o10s5
-```
+- `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/phase_scan.csv`
+  (101,250 rows, with frame-count audit columns and `scgi_proxy`)
+- `results/m2_hadamard_order_dense_r1_merged/phase_scan.csv` (155,250 rows,
+  with natural, sequency, cake-cutting-proxy, and random Hadamard row orders)
+- `results/m2_boundary_audit_hadamard_order_dense_r1/` (above-floor
+  `flip_boundary.csv`, winner maps, and R2-qualified boundary fits)
 
-Outputs:
-
-- `phase_scan.csv` (68,250 rows, with frame-count audit columns)
-- `phase_summary.csv` (1365 rows)
-- `phase_blind_summary.csv` (1155 rows)
-- `phase_equal_frame_blind_summary.csv` (525 rows)
-- `phase_reference_summary.csv` (630 rows)
-- `best_methods.csv`, `best_blind_methods.csv`,
-  `best_equal_frame_blind_methods.csv`, `best_reference_methods.csv`
-- `flip_boundary.csv` (135 rows)
-
-Additional Colab-sharded M2 run with `scgi_proxy`:
-
-```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\colab_imports\pro1_dense_r1_shard0of5\artifacts results\colab_imports\pro1_dense_r1_shard1of5\artifacts results\colab_imports\pro2_dense_r1_shard2of5\artifacts results\colab_imports\pro2_dense_r1_shard3of5\artifacts results\colab_imports\pro2_dense_r1_shard4of5\artifacts --output-dir results\phase_m2_scgi_proxy_dense_r1_merged
-```
-
-Outputs:
-
-- `results/phase_m2_scgi_proxy_dense_r1_merged/phase_scan.csv` (78,750 rows)
-- `results/phase_m2_scgi_proxy_dense_r1_merged/dense_r1_diagnostics.json`
-- merged best-method, equal-frame, reference, and flip-boundary CSVs
-
-`scgi_proxy` is a blind smooth-gain SCGI-style proxy with zero reference frames,
-not a trained SCGI network. The dense run has 10,500 `scgi_proxy` rows; all have
-`reference_frames=0` and `total_physical_frames=num_frames`.
+The earlier 7-rho reference and `scgi_proxy` merged directories are no longer
+retained as standalone checkout paths; the prompt-range high-rho merge and
+Hadamard-order dense audit are the current reviewable sources. `scgi_proxy` is a
+blind smooth-gain SCGI-style proxy with zero reference frames, not a trained SCGI
+network.
 
 Frozen SCGI-network M2 smoke baseline:
 
@@ -557,7 +541,7 @@ Dense M2 above-floor headline summary:
 
 | Budget rule | Prompt-range headline map after `rel_mse<0.5` gate | Notes |
 |---|---|---|
-| strict equal-total-frame blind, 2048 frames | `srht_paired + pairwise` wins 29 above-floor cells; 16/45 cells are sub-floor | floor cells greyed out |
+| strict equal-total-frame blind, 2048 frames | 29/45 cells are above-floor: `srht_paired + pairwise` wins 28, and `hadamard_random_paired + scgi_proxy` wins 1; 16/45 cells are sub-floor | floor cells greyed out |
 | any-budget blind/reference | `srht_paired + reference_k2` wins 31 above-floor cells; 14/45 cells are sub-floor | spends 3073 total frames |
 
 Interpretation: under the strict 2048-frame blind budget, SRHT paired
@@ -569,16 +553,15 @@ fair blind winner. In the dense `scgi_proxy` run, `scgi_proxy` improves over raw
 `none` in 88.6% of matched basis/rho/sigma means and over AGC in 66.7%, but it
 never beats pairwise on paired bases. Across equal-frame blind candidates, it is
 ranked first in 45 of 210 basis/rho/sigma triples before the floor mask, mostly
-for random bases, but it does not change the above-floor best-method map. The
-old pre-floor flip-boundary counts from the 7x5 reference protocol are retained
-only as provenance; headline boundary and winner claims use the high-rho
-`results/m2_boundary_audit_highrho` tables below.
+  for random bases, but it does not change the above-floor best-method map. The
+  old pre-floor flip-boundary counts from the 7x5 reference protocol are retained
+  only as provenance; headline boundary and winner claims use the latest
+  `results/m2_boundary_audit_hadamard_order_dense_r1` tables.
 
-Prompt-range high-rho M2 extension:
+Current prompt-range M2 review commands:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "3,10" --sigma-values "0.05,0.10,0.15,0.30,0.50" --shard i/5 --output-dir results\phase_m2_highrho_o10s5_shardiof5 --no-findings
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_scgi_proxy_dense_r1_merged results\phase_m2_highrho_o10s5_shard0of5 results\phase_m2_highrho_o10s5_shard1of5 results\phase_m2_highrho_o10s5_shard2of5 results\phase_m2_highrho_o10s5_shard3of5 results\phase_m2_highrho_o10s5_shard4of5 --output-dir results\phase_m2_scgi_proxy_dense_r1_highrho_merged
+& 'D:\Anacondar\anaconda3\python.exe' run_m2_boundary_audit.py --phase-dir results\m2_hadamard_order_dense_r1_merged --output-dir results\m2_boundary_audit_hadamard_order_dense_r1
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_boundary_audit.py --phase-dir results\phase_m2_scgi_proxy_dense_r1_highrho_merged --output-dir results\m2_boundary_audit_highrho
 ```
 
@@ -591,9 +574,12 @@ method), the boundary audit reports four above-floor log-rho boundary fits with
 `none/srht_paired` (`R2=0.9921`), `scgi_proxy/srht_paired` (`R2=0.9889`), and
 `reference_k32/srht_paired` (`R2=0.9916`). The former `agc/random_binary`
 boundary is no longer a headline fit after the floor mask. Under the strict
-equal-frame blind budget, `srht_paired + pairwise` is the above-floor winner in
-29/45 prompt-range rho/sigma cells and 16/45 cells are labelled
-sub-floor/noise-floor. Across all non-oracle methods, `srht_paired +
+equal-frame blind budget in this earlier high-rho audit, `srht_paired +
+pairwise` is the above-floor winner in 29/45 prompt-range rho/sigma cells and
+16/45 cells are labelled sub-floor/noise-floor. The later Hadamard row-order
+dense audit refines the strict map to 28 `srht_paired + pairwise` wins, one
+`hadamard_random_paired + scgi_proxy` win, and 16 sub-floor cells. Across all
+non-oracle methods, `srht_paired +
 reference_k2` is the above-floor winner in 31/45 cells and 14/45 cells are
 sub-floor. The audit also writes an above-floor `flip_boundary.csv`,
 `m2_psnr_rho_curves_sigma_0p30.png`, and `m2_boundary_fit_curves.png` for
@@ -813,7 +799,7 @@ Key M4 checks:
 | fixed-P random frame law | random uniform/binary `num_frames` exponent about -0.72/-0.71, R2 > 0.998; bootstrap CIs roughly [-0.75,-0.70] and [-0.77,-0.66] |
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
 | flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has four above-floor R2-qualified fits |
-| high-rho M2 boundary audit | prompt rho range now reaches 10; after the rel_mse<0.5 above-floor gate, four log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner cells are SRHT/pairwise in 29/45 above-floor cells and 16/45 cells are sub-floor/noise-floor |
+| high-rho/Hadamard-order M2 boundary audit | prompt rho range now reaches 10; after the rel_mse<0.5 above-floor gate, four log-rho boundary fits have R2 >= 0.9; in the latest Hadamard-order strict equal-frame map, 29/45 cells are above-floor: 28 select SRHT/pairwise, one selects Hadamard-random/scgi_proxy, and 16/45 cells are sub-floor/noise-floor |
 | AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; targeted validation improves fits to R2 0.71-0.82 but still has 42-56% boundary-selected best windows; the censored follow-up reaches interval satisfaction 0.80 for random bases, 0.64 for SRHT, and 0.40 for Hadamard, so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for

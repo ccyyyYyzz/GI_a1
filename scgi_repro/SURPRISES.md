@@ -70,11 +70,13 @@ simulator, but it also supersedes the earlier random-versus-Hadamard shorthand:
 the best blind method in this implementation is a randomized orthogonal paired
 basis, not an i.i.d. random correlation basis.
 
-The later high-rho audit adds an important qualifier: after applying a
-`rel_mse<0.5` above-floor gate, the prompt-range strict map has 29/45
-above-floor `srht_paired + pairwise` wins and 16/45 sub-floor cells. This does
-not weaken the above-floor winner result; it prevents the fast/high-amplitude
-noise-floor cells from being misreported as method wins.
+The later high-rho and Hadamard-row-order audits add an important qualifier:
+after applying a `rel_mse<0.5` above-floor gate, the prompt-range strict map has
+29/45 above-floor cells. In the latest row-order audit, 28 of those cells select
+`srht_paired + pairwise`, one selects `hadamard_random_paired + scgi_proxy`, and
+16/45 cells are sub-floor. This does not weaken the above-floor winner result;
+it prevents the fast/high-amplitude noise-floor cells from being misreported as
+method wins.
 
 ## 2026-07-09 M3 Fast Drift Is A Reconstruction Floor
 

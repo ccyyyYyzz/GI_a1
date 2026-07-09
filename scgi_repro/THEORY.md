@@ -173,12 +173,14 @@ high-rho rerun `results/theory_m4_paper_r2_highrho`:
   (`reference_k32`, `reference_k8`, and `scgi_proxy` against `srht_paired`).
   This is a censored-aware accounting layer, not yet a full survival-style
   boundary estimator.
-- `results/m2_boundary_audit_highrho` extends the M2 rho grid to the prompt
-  upper range `rho=10` and recomputes log-rho interpolated boundaries under the
-  `rel_mse<0.5` above-floor gate. Four observed boundary fits now have
-  `R2 >= 0.9`; strict equal-frame winner cells are above-floor in 29/45 sampled
-  rho/sigma cells and the remaining 16/45 cells are labelled sub-floor/noise
-  floor rather than headline method wins.
+- `results/m2_boundary_audit_hadamard_order_dense_r1` extends the M2 rho grid
+  to the prompt upper range `rho=10`, adds Hadamard row-order variants, and
+  recomputes log-rho interpolated boundaries under the `rel_mse<0.5`
+  above-floor gate. Four observed boundary fits now have `R2 >= 0.9`; in the
+  strict equal-frame map, 29/45 sampled rho/sigma cells are above-floor, 28
+  select `srht_paired + pairwise`, one selects
+  `hadamard_random_paired + scgi_proxy`, and the remaining 16/45 cells are
+  labelled sub-floor/noise floor rather than headline method wins.
 - `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The paper-r2
   random/SRHT fits have low-to-moderate R2 (`0.29-0.55`).
 - `results/theory_m4_agc_targeted_r1` reruns the AGC validation with a denser

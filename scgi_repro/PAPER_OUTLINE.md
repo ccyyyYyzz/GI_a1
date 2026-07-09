@@ -80,8 +80,9 @@ interval-qualified regions.
 cost.** `reference_k2` is the best above-floor all-non-oracle method in 31/45
 prompt-range rho/sigma cells, but it spends 3073 total physical frames for a
 2048-frame measurement budget. Under strict equal-frame accounting,
-`srht_paired+pairwise` is the winner in 29/45 above-floor cells; the remaining
-strict cells are shown as sub-floor/noise-floor rather than method wins.
+29/45 strict cells are above-floor: `srht_paired+pairwise` wins 28 and
+`hadamard_random_paired+scgi_proxy` wins one; the remaining 16 strict cells are
+shown as sub-floor/noise-floor rather than method wins.
 
 **Figure 7. Prompt-range phase diagram of basis/correction winners.** Dense M2
 scans over nine drift rates (`rho=0.001..10`) and five gain amplitudes show that
@@ -121,8 +122,10 @@ estimable.
   continuous-output reporting protocol.
 - The dense M2 reference scan supports `srht_paired + pairwise` as the
   above-floor strict equal-frame blind winner. The high-rho merge covers
-  `rho=0.001..10`; after the reconstruction-floor gate, 29/45 strict cells are
-  above-floor SRHT/pairwise wins and 16/45 are sub-floor. This is useful
+  `rho=0.001..10`; after the reconstruction-floor gate in the latest
+  Hadamard-order audit, 29/45 strict cells are above-floor, 28 are
+  SRHT/pairwise wins, one is a Hadamard-random/scgi_proxy win, and 16/45 are
+  sub-floor. This is useful
   evidence for the randomized-orthogonal design rule, but it is still idealized.
 - The dense `scgi_proxy` scan shows that a blind smooth-gain proxy improves over
   raw/AGC baselines without reference frames, but it does not displace SRHT

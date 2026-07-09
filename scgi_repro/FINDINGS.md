@@ -307,16 +307,16 @@ the prompt-range 9 x 5 grid with `rho = 0.001..10`.
 
 Prediction: best blind method should depend on channel drift speed and amplitude.
 
-Result: `results/phase_m2_reference_protocol_o10s5/phase_scan.csv` records
-68,250 rows. The outputs separate `best_blind_methods.csv` from
-`best_equal_frame_blind_methods.csv`, so extra-reference-frame methods are not
-silently compared as if they used the same physical budget.
+Result: the retained prompt-range M2 source is
+`results/phase_m2_scgi_proxy_dense_r1_highrho_merged/phase_scan.csv`, which
+has 101,250 rows and keeps the frame-count audit columns needed to separate
+`best_blind_methods.csv` from `best_equal_frame_blind_methods.csv`.
+This prevents extra-reference-frame methods from being silently compared as if
+they used the same physical budget.
 
-Follow-up dense Colab-sharded check:
-`results/phase_m2_scgi_proxy_dense_r1_merged/phase_scan.csv` adds
-`scgi_proxy`, a blind smooth-gain SCGI-style proxy. It contributes 10,500 dense
-rows inside a 78,750-row merged scan, uses zero reference frames, and is kept
-separate from claims about a trained SCGI network.
+Follow-up dense Colab-sharded check: `scgi_proxy`, a blind smooth-gain
+SCGI-style proxy, is included in the retained prompt-range merge. It uses zero
+reference frames and is kept separate from claims about a trained SCGI network.
 
 High-rho prompt-range check:
 `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/phase_scan.csv` merges the
@@ -413,10 +413,12 @@ counts should be recomputed before using this trained-network scan as a headline
 phase diagram.
 
 Supports/refutes: supports the current M2 compact conclusion that
-`srht_paired + pairwise` is the best strict equal-frame blind method in the
-above-floor part of the prompt-range grid: 29/45 strict equal-frame cells are
-above-floor and 16/45 are labelled sub-floor/noise-floor rather than method
-wins. `srht_paired + reference_k2` is the best above-floor all-non-oracle method
+`srht_paired + pairwise` is the dominant strict equal-frame blind method in the
+above-floor part of the prompt-range grid: in the latest Hadamard-order audit,
+29/45 strict equal-frame cells are above-floor, 28 select
+`srht_paired + pairwise`, one selects `hadamard_random_paired + scgi_proxy`,
+and 16/45 are labelled sub-floor/noise-floor rather than method wins.
+`srht_paired + reference_k2` is the best above-floor all-non-oracle method
 in 31/45 cells but uses 3073 total physical frames instead of 2048, so it should
 be reported as a separate semi-calibrated baseline. Dense `scgi_proxy` improves
 over `none` in 88.6% and over AGC in 66.7% of matched basis/rho/sigma means, but
