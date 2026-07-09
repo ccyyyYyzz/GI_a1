@@ -53,6 +53,12 @@ def parse_int_list(value: str | None) -> list[int] | None:
     return [int(part) for part in str(value).replace(",", " ").split() if part.strip()]
 
 
+def parse_string_list(value: str | None) -> list[str] | None:
+    if value is None or not str(value).strip():
+        return None
+    return [part.strip() for part in str(value).replace(",", " ").split() if part.strip()]
+
+
 def load_frozen_scgi_corrector(
     root: Path,
     cfg: dict,
@@ -147,6 +153,11 @@ def main() -> None:
     parser.add_argument("--rho-values", default="", help="Optional override for mechanism.rho_values, e.g. '0.001 0.01 0.1 1 10'.")
     parser.add_argument("--sigma-values", default="", help="Optional override for mechanism.sigma_a_values, e.g. '0.05 0.1 0.3'.")
     parser.add_argument("--reference-periods", default="", help="Optional override for mechanism.reference_periods, e.g. '2 8 32'.")
+    parser.add_argument(
+        "--hadamard-orders",
+        default="natural",
+        help="Space/comma-separated Hadamard row orders to include: natural sequency cake random.",
+    )
     parser.add_argument("--resume", action="store_true", help="Resume from an existing phase_scan.csv by skipping completed unit_index values.")
     parser.add_argument("--no-findings", action="store_true")
     args = parser.parse_args()
@@ -163,15 +174,35 @@ def main() -> None:
     rho_values = parse_float_list(args.rho_values) or list(mech.get("rho_values", [0.001, 0.01, 0.1, 1.0]))
     sigma_values = parse_float_list(args.sigma_values) or list(mech.get("sigma_a_values", [0.05, 0.15, 0.3]))
     reference_periods = parse_int_list(args.reference_periods) or [int(x) for x in mech.get("reference_periods", [2, 8, 32])]
+    hadamard_orders = parse_string_list(args.hadamard_orders) or ["natural"]
     objects = make_synthetic_objects(args.objects, h, int(cfg.get("seed", 0)))
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     scan_path = out_dir / "phase_scan.csv"
 
+    hadamard_name = {
+        "natural": "hadamard_paired",
+        "ordered": "hadamard_paired",
+        "sequency": "hadamard_sequency_paired",
+        "walsh": "hadamard_sequency_paired",
+        "cake": "hadamard_cake_paired",
+        "cake_cutting": "hadamard_cake_paired",
+        "random": "hadamard_random_paired",
+        "random_order": "hadamard_random_paired",
+    }
+    hadamard_specs = []
+    for order in hadamard_orders:
+        key = order.lower().replace("-", "_")
+        if key not in hadamard_name:
+            raise ValueError(f"Unsupported --hadamard-orders value: {order}")
+        name = hadamard_name[key]
+        if name not in [existing for existing, _ in hadamard_specs]:
+            hadamard_specs.append((name, {}))
+
     basis_specs = [
         ("random_uniform", {"num_frames": frame_budget, "reconstruction": "correlation"}),
         ("random_binary", {"num_frames": frame_budget, "reconstruction": "correlation"}),
-        ("hadamard_paired", {}),
+        *hadamard_specs,
         ("dct_paired", {}),
         ("fourier_fourstep", {"num_frames": frame_budget}),
         ("srht_paired", {}),
@@ -193,6 +224,8 @@ def main() -> None:
             "rho_values": rho_values,
             "sigma_values": sigma_values,
             "reference_periods": reference_periods,
+            "hadamard_orders": hadamard_orders,
+            "basis_specs": [basis_name for basis_name, _ in basis_specs],
             "scgi_checkpoint": None if args.scgi_checkpoint is None else str(args.scgi_checkpoint),
             "scgi_checkpoint_map": None if args.scgi_checkpoint_map is None else str(args.scgi_checkpoint_map),
             "scgi_model_kind": args.scgi_model_kind,

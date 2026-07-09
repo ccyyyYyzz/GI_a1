@@ -1,0 +1,46 @@
+{
+  "basis_specs": [
+    "random_uniform",
+    "random_binary",
+    "hadamard_paired",
+    "hadamard_sequency_paired",
+    "hadamard_cake_paired",
+    "hadamard_random_paired",
+    "dct_paired",
+    "fourier_fourstep",
+    "srht_paired"
+  ],
+  "hadamard_orders": [
+    "natural",
+    "sequency",
+    "cake",
+    "random"
+  ],
+  "objects": 3,
+  "outputs": {
+    "best_equal_frame_blind": "best_equal_frame_blind_methods.csv",
+    "flip_boundary": "flip_boundary.csv",
+    "progress": "progress.json",
+    "scan": "phase_scan.csv",
+    "summary": "phase_summary.csv"
+  },
+  "profile": "smoke",
+  "reference_periods": [
+    2
+  ],
+  "resume": false,
+  "rho_values": [
+    0.001,
+    0.1,
+    1.0
+  ],
+  "scgi_checkpoint": null,
+  "scgi_checkpoint_map": null,
+  "scgi_model_kind": null,
+  "seeds": 2,
+  "shard": "0/1",
+  "sigma_values": [
+    0.05,
+    0.3
+  ]
+}

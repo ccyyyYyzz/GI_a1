@@ -126,6 +126,13 @@ estimable.
   raw/AGC baselines without reference frames, but it does not displace SRHT
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
+- Hadamard row-order support now covers natural, sequency, cake-cutting-proxy,
+  and random orders. A monitored smoke run
+  (`results/m2_hadamard_order_smoke_r1`) verifies the expanded phase-map
+  plumbing and shows row-order sensitivity, with random Hadamard selected in
+  5/6 equal-frame smoke cells. This should be treated as a framework-completion
+  and hypothesis-generation result until the full 9x5 prompt grid is rerun with
+  all order variants.
 - Frozen-network M2 smoke and prompt-range dense baselines now exist. Directly
   applying the returned SCGI checkpoint to M2 sequences underperforms
   proxy/pairwise baselines, so a credible network-level phase diagram would need

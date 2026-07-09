@@ -427,6 +427,18 @@ shows that a learned blind correction can become competitive with raw and AGC
 baselines on the dense prompt grid, but it does not change the best equal-frame
 map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 
+Hadamard row-order smoke:
+`run_phase_m2.py` now supports `--hadamard-orders`, covering natural,
+sequency, cake-cutting-proxy, and random Hadamard row orders without changing
+the default natural-order scan. The monitored
+`results/m2_hadamard_order_smoke_r1` run uses 3 objects x 2 seeds over
+`rho=0.001,0.1,1.0` and `sigma_a=0.05,0.30`; it writes 1,836 scan rows, 306
+summary rows, and 44 challenger-vs-natural-Hadamard flip-boundary rows. `hadamard_random_paired`
+is the best equal-frame blind method in 5/6 smoke cells and `srht_paired` in
+1/6; only 4/6 selected cells are above the default reconstruction-floor gate.
+This closes the framework gap for requested Hadamard order variants, but the
+ordering result itself remains smoke-scale until rerun on the dense prompt grid.
+
 ## M3 SRHT Constructive Ablation
 
 Experiment: monitored 10-object x 5-seed M3 ablation over ordered Hadamard,

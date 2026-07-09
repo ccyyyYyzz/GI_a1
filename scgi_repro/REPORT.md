@@ -599,6 +599,23 @@ sub-floor. The audit also writes an above-floor `flip_boundary.csv`,
 `m2_psnr_rho_curves_sigma_0p30.png`, and `m2_boundary_fit_curves.png` for
 selected-curve and boundary-fit review.
 
+Hadamard row-order coverage:
+
+```powershell
+& 'D:\Anacondar\anaconda3\python.exe' run_monitored_job.py --run-id m2_hadamard_order_smoke_r1 --output-dir results\cli_runs\m2_hadamard_order_smoke_r1 --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\python.exe run_phase_m2.py --profile smoke --objects 3 --seeds 2 --rho-values "0.001,0.1,1.0" --sigma-values "0.05,0.30" --reference-periods "2" --hadamard-orders "natural sequency cake random" --output-dir results\m2_hadamard_order_smoke_r1 --no-findings
+```
+
+`run_phase_m2.py` now exposes `--hadamard-orders`, and
+`results/m2_hadamard_order_smoke_r1` verifies natural, sequency,
+cake-cutting-proxy, and random Hadamard orderings inside the phase-map pipeline.
+The smoke run writes 1,836 scan rows, 306 summary rows, and 44 flip-boundary
+rows for challenger-vs-natural-Hadamard diagnostics. In the six equal-frame blind smoke cells,
+`hadamard_random_paired` is selected five times and `srht_paired` once; four
+selected cells are above the `rel_mse<0.5` reconstruction-floor gate and two are
+sub-floor. This closes the framework gap for requested Hadamard order variants,
+but it is ordering-sensitivity plumbing evidence rather than a substitute for a
+dense 9x5 prompt-grid rerun with all order variants.
+
 Frozen-network prompt-range high-rho completion:
 
 ```powershell

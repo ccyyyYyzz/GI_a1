@@ -1,0 +1,7 @@
+rho,sigma_a,basis,correction,psnr_mean,psnr_std,rel_mse_mean,rel_mse_std,num_frames,reference_frames,total_physical_frames
+0.001,0.05,hadamard_cake_paired,oracle,120.0,0.0,9.926656144338068e-13,7.728344518902119e-14,2048,0,2048
+0.001,0.3,hadamard_cake_paired,oracle,120.0,0.0,1.0140243447643119e-12,7.503927947283015e-14,2048,0,2048
+0.1,0.05,hadamard_cake_paired,oracle,120.0,0.0,1.0100790220421596e-12,9.117028619515841e-14,2048,0,2048
+0.1,0.3,hadamard_cake_paired,oracle,120.0,0.0,9.923807850621528e-13,6.417901811985296e-14,2048,0,2048
+1.0,0.05,hadamard_cake_paired,oracle,120.0,0.0,1.0054133789406135e-12,9.798289598315926e-14,2048,0,2048
+1.0,0.3,hadamard_cake_paired,oracle,120.0,0.0,9.816941363349817e-13,7.678220565849033e-14,2048,0,2048

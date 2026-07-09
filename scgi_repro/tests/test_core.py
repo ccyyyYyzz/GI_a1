@@ -841,6 +841,49 @@ class TestBasisGeneration(unittest.TestCase):
             recon = basis.reconstruct(basis.measure(x))
             self.assertLess(float(torch.mean((recon - x) ** 2)), 1.0e-10, name)
 
+    def test_hadamard_row_order_variants_preserve_inverse(self):
+        if torch is None:
+            self.skipTest("torch is required for Hadamard row-order tests.")
+        p = 64
+        natural = self.basis.hadamard_row_order(p, "natural")
+        self.assertTrue(torch.equal(natural, torch.arange(p)))
+
+        h = self.basis.hadamard_matrix(p)
+        sequency = self.basis.hadamard_row_order(p, "sequency")
+        sign_changes = (torch.sign(h.index_select(0, sequency))[:, 1:] != torch.sign(h.index_select(0, sequency))[:, :-1]).sum(dim=1)
+        self.assertTrue(torch.all(sign_changes[1:] >= sign_changes[:-1]))
+
+        cake = self.basis.hadamard_row_order(p, "cake")
+        side = int(np.sqrt(p))
+        cake_patterns = h.index_select(0, cake).reshape(p, side, side)
+        cake_tv = (
+            cake_patterns[:, 1:, :].sub(cake_patterns[:, :-1, :]).abs().sum(dim=(1, 2))
+            + cake_patterns[:, :, 1:].sub(cake_patterns[:, :, :-1]).abs().sum(dim=(1, 2))
+        )
+        self.assertTrue(torch.all(cake_tv[1:] >= cake_tv[:-1]))
+
+        x = torch.linspace(0.0, 1.0, p)
+        for name in (
+            "hadamard_paired",
+            "hadamard_sequency_paired",
+            "hadamard_cake_paired",
+            "hadamard_random_paired",
+        ):
+            basis = self.basis.make_basis(name, num_pixels=p, seed=123)
+            self.assertEqual(tuple(basis.patterns.shape), (2 * p, p))
+            self.assertEqual(sorted(basis.row_indices.tolist()), list(range(p)))
+            recon = basis.reconstruct(basis.measure(x))
+            self.assertLess(float(torch.mean((recon - x) ** 2)), 1.0e-10, name)
+
+        self.assertTrue(torch.equal(self.basis.make_basis("hadamard_natural_paired", num_pixels=p).row_indices.cpu(), natural))
+        self.assertTrue(torch.equal(self.basis.make_basis("hadamard_sequency_paired", num_pixels=p).row_indices.cpu(), sequency))
+        self.assertTrue(torch.equal(self.basis.make_basis("hadamard_cake_cutting_paired", num_pixels=p).row_indices.cpu(), cake))
+        random_order = self.basis.hadamard_row_order(p, "random", seed=123)
+        self.assertTrue(torch.equal(self.basis.make_basis("hadamard_random_order_paired", num_pixels=p, seed=123).row_indices.cpu(), random_order))
+        alias_basis = self.basis.make_hadamard_paired_basis(p, order="hadamard_paired")
+        self.assertEqual(alias_basis.name, "hadamard_paired")
+        self.assertEqual(alias_basis.metadata["row_order"], "natural")
+
     def test_dct_and_fourier_static_roundtrip(self):
         p = 16
         x = torch.linspace(0.0, 1.0, p)

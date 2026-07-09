@@ -60,6 +60,65 @@ def interleave_paired_frames(signed_rows: torch.Tensor) -> torch.Tensor:
     return frames
 
 
+def _row_sign_changes(rows: torch.Tensor) -> torch.Tensor:
+    """Count one-dimensional sign changes for each Hadamard row."""
+
+    signs = torch.sign(rows)
+    return (signs[:, 1:] != signs[:, :-1]).sum(dim=1)
+
+
+def hadamard_row_order(size: int, order: str = "natural", seed: int = 0) -> torch.Tensor:
+    """Return row indices for common Hadamard sampling orders.
+
+    ``sequency`` sorts rows by one-dimensional zero crossings. ``cake`` is a
+    compact cake-cutting proxy: rows are sorted by two-dimensional total
+    variation after reshaping square images, with sequency and natural index as
+    deterministic tie-breakers.
+    """
+
+    key = order.lower().replace("-", "_")
+    if key in {"natural", "ordered", "hadamard", "hadamard_paired"}:
+        return torch.arange(int(size), dtype=torch.long)
+    if key in {"random", "random_order", "random_permutation", "permuted"}:
+        return torch.randperm(int(size), generator=_cpu_generator(seed))
+
+    h = hadamard_matrix(int(size))
+    sign_changes = _row_sign_changes(h)
+    if key in {"sequency", "walsh", "walsh_sequency"}:
+        return torch.tensor(
+            sorted(range(int(size)), key=lambda idx: (int(sign_changes[idx]), idx)),
+            dtype=torch.long,
+        )
+    if key in {"cake", "cake_cutting", "cakecutting", "cc"}:
+        side = int(math.isqrt(int(size)))
+        if side * side == int(size):
+            patterns = h.reshape(int(size), side, side)
+            tv = (
+                patterns[:, 1:, :].sub(patterns[:, :-1, :]).abs().sum(dim=(1, 2))
+                + patterns[:, :, 1:].sub(patterns[:, :, :-1]).abs().sum(dim=(1, 2))
+            )
+        else:
+            tv = sign_changes.to(dtype=torch.float32)
+        return torch.tensor(
+            sorted(range(int(size)), key=lambda idx: (float(tv[idx]), int(sign_changes[idx]), idx)),
+            dtype=torch.long,
+        )
+    raise ValueError(f"Unsupported Hadamard row order: {order}")
+
+
+def _canonical_hadamard_order(order: str) -> str:
+    key = order.lower().replace("-", "_")
+    if key in {"natural", "ordered", "hadamard", "hadamard_paired"}:
+        return "natural"
+    if key in {"random", "random_order", "random_permutation", "permuted"}:
+        return "random"
+    if key in {"sequency", "walsh", "walsh_sequency"}:
+        return "sequency"
+    if key in {"cake", "cake_cutting", "cakecutting", "cc"}:
+        return "cake"
+    raise ValueError(f"Unsupported Hadamard row order: {order}")
+
+
 @dataclass
 class MeasurementBasis:
     """Container for a physical measurement basis and its inverse map."""
@@ -259,6 +318,8 @@ def make_random_basis(
 def make_hadamard_paired_basis(
     num_pixels: int,
     num_coefficients: Optional[int] = None,
+    order: str = "natural",
+    seed: int = 0,
     device: str = "cpu",
     dtype: torch.dtype = torch.float32,
 ) -> MeasurementBasis:
@@ -269,14 +330,17 @@ def make_hadamard_paired_basis(
     if coeffs <= 0 or coeffs > size:
         raise ValueError(f"num_coefficients must be in [1, {size}], got {coeffs}.")
 
-    signed_rows = hadamard_matrix(size, device=device, dtype=dtype)[:coeffs]
+    order_key = _canonical_hadamard_order(order)
+    row_order = hadamard_row_order(size, order=order_key, seed=seed)[:coeffs].to(device=device)
+    signed_rows = hadamard_matrix(size, device=device, dtype=dtype).index_select(0, row_order)
+    name = "hadamard_paired" if order_key == "natural" else f"hadamard_{order_key}_paired"
     return MeasurementBasis(
-        name="hadamard_paired",
+        name=name,
         patterns=interleave_paired_frames(signed_rows),
         paired=True,
         signed_rows=signed_rows,
-        row_indices=torch.arange(coeffs, device=device),
-        metadata={"transform": "hadamard", "ordered": True},
+        row_indices=row_order,
+        metadata={"transform": "hadamard", "row_order": order_key, "ordered": order_key in {"natural", "ordered"}},
     )
 
 
@@ -430,9 +494,46 @@ def make_basis(
             dtype=dtype,
             reconstruction=reconstruction,
         )
-    if key in {"hadamard", "hadamard_paired"}:
+    if key in {"hadamard", "hadamard_paired", "hadamard_natural", "hadamard_natural_paired"}:
         coeffs = None if num_frames is None else max(1, int(num_frames) // 2)
-        return make_hadamard_paired_basis(num_pixels=num_pixels, num_coefficients=coeffs, device=device, dtype=dtype)
+        return make_hadamard_paired_basis(
+            num_pixels=num_pixels,
+            num_coefficients=coeffs,
+            order="natural",
+            seed=seed,
+            device=device,
+            dtype=dtype,
+        )
+    if key in {"hadamard_sequency", "hadamard_sequency_paired", "walsh_sequency", "walsh_sequency_paired"}:
+        coeffs = None if num_frames is None else max(1, int(num_frames) // 2)
+        return make_hadamard_paired_basis(
+            num_pixels=num_pixels,
+            num_coefficients=coeffs,
+            order="sequency",
+            seed=seed,
+            device=device,
+            dtype=dtype,
+        )
+    if key in {"hadamard_cake", "hadamard_cake_paired", "hadamard_cake_cutting", "hadamard_cake_cutting_paired"}:
+        coeffs = None if num_frames is None else max(1, int(num_frames) // 2)
+        return make_hadamard_paired_basis(
+            num_pixels=num_pixels,
+            num_coefficients=coeffs,
+            order="cake",
+            seed=seed,
+            device=device,
+            dtype=dtype,
+        )
+    if key in {"hadamard_random", "hadamard_random_paired", "hadamard_random_order", "hadamard_random_order_paired"}:
+        coeffs = None if num_frames is None else max(1, int(num_frames) // 2)
+        return make_hadamard_paired_basis(
+            num_pixels=num_pixels,
+            num_coefficients=coeffs,
+            order="random",
+            seed=seed,
+            device=device,
+            dtype=dtype,
+        )
     if key in {"srht", "srht_paired"}:
         coeffs = None if num_frames is None else max(1, int(num_frames) // 2)
         return make_srht_paired_basis(

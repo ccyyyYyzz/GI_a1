@@ -234,6 +234,13 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   zero reference frames.
 - `results/phase_m2_scgi_proxy_dense_r1_highrho_merged/`: 101,250-row dense
   9x5 M2 output extending the prompt rho range to `0.001..10`.
+- `results/m2_hadamard_order_smoke_r1/`: monitored M2 smoke including natural,
+  sequency, cake-cutting-proxy, and random Hadamard row orders via
+  `run_phase_m2.py --hadamard-orders`. It writes 1,836 scan rows and verifies
+  the expanded basis list in the phase-map pipeline; `hadamard_random_paired`
+  is selected in 5/6 equal-frame smoke cells, while 2/6 selected cells are
+  sub-floor by the default `rel_mse<0.5` gate. The dense prompt-grid rerun with
+  all Hadamard orders remains open.
 - `results/m2_boundary_audit_highrho/`: rho-coverage audit, above-floor
   `flip_boundary.csv`, log-rho interpolated flip-boundary fits, and winner-map
   summaries for the high-rho M2 merge. With the default `rel_mse<0.5` gate,
