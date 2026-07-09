@@ -179,7 +179,7 @@ def _svg_text(
 
 
 def make_m2_paper_figures(root: Path, out_dir: Path) -> list[dict[str, str]]:
-    audit_dir = root / "results" / "m2_boundary_audit_highrho"
+    audit_dir = root / "results" / "m2_boundary_audit_hadamard_order_dense_r1"
     winner_cells = _read(audit_dir / "m2_winner_cells.csv")
     boundary_fit = _read(audit_dir / "m2_boundary_fit.csv")
     boundary_observed = boundary_fit[boundary_fit["fit_status"] == "ok"].copy()

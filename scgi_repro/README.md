@@ -239,8 +239,17 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   `run_phase_m2.py --hadamard-orders`. It writes 1,836 scan rows and verifies
   the expanded basis list in the phase-map pipeline; `hadamard_random_paired`
   is selected in 5/6 equal-frame smoke cells, while 2/6 selected cells are
-  sub-floor by the default `rel_mse<0.5` gate. The dense prompt-grid rerun with
-  all Hadamard orders remains open.
+  sub-floor by the default `rel_mse<0.5` gate.
+- `results/m2_hadamard_order_dense_r1_merged/`: Colab-sharded 155,250-row dense
+  9x5 M2 output over 10 objects x 5 seeds with natural, sequency,
+  cake-cutting-proxy, and random Hadamard row orders. The five imported L4
+  shards each have 31,050 rows, 4,050 completed units, and shard labels `0/5`
+  through `4/5`.
+- `results/m2_boundary_audit_hadamard_order_dense_r1/`: rho-coverage audit,
+  above-floor `flip_boundary.csv`, winner maps, and boundary fits for the
+  Hadamard-order dense run. With `rel_mse<0.5`, strict equal-frame winners are
+  above-floor in 29/45 prompt-range cells, 16/45 cells are sub-floor, and one
+  above-floor strict cell selects `hadamard_random_paired + scgi_proxy`.
 - `results/m2_boundary_audit_highrho/`: rho-coverage audit, above-floor
   `flip_boundary.csv`, log-rho interpolated flip-boundary fits, and winner-map
   summaries for the high-rho M2 merge. With the default `rel_mse<0.5` gate,

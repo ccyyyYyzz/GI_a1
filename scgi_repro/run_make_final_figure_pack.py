@@ -447,9 +447,9 @@ def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
             ),
             status="compact-protocol complete; final artwork draft",
             panels=(
-                PanelSpec("A", "Strict equal-frame winners", "results/paper_figures_r1/m2_equal_frame_winner_map.svg", "results/paper_figures_r1/m2_equal_frame_winner_map.png", "results/m2_boundary_audit_highrho/m2_winner_cells.csv", "Strict equal-frame winner map."),
-                PanelSpec("B", "All non-oracle winners", "results/paper_figures_r1/m2_all_non_oracle_winner_map.svg", "results/paper_figures_r1/m2_all_non_oracle_winner_map.png", "results/m2_boundary_audit_highrho/m2_winner_cells.csv", "All non-oracle winner map."),
-                PanelSpec("C", "Boundary fits", "results/paper_figures_r1/m2_observed_boundary_fit_table.svg", "results/paper_figures_r1/m2_observed_boundary_fit_table.png", "results/m2_boundary_audit_highrho/m2_boundary_fit.csv", "Observed boundary fits."),
+                PanelSpec("A", "Strict equal-frame winners", "results/paper_figures_r1/m2_equal_frame_winner_map.svg", "results/paper_figures_r1/m2_equal_frame_winner_map.png", "results/m2_boundary_audit_hadamard_order_dense_r1/m2_winner_cells.csv", "Strict equal-frame winner map."),
+                PanelSpec("B", "All non-oracle winners", "results/paper_figures_r1/m2_all_non_oracle_winner_map.svg", "results/paper_figures_r1/m2_all_non_oracle_winner_map.png", "results/m2_boundary_audit_hadamard_order_dense_r1/m2_winner_cells.csv", "All non-oracle winner map."),
+                PanelSpec("C", "Boundary fits", "results/paper_figures_r1/m2_observed_boundary_fit_table.svg", "results/paper_figures_r1/m2_observed_boundary_fit_table.png", "results/m2_boundary_audit_hadamard_order_dense_r1/m2_boundary_fit.csv", "Observed boundary fits."),
             ),
         ),
         FigureSpec(

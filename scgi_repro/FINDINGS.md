@@ -427,7 +427,7 @@ shows that a learned blind correction can become competitive with raw and AGC
 baselines on the dense prompt grid, but it does not change the best equal-frame
 map and remains slightly below the handcrafted smooth-gain `scgi_proxy`.
 
-Hadamard row-order smoke:
+Hadamard row-order prompt-grid check:
 `run_phase_m2.py` now supports `--hadamard-orders`, covering natural,
 sequency, cake-cutting-proxy, and random Hadamard row orders without changing
 the default natural-order scan. The monitored
@@ -436,8 +436,16 @@ the default natural-order scan. The monitored
 summary rows, and 44 challenger-vs-natural-Hadamard flip-boundary rows. `hadamard_random_paired`
 is the best equal-frame blind method in 5/6 smoke cells and `srht_paired` in
 1/6; only 4/6 selected cells are above the default reconstruction-floor gate.
-This closes the framework gap for requested Hadamard order variants, but the
-ordering result itself remains smoke-scale until rerun on the dense prompt grid.
+The follow-up Colab-sharded dense run,
+`results/m2_hadamard_order_dense_r1_merged`, completes the full prompt grid
+with 155,250 raw rows over 9 rho values, 5 sigma values, 10 objects, 5 seeds,
+and all four Hadamard orders. Each of the five L4 shards contributes 31,050
+rows and 4,050 unit indexes; the merged table covers unit indexes 0..20,249
+with no duplicates. `results/m2_boundary_audit_hadamard_order_dense_r1`
+confirms prompt rho coverage and retains the main above-floor pattern:
+strict equal-frame winners are `srht_paired + pairwise` in 28/45 cells,
+`hadamard_random_paired + scgi_proxy` in 1/45 cells, and sub-floor/noise-floor
+in 16/45 cells.
 
 ## M3 SRHT Constructive Ablation
 

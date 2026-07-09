@@ -55,7 +55,7 @@ echo "BG_UPLOAD_CONFIG $CONFIG_FILE"
 HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 upload --session "$SESSION" "$CONFIG_FILE" /content/background_command_config.json
 HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 upload --session "$SESSION" "$ROOT/colab/background_command_launcher.py" /content/background_command_launcher.py
 echo "BG_EXEC_LAUNCHER $SESSION"
-HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 exec --session "$SESSION" --file /content/background_command_launcher.py --timeout 120 2>&1 | tee "$LAUNCH_LOG"
+HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 exec --session "$SESSION" --file "$ROOT/colab/background_command_launcher.py" --timeout 120 2>&1 | tee "$LAUNCH_LOG"
 echo "BG_SESSION_LAUNCHED $SESSION"
 echo "status=/content/${RUN_ID}.status.json"
 echo "log=/content/${RUN_ID}.log"

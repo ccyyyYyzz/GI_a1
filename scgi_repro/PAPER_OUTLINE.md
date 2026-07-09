@@ -68,11 +68,13 @@ frame exponents near -0.72 and -0.71, supporting the predicted averaging of
 uncorrelated gain errors.
 
 **Figure 5. Flip-boundary curves over drift rate and gain amplitude.** The
-high-rho boundary audit extends the sampled range to `rho=10` and records
-observed, left-censored, not-reached, and sub-floor cells. After the
-`rel_mse<0.5` above-floor gate, four log-rho boundary fits are observed in
-`results/m2_boundary_audit_highrho`; the M4 r2 censored tables retain unresolved
-cells so the figure can show both fitted curves and interval-qualified regions.
+Hadamard-order dense boundary audit extends the sampled range to `rho=10`,
+includes natural/sequency/cake/random Hadamard row orders, and records observed,
+left-censored, not-reached, and sub-floor cells. After the `rel_mse<0.5`
+above-floor gate, four log-rho boundary fits are observed in
+`results/m2_boundary_audit_hadamard_order_dense_r1`; the M4 r2 censored tables
+retain unresolved cells so the figure can show both fitted curves and
+interval-qualified regions.
 
 **Figure 6. Reference-frame calibration improves quality at a physical-frame
 cost.** `reference_k2` is the best above-floor all-non-oracle method in 31/45
@@ -127,12 +129,11 @@ estimable.
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
 - Hadamard row-order support now covers natural, sequency, cake-cutting-proxy,
-  and random orders. A monitored smoke run
-  (`results/m2_hadamard_order_smoke_r1`) verifies the expanded phase-map
-  plumbing and shows row-order sensitivity, with random Hadamard selected in
-  5/6 equal-frame smoke cells. This should be treated as a framework-completion
-  and hypothesis-generation result until the full 9x5 prompt grid is rerun with
-  all order variants.
+  and random orders. A monitored smoke run verifies the expanded phase-map
+  plumbing, and `results/m2_hadamard_order_dense_r1_merged` now completes the
+  full 9x5 prompt grid with all order variants. The dense strict equal-frame map
+  remains mostly `srht_paired + pairwise` above-floor, with one
+  `hadamard_random_paired + scgi_proxy` cell and 16/45 sub-floor cells.
 - Frozen-network M2 smoke and prompt-range dense baselines now exist. Directly
   applying the returned SCGI checkpoint to M2 sequences underperforms
   proxy/pairwise baselines, so a credible network-level phase diagram would need
@@ -163,7 +164,7 @@ estimable.
   caveat: random binary remains at floor (`rel_mse` 0.963-0.987), and SRHT is
   only +0.059 to +0.322 dB above the best random basis in fast drift.
 - Flip boundaries are now represented both as observed fits and censored
-  intervals. `results/m2_boundary_audit_highrho` gives four above-floor
+  intervals. `results/m2_boundary_audit_hadamard_order_dense_r1` gives four above-floor
   prompt-range log-rho boundary fits with `R2 >= 0.9`, while
   `results/theory_m4_paper_r2_highrho` keeps the censored cells for paper
   plotting.

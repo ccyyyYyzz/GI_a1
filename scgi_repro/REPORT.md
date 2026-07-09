@@ -613,8 +613,27 @@ rows for challenger-vs-natural-Hadamard diagnostics. In the six equal-frame blin
 `hadamard_random_paired` is selected five times and `srht_paired` once; four
 selected cells are above the `rel_mse<0.5` reconstruction-floor gate and two are
 sub-floor. This closes the framework gap for requested Hadamard order variants,
-but it is ordering-sensitivity plumbing evidence rather than a substitute for a
-dense 9x5 prompt-grid rerun with all order variants.
+and the follow-up below closes the dense 9x5 prompt-grid rerun.
+
+Hadamard row-order dense prompt-grid completion:
+
+```powershell
+wsl -e bash -lc 'cd /mnt/e/GAN_FCC_WORK/github_sync/GI_a1_scgi_20260709_014434/scgi_repro && REF=a8c6970d54df843d3a0cd4ba403e2174f11dde06 RUN_TAG=m2_hadamard_order_dense_r1 bash launch_colab_m2_hadamard_order_dense.sh'
+& 'D:\Anacondar\anaconda3\python.exe' merge_phase_m2_shards.py --inputs results\colab_imports\pro1_m2_hadamard_order_dense_r1_shard0of5\artifacts results\colab_imports\pro1_m2_hadamard_order_dense_r1_bg_shard1of5\artifacts results\colab_imports\pro2_m2_hadamard_order_dense_r1_bg_shard2of5\artifacts results\colab_imports\pro1_m2_hadamard_order_dense_r1_bg_shard3of5\artifacts results\colab_imports\pro2_m2_hadamard_order_dense_r1_bg_shard4of5\artifacts --output-dir results\m2_hadamard_order_dense_r1_merged
+& 'D:\Anacondar\anaconda3\python.exe' run_m2_boundary_audit.py --phase-dir results\m2_hadamard_order_dense_r1_merged --output-dir results\m2_boundary_audit_hadamard_order_dense_r1
+```
+
+The merged Hadamard-order dense scan has 155,250 rows over the full prompt grid
+(`rho=0.001..10`, five `sigma_a` values, 10 objects, 5 seeds), nine bases, and
+eight correction categories where physically applicable. Each of the five
+Colab L4 shards contributes 31,050 rows and 4,050 unit indexes; the merge covers
+unit indexes 0..20,249 with no duplicates and shard labels `0/5` through `4/5`.
+`results/m2_boundary_audit_hadamard_order_dense_r1` confirms full rho coverage.
+After the `rel_mse<0.5` above-floor gate, strict equal-frame winners are
+`srht_paired + pairwise` in 28/45 prompt-range cells,
+`hadamard_random_paired + scgi_proxy` in 1/45 cells, and sub-floor/noise-floor
+in 16/45 cells. The paper-facing M2 figures and final Figure 5 provenance now
+source this audit rather than the earlier high-rho-only audit.
 
 Frozen-network prompt-range high-rho completion:
 
@@ -946,6 +965,13 @@ Additional checks:
   merged into `results/phase_m2_scgi_proxy_dense_r1_highrho_merged` with
   101,250 rows covering `rho=0.001..10`; boundary audit writes
   `results/m2_boundary_audit_highrho`.
+- M2 Hadamard-order dense prompt-grid completion was split across Colab L4
+  shards using the kept-session background fallback after plain `colab run`
+  exposed websocket and assignment limits. The merged output,
+  `results/m2_hadamard_order_dense_r1_merged`, has 155,250 rows, all five
+  shard labels, no duplicate rows, and complete unit coverage `0..20249`;
+  `results/m2_boundary_audit_hadamard_order_dense_r1` is now the M2 figure
+  source.
 - Frozen `scgi_frozen` M2 smoke baseline loads the returned SCGI checkpoint and
   writes `results/phase_m2_scgi_frozen_smoke` with 1785 rows; the dense run
   writes `results/phase_m2_scgi_frozen_dense_r1_merged` with 89,250 rows, and
@@ -999,7 +1025,8 @@ Additional checks:
   `results/theory_m4_agc_boundary_aware_r1`.
 - Paper-facing M2/M4 figures are rendered under `results/paper_figures_r1` with
   `paper_figure_manifest.csv`, SVG sidecars, and
-  `paper_figure_manifest_vectors.csv`.
+  `paper_figure_manifest_vectors.csv`; M2 panels now source
+  `results/m2_boundary_audit_hadamard_order_dense_r1`.
 - Draft paper multipanels are rendered under
   `results/paper_figures_r1/multipanels` with PNG/PDF/SVG outputs for Figures
   3, 4, and 7 plus an 11-row `paper_multipanel_manifest.csv`.

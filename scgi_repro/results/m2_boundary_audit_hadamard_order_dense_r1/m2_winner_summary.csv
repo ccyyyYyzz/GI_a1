@@ -1,0 +1,6 @@
+scope,basis,correction,above_floor,winning_cells,rho_min,rho_max,sigma_min,sigma_max,psnr_mean_over_wins,rel_mse_mean_over_wins,above_floor_rel_mse
+all_non_oracle,srht_paired,reference_k2,True,31,0.001,10.0,0.05,0.5,26.27564815798292,0.10214199618569011,0.5
+all_non_oracle,sub_floor,noise_floor,False,14,0.1,10.0,0.1,0.5,11.78728849688334,0.769915661785381,0.5
+equal_frame_non_oracle,srht_paired,pairwise,True,28,0.001,10.0,0.05,0.5,24.990748129035353,0.11146273939825724,0.5
+equal_frame_non_oracle,sub_floor,noise_floor,False,16,0.03,10.0,0.1,0.5,11.701204840319958,0.7837100413590999,0.5
+equal_frame_non_oracle,hadamard_random_paired,scgi_proxy,True,1,0.3,0.3,0.15,0.15,13.86451470837016,0.4684498677877836,0.5
