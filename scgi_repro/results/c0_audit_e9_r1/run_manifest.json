@@ -1,0 +1,22 @@
+{
+  "utc_timestamp": "2026-07-09T21:52:17.845067+00:00",
+  "git_commit": "5352ac4b11b5d9ac37bfda8b3fb3fee93e0fafda",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\c0_audit_e9_r1",
+    "image_size": 32,
+    "seed": 20240708,
+    "n_draws": 20000,
+    "gaussian_mu": 0.5,
+    "gaussian_sigma": 0.2,
+    "s": 0.1,
+    "rho_star_n": null,
+    "photon_ref": 8.0,
+    "photon_n0": null,
+    "kappa_s": 0.05
+  },
+  "rows": 20
+}

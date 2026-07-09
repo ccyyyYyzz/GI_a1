@@ -1,0 +1,22 @@
+{
+  "utc_timestamp": "2026-07-09T21:52:07.751409+00:00",
+  "git_commit": "5352ac4b11b5d9ac37bfda8b3fb3fee93e0fafda",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\coherent_residual_e4_r1",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 10,
+    "seed": 20240708,
+    "v": 0.001,
+    "ar1_phi": 0.9,
+    "lowpass_rho": 0.001,
+    "sinusoid_period_fraction_inv": 8.0,
+    "block_size": 64,
+    "mc_draws": 96
+  },
+  "rows": 1500
+}

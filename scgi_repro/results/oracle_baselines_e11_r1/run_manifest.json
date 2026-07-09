@@ -1,0 +1,20 @@
+{
+  "utc_timestamp": "2026-07-09T21:52:27.960696+00:00",
+  "git_commit": "5352ac4b11b5d9ac37bfda8b3fb3fee93e0fafda",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\oracle_baselines_e11_r1",
+    "image_size": 32,
+    "oversample": 2,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "s": 0.1,
+    "metered_noise_frac": 0.01
+  },
+  "rows": 100,
+  "agc_window": 32
+}
