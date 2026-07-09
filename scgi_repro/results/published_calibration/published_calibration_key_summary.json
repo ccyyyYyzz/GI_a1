@@ -1,0 +1,14 @@
+{
+  "num_targets": 120,
+  "apl_cnr_targets": 16,
+  "oe_psnr_targets": 64,
+  "approximate_digitized_targets": 59,
+  "apl_scgi_min_cnr": 3.39,
+  "apl_unn_min_cnr": 7.93,
+  "apl_ured_min_cnr": 10.43,
+  "oe_fixed_reference_fig3_min_psnr": 35.32,
+  "oe_fixed_reference_fig6_min_psnr_digitized": 23.3,
+  "apl_current_status_counts": {
+    "below_min": 6
+  }
+}

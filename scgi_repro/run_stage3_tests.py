@@ -16,6 +16,7 @@ from src.metrics import bundle
 from src.plotting import save_image_grid, save_metrics_table
 from src.scgi_model import make_scgi_model
 from src.train_scgi import analytic_gain_correct, correct_measurements, oracle_gain_correct
+from src.ured import optimize_untrained
 
 
 def _font(size: int) -> ImageFont.ImageFont:
@@ -69,18 +70,37 @@ def load_stage0_model(root: Path, cfg: dict, checkpoint: Path, device: torch.dev
     return model
 
 
+def parse_shard(spec: str | None) -> tuple[int, int] | None:
+    if not spec:
+        return None
+    try:
+        index_text, total_text = spec.split("/", 1)
+        index = int(index_text)
+        total = int(total_text)
+    except Exception as exc:
+        raise argparse.ArgumentTypeError(f"Shard must be formatted as i/k, got {spec!r}") from exc
+    if total <= 0 or index < 0 or index >= total:
+        raise argparse.ArgumentTypeError(f"Invalid shard {spec!r}; require 0 <= i < k")
+    return index, total
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Stage 3 held-out target DGI/SCGI tests.")
     parser.add_argument("--profile", default="smoke")
     parser.add_argument("--checkpoint", type=Path, default=None)
     parser.add_argument("--output-dir", type=Path, default=Path("results/stage_3"))
     parser.add_argument("--model-kind", default=None, help="Override scgi.model_kind for loading a checkpoint.")
+    parser.add_argument("--include-unn-ured", action="store_true", help="Run SCGI-UNN and SCGI-URED for each Stage 3 target.")
+    parser.add_argument("--ured-steps", type=int, default=None, help="Override active.ured_steps for this run.")
+    parser.add_argument("--object-shard", type=parse_shard, default=None, help="Optional held-out object shard as i/k.")
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
     if args.model_kind:
         cfg.setdefault("scgi", {})["model_kind"] = str(args.model_kind)
+    if args.ured_steps is not None:
+        cfg.setdefault("active", {})["ured_steps"] = int(args.ured_steps)
     active = cfg["active"]
     h = int(active["image_size"])
     n = int(active["num_patterns"])
@@ -93,6 +113,11 @@ def main() -> None:
     generator = seed_everything(int(cfg.get("seed", 0)))
     patterns = generate_patterns(n, h, generator, cfg.get("data", {}).get("pattern_distribution", "uniform"), device=device)
     objects = make_stage3_objects(h)
+    if args.object_shard is not None:
+        shard_index, shard_total = args.object_shard
+        objects = [obj for idx, obj in enumerate(objects) if idx % shard_total == shard_index]
+        if not objects:
+            raise ValueError(f"No Stage 3 objects selected by shard {shard_index}/{shard_total}")
     images = torch.stack([obj for _name, obj in objects], dim=0).unsqueeze(1).to(device)
     flat = images.reshape(images.shape[0], h * h)
     b_static = normalize_rows(
@@ -124,6 +149,26 @@ def main() -> None:
             "analytic": (dgi_reconstruct(y_analytic[idx], patterns, h), y_analytic[idx]),
             "oracle": (dgi_reconstruct(y_oracle[idx], patterns, h), y_oracle[idx]),
         }
+        if args.include_unn_ured:
+            coarse = reconstructions["scgi"][0]
+            unn = optimize_untrained(
+                coarse,
+                y_scgi[idx],
+                patterns,
+                cfg,
+                target=target,
+                use_regularizer=False,
+            )
+            ured = optimize_untrained(
+                coarse,
+                y_scgi[idx],
+                patterns,
+                cfg,
+                target=target,
+                use_regularizer=True,
+            )
+            reconstructions["scgi_unn"] = (unn.image, y_scgi[idx])
+            reconstructions["scgi_ured"] = (ured.image, y_scgi[idx])
         grid_images.append(target.detach().cpu().squeeze().numpy())
         grid_labels.append(f"{name} target")
         for method, (recon, measurements) in reconstructions.items():
@@ -174,6 +219,31 @@ def main() -> None:
             "passed": bool((df[df["method"] == "static"]["psnr"] > 20.0).all()),
         },
     ]
+    if args.include_unn_ured:
+        checks.extend(
+            [
+                {
+                    "check": "scgi_unn_cnr_above_scgi_all",
+                    "value": bool((pivot["scgi_unn"] > pivot["scgi"]).all()),
+                    "passed": bool((pivot["scgi_unn"] > pivot["scgi"]).all()),
+                },
+                {
+                    "check": "scgi_ured_cnr_above_scgi_unn_all",
+                    "value": bool((pivot["scgi_ured"] > pivot["scgi_unn"]).all()),
+                    "passed": bool((pivot["scgi_ured"] > pivot["scgi_unn"]).all()),
+                },
+                {
+                    "check": "scgi_unn_cnr_ge_apl_min_all",
+                    "value": bool((pivot["scgi_unn"] >= 7.93).all()),
+                    "passed": bool((pivot["scgi_unn"] >= 7.93).all()),
+                },
+                {
+                    "check": "scgi_ured_cnr_ge_apl_min_all",
+                    "value": bool((pivot["scgi_ured"] >= 10.43).all()),
+                    "passed": bool((pivot["scgi_ured"] >= 10.43).all()),
+                },
+            ]
+        )
     with (out_dir / "stage3_acceptance.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["check", "value", "passed"])
         writer.writeheader()

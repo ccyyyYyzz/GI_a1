@@ -1,0 +1,11 @@
+comparison,method,current_result_set,published_min,published_mean,published_max,current_value,gap_to_min,ratio_to_min,status,current_source_path
+APL CNR target for GI,GI,full_exp_residual_stage0_colab,0.098,0.098,0.098,0.0183577630668878,-0.0796422369331122,0.1873241129274265,below_min,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+APL CNR target for SCGI,SCGI,full_exp_residual_stage0_colab,3.39,3.6999999999999997,4.04,2.5352532863616943,-0.8547467136383058,0.7478623263603817,below_min,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+APL CNR target for SCGI,SCGI,full_exp_residual_stage3_colab_mean,3.39,3.6999999999999997,4.04,3.082876741886139,-0.3071232581138612,0.909403168697976,below_min,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+APL CNR target for SCGI,SCGI,full_exp_residual_stage3_colab_min,3.39,3.6999999999999997,4.04,2.4919238090515137,-0.8980761909484865,0.7350807696317149,below_min,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+APL CNR target for SCGI-UNN,SCGI-UNN,full_exp_residual_stage0_colab,7.93,11.379999999999999,14.2,2.5352532863616943,-5.394746713638305,0.319704071420138,below_min,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+APL CNR target for SCGI-URED,SCGI-URED,full_exp_residual_stage0_colab,10.43,29.845,38.28,2.5352532863616943,-7.894746713638305,0.24307318181799561,below_min,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+OE Fig. 3 fixed-reference image PSNR,fixed_reference,not_calibrated_in_current_project,35.32,37.23166666666666,38.02,,,,target_only,
+OE Fig. 3 no-reference image PSNR,without_reference,not_calibrated_in_current_project,12.5,14.718333333333334,19.23,,,,target_only,
+OE Fig. 6 fixed-reference attenuation-sweep PSNR,fixed_reference,not_calibrated_in_current_project,23.3,31.475,37.8,,,,target_only,
+OE Fig. 8 fixed-reference distance-sweep PSNR,fixed_reference,not_calibrated_in_current_project,30.7,36.28333333333333,39.0,,,,target_only,

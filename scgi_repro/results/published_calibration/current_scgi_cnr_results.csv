@@ -1,0 +1,15 @@
+result_set,scope,method,metric,value,source_path
+full_exp_residual_stage0_colab,single full-profile target,GI,CNR,0.0183577630668878,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+full_exp_residual_stage0_colab,single full-profile target,SCGI,CNR,2.5352532863616943,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+full_exp_residual_stage0_colab,single full-profile target,SCGI-UNN,CNR,2.5352532863616943,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+full_exp_residual_stage0_colab,single full-profile target,SCGI-URED,CNR,2.5352532863616943,results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\metrics.csv
+full_exp_residual_stage3_colab_mean,held-out target mean,ANALYTIC,CNR,3.0828720927238464,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_min,held-out target minimum,ANALYTIC,CNR,2.4919214248657227,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_mean,held-out target mean,DYNAMIC,CNR,0.018686727387830625,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_min,held-out target minimum,DYNAMIC,CNR,-0.0094329044222831,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_mean,held-out target mean,ORACLE,CNR,3.082852780818939,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_min,held-out target minimum,ORACLE,CNR,2.491786241531372,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_mean,held-out target mean,SCGI,CNR,3.082876741886139,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_min,held-out target minimum,SCGI,CNR,2.4919238090515137,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_mean,held-out target mean,STATIC,CNR,3.0828553438186646,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
+full_exp_residual_stage3_colab_min,held-out target minimum,STATIC,CNR,2.4918155670166016,results\stage_3_exp_residual_colab_full\full\stage3_metrics.csv
