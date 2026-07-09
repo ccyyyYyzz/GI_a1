@@ -190,7 +190,11 @@ around that basin. All five shard artifacts succeed and merge to 648 rows, but
 the best final/trace stripe CNR reaches only `9.898` at
 `steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`,
 `nlm_h=0.062`, and `binary_prior_weight=0.02`, still below the APL URED minimum
-of `10.43`. The stronger
+of `10.43`. `results/stage4_unn_stripe_puredata_colab_r1_merged` separately
+isolates the SCGI-UNN-like pure data route on Colab L4 with `beta=0`,
+`denoiser=none`, and low/no augmentation. It expands the UNN stripe evidence to
+96 rows, but the best final/target-aware trace CNR is only `2.547`/`2.550`, far
+below the APL UNN minimum of `7.93`. The stronger
 change is `nlm_otsu_soft`, a target-free soft-Otsu RED denoiser that keeps the
 final report image as continuous `x-u`. In
 `results/stage4_ured_otsu_soft_fixedstep_r1_stripe`, a fixed 15-step run reaches

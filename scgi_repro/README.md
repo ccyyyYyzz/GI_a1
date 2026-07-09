@@ -173,6 +173,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   best stripe basin. It merges 648 rows from five successful shard artifacts;
   the best final/trace stripe CNR is 9.898 at `binary_prior_weight=0.02`, still
   below the APL URED gate of 10.43.
+- `results/stage4_unn_stripe_puredata_colab_r1_merged/`: two-shard Colab L4
+  strict SCGI-UNN stripe sweep with `beta=0`, `denoiser=none`, and low/no
+  augmentation. It merges 96 rows from two successful shard artifacts; the best
+  final/trace stripe CNR is only 2.547/2.550, far below the APL UNN gate of
+  7.93.
 - `results/stage4_ured_otsu_soft_pilot_r1_stripe/` and
   `results/stage4_ured_otsu_soft_fixedstep_r1_stripe/`: monitored target-free
   soft-Otsu RED pilots. The fixed-step continuous `x-u` stripe output reaches

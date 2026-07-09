@@ -289,6 +289,7 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_proxy_audit_r1`
 - `results/stage4_trace_audit_r4`
 - `results/stage4_ured_otsu_soft_seed_robust_colab_r1`
+- `results/stage4_unn_stripe_puredata_colab_r1_merged`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
@@ -355,7 +356,11 @@ binary-prior neighborhood configurations. All five shard jobs return success,
 but the best stripe final/trace CNR is 9.898 at
 `steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`, `nlm_h=0.062`,
 and `binary_prior_weight=0.02`, so this path still misses the 10.43 APL URED
-minimum. Third,
+minimum. A separate two-shard Colab L4 UNN isolation,
+`results/stage4_unn_stripe_puredata_colab_r1_merged`, keeps `beta=0`,
+`denoiser=none`, and low/no augmentation over 96 stripe configurations. Its
+best final/target-aware trace CNR is only 2.547/2.550, so the original SCGI-UNN
+route remains far below the APL UNN minimum of 7.93. Third,
 `results/stage4_ured_otsu_soft_pilot_r1_stripe` and
 `results/stage4_ured_otsu_soft_fixedstep_r1_stripe` add a target-free soft-Otsu
 RED denoiser. This is the first strict continuous-output stripe run to clear
