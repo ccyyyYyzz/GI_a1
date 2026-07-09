@@ -43,7 +43,8 @@ Channels
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
-  samples; a non-ideal detector/reference-noise section is still needed.
+  samples. A compact nonideal digital-twin runner now exists, but a full
+  calibrated nonideal main scan is still needed.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty, although `run_theory_m4.py` now provides observed-only
   compact fits as a starting point.
@@ -53,6 +54,8 @@ Channels
   flip-boundary treatment.
 - A true pretrained/frozen SCGI-network correction is not yet part of the M2
   phase diagram.
+- Published-curve calibration is still missing: APL intensity traces and OE
+  attenuation ranges have not yet been digitized into OU/channel parameters.
 
 ## Venue Positioning
 

@@ -421,11 +421,47 @@ class TestChannelMechanisms(unittest.TestCase):
         rel_mse = torch.mean((estimated - gains) ** 2) / torch.mean(gains ** 2).clamp_min(1.0e-8)
         self.assertLess(float(rel_mse), 0.01)
 
+    def test_noisy_reference_gain_remains_positive(self):
+        gains = self.mechanisms.make_multiplicative_channel(
+            128, model="ou", rho=0.01, sigma_a=0.2, seed=322
+        ).gains
+        estimated = self.mechanisms.estimate_reference_gain(
+            gains,
+            period=8,
+            reference_photons=2000.0,
+            reference_read_noise=0.001,
+            seed=44,
+        )
+        self.assertEqual(tuple(estimated.shape), tuple(gains.shape))
+        self.assertTrue(torch.all(torch.isfinite(estimated)))
+        self.assertTrue(torch.all(estimated > 0))
+
     def test_reference_anchor_count_includes_terminal_anchor(self):
         self.assertEqual(self.mechanisms.reference_anchor_count(2048, 8), 257)
         self.assertEqual(self.mechanisms.reference_anchor_count(2048, 2), 1025)
         self.assertEqual(self.mechanisms.reference_anchor_count(2048, 32), 65)
         self.assertEqual(self.mechanisms.reference_anchor_count(2049, 8), 257)
+
+    def test_slm_quantization_and_timing_jitter_are_bounded(self):
+        patterns = torch.tensor([0.0, 0.2, 0.7, 1.0])
+        quantized = self.mechanisms.quantize_slm_patterns(patterns, levels=4, contrast_ratio=1000.0)
+        self.assertTrue(torch.all(quantized >= 0.001))
+        self.assertTrue(torch.all(quantized <= 1.0))
+        self.assertLessEqual(int(torch.unique(quantized).numel()), 4)
+
+        gains = torch.linspace(0.5, 1.5, 64)
+        jittered = self.mechanisms.apply_frame_timing_jitter(gains, jitter_std_frames=0.2, seed=9)
+        self.assertEqual(tuple(jittered.shape), tuple(gains.shape))
+        self.assertTrue(torch.all(torch.isfinite(jittered)))
+        self.assertAlmostEqual(float(jittered.mean()), 1.0, places=5)
+
+    def test_detector_noise_is_seeded_and_finite(self):
+        signal = torch.full((64,), 0.5)
+        noisy_a = self.mechanisms.apply_detector_noise(signal, photon_count=1000.0, read_noise=0.001, seed=11)
+        noisy_b = self.mechanisms.apply_detector_noise(signal, photon_count=1000.0, read_noise=0.001, seed=11)
+        self.assertTrue(torch.all(torch.isfinite(noisy_a)))
+        self.assertTrue(torch.allclose(noisy_a, noisy_b))
+        self.assertGreater(float(torch.std(noisy_a)), 0.0)
 
     def test_scgi_proxy_gain_is_blind_positive_and_tracks_slow_channel(self):
         gains = self.mechanisms.make_multiplicative_channel(

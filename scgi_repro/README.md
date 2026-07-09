@@ -26,6 +26,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
 & $py run_srht_m3.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\srht_m3_quick
+& $py run_nonideal_m2.py --output-dir results\nonideal_m2_compact
 & $py run_make_figures.py --output-dir results\figures
 & $py -m unittest discover tests -v
 ```
@@ -75,6 +76,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.
+- `results/nonideal_m2_compact/`: compact ideal/nonideal M2 digital-twin scan
+  with SLM quantization, finite contrast, detector noise, timing jitter, and
+  noisy reference samples.
 - `results/mechanism_m1_protocol_o10s5/`,
   `results/phase_m2_reference_protocol_o10s5/`, and
   `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used

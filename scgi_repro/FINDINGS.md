@@ -184,3 +184,26 @@ Supports/refutes: supports H2/H4 as compact fitted-law evidence. It does not yet
 complete the paper-grade theory requirement because flip-boundary fits are still
 mostly censored or insufficiently sampled, and bootstrap uncertainty intervals
 and nonideal calibration are still open.
+
+## Compact Nonideal Digital Twin
+
+Experiment: compact M2 ideal/nonideal comparison over random uniform,
+Hadamard-paired, and SRHT-paired bases with none/oracle/AGC/scgi_proxy/reference
+and pairwise corrections.
+
+Prediction: if the SRHT/pairwise conclusion is not only an artifact of perfect
+patterns and noiseless reference samples, the equal-frame winner should remain
+stable under moderate SLM quantization, finite contrast, detector noise,
+reference-sample noise, and frame timing jitter.
+
+Result: output written to `results/nonideal_m2_compact`. The scan has 1224 rows,
+split evenly between ideal and nonideal conditions. The equal-frame winner is
+pairwise in all six compact rho/sigma cells for both conditions. Under the
+nonideal condition, SRHT is the winning equal-frame basis in 5/6 cells and
+Hadamard in 1/6. Oracle mean PSNR falls from 85.3 dB to 33.4 dB, confirming that
+the nonideal perturbations are active rather than decorative.
+
+Supports/refutes: supports the robustness direction at compact scale. It does
+not yet satisfy the prompt's full nonideal main-scan requirement because the
+parameters are normalized placeholders, not calibrated from published curves or
+hardware measurements.

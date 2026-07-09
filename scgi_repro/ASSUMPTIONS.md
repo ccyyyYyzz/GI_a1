@@ -39,6 +39,12 @@ code or raw data.
     the literal direct-output baseline.
 13. `reference_kK` mechanism scans assume an inserted reference pattern with a
     known ideal bucket value, giving a direct gain sample every `K` measurement
-    frames. The current compact simulator linearly interpolates those gain
-    samples and records the extra reference frames; it does not yet add shot
-    noise to the reference measurement itself.
+    frames. The ideal M2 protocol linearly interpolates noiseless gain samples
+    and records the extra reference frames. The nonideal M2 runner additionally
+    supports shot/read noise on reference samples.
+14. The compact nonideal digital-twin scan uses normalized detector units rather
+    than a calibrated PDA100A2 electronics model: default photon count is
+    `1e4`, additive read noise is `0.002` times the mean signal, SLM quantization
+    is 8-bit, finite contrast ratio is `1000:1`, and timing jitter is
+    `0.05` frame. These are engineering placeholders until published-curve or
+    hardware-calibrated parameters are digitized.

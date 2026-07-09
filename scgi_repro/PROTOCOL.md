@@ -39,3 +39,10 @@ All basis/channel comparisons in this project follow these rules.
     estimates a smooth gain envelope from observed measurements only and adds no
     reference frames. It is an equal-frame blind correction, not a trained SCGI
     network, and should not be reported as a paper-level SCGI-network result.
+13. **Nonideal scans are a separate digital-twin condition.** Ideal M2 scans use
+    exact SLM patterns and noiseless reference gain samples. Nonideal scans must
+    explicitly report SLM quantization levels, contrast ratio, photon count,
+    read-noise scale, timing-jitter scale, and reference-sample noise. Until
+    these parameters are digitized from published experiments or hardware
+    datasheets, report them as compact robustness checks rather than calibrated
+    experimental predictions.

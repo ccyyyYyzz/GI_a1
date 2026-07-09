@@ -331,6 +331,29 @@ spreading. It is still not a publication-grade theory closure because the large
 16/32/64 sweep, bootstrap intervals, AGC window bias-variance law, and censored
 flip-boundary model remain open.
 
+Latest compact nonideal M2 digital-twin run:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_nonideal_m2.py --output-dir results\nonideal_m2_compact
+```
+
+Outputs:
+
+- `nonideal_phase_scan.csv` (1224 rows; 612 ideal and 612 nonideal)
+- `nonideal_summary.csv`
+- `nonideal_best_equal_frame_blind_methods.csv`
+- `nonideal_best_reference_methods.csv`
+- `nonideal_key_summary.json`
+
+The nonideal condition uses 8-bit SLM quantization, finite contrast ratio
+1000:1, shot noise with photon count `1e4`, read noise `0.002` times mean
+signal, timing jitter `0.05` frame, and noisy `reference_k8` samples. In this
+compact 3-basis/3-rho/2-sigma check, strict equal-frame blind winners remain
+`pairwise` in all six rho/sigma cells; SRHT is the winning basis in 5/6 nonideal
+cells and Hadamard in 1/6. The nonideal oracle mean PSNR drops from near-exact
+85.3 dB to 33.4 dB, confirming that detector/SLM perturbations are active. This
+is a robustness entry point, not the requested full nonideal main scan.
+
 ## Figures
 
 `run_make_figures.py` now prefers the protocol-statistics result directories and
@@ -357,7 +380,7 @@ writes:
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
 ```
 
-Result: 18 tests passed.
+Result: 21 tests passed.
 
 Additional checks:
 
@@ -379,6 +402,8 @@ Additional checks:
 - Stage 3 smoke writes held-out target metrics, acceptance, and reconstruction grid.
 - M4 compact theory runner writes residual-error, random-frame, energy
   concentration, and flip-boundary fit tables under `results/theory_m4_compact`.
+- Compact nonideal M2 runner writes ideal/nonideal digital-twin comparison tables
+  under `results/nonideal_m2_compact`.
 
 ## Remaining Work Before Full Paper-Level Completion
 

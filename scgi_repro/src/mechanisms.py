@@ -122,6 +122,93 @@ def simulate_channel_measurements(
     return observed
 
 
+def quantize_slm_patterns(
+    patterns: torch.Tensor,
+    levels: int = 256,
+    contrast_ratio: float = 1000.0,
+) -> torch.Tensor:
+    """Apply amplitude SLM quantization and finite off-state leakage.
+
+    ``contrast_ratio`` models the ratio between fully-on and fully-off
+    transmission. The returned patterns stay in normalized intensity units.
+    """
+
+    values = patterns.clamp(0.0, 1.0)
+    count = max(2, int(levels))
+    quantized = torch.round(values * float(count - 1)) / float(count - 1)
+    if contrast_ratio and float(contrast_ratio) > 1.0:
+        leakage = 1.0 / float(contrast_ratio)
+        quantized = leakage + (1.0 - leakage) * quantized
+    return quantized
+
+
+def apply_frame_timing_jitter(
+    gains: torch.Tensor,
+    jitter_std_frames: float = 0.0,
+    seed: int = 0,
+) -> torch.Tensor:
+    """Sample gains at slightly jittered frame times by linear interpolation."""
+
+    values = gains.reshape(-1)
+    frames = values.numel()
+    if frames == 0:
+        raise ValueError("gains must be non-empty.")
+    if jitter_std_frames <= 0.0 or frames == 1:
+        return values.clone()
+    generator = _cpu_generator(seed)
+    jitter = torch.randn((frames,), generator=generator, dtype=values.dtype) * float(jitter_std_frames)
+    positions = (torch.arange(frames, dtype=values.dtype) + jitter).clamp(0.0, float(frames - 1))
+    left = torch.floor(positions).to(dtype=torch.long)
+    right = torch.ceil(positions).to(dtype=torch.long)
+    weight = positions - left.to(dtype=values.dtype)
+    sampled = values.index_select(0, left) * (1.0 - weight) + values.index_select(0, right) * weight
+    return sampled / sampled.mean().clamp_min(1.0e-8)
+
+
+def apply_detector_noise(
+    signal: torch.Tensor,
+    photon_count: float = 0.0,
+    read_noise: float = 0.0,
+    seed: int = 0,
+) -> torch.Tensor:
+    """Apply shot noise and additive read noise in normalized detector units."""
+
+    values = signal.reshape(-1)
+    noisy = values.clone()
+    generator = _cpu_generator(seed)
+    if photon_count and float(photon_count) > 0.0:
+        scale = float(photon_count)
+        rates = values.clamp_min(0.0).detach().cpu() * scale
+        sampled = torch.poisson(rates, generator=generator).to(device=values.device, dtype=values.dtype)
+        noisy = sampled / scale
+    if read_noise and float(read_noise) > 0.0:
+        reference = values.detach().abs().mean().clamp_min(1.0e-8).cpu()
+        noise = torch.randn(values.shape, generator=generator, dtype=values.dtype).to(values.device)
+        noisy = noisy + noise * (float(read_noise) * reference.to(values.device))
+    return noisy
+
+
+def simulate_nonideal_measurements(
+    ideal_measurements: torch.Tensor,
+    channel: ChannelTrace,
+    photon_count: float = 0.0,
+    read_noise: float = 0.0,
+    timing_jitter_std: float = 0.0,
+    seed: int = 0,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Apply multiplicative gain plus detector and timing nonidealities.
+
+    Returns the noisy observed measurements and the effective gain trace after
+    optional timing jitter.
+    """
+
+    ideal = ideal_measurements.reshape(-1).to(device=channel.gains.device, dtype=channel.gains.dtype)
+    effective_gains = apply_frame_timing_jitter(channel.gains, jitter_std_frames=timing_jitter_std, seed=seed + 17)
+    observed = ideal * effective_gains
+    observed = apply_detector_noise(observed, photon_count=photon_count, read_noise=read_noise, seed=seed)
+    return observed, effective_gains
+
+
 def moving_average_1d(values: torch.Tensor, window: int) -> torch.Tensor:
     """Centered moving average using replicated edge padding."""
 
@@ -253,6 +340,9 @@ def estimate_reference_gain(
     true_gains: torch.Tensor,
     period: int,
     eps: float = 1.0e-8,
+    reference_photons: float = 0.0,
+    reference_read_noise: float = 0.0,
+    seed: int = 0,
 ) -> torch.Tensor:
     """Estimate frame gains from every-K reference samples by linear interpolation.
 
@@ -271,6 +361,15 @@ def estimate_reference_gain(
     if ref_idx[-1].item() != frames - 1:
         ref_idx = torch.cat([ref_idx, torch.tensor([frames - 1], device=gains.device, dtype=ref_idx.dtype)])
     ref_vals = gains.index_select(0, ref_idx).clamp_min(eps)
+    if (reference_photons and float(reference_photons) > 0.0) or (
+        reference_read_noise and float(reference_read_noise) > 0.0
+    ):
+        ref_vals = apply_detector_noise(
+            ref_vals,
+            photon_count=reference_photons,
+            read_noise=reference_read_noise,
+            seed=seed,
+        ).clamp_min(eps)
 
     x = torch.arange(frames, device=gains.device, dtype=gains.dtype)
     xp = ref_idx.to(dtype=gains.dtype)
@@ -294,6 +393,9 @@ def apply_correction(
     paired: bool = False,
     agc_window: Optional[int] = None,
     eps: float = 1.0e-8,
+    reference_photons: float = 0.0,
+    reference_read_noise: float = 0.0,
+    reference_seed: int = 0,
 ) -> CorrectedMeasurements:
     """Apply oracle, none, blind gain corrections, or paired-ratio correction.
 
@@ -346,7 +448,14 @@ def apply_correction(
         gains = true_gains.reshape(-1).to(device=values.device, dtype=values.dtype)
         if gains.numel() != values.numel():
             raise ValueError(f"Expected {values.numel()} true gains, got {gains.numel()}.")
-        gain_hat = estimate_reference_gain(gains, period=reference_period, eps=eps)
+        gain_hat = estimate_reference_gain(
+            gains,
+            period=reference_period,
+            eps=eps,
+            reference_photons=reference_photons,
+            reference_read_noise=reference_read_noise,
+            seed=reference_seed,
+        )
         return CorrectedMeasurements(
             values=values / gain_hat.clamp_min(eps),
             values_are_coefficients=False,
