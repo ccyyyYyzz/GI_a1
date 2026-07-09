@@ -157,6 +157,16 @@ including 210 `scgi_frozen` rows. Mean equal-frame blind PSNR is 12.75 dB for
 `scgi_frozen`, below `none` at 16.87 dB, `scgi_proxy` at 17.94 dB, and
 `pairwise` at 22.25 dB.
 
+Dense frozen-network check:
+`results/phase_m2_scgi_frozen_dense_r1_merged/phase_scan.csv` has 89,250 rows,
+all five shard labels, and 10,500 `scgi_frozen` rows. The 35-cell strict
+equal-frame best map is unchanged: `srht_paired + pairwise` wins in 35/35
+rho/sigma cells. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
+16.64 dB for `none`, 17.40 dB for `scgi_proxy`, and 21.43 dB for `pairwise`.
+`scgi_frozen` beats `none` in 60.3% of matched comparisons but by only
++0.0047 dB on average, beats `scgi_proxy` in 18.8%, and beats pairwise on paired
+bases in 6.5%.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best
@@ -167,7 +177,7 @@ baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 bases and does not change the best 35-cell equal-frame map. Flip-boundary output
 is now diagnostic rather than a fitted law: 104 rows are `not_reached`, 17
 `left_censored`, and 14 `observed` in the reference protocol. The frozen-network
-smoke result shows that directly reusing the SCGI checkpoint is a real but weak
+results show that directly reusing the SCGI checkpoint is a real but weak
 cross-domain baseline, not a replacement for basis-aware retraining or
 fine-tuning.
 

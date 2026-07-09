@@ -42,10 +42,10 @@ Channels
   raw/AGC baselines without reference frames, but it does not displace SRHT
   pairwise as the equal-frame winner and should not be described as a trained
   SCGI-network result.
-- A frozen-network M2 smoke baseline now exists. Directly applying the returned
-  SCGI checkpoint to M2 sequences underperforms raw/proxy/pairwise baselines, so
-  a credible network-level phase diagram would need basis-aware retraining,
-  fine-tuning, or a different sequence representation.
+- Frozen-network M2 smoke and dense baselines now exist. Directly applying the
+  returned SCGI checkpoint to M2 sequences underperforms proxy/pairwise
+  baselines, so a credible network-level phase diagram would need basis-aware
+  retraining, fine-tuning, or a different sequence representation.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples. Compact and full nonideal digital-twin scans now exist, and the full
   scan preserves the pairwise winner under detector/SLM perturbations; published
@@ -58,8 +58,8 @@ Channels
   random/SRHT coefficient spreading, but the publication version still needs a
   larger N sweep, bootstrap confidence intervals, AGC window law, and censored
   flip-boundary treatment.
-- A dense or fine-tuned SCGI-network correction is not yet part of the M2 phase
-  diagram; only the underperforming frozen smoke baseline is implemented.
+- A competitive fine-tuned SCGI-network correction is not yet part of the M2
+  phase diagram; the implemented frozen dense baseline underperforms.
 - Published-curve calibration is still missing: APL intensity traces and OE
   attenuation ranges have not yet been digitized into OU/channel parameters.
 

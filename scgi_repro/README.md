@@ -77,6 +77,8 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   zero reference frames.
 - `results/phase_m2_scgi_frozen_smoke/`: frozen-network M2 smoke baseline using
   the returned SCGI checkpoint and explicit `scgi_frozen` correction.
+- `results/phase_m2_scgi_frozen_dense_r1_merged/`: 89,250-row dense M2 run with
+  explicit `scgi_frozen` correction and all five Colab shard labels present.
 - `results/theory_m4_compact/`: compact M4 fitted-law outputs for residual gain
   scaling, random frame scaling, coefficient energy concentration, and observed
   flip-boundary fits.
