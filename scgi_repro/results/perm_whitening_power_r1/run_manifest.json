@@ -1,0 +1,28 @@
+{
+  "utc_timestamp": "2026-07-09T20:31:21.754458+00:00",
+  "git_commit": "c99487b7a214630a0555474e844429daad0ed3bf",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\perm_whitening_power_r1",
+    "image_size": 64,
+    "objects": 10,
+    "nperm": 32,
+    "seed": 20240708,
+    "window": 64,
+    "chunks": 8,
+    "transient": 128,
+    "reject_alpha": 0.001,
+    "device": "cpu",
+    "shard": "",
+    "smoke": false
+  },
+  "rows": 330,
+  "units_total": 330,
+  "shard": "0/1",
+  "K": 4096,
+  "nperm": 32,
+  "carrier_verify_max_abs_diff_vs_make_paper_basis": 4.147923380060092e-05
+}

@@ -1,0 +1,28 @@
+{
+  "utc_timestamp": "2026-07-09T20:28:52.343309+00:00",
+  "git_commit": "c99487b7a214630a0555474e844429daad0ed3bf",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\perm_whitening_power_smoke",
+    "image_size": 16,
+    "objects": 3,
+    "nperm": 4,
+    "seed": 20240708,
+    "window": 16,
+    "chunks": 8,
+    "transient": 16,
+    "reject_alpha": 0.001,
+    "device": "cpu",
+    "shard": "",
+    "smoke": true
+  },
+  "rows": 15,
+  "units_total": 15,
+  "shard": "0/1",
+  "K": 256,
+  "nperm": 4,
+  "carrier_verify_max_abs_diff_vs_make_paper_basis": 1.3290572553614766e-06
+}
