@@ -125,9 +125,12 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_ured_sweep_nlm_patch_r1_stripe/`: monitored 144-config NLM
   patch-size/patch-distance stripe sweep. It does not improve beyond 9.365 CNR;
   the best row keeps the previous effective NLM patch defaults (`5`, `6`).
-- `results/stage4_trace_audit_r2/`: combined final-vs-target-aware trace audit
-  for the Stage 4 NLM URED sweeps including the patch sweep; stripe remains
-  below the APL URED minimum CNR.
+- `results/stage4_ured_sweep_naf_capacity_r1_stripe/`: monitored 9-config
+  NAFNet capacity check over 24/32/48 channels and 3/4/5 blocks. Prompt-like
+  32-channel/4-block capacity does not improve the stripe CNR plateau.
+- `results/stage4_trace_audit_r3/`: combined final-vs-target-aware trace audit
+  for the Stage 4 NLM URED sweeps including the patch and capacity sweeps;
+  stripe remains below the APL URED minimum CNR.
 - `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
   Its target-aware trace peaks are diagnostic only, and no tested proxy is a
   deployable stopping rule.

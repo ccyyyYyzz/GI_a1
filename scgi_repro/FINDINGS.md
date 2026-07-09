@@ -115,7 +115,11 @@ as sweep parameters and tests 144 monitored stripe configurations around this
 best region. It does not improve the threshold gap: the best final/trace CNR is
 again `9.365`, with `patch_size=5` and `patch_distance=6`, so the remaining
 failure is not explained by the previously fixed NLM patch defaults.
-`results/stage4_trace_audit_r2` records the combined final-vs-trace audit across
+`results/stage4_ured_sweep_naf_capacity_r1_stripe` tests NAFNet capacity over
+24/32/48 channels and 3/4/5 blocks at the best stripe setting. It also does not
+improve the gap: the best row is still the 24-channel/3-block configuration at
+`9.365`, while the prompt-like 32-channel/4-block row reaches only `6.091`.
+`results/stage4_trace_audit_r3` records the combined final-vs-trace audit across
 these sweeps and keeps stripe below the APL URED minimum even with target-aware
 trace selection.
 
