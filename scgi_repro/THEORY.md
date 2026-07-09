@@ -94,9 +94,14 @@ candidate scaling
 W* ∝ (CV_B^2 / (sigma_a^2 rho^nu))^(1/(nu+1)).
 ```
 
-The current AGC-window sweep should be interpreted as a diagnostic of this
-tradeoff, not as a confirmed law: many grid cells hit the sampled window bounds,
-and the fitted random/SRHT exponents have only low-to-moderate R2.
+The AGC-window sweeps should be interpreted as diagnostics of this tradeoff,
+not as a confirmed law. The first paper-r2 grid had many best-window selections
+on the sampled bounds and random/SRHT fits with only low-to-moderate R2. The
+targeted follow-up in `results/theory_m4_agc_targeted_r1` widens and densifies
+the window grid, but 42-56% of best-window cells still sit on a boundary and
+the fitted R2 values remain 0.71-0.82. This supports the existence of a
+bias-variance tension but not a publication-ready scaling law for the current
+AGC estimator.
 
 ## H4: Energy Concentration
 
@@ -156,13 +161,16 @@ high-rho rerun `results/theory_m4_paper_r2_highrho`:
   upper range `rho=10` and recomputes log-rho interpolated boundaries. Five
   observed boundary fits now have `R2 >= 0.9`, while censored rows distinguish
   "already better at the smallest rho" from "not reached by rho=10".
-- `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The current
-  random/SRHT fits have low-to-moderate R2 (`0.29-0.55`), so the candidate
-  bias-variance law above should be treated as an explanatory model that still
-  needs a better-designed window sweep.
+- `m4_agc_window_law_fit.csv` logs empirical best-window scaling. The paper-r2
+  random/SRHT fits have low-to-moderate R2 (`0.29-0.55`).
+- `results/theory_m4_agc_targeted_r1` reruns the AGC validation with a denser
+  window grid and 86,400 raw rows. Fits improve to R2 `0.71-0.82`, but
+  best-window selections remain boundary-heavy (`boundary_frac = 0.42-0.56`).
+  The candidate bias-variance law should therefore remain an explanatory sketch,
+  not a claimed quantitative theorem.
 
-Remaining theory work before publication: validate the AGC window law with a
-dedicated sweep that avoids window-grid saturation, convert the high-rho
+Remaining theory work before publication: either redesign the AGC estimator or
+derive a boundary-aware/censored window-selection model, convert the high-rho
 boundary diagnostics into final vector figures, and connect the published
 figure-level channel anchors to a hardware-calibrated nonideal model if raw
 detector/SLM logs become available.

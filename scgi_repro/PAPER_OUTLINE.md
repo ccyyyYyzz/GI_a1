@@ -48,8 +48,10 @@ identifiability/calibration problem rather than irreversible information loss.
 reduces random bucket fluctuation as the window grows but increasingly smooths
 over channel drift. The candidate law in `THEORY.md` predicts a competition
 between `CV_B^2/W` variance and a drift-bias term proportional to
-`sigma_a^2(rho W)^nu`; the present `results/theory_m4_paper_r2_highrho` fits are
-diagnostic because many sampled cells hit the window-grid boundary.
+`sigma_a^2(rho W)^nu`. The targeted validation in
+`results/theory_m4_agc_targeted_r1` improves AGC best-window fit R2 to 0.71-0.82
+but still has 42-56% boundary-selected cells, so Figure 3 should present the law
+as an explanatory diagnostic rather than a final theorem.
 
 **Figure 4. Residual gain errors propagate coherently through orthogonal
 inversion but average through random measurements.** M4 residual-error sweeps
@@ -127,8 +129,10 @@ whitening object-dependent coefficient order.
   bootstrap confidence intervals, random/SRHT coefficient spreading up to 4096
   pixels, censored flip-boundary accounting, and AGC window diagnostics.
   `results/paper_figures_r1` now renders the current M2/M4 figure draft set and
-  manifest. The publication version still needs final venue-formatted vector
-  polishing and a more targeted AGC validation sweep.
+  manifest. The targeted AGC validation sweep is complete but remains
+  boundary-sensitive, so the publication version still needs final
+  venue-formatted vector polishing and either a better AGC estimator or a
+  boundary-aware window-selection model.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
   phase diagram; the frozen dense baseline, current fine-tuned smokes, and
   true-gain predictor smokes underperform overall.

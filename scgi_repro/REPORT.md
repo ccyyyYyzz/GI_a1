@@ -535,7 +535,7 @@ Key M4 checks:
 | H4 energy concentration at 4096 pixels | DCT/Fourier/Hadamard top-5% energy 0.88-0.92; random/SRHT about 0.28 |
 | flip-boundary fits | high-rho r2 has 5 observed fits and censored interval tables; three observed fits have R2 >= 0.9 inside M4, while the separate M2 high-rho audit has five R2-qualified fits |
 | high-rho M2 boundary audit | prompt rho range now reaches 10; five log-rho boundary fits have R2 >= 0.9; strict equal-frame blind winner is SRHT/pairwise in 45/45 cells |
-| AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; empirical best-window fits remain weak for random/SRHT bases (R2 0.29-0.55), so this remains diagnostic |
+| AGC window law | candidate bias-variance derivation is now written in `THEORY.md`; targeted validation improves fits to R2 0.71-0.82 but still has 42-56% boundary-selected best windows, so this remains diagnostic |
 
 Interpretation: M4 now has a larger-N 16/32/64 sweep, bootstrap intervals for
 the main log-linear fits, censored-aware flip-boundary interval tables, and an
@@ -546,8 +546,12 @@ draft captions for the eight main figures. `run_make_paper_figures.py` renders
 the first paper-facing M2/M4 draft set under `results/paper_figures_r1`,
 including prompt-range winner maps, boundary fits, residual-error fits,
 random-frame scaling, energy concentration, and AGC-window diagnostics. The
-remaining publication work is final venue-formatted vector panel polishing plus
-a targeted AGC sweep that avoids window-grid saturation.
+targeted AGC validation in `results/theory_m4_agc_targeted_r1` adds 86,400 raw
+rows, a denser window grid, best-window saturation statistics, and fit tables.
+It improves fit R2 to 0.71-0.82 but still leaves 42-56% of best-window cells at
+the grid boundary, so the candidate AGC law remains diagnostic. The remaining
+publication work is final venue-formatted vector panel polishing plus either a
+better AGC estimator or a boundary-aware window-selection model.
 
 Latest nonideal M2 digital-twin runs:
 

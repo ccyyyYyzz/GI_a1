@@ -248,6 +248,39 @@ def make_m4_paper_figures(root: Path, out_dir: Path) -> list[dict[str, str]]:
         }
     )
 
+    targeted_dir = root / "results" / "theory_m4_agc_targeted_r1"
+    targeted_saturation = targeted_dir / "m4_agc_targeted_saturation.csv"
+    targeted_fit = targeted_dir / "m4_agc_targeted_fit.csv"
+    if targeted_saturation.exists() and targeted_fit.exists():
+        saturation = _read(targeted_saturation)
+        out = save_metrics_table(
+            out_dir / "m4_agc_targeted_saturation_table.png",
+            saturation[["basis", "lower_bound", "interior", "upper_bound", "interior_frac", "boundary_frac"]],
+            title="M4 targeted AGC best-window saturation",
+            max_rows=8,
+        )
+        manifest.append(
+            {
+                "figure": out.name,
+                "source": str(targeted_saturation),
+                "caption": "The targeted AGC sweep expands the window grid but many best windows still sit on the lower boundary.",
+            }
+        )
+        targeted = _read(targeted_fit)
+        out = save_metrics_table(
+            out_dir / "m4_agc_targeted_fit_table.png",
+            targeted[["basis", "rho_exponent", "sigma_a_exponent", "r2", "rmse_log10", "n"]],
+            title="M4 targeted AGC window-law fits",
+            max_rows=8,
+        )
+        manifest.append(
+            {
+                "figure": out.name,
+                "source": str(targeted_fit),
+                "caption": "Targeted AGC fits improve over the earlier diagnostic but remain too boundary-sensitive for a final law.",
+            }
+        )
+
     summary_path = theory_dir / "m4_key_summary.json"
     if summary_path.exists():
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
