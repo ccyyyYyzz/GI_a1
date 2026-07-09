@@ -69,9 +69,9 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/phase_m2_reference_protocol_o10s5/`: 68,250-row dense 7x5 M2
   protocol output with `reference_k2/k8/k32` calibration, equal-frame blind
   summaries, and flip-boundary diagnostics.
-- `results/phase_m2_scgi_proxy_smoke/`: smoke validation that `scgi_proxy`
-  appears in M2 as an equal-frame blind smooth-gain proxy with zero reference
-  frames.
+- `results/phase_m2_scgi_proxy_dense_r1_merged/`: 78,750-row dense 7x5 M2
+  output that adds `scgi_proxy` as an equal-frame blind smooth-gain proxy with
+  zero reference frames.
 - `results/mechanism_m1_protocol_o10s5/`,
   `results/phase_m2_reference_protocol_o10s5/`, and
   `results/srht_m3_protocol_o10s5/`: 10-object x 5-seed mechanism outputs used

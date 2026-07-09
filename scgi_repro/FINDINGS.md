@@ -143,18 +143,22 @@ Result: `results/phase_m2_reference_protocol_o10s5/phase_scan.csv` records
 `best_equal_frame_blind_methods.csv`, so extra-reference-frame methods are not
 silently compared as if they used the same physical budget.
 
-Follow-up smoke check: `results/phase_m2_scgi_proxy_smoke/phase_scan.csv`
-adds `scgi_proxy`, a blind smooth-gain SCGI-style proxy. It contributes 210
-smoke rows, uses zero reference frames, and is kept separate from claims about a
-trained SCGI network.
+Follow-up dense Colab-sharded check:
+`results/phase_m2_scgi_proxy_dense_r1_merged/phase_scan.csv` adds
+`scgi_proxy`, a blind smooth-gain SCGI-style proxy. It contributes 10,500 dense
+rows inside a 78,750-row merged scan, uses zero reference frames, and is kept
+separate from claims about a trained SCGI network.
 
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 35 sampled rho/sigma cells. `srht_paired + reference_k2` is the best
 reference-calibrated method across all 35 cells but uses 3073 total physical
 frames instead of 2048, so it should be reported as a separate semi-calibrated
-baseline. Flip-boundary output is now diagnostic rather than a fitted law:
-104 rows are `not_reached`, 17 `left_censored`, and 14 `observed`.
+baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
+66.7% of matched basis/rho/sigma means, but it never beats pairwise on paired
+bases and does not change the best 35-cell equal-frame map. Flip-boundary output
+is now diagnostic rather than a fitted law: 104 rows are `not_reached`, 17
+`left_censored`, and 14 `observed` in the reference protocol.
 
 ## Rendered Figures
 

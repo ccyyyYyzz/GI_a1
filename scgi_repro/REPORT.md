@@ -245,10 +245,21 @@ Outputs:
   `best_equal_frame_blind_methods.csv`, `best_reference_methods.csv`
 - `flip_boundary.csv` (135 rows)
 
-An additional M2 smoke validation at `results/phase_m2_scgi_proxy_smoke`
-confirms the new `scgi_proxy` correction is present in the scan output. It is a
-blind smooth-gain SCGI-style proxy with zero reference frames, not a trained
-SCGI network. The smoke CSV has 1575 rows overall and 210 `scgi_proxy` rows.
+Additional Colab-sharded M2 run with `scgi_proxy`:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\colab_imports\pro1_dense_r1_shard0of5\artifacts results\colab_imports\pro1_dense_r1_shard1of5\artifacts results\colab_imports\pro2_dense_r1_shard2of5\artifacts results\colab_imports\pro2_dense_r1_shard3of5\artifacts results\colab_imports\pro2_dense_r1_shard4of5\artifacts --output-dir results\phase_m2_scgi_proxy_dense_r1_merged
+```
+
+Outputs:
+
+- `results/phase_m2_scgi_proxy_dense_r1_merged/phase_scan.csv` (78,750 rows)
+- `results/phase_m2_scgi_proxy_dense_r1_merged/dense_r1_diagnostics.json`
+- merged best-method, equal-frame, reference, and flip-boundary CSVs
+
+`scgi_proxy` is a blind smooth-gain SCGI-style proxy with zero reference frames,
+not a trained SCGI network. The dense run has 10,500 `scgi_proxy` rows; all have
+`reference_frames=0` and `total_physical_frames=num_frames`.
 
 Frame audit for M2 reference protocol:
 
@@ -270,8 +281,13 @@ Interpretation: under the strict 2048-frame blind budget, SRHT paired
 measurements with pairwise normalization dominate this compact M2 grid. The
 reference-calibrated `reference_k2` variant improves PSNR but spends 3073 total
 physical frames, so it is a separate semi-calibrated baseline rather than a
-fair blind winner. Flip-boundary diagnostics are emitted with boundary statuses:
-104 `not_reached`, 17 `left_censored`, and 14 `observed`.
+fair blind winner. In the dense `scgi_proxy` run, `scgi_proxy` improves over raw
+`none` in 88.6% of matched basis/rho/sigma means and over AGC in 66.7%, but it
+never beats pairwise on paired bases. Across equal-frame blind candidates, it is
+ranked first in 45 of 210 basis/rho/sigma triples, mostly for random bases, but
+it does not change the 35-cell best-method map. Flip-boundary diagnostics are
+emitted with boundary statuses: 104 `not_reached`, 17 `left_censored`, and 14
+`observed` in the reference protocol.
 
 Latest M3 protocol-statistics run:
 
@@ -310,7 +326,7 @@ writes:
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
 ```
 
-Result: 14 tests passed.
+Result: 18 tests passed.
 
 Additional checks:
 
@@ -324,6 +340,8 @@ Additional checks:
 - M2 sharding was smoke-tested with `--shard 0/2` and `--shard 1/2`; merging
   with `merge_phase_m2_shards.py` reproduced the 1365-row smoke scan within
   numeric tolerance.
+- M2 `scgi_proxy` dense run was split into five Colab L4 shards and merged into
+  a 78,750-row scan with all five shard labels present.
 - Stage 0 smoke now writes `val_diagnostics.csv` and `acceptance.csv`.
 - Stage 1 smoke diagnostics write histogram, dynamic-curve, gain-curve, and
   lambda-distribution figures.
@@ -333,8 +351,9 @@ Additional checks:
 
 - Redesign the `full` SCGI training profile. Colab has now run both 20 and
   100 epochs at 128x128/N=16384; both remain far below the SCGI thresholds.
-- Add SCGI-network correction inside M2 and published-channel/non-ideal detector
-  calibration.
+- Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
+  SCGI-network correction if a network-level phase diagram is required, and add
+  published-channel/non-ideal detector calibration.
 - Fit and report M2 flip-boundary laws with R2, then update `THEORY.md` with
   quantitative curves rather than smoke-level diagnostics.
 

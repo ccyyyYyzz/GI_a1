@@ -38,11 +38,16 @@ Channels
 - The dense M2 reference scan supports `srht_paired + pairwise` as the strict
   equal-frame blind winner across the current 35-cell grid. This is useful
   evidence for the SRHT design rule, but it is still idealized.
+- The dense `scgi_proxy` scan shows that a blind smooth-gain proxy improves over
+  raw/AGC baselines without reference frames, but it does not displace SRHT
+  pairwise as the equal-frame winner and should not be described as a trained
+  SCGI-network result.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples; a non-ideal detector/reference-noise section is still needed.
 - Flip boundaries are discrete sampled diagnostics, not yet fitted theory curves
   with uncertainty.
-- SCGI-network correction is not yet part of the M2 phase diagram.
+- A true pretrained/frozen SCGI-network correction is not yet part of the M2
+  phase diagram.
 
 ## Venue Positioning
 
