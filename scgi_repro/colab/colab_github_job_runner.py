@@ -110,7 +110,7 @@ def main() -> None:
         repo_dir = tmp_path / "repo"
         run(["git", "clone", "--depth", "1", args.repo, str(repo_dir)])
         run(["git", "fetch", "--depth", "1", "origin", args.ref], cwd=repo_dir)
-        run(["git", "checkout", "--detach", args.ref], cwd=repo_dir)
+        run(["git", "checkout", "--detach", "FETCH_HEAD"], cwd=repo_dir)
         run(["git", "rev-parse", "--short", "HEAD"], cwd=repo_dir)
         workdir = repo_dir / args.workdir
         if not workdir.exists():
