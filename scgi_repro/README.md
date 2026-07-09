@@ -47,6 +47,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_make_paper_figures.py --output-dir results\paper_figures_r1
 & $py run_make_paper_multipanels.py --output-dir results\paper_figures_r1\multipanels
 & $py run_stage4_postprocess_audit.py --arrays results\stage4_image_audit_r1\stage4_image_audit_arrays.npz --output-dir results\stage4_postprocess_audit_r1
+& $py run_monitored_job.py --run-id stage4_postprocess_allobjects_r1 --output-dir results\cli_runs\stage4_postprocess_allobjects_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage4_postprocess_allobjects.py --output-dir results\stage4_postprocess_allobjects_r1
 & $py -m unittest discover tests -v
 ```
 
@@ -142,6 +143,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   the best stripe URED output. Otsu thresholding the reconstruction histogram
   raises stripe CNR from 9.365 to 15.288 with IoU 0.987, showing the shape is
   present, but this changes the reporting protocol relative to continuous URED.
+- `results/stage4_postprocess_allobjects_r1/`: monitored all-object extension of
+  the post-processing audit. Best-trace target-free thresholded masks clear the
+  APL URED CNR gate on all four held-out objects (minimum 15.288), while
+  best-final target-free masks still miss for ring (9.332), so fully deployable
+  continuous/final Stage 4 remains open.
 - `results/stage4_ured_proxy_audit_r1/`: target-free URED trace-proxy audit.
   Its target-aware trace peaks are diagnostic only, and no tested proxy is a
   deployable stopping rule.

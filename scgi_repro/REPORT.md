@@ -308,6 +308,15 @@ reproduction unless the reporting protocol permits thresholded URED outputs, but
 it is strong evidence that the remaining Stage 4 failure is output calibration or
 post-processing, not target localization.
 
+`results/stage4_postprocess_allobjects_r1` extends that check to all four
+held-out objects by regenerating each object's best final and best target-aware
+trace image from `stage4_trace_audit_r3`. The best-trace target-free masks all
+clear the APL URED CNR gate: `letter_A=22.505`, `letter_L=70.550`,
+`ring=21.163`, and `stripe_target=15.288`. The fixed best-final target-free
+post-processing is weaker: `ring` remains below the gate at 9.332. Therefore the
+current evidence supports "shape present, calibration/stopping unresolved",
+rather than a fully deployable Stage 4 reproduction.
+
 A follow-up target-free proxy audit records `loss`, data/augmentation losses,
 denoiser residual, TV/roughness, Otsu, entropy, range, and related image proxies
 at every URED step. Among these simple rules, `max_proxy_min` is best by

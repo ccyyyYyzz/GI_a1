@@ -1,0 +1,72 @@
+{
+  "apl_min_cnr": 10.43,
+  "objects": [
+    "letter_A",
+    "letter_L",
+    "ring",
+    "stripe_target"
+  ],
+  "image_audit_dirs": {
+    "letter_A": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\stage4_postprocess_allobjects_r1\\image_audits\\letter_A",
+    "letter_L": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\stage4_postprocess_allobjects_r1\\image_audits\\letter_L",
+    "ring": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\stage4_postprocess_allobjects_r1\\image_audits\\ring",
+    "stripe_target": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\stage4_postprocess_allobjects_r1\\image_audits\\stripe_target"
+  },
+  "num_metric_rows": 56,
+  "best_final_target_free_min_cnr": 9.331894874572754,
+  "best_final_target_free_all_hit_apl_min": false,
+  "best_trace_target_free_min_cnr": 15.288484573364258,
+  "best_trace_target_free_all_hit_apl_min": true,
+  "best_final_target_free_methods": [
+    {
+      "object": "letter_A",
+      "postprocess_method": "raw_mean_plus_std_binary",
+      "cnr": 11.112298965454102,
+      "hits_apl_min": true
+    },
+    {
+      "object": "letter_L",
+      "postprocess_method": "raw_otsu_binary",
+      "cnr": 34.90959167480469,
+      "hits_apl_min": true
+    },
+    {
+      "object": "ring",
+      "postprocess_method": "raw_mean_plus_std_binary",
+      "cnr": 9.331894874572754,
+      "hits_apl_min": false
+    },
+    {
+      "object": "stripe_target",
+      "postprocess_method": "raw_otsu_binary",
+      "cnr": 15.288484573364258,
+      "hits_apl_min": true
+    }
+  ],
+  "best_trace_target_free_methods": [
+    {
+      "object": "letter_A",
+      "postprocess_method": "raw_mean_plus_std_binary",
+      "cnr": 22.50545883178711,
+      "hits_apl_min": true
+    },
+    {
+      "object": "letter_L",
+      "postprocess_method": "raw_otsu_binary",
+      "cnr": 70.55021667480469,
+      "hits_apl_min": true
+    },
+    {
+      "object": "ring",
+      "postprocess_method": "raw_otsu_binary",
+      "cnr": 21.1628360748291,
+      "hits_apl_min": true
+    },
+    {
+      "object": "stripe_target",
+      "postprocess_method": "raw_otsu_binary",
+      "cnr": 15.288484573364258,
+      "hits_apl_min": true
+    }
+  ]
+}

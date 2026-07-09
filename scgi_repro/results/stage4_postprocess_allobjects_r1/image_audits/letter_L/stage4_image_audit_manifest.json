@@ -1,0 +1,27 @@
+{
+  "profile": "full",
+  "checkpoint": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\colab_imports\\pro2_full_exp_residual_e2_r1\\artifacts\\model_checkpoint.pt",
+  "audit_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\stage4_trace_audit_r3",
+  "object": "letter_L",
+  "object_index": 2,
+  "lambda_true": 0.9998273253440857,
+  "lambda_analytic": 0.9998273253440857,
+  "bbox_pad": 2,
+  "bbox": {
+    "y_start": 23,
+    "y_stop": 104,
+    "x_start": 23,
+    "x_stop": 104
+  },
+  "final_source": {
+    "sweep": "nlm_allobjects",
+    "config_id": "cfg0000",
+    "cnr": 12.796236038208008
+  },
+  "trace_source": {
+    "sweep": "nlm_allobjects",
+    "config_id": "cfg0000",
+    "best_trace_step": 40,
+    "best_trace_cnr": 21.110126495361328
+  }
+}

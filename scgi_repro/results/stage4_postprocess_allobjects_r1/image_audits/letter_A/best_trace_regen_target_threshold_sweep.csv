@@ -1,0 +1,10 @@
+target_threshold,cnr,method
+0.1,9.81772232055664,best_trace_regen
+0.2,11.210511207580566,best_trace_regen
+0.3,12.375532150268555,best_trace_regen
+0.4,12.833517074584961,best_trace_regen
+0.5,13.209966659545898,best_trace_regen
+0.6,14.650145530700684,best_trace_regen
+0.7,14.446927070617676,best_trace_regen
+0.8,14.069073677062988,best_trace_regen
+0.9,13.430057525634766,best_trace_regen

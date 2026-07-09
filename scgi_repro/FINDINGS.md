@@ -55,6 +55,13 @@ reproduction because it changes the reported output from continuous URED to a
 thresholded mask, but it localizes the remaining Stage 4 gap to output
 calibration/post-processing rather than object localization.
 
+The all-object follow-up in `results/stage4_postprocess_allobjects_r1` reinforces
+that interpretation. For target-aware best-trace images, target-free thresholded
+masks clear the APL URED CNR gate for all four held-out objects, with minimum CNR
+15.288. For fixed best-final images, the best target-free thresholded mask still
+misses on `ring` (9.332), so the fully deployable Stage 4 protocol remains
+partial.
+
 ## Stage 3 Held-Out Targets
 
 Experiment: load the saved Stage 0 smoke checkpoint and test letter/stripe/ring

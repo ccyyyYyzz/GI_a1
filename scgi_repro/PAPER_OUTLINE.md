@@ -102,6 +102,11 @@ benefit claim.
   APL-scale Colab runs at 20 and 100 epochs complete but do not converge, so the
   SCGI reproduction should be presented as an executable diagnostic prototype
   until the full training setup is redesigned.
+- Stage 4 now has an important diagnostic split: strict continuous URED remains
+  below the APL gate, but target-free thresholded masks from target-aware
+  best-trace images clear the URED CNR threshold on all four held-out objects.
+  This supports "shape present, calibration/stopping unresolved" rather than a
+  fully deployable reproduction.
 - The dense M2 reference scan supports `srht_paired + pairwise` as the strict
   equal-frame blind winner. The high-rho merge covers `rho=0.001..10` and keeps
   `srht_paired + pairwise` as the winner in 45/45 equal-frame cells. This is
