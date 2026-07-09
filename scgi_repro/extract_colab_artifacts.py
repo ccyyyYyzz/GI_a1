@@ -24,6 +24,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("log", type=Path)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--skip-text-outputs", action="store_true")
     args = parser.parse_args()
 
     text = read_log_text(args.log)
@@ -34,7 +35,7 @@ def main() -> None:
         (args.out / "colab_job_summary.json").write_text(summaries[-1] + "\n", encoding="utf-8")
 
     text_blocks = extract_between(text, "COLAB_TEXT_OUTPUTS_BEGIN", "COLAB_TEXT_OUTPUTS_END")
-    if text_blocks:
+    if text_blocks and not args.skip_text_outputs:
         outputs = json.loads(text_blocks[-1])
         text_root = args.out / "text_outputs"
         text_root.mkdir(exist_ok=True)

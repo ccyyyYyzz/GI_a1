@@ -183,7 +183,14 @@ minimum even with target-aware trace selection.
 prompt-like 32-channel/4-block capacity around the improved LR/residual-scale
 basin; the best stripe CNR rises only to `9.670`, so capacity is still not the
 binding issue. `results/stage4_ured_binary_prior_pilot_r1_stripe` adds a
-continuous double-well prior and gives a small gain to `9.711`. The stronger
+continuous double-well prior and gives a small gain to `9.711`.
+`results/stage4_ured_continuous_binary_refine_colab_r1_merged` then runs a
+five-shard Colab L4 strict continuous `denoiser=nlm` binary-prior refinement
+around that basin. All five shard artifacts succeed and merge to 648 rows, but
+the best final/trace stripe CNR reaches only `9.898` at
+`steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`,
+`nlm_h=0.062`, and `binary_prior_weight=0.02`, still below the APL URED minimum
+of `10.43`. The stronger
 change is `nlm_otsu_soft`, a target-free soft-Otsu RED denoiser that keeps the
 final report image as continuous `x-u`. In
 `results/stage4_ured_otsu_soft_fixedstep_r1_stripe`, a fixed 15-step run reaches

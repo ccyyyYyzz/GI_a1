@@ -344,11 +344,18 @@ sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
 `letter_L`, and `ring`, but not for `stripe_target`
 (`best_final_cnr=9.502`, `best_trace_cnr=9.606`).
-The next stripe-focused pass adds three monitored checks. First,
+The next stripe-focused pass adds a sequence of monitored checks. First,
 `results/stage4_ured_prompt_capacity_micro_r1_stripe` retunes the prompt-like
 capacity question near the improved LR/residual-scale basin and reaches only
 9.670 CNR. Second, `results/stage4_ured_binary_prior_pilot_r1_stripe` adds a
-continuous double-well prior and reaches 9.711 CNR. Third,
+continuous double-well prior and reaches 9.711 CNR. A follow-up five-shard Colab
+L4 refinement, `results/stage4_ured_continuous_binary_refine_colab_r1_merged`,
+keeps the strict continuous `denoiser=nlm` output protocol and sweeps 648
+binary-prior neighborhood configurations. All five shard jobs return success,
+but the best stripe final/trace CNR is 9.898 at
+`steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`, `nlm_h=0.062`,
+and `binary_prior_weight=0.02`, so this path still misses the 10.43 APL URED
+minimum. Third,
 `results/stage4_ured_otsu_soft_pilot_r1_stripe` and
 `results/stage4_ured_otsu_soft_fixedstep_r1_stripe` add a target-free soft-Otsu
 RED denoiser. This is the first strict continuous-output stripe run to clear

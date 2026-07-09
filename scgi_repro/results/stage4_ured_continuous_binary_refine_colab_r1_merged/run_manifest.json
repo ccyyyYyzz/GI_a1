@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "run_id": "stage4_ured_continuous_binary_refine_colab_r1_merged",
+  "created_time_utc": "2026-07-09T15:48:55Z",
+  "source_ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+  "source_imports": [
+    "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard0of5",
+    "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+    "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard2of5",
+    "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard3of5",
+    "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard4of5"
+  ],
+  "source_count": 5,
+  "rows": 648,
+  "expected_rows": 648,
+  "row_count_passed": true,
+  "success_sources": 5,
+  "apl_ured_min_cnr": 10.43,
+  "best_cnr": 9.898012161254885,
+  "best_trace_cnr": 9.898012161254885,
+  "passed_apl_ured_min": false,
+  "best_record": {
+    "source_import": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+    "config_id": "cfg0511",
+    "global_config_index": 511,
+    "steps": 33,
+    "lr": 0.00045,
+    "beta": 0.55,
+    "xi": 0.5,
+    "x_step": 0.15,
+    "channels": 24,
+    "blocks": 3,
+    "residual_scale": 0.06,
+    "denoiser": "nlm",
+    "nlm_h": 0.062,
+    "nlm_patch_size": 5,
+    "nlm_patch_distance": 6,
+    "binary_prior_weight": 0.02,
+    "cnr": 9.898012161254885,
+    "psnr": 7.501806735992432,
+    "best_trace_cnr": 9.898012161254885
+  },
+  "best_trace_record": {
+    "source_import": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+    "config_id": "cfg0511",
+    "global_config_index": 511,
+    "steps": 33,
+    "lr": 0.00045,
+    "beta": 0.55,
+    "xi": 0.5,
+    "x_step": 0.15,
+    "channels": 24,
+    "blocks": 3,
+    "residual_scale": 0.06,
+    "denoiser": "nlm",
+    "nlm_h": 0.062,
+    "nlm_patch_size": 5,
+    "nlm_patch_distance": 6,
+    "binary_prior_weight": 0.02,
+    "cnr": 9.898012161254885,
+    "psnr": 7.501806735992432,
+    "best_trace_cnr": 9.898012161254885
+  },
+  "sources": [
+    {
+      "import_dir": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard0of5",
+      "metrics_rows": 130,
+      "run_manifest": {
+        "profile": "full",
+        "checkpoint": "results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt",
+        "model_kind": "exponential_residual_unet",
+        "device": "cuda",
+        "image_size": 128,
+        "num_patterns": 16384,
+        "objects": [
+          "stripe_target"
+        ],
+        "selected_object_indices": [
+          1
+        ],
+        "num_configs": 130,
+        "object_shard": "None",
+        "config_shard": "(0, 5)",
+        "fixed_init_seed": 20240709,
+        "fixed_init_seed_values": null,
+        "started_unix": 1783611035.9114945,
+        "elapsed_seconds": 213.4193196296692,
+        "completed": true
+      },
+      "colab_job_status": {
+        "accelerator": "L4",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 0/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard0of5 --save-traces",
+        "cu_per_hour": 0.0,
+        "elapsed_seconds": 240.005,
+        "end_time_utc": "2026-07-09T15:34:33Z",
+        "estimated_cu_hours": null,
+        "persist_root": null,
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "return_code": 0,
+        "run_id": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard0of5",
+        "schema_version": 1,
+        "start_time_utc": "2026-07-09T15:30:33Z",
+        "state": "success",
+        "updated_time_utc": "2026-07-09T15:34:33Z",
+        "workdir": "scgi_repro"
+      },
+      "colab_job_summary": {
+        "run_id": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard0of5",
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 0/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard0of5 --save-traces",
+        "exit_code": 0,
+        "elapsed_seconds": 255.01,
+        "command_elapsed_seconds": 240.005,
+        "accelerator": "L4",
+        "cu_per_hour": 0.0,
+        "estimated_cu_hours": null,
+        "status_path": "results/stage4_ured_continuous_binary_refine_colab_r1_shard0of5/colab_job_status.json",
+        "workdir": "scgi_repro"
+      }
+    },
+    {
+      "import_dir": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+      "metrics_rows": 130,
+      "run_manifest": {
+        "profile": "full",
+        "checkpoint": "results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt",
+        "model_kind": "exponential_residual_unet",
+        "device": "cuda",
+        "image_size": 128,
+        "num_patterns": 16384,
+        "objects": [
+          "stripe_target"
+        ],
+        "selected_object_indices": [
+          1
+        ],
+        "num_configs": 130,
+        "object_shard": "None",
+        "config_shard": "(1, 5)",
+        "fixed_init_seed": 20240709,
+        "fixed_init_seed_values": null,
+        "started_unix": 1783611076.4061594,
+        "elapsed_seconds": 220.89116096496582,
+        "completed": true
+      },
+      "colab_job_status": {
+        "accelerator": "L4",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 1/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard1of5 --save-traces",
+        "cu_per_hour": 0.0,
+        "elapsed_seconds": 240.006,
+        "end_time_utc": "2026-07-09T15:35:14Z",
+        "estimated_cu_hours": null,
+        "persist_root": null,
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "return_code": 0,
+        "run_id": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+        "schema_version": 1,
+        "start_time_utc": "2026-07-09T15:31:14Z",
+        "state": "success",
+        "updated_time_utc": "2026-07-09T15:35:14Z",
+        "workdir": "scgi_repro"
+      },
+      "colab_job_summary": {
+        "run_id": "pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5",
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 1/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard1of5 --save-traces",
+        "exit_code": 0,
+        "elapsed_seconds": 256.338,
+        "command_elapsed_seconds": 240.006,
+        "accelerator": "L4",
+        "cu_per_hour": 0.0,
+        "estimated_cu_hours": null,
+        "status_path": "results/stage4_ured_continuous_binary_refine_colab_r1_shard1of5/colab_job_status.json",
+        "workdir": "scgi_repro"
+      }
+    },
+    {
+      "import_dir": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard2of5",
+      "metrics_rows": 130,
+      "run_manifest": {
+        "profile": "full",
+        "checkpoint": "results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt",
+        "model_kind": "exponential_residual_unet",
+        "device": "cuda",
+        "image_size": 128,
+        "num_patterns": 16384,
+        "objects": [
+          "stripe_target"
+        ],
+        "selected_object_indices": [
+          1
+        ],
+        "num_configs": 130,
+        "object_shard": "None",
+        "config_shard": "(2, 5)",
+        "fixed_init_seed": 20240709,
+        "fixed_init_seed_values": null,
+        "started_unix": 1783611419.834696,
+        "elapsed_seconds": 218.3459756374359,
+        "completed": true
+      },
+      "colab_job_status": {
+        "accelerator": "L4",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 2/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard2of5 --save-traces",
+        "cu_per_hour": 0.0,
+        "elapsed_seconds": 240.005,
+        "end_time_utc": "2026-07-09T15:40:57Z",
+        "estimated_cu_hours": null,
+        "persist_root": null,
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "return_code": 0,
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard2of5",
+        "schema_version": 1,
+        "start_time_utc": "2026-07-09T15:36:57Z",
+        "state": "success",
+        "updated_time_utc": "2026-07-09T15:40:57Z",
+        "workdir": "scgi_repro"
+      },
+      "colab_job_summary": {
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard2of5",
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 2/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard2of5 --save-traces",
+        "exit_code": 0,
+        "elapsed_seconds": 255.528,
+        "command_elapsed_seconds": 240.005,
+        "accelerator": "L4",
+        "cu_per_hour": 0.0,
+        "estimated_cu_hours": null,
+        "status_path": "results/stage4_ured_continuous_binary_refine_colab_r1_shard2of5/colab_job_status.json",
+        "workdir": "scgi_repro"
+      }
+    },
+    {
+      "import_dir": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard3of5",
+      "metrics_rows": 129,
+      "run_manifest": {
+        "profile": "full",
+        "checkpoint": "results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt",
+        "model_kind": "exponential_residual_unet",
+        "device": "cuda",
+        "image_size": 128,
+        "num_patterns": 16384,
+        "objects": [
+          "stripe_target"
+        ],
+        "selected_object_indices": [
+          1
+        ],
+        "num_configs": 129,
+        "object_shard": "None",
+        "config_shard": "(3, 5)",
+        "fixed_init_seed": 20240709,
+        "fixed_init_seed_values": null,
+        "started_unix": 1783611425.7258677,
+        "elapsed_seconds": 218.046621799469,
+        "completed": true
+      },
+      "colab_job_status": {
+        "accelerator": "L4",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 3/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard3of5 --save-traces",
+        "cu_per_hour": 0.0,
+        "elapsed_seconds": 240.006,
+        "end_time_utc": "2026-07-09T15:41:03Z",
+        "estimated_cu_hours": null,
+        "persist_root": null,
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "return_code": 0,
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard3of5",
+        "schema_version": 1,
+        "start_time_utc": "2026-07-09T15:37:03Z",
+        "state": "success",
+        "updated_time_utc": "2026-07-09T15:41:03Z",
+        "workdir": "scgi_repro"
+      },
+      "colab_job_summary": {
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard3of5",
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 3/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard3of5 --save-traces",
+        "exit_code": 0,
+        "elapsed_seconds": 255.105,
+        "command_elapsed_seconds": 240.006,
+        "accelerator": "L4",
+        "cu_per_hour": 0.0,
+        "estimated_cu_hours": null,
+        "status_path": "results/stage4_ured_continuous_binary_refine_colab_r1_shard3of5/colab_job_status.json",
+        "workdir": "scgi_repro"
+      }
+    },
+    {
+      "import_dir": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard4of5",
+      "metrics_rows": 129,
+      "run_manifest": {
+        "profile": "full",
+        "checkpoint": "results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt",
+        "model_kind": "exponential_residual_unet",
+        "device": "cuda",
+        "image_size": 128,
+        "num_patterns": 16384,
+        "objects": [
+          "stripe_target"
+        ],
+        "selected_object_indices": [
+          1
+        ],
+        "num_configs": 129,
+        "object_shard": "None",
+        "config_shard": "(4, 5)",
+        "fixed_init_seed": 20240709,
+        "fixed_init_seed_values": null,
+        "started_unix": 1783611787.5406804,
+        "elapsed_seconds": 216.4602255821228,
+        "completed": true
+      },
+      "colab_job_status": {
+        "accelerator": "L4",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 4/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard4of5 --save-traces",
+        "cu_per_hour": 0.0,
+        "elapsed_seconds": 240.005,
+        "end_time_utc": "2026-07-09T15:47:05Z",
+        "estimated_cu_hours": null,
+        "persist_root": null,
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "return_code": 0,
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard4of5",
+        "schema_version": 1,
+        "start_time_utc": "2026-07-09T15:43:05Z",
+        "state": "success",
+        "updated_time_utc": "2026-07-09T15:47:05Z",
+        "workdir": "scgi_repro"
+      },
+      "colab_job_summary": {
+        "run_id": "pro2_stage4_ured_continuous_binary_refine_colab_r1_shard4of5",
+        "ref": "fcbd9d1d784aef89254295c33598158a3a91bd80",
+        "command": "python run_stage4_ured_sweep.py --profile full --checkpoint results/colab_imports/pro2_full_exp_residual_e2_r1/artifacts/model_checkpoint.pt --model-kind exponential_residual_unet --object-names stripe_target --config-shard 4/5 --steps-values '31 32 33' --lr-values '0.00045 0.0005' --beta-values '0.55' --xi-values '0.5' --x-step-values '0.13 0.14 0.15' --channels-values '24' --blocks-values '3' --residual-scale-values '0.06 0.08 0.10' --denoiser-values 'nlm' --denoise-kernel-values '3' --nlm-h-values '0.060 0.062 0.064' --nlm-patch-size-values '5' --nlm-patch-distance-values '6' --binary-prior-values '0.005 0.010 0.015 0.020' --fixed-init-seed 20240709 --output-dir results/stage4_ured_continuous_binary_refine_colab_r1_shard4of5 --save-traces",
+        "exit_code": 0,
+        "elapsed_seconds": 256.608,
+        "command_elapsed_seconds": 240.005,
+        "accelerator": "L4",
+        "cu_per_hour": 0.0,
+        "estimated_cu_hours": null,
+        "status_path": "results/stage4_ured_continuous_binary_refine_colab_r1_shard4of5/colab_job_status.json",
+        "workdir": "scgi_repro"
+      }
+    }
+  ]
+}

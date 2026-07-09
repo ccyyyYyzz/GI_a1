@@ -168,6 +168,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/stage4_ured_binary_prior_pilot_r1_stripe/`: monitored continuous
   double-well pilot. It gives a small gain to 9.711 CNR, but remains below
   10.43.
+- `results/stage4_ured_continuous_binary_refine_colab_r1_merged/`: five-shard
+  Colab L4 strict continuous `denoiser=nlm` binary-prior refinement around the
+  best stripe basin. It merges 648 rows from five successful shard artifacts;
+  the best final/trace stripe CNR is 9.898 at `binary_prior_weight=0.02`, still
+  below the APL URED gate of 10.43.
 - `results/stage4_ured_otsu_soft_pilot_r1_stripe/` and
   `results/stage4_ured_otsu_soft_fixedstep_r1_stripe/`: monitored target-free
   soft-Otsu RED pilots. The fixed-step continuous `x-u` stripe output reaches
