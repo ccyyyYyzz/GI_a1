@@ -1,0 +1,17 @@
+{
+  "args": {
+    "output_dir": "results\\paper_fig2_stationarity_r1",
+    "image_size": 32,
+    "objects": 10,
+    "seed": 20240708,
+    "window": 64,
+    "bases": [
+      "random_uniform",
+      "random_binary",
+      "hadamard_ordered",
+      "hadamard_shuffled",
+      "srht_paired"
+    ]
+  },
+  "rows": 50
+}

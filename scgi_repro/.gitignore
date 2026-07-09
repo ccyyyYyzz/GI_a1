@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 data/
 results/cli_runs/
+results/colab_runs/
 results/colab_runs/*.log
 results/colab_runs/*.wslpid
 results/colab_runs/*.launch.log

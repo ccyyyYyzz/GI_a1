@@ -1,0 +1,12 @@
+{
+  "args": {
+    "output_dir": "results\\paper_fig4_bridge_smoke_r1",
+    "image_size": 16,
+    "objects": 2,
+    "seeds": 1,
+    "seed": 20240708,
+    "v_values": "1e-4,3e-4,1e-3,3e-3,1e-2",
+    "n_factors": "1,2,4"
+  },
+  "rows": 50
+}
