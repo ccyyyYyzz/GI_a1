@@ -252,6 +252,16 @@ Overall, however, it remains below non-network baselines on matched rows:
 -0.90 dB versus `none`, -1.69 dB versus `scgi_proxy`, and -2.48 dB versus
 paired-basis `pairwise`.
 
+Gain-prediction SCGI smoke:
+`src/scgi_model.py` now includes signed-safe SCGI outputs and a
+`gain_predictor_unet` that predicts positive multiplicative gains. The
+checkpoint metadata path applies these models as `observed / gain_hat` rather
+than clamped corrected measurements. This removes the most obvious output-range
+mismatch, but it does not make the network competitive. On the same held-out
+grid, row-max-normalized gain targets give mean `scgi_frozen` PSNR 12.04 dB
+(-3.27 dB versus `none`), and raw gain targets give 12.05 dB (-3.26 dB versus
+`none`, -3.85 dB versus `scgi_proxy`, and -6.19 dB versus paired `pairwise`).
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best
@@ -262,7 +272,10 @@ baseline. Dense `scgi_proxy` improves over `none` in 88.6% and over AGC in
 bases and does not change the best equal-frame map. The high-rho boundary audit
 now provides R2-qualified flip-boundary fits, but the frozen-network results
 and fine-tuned smoke results show that the current network paths are real but
-weak baselines, not yet a competitive basis-aware SCGI phase diagram.
+weak baselines, not yet a competitive basis-aware SCGI phase diagram. The gain
+predictor result specifically suggests that the next bottleneck is not only the
+output clamp, but the input representation's inability to separate object
+coefficient envelope from channel gain.
 
 ## Rendered Figures
 

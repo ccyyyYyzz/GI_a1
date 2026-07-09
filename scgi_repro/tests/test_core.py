@@ -197,6 +197,26 @@ class TestCoreNumerics(unittest.TestCase):
         self.assertLessEqual(model.gain_min, full_tail_gain)
         self.assertGreaterEqual(model.gain_max, 1.0)
 
+    def test_gain_predictor_outputs_positive_gains_above_one(self):
+        scgi_model = importlib.import_module("src.scgi_model")
+        model = scgi_model.make_scgi_model(
+            {
+                "scgi": {
+                    "model_kind": "gain_predictor_unet",
+                    "unet_base_channels": 2,
+                    "unet_depth": 1,
+                    "use_coord_channels": False,
+                    "gain_min": 0.1,
+                    "gain_max": 4.0,
+                }
+            }
+        )
+        pred = model(torch.zeros((1, 1, 8, 8), dtype=torch.float32))
+        self.assertEqual(tuple(pred.shape), (1, 1, 8, 8))
+        self.assertGreaterEqual(float(pred.min()), 0.1)
+        self.assertLessEqual(float(pred.max()), 4.0)
+        self.assertGreater(float(pred.max()), 1.0)
+
     def test_exponential_residual_model_can_remove_known_decay(self):
         scgi_model = importlib.import_module("src.scgi_model")
         model = scgi_model.make_scgi_model(
@@ -228,6 +248,27 @@ class TestCoreNumerics(unittest.TestCase):
         corrected = train_scgi.correct_measurements_padded(ScaleModel(), seq)
         self.assertEqual(tuple(corrected.shape), tuple(seq.shape))
         self.assertTrue(torch.allclose(corrected, 0.5 * seq))
+
+    def test_signed_scgi_correction_can_preserve_negative_values(self):
+        scgi_model = importlib.import_module("src.scgi_model")
+        train_scgi = importlib.import_module("src.train_scgi")
+        model = scgi_model.make_scgi_model(
+            {
+                "scgi": {
+                    "model_kind": "signed_gain_unet",
+                    "unet_base_channels": 2,
+                    "unet_depth": 1,
+                    "use_coord_channels": False,
+                    "gain_min": 1.0,
+                    "gain_max": 1.0 + 1.0e-6,
+                }
+            }
+        )
+        seq = torch.linspace(-1.0, 1.0, 10).reshape(1, 10)
+        corrected = train_scgi.correct_measurements_padded(model, seq, clamp=False)
+        self.assertEqual(tuple(corrected.shape), tuple(seq.shape))
+        self.assertLess(float(corrected.min()), 0.0)
+        self.assertGreater(float(corrected.max()), 0.0)
 
     def test_dgi_output_shape_matches_object_shape(self):
         func = _find_function(

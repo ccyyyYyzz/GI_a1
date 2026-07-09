@@ -128,14 +128,23 @@ def train_scgi(
 
 
 @torch.no_grad()
-def correct_measurements(model: torch.nn.Module, r_dynamic: torch.Tensor, image_size: int) -> torch.Tensor:
+def correct_measurements(
+    model: torch.nn.Module,
+    r_dynamic: torch.Tensor,
+    image_size: int,
+    clamp: bool = True,
+) -> torch.Tensor:
     model.eval()
     y = model(as_images(r_dynamic, image_size)).reshape(r_dynamic.shape)
-    return y.clamp(0.0, 1.0)
+    return y.clamp(0.0, 1.0) if clamp else y
 
 
 @torch.no_grad()
-def correct_measurements_padded(model: torch.nn.Module, r_dynamic: torch.Tensor) -> torch.Tensor:
+def correct_measurements_padded(
+    model: torch.nn.Module,
+    r_dynamic: torch.Tensor,
+    clamp: bool = True,
+) -> torch.Tensor:
     """Apply a fully convolutional SCGI model to any sequence length.
 
     The original SCGI training data uses square measurement maps. M2 mechanism
@@ -155,4 +164,6 @@ def correct_measurements_padded(model: torch.nn.Module, r_dynamic: torch.Tensor)
         padded = torch.cat([rows, pad], dim=1)
     model.eval()
     y = model(as_images(padded, side)).reshape(rows.shape[0], padded_frames)[:, :frames]
-    return y.clamp(0.0, 1.0).reshape(original_shape)
+    if clamp:
+        y = y.clamp(0.0, 1.0)
+    return y.reshape(original_shape)

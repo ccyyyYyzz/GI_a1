@@ -108,6 +108,11 @@ whitening object-dependent coefficient order.
   local held-out signal (`srht_paired + scgi_frozen` wins 2/6 cells at
   `rho=0.3`) but remains below `none`, `scgi_proxy`, and paired `pairwise` on
   average.
+- Signed-safe outputs and true-gain prediction have also been tested. The
+  `gain_predictor_unet` route still underperforms raw/no-network baselines,
+  implying that the next network attempt needs a richer representation of
+  basis phase, pair sums, or object-envelope/gain separation rather than only a
+  different output activation.
 - The M2 dense reference scan idealizes reference measurements as noiseless gain
   samples. Compact and full nonideal digital-twin scans now exist, and the full
   scan preserves the pairwise winner under detector/SLM perturbations. Published
@@ -124,8 +129,8 @@ whitening object-dependent coefficient order.
   publication version still needs final vector plotting and a more targeted AGC
   validation sweep.
 - A competitive fine-tuned SCGI-network correction is not yet part of the M2
-  phase diagram; the frozen dense baseline and current fine-tuned smokes
-  underperform overall.
+  phase diagram; the frozen dense baseline, current fine-tuned smokes, and
+  true-gain predictor smokes underperform overall.
 - Published-curve calibration is limited to figure-level priors: APL intensity
   traces fit `lambda_per_measurement = 0.999897-0.999921`, and OE Fig. 6
   fixed-reference PSNR crosses 30 dB near `beta = 1.90 x 10^-2 mm^-1`.

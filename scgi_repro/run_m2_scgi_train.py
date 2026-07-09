@@ -49,6 +49,14 @@ def pad_rows_to_square(rows: torch.Tensor, side: int) -> torch.Tensor:
     return torch.cat([rows, pad], dim=1)
 
 
+def uses_signed_output(model_kind: str) -> bool:
+    return str(model_kind).lower() in {"signed_gain_unet", "signed_unet", "tanh_unet", "linear_unet", "identity_unet"}
+
+
+def predicts_gain(model_kind: str, target_mode: str) -> bool:
+    return str(target_mode).lower() == "gain" or str(model_kind).lower() in {"gain_predictor_unet", "log_gain_predictor_unet"}
+
+
 def basis_specs_from_names(names: list[str], frame_budget: int) -> list[tuple[str, dict[str, object]]]:
     specs: list[tuple[str, dict[str, object]]] = []
     for name in names:
@@ -99,7 +107,10 @@ def build_training_rows(args: argparse.Namespace, cfg: dict) -> tuple[torch.Tens
                             seed=13000 + 53 * object_idx + seed_idx,
                         )
                         x_rows.append(observed.reshape(1, -1))
-                        y_rows.append(ideal.reshape(1, -1))
+                        if args.target_mode == "gain":
+                            y_rows.append(channel.gains.reshape(1, -1))
+                        else:
+                            y_rows.append(ideal.reshape(1, -1))
                         meta_rows.append(
                             {
                                 "basis": basis.name,
@@ -133,12 +144,24 @@ def main() -> None:
     parser.add_argument("--val-frac", type=float, default=0.2)
     parser.add_argument("--input-normalize", default="row_max", choices=["row_max", "row_absmax", "none"])
     parser.add_argument("--target-normalize", default="row_max", choices=["row_max", "row_absmax", "none"])
+    parser.add_argument("--target-mode", default="measurement", choices=["measurement", "gain"])
+    parser.add_argument("--output-clamp", default="auto", choices=["auto", "01", "none"])
+    parser.add_argument("--gain-min", type=float, default=None)
+    parser.add_argument("--gain-max", type=float, default=None)
     parser.add_argument("--seed", type=int, default=20260709)
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
     cfg.setdefault("scgi", {})["model_kind"] = str(args.model_kind)
+    if args.gain_min is not None:
+        cfg["scgi"]["gain_min"] = float(args.gain_min)
+    if args.gain_max is not None:
+        cfg["scgi"]["gain_max"] = float(args.gain_max)
+    if str(args.output_clamp) == "auto":
+        output_clamp = "none" if uses_signed_output(args.model_kind) or predicts_gain(args.model_kind, args.target_mode) else "01"
+    else:
+        output_clamp = str(args.output_clamp)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -175,7 +198,7 @@ def main() -> None:
         val_losses = []
         with torch.no_grad():
             for xb, yb in DataLoader(val_ds, batch_size=int(args.batch_size)):
-                pred = correct_measurements_padded(model, xb.to(device)).to(device)
+                pred = correct_measurements_padded(model, xb.to(device), clamp=(output_clamp != "none")).to(device)
                 val_losses.append(float(torch.mean((pred.reshape_as(yb.to(device)) - yb.to(device)) ** 2).detach().cpu()))
         row = {
             "epoch": float(epoch),
@@ -193,6 +216,8 @@ def main() -> None:
             "task": "m2_scgi_finetune",
             "input_normalize": args.input_normalize,
             "target_normalize": args.target_normalize,
+            "target_mode": args.target_mode,
+            "output_clamp": output_clamp,
             "num_frames": frames,
             "padded_side": side,
             "model_kind": args.model_kind,
@@ -213,6 +238,8 @@ def main() -> None:
         "model_kind": args.model_kind,
         "input_normalize": args.input_normalize,
         "target_normalize": args.target_normalize,
+        "target_mode": args.target_mode,
+        "output_clamp": output_clamp,
         "final_train_mse": history[-1]["train_mse"],
         "final_val_mse": history[-1]["val_mse"],
     }

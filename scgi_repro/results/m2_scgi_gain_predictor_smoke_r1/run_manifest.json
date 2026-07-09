@@ -1,0 +1,17 @@
+{
+  "profile": "smoke",
+  "device": "cuda",
+  "checkpoint": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\m2_scgi_gain_predictor_smoke_r1\\m2_scgi_checkpoint.pt",
+  "samples": 108,
+  "train_samples": 86,
+  "val_samples": 22,
+  "num_frames": 2048,
+  "padded_side": 46,
+  "model_kind": "gain_predictor_unet",
+  "input_normalize": "row_max",
+  "target_normalize": "row_max",
+  "target_mode": "gain",
+  "output_clamp": "none",
+  "final_train_mse": 0.01525168182949225,
+  "final_val_mse": 0.01944147888571024
+}

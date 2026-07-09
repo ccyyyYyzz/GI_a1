@@ -20,9 +20,17 @@ class ConvBlock(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, in_channels: int = 1, out_channels: int = 1, base_channels: int = 16, depth: int = 4):
+    def __init__(
+        self,
+        in_channels: int = 1,
+        out_channels: int = 1,
+        base_channels: int = 16,
+        depth: int = 4,
+        output_activation: str = "sigmoid",
+    ):
         super().__init__()
         self.depth = int(depth)
+        self.output_activation = str(output_activation).lower()
         chans = [base_channels * (2**i) for i in range(self.depth)]
         self.downs = nn.ModuleList()
         prev = in_channels
@@ -53,15 +61,28 @@ class UNet(nn.Module):
             if h.shape[-2:] != skip.shape[-2:]:
                 h = F.interpolate(h, size=skip.shape[-2:], mode="bilinear", align_corners=False)
             h = up(torch.cat([skip, h], dim=1))
-        return torch.sigmoid(self.out(h))
+        y = self.out(h)
+        if self.output_activation == "sigmoid":
+            return torch.sigmoid(y)
+        if self.output_activation == "tanh":
+            return torch.tanh(y)
+        if self.output_activation in {"identity", "linear", "none"}:
+            return y
+        raise ValueError(f"Unsupported output activation: {self.output_activation}")
 
 
 class CoordUNet(nn.Module):
     """U-Net with normalized coordinate channels for sequence-index-aware SCGI."""
 
-    def __init__(self, base_channels: int = 16, depth: int = 4):
+    def __init__(self, base_channels: int = 16, depth: int = 4, output_activation: str = "sigmoid"):
         super().__init__()
-        self.unet = UNet(in_channels=3, out_channels=1, base_channels=base_channels, depth=depth)
+        self.unet = UNet(
+            in_channels=3,
+            out_channels=1,
+            base_channels=base_channels,
+            depth=depth,
+            output_activation=output_activation,
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         b, _c, h, w = x.shape
@@ -72,6 +93,10 @@ class CoordUNet(nn.Module):
 
 def _row_max_normalize_image(x: torch.Tensor) -> torch.Tensor:
     return x / x.amax(dim=(2, 3), keepdim=True).clamp_min(1e-8)
+
+
+def _row_absmax_normalize_image(x: torch.Tensor) -> torch.Tensor:
+    return x / x.abs().amax(dim=(2, 3), keepdim=True).clamp_min(1e-8)
 
 
 class GainCorrectorUNet(nn.Module):
@@ -101,6 +126,62 @@ class GainCorrectorUNet(nn.Module):
         gain = self.gain_min + (self.gain_max - self.gain_min) * raw_gain
         corrected = x / gain.clamp_min(1e-6)
         return _row_max_normalize_image(corrected).clamp(0.0, 1.0)
+
+
+class SignedGainCorrectorUNet(nn.Module):
+    """Predict a positive gain map while preserving signed measurement values."""
+
+    def __init__(
+        self,
+        base_channels: int = 16,
+        depth: int = 4,
+        use_coord_channels: bool = True,
+        gain_min: float = 1.0e-4,
+        gain_max: float = 2.0,
+    ):
+        super().__init__()
+        self.use_coord_channels = bool(use_coord_channels)
+        self.gain_min = float(gain_min)
+        self.gain_max = float(gain_max)
+        if not (0.0 < self.gain_min < self.gain_max):
+            raise ValueError("gain_min must be positive and smaller than gain_max.")
+        if self.use_coord_channels:
+            self.gain_net = CoordUNet(base_channels=base_channels, depth=depth)
+        else:
+            self.gain_net = UNet(in_channels=1, out_channels=1, base_channels=base_channels, depth=depth)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        raw_gain = self.gain_net(x)
+        gain = self.gain_min + (self.gain_max - self.gain_min) * raw_gain
+        corrected = x / gain.clamp_min(1e-6)
+        return _row_absmax_normalize_image(corrected).clamp(-1.0, 1.0)
+
+
+class GainPredictorUNet(nn.Module):
+    """Predict a positive multiplicative gain sequence."""
+
+    def __init__(
+        self,
+        base_channels: int = 16,
+        depth: int = 4,
+        use_coord_channels: bool = True,
+        gain_min: float = 1.0e-4,
+        gain_max: float = 4.0,
+    ):
+        super().__init__()
+        self.use_coord_channels = bool(use_coord_channels)
+        self.gain_min = float(gain_min)
+        self.gain_max = float(gain_max)
+        if not (0.0 < self.gain_min < self.gain_max):
+            raise ValueError("gain_min must be positive and smaller than gain_max.")
+        if self.use_coord_channels:
+            self.gain_net = CoordUNet(base_channels=base_channels, depth=depth)
+        else:
+            self.gain_net = UNet(in_channels=1, out_channels=1, base_channels=base_channels, depth=depth)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        raw_gain = self.gain_net(x)
+        return self.gain_min + (self.gain_max - self.gain_min) * raw_gain
 
 
 class ExponentialResidualUNet(nn.Module):
@@ -164,6 +245,22 @@ def make_scgi_model(cfg: dict) -> UNet:
             gain_min=float(scgi.get("gain_min", 1.0e-4)),
             gain_max=float(scgi.get("gain_max", 2.0)),
         )
+    if kind == "signed_gain_unet":
+        return SignedGainCorrectorUNet(
+            base_channels=base_channels,
+            depth=depth,
+            use_coord_channels=bool(scgi.get("use_coord_channels", False)),
+            gain_min=float(scgi.get("gain_min", 1.0e-4)),
+            gain_max=float(scgi.get("gain_max", 2.0)),
+        )
+    if kind in {"gain_predictor_unet", "log_gain_predictor_unet"}:
+        return GainPredictorUNet(
+            base_channels=base_channels,
+            depth=depth,
+            use_coord_channels=bool(scgi.get("use_coord_channels", False)),
+            gain_min=float(scgi.get("gain_min", 1.0e-4)),
+            gain_max=float(scgi.get("gain_max", 4.0)),
+        )
     if kind in {"exponential_residual_unet", "analytic_residual_unet"}:
         return ExponentialResidualUNet(
             base_channels=base_channels,
@@ -174,6 +271,14 @@ def make_scgi_model(cfg: dict) -> UNet:
             residual_max_blend=float(scgi.get("residual_max_blend", 0.10)),
             residual_blend_logit=float(scgi.get("residual_blend_logit", -8.0)),
         )
+    if kind in {"signed_unet", "tanh_unet"}:
+        if bool(scgi.get("use_coord_channels", False)):
+            return CoordUNet(base_channels=base_channels, depth=depth, output_activation="tanh")
+        return UNet(base_channels=base_channels, depth=depth, output_activation="tanh")
+    if kind in {"linear_unet", "identity_unet"}:
+        if bool(scgi.get("use_coord_channels", False)):
+            return CoordUNet(base_channels=base_channels, depth=depth, output_activation="identity")
+        return UNet(base_channels=base_channels, depth=depth, output_activation="identity")
     if bool(scgi.get("use_coord_channels", False)):
         return CoordUNet(base_channels=base_channels, depth=depth)
     return UNet(base_channels=base_channels, depth=depth)

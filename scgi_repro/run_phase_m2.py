@@ -75,7 +75,12 @@ def load_frozen_scgi_corrector(
             rows = rows / rows.amax(dim=1, keepdim=True).clamp_min(1.0e-8)
         elif metadata.get("input_normalize") == "row_absmax":
             rows = rows / rows.abs().amax(dim=1, keepdim=True).clamp_min(1.0e-8)
-        corrected = correct_measurements_padded(model, rows).reshape(-1)
+        output_clamp = metadata.get("output_clamp", "01")
+        predicted = correct_measurements_padded(model, rows, clamp=(output_clamp != "none")).reshape(-1)
+        if metadata.get("target_mode") == "gain":
+            corrected = values.detach().to(device=device, dtype=torch.float32) / predicted.clamp_min(1.0e-6)
+        else:
+            corrected = predicted
         return corrected.to(device=source_device, dtype=source_dtype)
 
     return correct
