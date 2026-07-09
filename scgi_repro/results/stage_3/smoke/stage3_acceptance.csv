@@ -1,0 +1,4 @@
+check,value,passed
+scgi_cnr_above_dynamic_all,True,True
+scgi_cnr_ge_3_all,False,False
+static_psnr_gt_20_all,False,False

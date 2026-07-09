@@ -19,9 +19,9 @@ figures so the smoke tests remain portable.
 ```powershell
 cd E:\GAN_FCC_WORK\scgi-repro
 $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
-& $py run_stage0.py --profile smoke
-& $py run_stage1_diagnostics.py --profile smoke --samples 3
-& $py run_stage3_tests.py --profile smoke
+& $py run_monitored_job.py --run-id stage0_smoke_refresh_r1 --output-dir results\cli_runs\stage0_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage0.py --profile smoke --epochs 2 --tag smoke --model-kind exponential_residual_unet
+& $py run_monitored_job.py --run-id stage1_smoke_refresh_r1 --output-dir results\cli_runs\stage1_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage1_diagnostics.py --profile smoke --samples 3 --output-dir results\stage_1
+& $py run_monitored_job.py --run-id stage3_smoke_refresh_r1 --output-dir results\cli_runs\stage3_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage3_tests.py --profile smoke --checkpoint results\stage_0\smoke\model_checkpoint.pt --model-kind exponential_residual_unet --output-dir results\stage_3
 & $py run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
 & $py run_published_calibration.py --output-dir results\published_calibration
 & $py run_published_channel_calibration.py --output-dir results\published_channel_calibration

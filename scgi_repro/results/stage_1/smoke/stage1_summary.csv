@@ -1,0 +1,2 @@
+profile,device,samples,image_size,patterns,sampled_for_plots,ks_pass_rate_plotted,lambda_min,lambda_max,outputs
+smoke,cuda:0,48,32,1024,3,1.0,0.9960252642631531,0.9989665746688843,E:\GAN_FCC_WORK\github_sync\GI_a1_scgi_20260709_014434\scgi_repro\results\stage_1\smoke

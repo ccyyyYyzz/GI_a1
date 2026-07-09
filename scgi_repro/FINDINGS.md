@@ -77,11 +77,13 @@ targets not used for training.
 Prediction: dynamic DGI should fail; SCGI should improve over dynamic DGI; oracle
 and analytic exponential correction should remain upper-bound controls.
 
-Result: output written to `results/stage_3/smoke` and
-`results/colab_imports/pro1_debug_e160_stage3/artifacts/stage_3_colab/debug`.
-SCGI improves CNR over dynamic DGI for all four held-out objects. In the Colab
-160-epoch checkpoint, CNRs are 8.54 for `letter_A`, 2.18 for `stripe_target`,
-2.77 for `letter_L`, and 2.63 for `ring`.
+Result: refreshed monitored output written to `results/stage_3/smoke` using the
+`results/stage_0/smoke` exp-residual checkpoint. SCGI improves CNR over dynamic
+DGI for all four held-out objects, with CNRs 3.219 for `letter_A`, 2.475 for
+`stripe_target`, 3.774 for `letter_L`, and 3.078 for `ring`; the stripe target
+keeps the all-target `CNR >= 3` gate false. The earlier Colab 160-epoch
+checkpoint also improves CNR over dynamic DGI for all four held-out objects, but
+still misses all-target prompt thresholds.
 
 Supports/refutes: supports directionality but not prompt-level Stage 3 thresholds.
 
@@ -181,8 +183,9 @@ Prediction: static bucket measurements should be near Gaussian, dynamic
 measurements should decay according to the lambda factors, and lambda draws
 should fall inside the configured profile range.
 
-Result: output written to `results/stage_1/smoke`. The three plotted samples
-have static-bucket KS p-values of 1.0 and gain end values from 0.347 to 0.0288.
+Result: refreshed monitored output written to `results/stage_1/smoke`. The
+three plotted samples have static-bucket KS p-values of 1.0 and gain end values
+from 0.347 to 0.0288.
 
 Supports/refutes: supports the Stage 1 simulator contract for smoke scale.
 

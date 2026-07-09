@@ -26,7 +26,7 @@ refinement.
 Latest smoke run:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage0.py --profile smoke
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id stage0_smoke_refresh_r1 --output-dir results\cli_runs\stage0_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_stage0.py --profile smoke --epochs 2 --tag smoke --model-kind exponential_residual_unet
 ```
 
 Outputs:
@@ -44,16 +44,18 @@ Key smoke metrics:
 | Metric | Value |
 |---|---:|
 | image size / patterns | 32 / 1024 |
-| train loss / validation MSE | 1.4426 / 0.01579 |
-| dynamic slope / corrected slope | -0.6039 / 0.0769 |
+| train loss / validation MSE | -2.2406 / 2.687e-6 |
+| dynamic slope / corrected slope | -0.6039 / 8.287e-6 |
 | true lambda / analytic lambda | 0.998828 / 0.998824 |
 | dynamic MSE vs static | 0.1470 |
-| SCGI MSE vs static | 0.00662 |
+| SCGI MSE vs static | 2.839e-6 |
 | analytic/oracle MSE vs static | 2.87e-6 / 1.58e-15 |
 | dynamic DGI CNR | 0.4886 |
-| SCGI DGI CNR | 1.9537 |
-| SCGI-UNN CNR | 1.9579 |
-| SCGI-URED CNR | 3.3891 |
+| SCGI DGI CNR | 3.0587 |
+| SCGI-UNN CNR | 3.0651 |
+| SCGI-URED CNR | 4.3605 |
+| static DGI PSNR | 8.9752 |
+| validation SCGI KS pass rate | 1.0 |
 | analytic/oracle DGI CNR | 3.0587 / 3.0618 |
 | SCGI KS p-value | 0.0640 |
 | validation SCGI KS pass rate | 0.1667 |
@@ -69,7 +71,7 @@ below 3, static DGI PSNR is below 20 dB, and validation KS pass rate is below
 Stage 1 diagnostics:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage1_diagnostics.py --profile smoke --samples 3
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id stage1_smoke_refresh_r1 --output-dir results\cli_runs\stage1_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_stage1_diagnostics.py --profile smoke --samples 3 --output-dir results\stage_1
 ```
 
 Outputs:
@@ -169,7 +171,7 @@ simulator can be corrected when the dynamic-scaling factor is parameterized.
 Stage 3 held-out target test:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage3_tests.py --profile smoke
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id stage3_smoke_refresh_r1 --output-dir results\cli_runs\stage3_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_stage3_tests.py --profile smoke --checkpoint results\stage_0\smoke\model_checkpoint.pt --model-kind exponential_residual_unet --output-dir results\stage_3
 ```
 
 Outputs:
@@ -178,12 +180,15 @@ Outputs:
 - `results/stage_3/smoke/stage3_acceptance.csv`
 - `results/stage_3/smoke/stage3_recon_grid.png`
 
-The saved smoke checkpoint improves every held-out target over raw dynamic DGI
-(`scgi_cnr_above_dynamic_all=True`), but still fails the prompt-level
-`SCGI CNR >= 3` and `static PSNR > 20 dB` gates. The Colab 160-epoch checkpoint
-also improves every held-out target over dynamic DGI. Its SCGI CNRs are 8.54
-for `letter_A`, 2.18 for `stripe_target`, 2.77 for `letter_L`, and 2.63 for
-`ring`, so it passes the directionality gate but still misses the all-target
+The refreshed smoke checkpoint improves every held-out target over raw dynamic
+DGI (`scgi_cnr_above_dynamic_all=True`). SCGI CNRs are 3.219 for `letter_A`,
+2.475 for `stripe_target`, 3.774 for `letter_L`, and 3.078 for `ring`, so the
+stripe target still fails the prompt-level all-target `SCGI CNR >= 3` gate.
+Static DGI also still fails the prompt `PSNR > 20 dB` gate. The Colab
+160-epoch checkpoint also improves every held-out target over dynamic DGI. Its
+SCGI CNRs are 8.54 for `letter_A`, 2.18 for `stripe_target`, 2.77 for
+`letter_L`, and 2.63 for `ring`, so it passes the directionality gate but still
+misses the all-target
 CNR >= 3 requirement.
 
 The full-profile exp-residual checkpoint was also tested on held-out targets in
