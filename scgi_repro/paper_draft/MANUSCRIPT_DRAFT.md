@@ -110,8 +110,8 @@ Section 4 offered one escape from the gain–object orbit: buy identifiability w
 
 Write $Y_n=\log R_n=\ell_n+\log B_n$. The anchor requirement is a condition on the carrier alone:
 
-> **Condition (★) (stationary carrier, quantitative form).** There is a scalar $c_T$ — depending on the object but not on time, and absorbed by the global-scale gauge — such that the windowed carrier averages over windows $W_n$ of length $W$ satisfy
-> $$\max_n \Big| W^{-1}\!\!\sum_{k\in W_n}\!\log B_k \;-\; c_T \Big| \;\longrightarrow\; 0 \quad \text{in probability as } W\to\infty,\ W/N\to 0 .$$
+> **Condition (★) (stationary carrier, quantitative form).** There is a scalar $m_T$ — depending on the object but not on time, and absorbed by the global-scale gauge — such that the windowed carrier averages over windows $W_n$ of length $W$ satisfy
+> $$\max_n \Big| W^{-1}\!\!\sum_{k\in W_n}\!\log B_k \;-\; m_T \Big| \;\longrightarrow\; 0 \quad \text{in probability as } W\to\infty,\ W/N\to 0 .$$
 > The condition presupposes a positive carrier on the analyzed record — physically, a positivity/offset margin, or the soft-log $\psi_\alpha$ of Sec. 6 in the photon-counting case.
 
 I.i.d. random illumination satisfies (★) by construction. For a finite random row permutation of a deterministic pattern set, or a single fixed SRHT draw, (★) is *not* automatic: a permuted record is exchangeable — which anchors windowed averages in distribution — but a particular draw can still fail for a spectrally concentrated object; the quantitative version of this distinction is the permutation bound of Sec. 7, and the permuted-arm rejections in Fig. 2 are its visible trace. For the i.i.d. case:
