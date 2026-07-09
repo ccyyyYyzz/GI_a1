@@ -15,4 +15,7 @@ env HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 run --gpu L4 --timeout 14400 \
   --workdir scgi_repro \
   --run-id pro2_full_e100_skip_ured \
   --install-requirements \
-  --command "python run_stage0.py --profile full --epochs 100 --tag colab_full_e100_skip_ured --skip-ured"
+  --command "python run_stage0.py --profile full --epochs 100 --tag colab_full_e100_skip_ured --skip-ured" \
+  --artifact-root "results/stage_0/colab_full_e100_skip_ured" \
+  --emit-zip \
+  --max-zip-mb 20
