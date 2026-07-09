@@ -338,9 +338,10 @@ including 210 `scgi_frozen` rows. Mean equal-frame blind PSNR is 12.75 dB for
 
 Dense frozen-network check:
 `results/phase_m2_scgi_frozen_dense_r1_merged/phase_scan.csv` has 89,250 rows,
-all five shard labels, and 10,500 `scgi_frozen` rows. The 35-cell strict
-equal-frame pre-floor diagnostic best map is unchanged: `srht_paired + pairwise`
-is selected in 35/35 rho/sigma cells. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
+all five shard labels, and 10,500 `scgi_frozen` rows. The legacy strict
+equal-frame pre-floor diagnostic map is unchanged, with `srht_paired + pairwise`
+selected in every rho/sigma cell, but headline counts are now read through the
+prompt-range above-floor audit. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
 16.64 dB for `none`, 17.40 dB for `scgi_proxy`, and 21.43 dB for `pairwise`.
 `scgi_frozen` beats `none` in 60.3% of matched comparisons but by only
 +0.0047 dB on average, beats `scgi_proxy` in 18.8%, and beats pairwise on paired

@@ -20,5 +20,8 @@
   "srht_minus_ordered_min_db": -0.009418935796363215,
   "srht_minus_ordered_max_db": -0.0031151519169743125,
   "srht_minus_best_random_min_db": 0.016270525050282814,
-  "srht_minus_best_random_max_db": 0.19004590385803155
+  "srht_minus_best_random_max_db": 0.19004590385803155,
+  "above_floor_rel_mse": 0.5,
+  "above_floor_delta_rows": 0,
+  "sub_floor_delta_rows": 4
 }

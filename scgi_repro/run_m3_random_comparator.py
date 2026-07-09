@@ -15,6 +15,9 @@ from src.config_utils import load_config, project_root
 from src.plotting import save_metrics_table
 
 
+DEFAULT_ABOVE_FLOOR_REL_MSE = 0.5
+
+
 def make_comparator_basis(name: str, num_pixels: int, seed: int, reconstruction: str) -> MeasurementBasis:
     if name in {"hadamard_ordered", "sign_only", "srht_full", "perm_only"}:
         return make_variant(name, num_pixels, seed)
@@ -51,7 +54,7 @@ def summarize(raw: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def build_fast_delta(summary: pd.DataFrame) -> pd.DataFrame:
+def build_fast_delta(summary: pd.DataFrame, above_floor_rel_mse: float = DEFAULT_ABOVE_FLOOR_REL_MSE) -> pd.DataFrame:
     blind = summary[summary["correction"] != "oracle"].copy()
     best = (
         blind.sort_values(["rho", "sigma_a", "variant", "psnr_mean"], ascending=[True, True, True, False])
@@ -83,15 +86,24 @@ def build_fast_delta(summary: pd.DataFrame) -> pd.DataFrame:
                 "sigma_a": float(sigma_a),
                 "srht_best_correction": str(srht.correction),
                 "srht_best_psnr": float(srht.psnr_mean),
+                "srht_best_rel_mse": float(srht.rel_mse_mean),
                 "ordered_best_correction": str(ordered.correction),
                 "ordered_best_psnr": float(ordered.psnr_mean),
+                "ordered_best_rel_mse": float(ordered.rel_mse_mean),
                 "best_random_variant": str(best_random.variant),
                 "best_random_correction": str(best_random.correction),
                 "best_random_psnr": float(best_random.psnr_mean),
+                "best_random_rel_mse": float(best_random.rel_mse_mean),
                 "srht_minus_ordered_db": float(srht.psnr_mean) - float(ordered.psnr_mean),
                 "srht_minus_best_random_db": float(srht.psnr_mean) - float(best_random.psnr_mean),
                 "srht_gap_to_best_srht_ablation_db": float(srht.psnr_mean) - float(best_ablation.psnr_mean),
                 "best_srht_ablation": str(best_ablation.variant),
+                "min_recon_rel_mse": min(float(srht.rel_mse_mean), float(ordered.rel_mse_mean), float(best_random.rel_mse_mean)),
+                "above_floor": bool(
+                    min(float(srht.rel_mse_mean), float(ordered.rel_mse_mean), float(best_random.rel_mse_mean))
+                    < float(above_floor_rel_mse)
+                ),
+                "above_floor_rel_mse": float(above_floor_rel_mse),
             }
         )
     return pd.DataFrame(rows)
@@ -109,6 +121,9 @@ def write_report(out_dir: Path, raw: pd.DataFrame, summary: pd.DataFrame, deltas
         "srht_minus_ordered_max_db": float(deltas["srht_minus_ordered_db"].max()) if len(deltas) else None,
         "srht_minus_best_random_min_db": float(deltas["srht_minus_best_random_db"].min()) if len(deltas) else None,
         "srht_minus_best_random_max_db": float(deltas["srht_minus_best_random_db"].max()) if len(deltas) else None,
+        "above_floor_rel_mse": DEFAULT_ABOVE_FLOOR_REL_MSE,
+        "above_floor_delta_rows": int(deltas["above_floor"].sum()) if len(deltas) else 0,
+        "sub_floor_delta_rows": int((~deltas["above_floor"]).sum()) if len(deltas) else 0,
     }
     (out_dir / "m3_random_comparator_summary.json").write_text(
         json.dumps(payload, indent=2) + "\n",
@@ -120,9 +135,11 @@ def write_report(out_dir: Path, raw: pd.DataFrame, summary: pd.DataFrame, deltas
         "srht_best_psnr",
         "ordered_best_psnr",
         "best_random_psnr",
+        "best_random_rel_mse",
         "srht_minus_ordered_db",
         "srht_minus_best_random_db",
         "srht_gap_to_best_srht_ablation_db",
+        "min_recon_rel_mse",
     ]:
         if column in display:
             display[column] = display[column].map(lambda value: f"{float(value):.3f}")
@@ -139,12 +156,9 @@ def write_report(out_dir: Path, raw: pd.DataFrame, summary: pd.DataFrame, deltas
         "",
         "## Interpretation",
         "",
-        "This audit closes the direct-random-comparator gap in the M3 ablation.",
-        "It compares the best non-oracle correction for full SRHT against ordered",
-        "Hadamard and the best random basis under the same object/seed/rho/sigma",
-        "cells. The strong prompt gate still requires a robust >=3 dB fast-drift",
-        "advantage over ordered Hadamard and no more than a 1 dB loss versus",
-        "random bases; these fields are reported directly in the delta table.",
+        "This audit closes the direct-random-comparator gap in the M3 ablation, but all rows are fast-drift rows and should be read through the reconstruction-floor mask.",
+        f"With the default rel_mse<{payload['above_floor_rel_mse']:.1f} gate, `{payload['above_floor_delta_rows']}` rows are above-floor and `{payload['sub_floor_delta_rows']}` rows are sub-floor.",
+        "The small SRHT-vs-random deltas in this table narrow the estimator caveat; they do not create an above-floor fast-drift effect or rescue the original >=3 dB fast-drift gate.",
         "",
     ]
     (out_dir / "m3_random_comparator_report.md").write_text("\n".join(lines), encoding="utf-8")
@@ -157,6 +171,8 @@ def write_report(out_dir: Path, raw: pd.DataFrame, summary: pd.DataFrame, deltas
                     "sigma_a",
                     "srht_minus_ordered_db",
                     "srht_minus_best_random_db",
+                    "min_recon_rel_mse",
+                    "above_floor",
                     "best_random_variant",
                     "best_srht_ablation",
                 ]

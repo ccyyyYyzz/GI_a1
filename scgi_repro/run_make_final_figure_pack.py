@@ -132,6 +132,35 @@ def strip_trailing_whitespace(path: Path) -> None:
     path.write_text("\n".join(line.rstrip() for line in text.splitlines()) + "\n", encoding="utf-8")
 
 
+def shade_log_rho_mask(ax: plt.Axes, rhos: list[float], mask: list[bool], **kwargs: object) -> list[tuple[float, float]]:
+    """Shade contiguous log-spaced rho cells selected by a boolean mask."""
+
+    if not rhos:
+        return []
+    pairs = sorted((float(rho), bool(flag)) for rho, flag in zip(rhos, mask))
+    values = [rho for rho, _flag in pairs]
+    flags = [flag for _rho, flag in pairs]
+    if len(values) == 1:
+        edges = [values[0] / np.sqrt(10.0), values[0] * np.sqrt(10.0)]
+    else:
+        midpoints = [float(np.sqrt(values[idx] * values[idx + 1])) for idx in range(len(values) - 1)]
+        left = values[0] / float(np.sqrt(values[1] / values[0]))
+        right = values[-1] * float(np.sqrt(values[-1] / values[-2]))
+        edges = [left, *midpoints, right]
+    spans: list[tuple[float, float]] = []
+    start: int | None = None
+    for idx, flag in enumerate(flags):
+        if flag and start is None:
+            start = idx
+        if start is not None and (not flag or idx == len(flags) - 1):
+            end = idx if flag and idx == len(flags) - 1 else idx - 1
+            spans.append((edges[start], edges[end + 1]))
+            start = None
+    for left, right in spans:
+        ax.axvspan(left, right, **kwargs)
+    return spans
+
+
 def render_svg_figure(spec: FigureSpec, out_path: Path, root: Path) -> None:
     width = 1800
     margin = 64
@@ -296,7 +325,20 @@ def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[PanelSpec, PanelSpe
     )
 
     fig, ax = plt.subplots(figsize=(4.2, 3.15), dpi=300)
-    ax.axvspan(1.0, 10.0, color="#e6e6e6", alpha=0.75, zorder=0)
+    floor_by_rho = (
+        agc.groupby("rho")["rel_mse_mean"]
+        .min()
+        .reset_index()
+        .sort_values("rho")
+    )
+    floor_spans = shade_log_rho_mask(
+        ax,
+        floor_by_rho["rho"].astype(float).tolist(),
+        (floor_by_rho["rel_mse_mean"].astype(float) >= 0.5).tolist(),
+        color="#e6e6e6",
+        alpha=0.75,
+        zorder=0,
+    )
     ax.axhline(0.0, color="#444444", linewidth=0.9)
     for variant in [v for v in variants if v != "hadamard_ordered"]:
         subset = delta_summary[delta_summary["variant"] == variant].sort_values("rho")
@@ -324,7 +366,9 @@ def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[PanelSpec, PanelSpe
             fontsize=6.6,
             color="#333333",
         )
-    ax.text(1.15, 0.55, "fast-drift\nfloor band", fontsize=6.6, color="#555555")
+    if floor_spans:
+        label_x = max(floor_spans[0][0] * 1.35, 0.03)
+        ax.text(label_x, 0.55, "sub-floor\nnoise band", fontsize=6.6, color="#555555")
     ax.set_xscale("log")
     ax.set_xlim(0.0008, 12.0)
     ax.set_xlabel("rho = frame time / coherence time")
@@ -353,7 +397,7 @@ def make_m3_panel_assets(root: Path, out_dir: Path) -> tuple[PanelSpec, PanelSpe
             rel(delta_base.with_suffix(".svg"), root),
             rel(delta_base.with_suffix(".png"), root),
             rel(raw_source, root),
-            "Per-object/seed AGC delta PSNR versus ordered Hadamard; grey region marks fast-drift floor cells.",
+            "Per-object/seed AGC delta PSNR versus ordered Hadamard; grey region marks data-detected sub-floor cells.",
         ),
     )
 
@@ -414,8 +458,9 @@ def build_specs(root: Path, out_dir: Path) -> tuple[FigureSpec, ...]:
             claim="Random sign/permutation restores a stable coefficient anchor where gain is estimable; fast-drift deltas are floor coincidences.",
             caption=(
                 "M3 SRHT ablation under AGC over 10 objects x 5 seeds. Panel A reports signal recovery with an oracle ceiling and a rel_mse>=0.5 sub-floor band. "
-                "Panel B reports delta PSNR relative to ordered Hadamard. SRHT/row permutation/diagonal signs give about +5.4 dB at rho=1e-3, while fast-drift "
-                "rho>=1 collapses every blind variant to the reconstruction floor; the residual 0.03-0.14 dB fast-drift deltas are not interpreted as effects."
+                "Panel B reports delta PSNR relative to ordered Hadamard with data-detected sub-floor rho cells shaded. SRHT/row permutation/diagonal signs give "
+                "about +5.4 dB at rho=1e-3, while rho=0.1 is already transitional/sub-floor and rho>=1 collapses every blind variant to the reconstruction floor; "
+                "the residual moderate/fast-drift deltas are not interpreted as effects."
             ),
             status="partial; fast >=3 dB gate refuted, estimable-regime randomization result retained",
             panels=m3_panels,

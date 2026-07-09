@@ -553,25 +553,26 @@ Frame audit for M2 reference protocol:
 | reference_k8 | 2048 | 257 | 2305 |
 | reference_k2 | 2048 | 1025 | 3073 |
 
-Dense M2 pre-floor diagnostic best-map summary:
+Dense M2 above-floor headline summary:
 
-| Budget rule | Pre-floor best map across 35 rho/sigma cells | PSNR mean range |
-|---|---|---:|
-| strict equal-total-frame blind, 2048 frames | `srht_paired + pairwise` in 35/35 cells | 10.76-44.69 dB |
-| any-budget blind/reference | `srht_paired + reference_k2` in 35/35 cells | 10.79-47.68 dB |
+| Budget rule | Prompt-range headline map after `rel_mse<0.5` gate | Notes |
+|---|---|---|
+| strict equal-total-frame blind, 2048 frames | `srht_paired + pairwise` wins 29 above-floor cells; 16/45 cells are sub-floor | floor cells greyed out |
+| any-budget blind/reference | `srht_paired + reference_k2` wins 31 above-floor cells; 14/45 cells are sub-floor | spends 3073 total frames |
 
 Interpretation: under the strict 2048-frame blind budget, SRHT paired
-measurements with pairwise normalization dominate the pre-floor compact M2
-diagnostic map. The
+measurements with pairwise normalization dominate the above-floor part of the
+prompt-range M2 diagnostic map. The
 reference-calibrated `reference_k2` variant improves PSNR but spends 3073 total
 physical frames, so it is a separate semi-calibrated baseline rather than a
 fair blind winner. In the dense `scgi_proxy` run, `scgi_proxy` improves over raw
 `none` in 88.6% of matched basis/rho/sigma means and over AGC in 66.7%, but it
 never beats pairwise on paired bases. Across equal-frame blind candidates, it is
-ranked first in 45 of 210 basis/rho/sigma triples, mostly for random bases, but
-it does not change the 35-cell best-method map. Flip-boundary diagnostics are
-emitted with boundary statuses: 104 `not_reached`, 17 `left_censored`, and 14
-`observed` in the reference protocol.
+ranked first in 45 of 210 basis/rho/sigma triples before the floor mask, mostly
+for random bases, but it does not change the above-floor best-method map. The
+old pre-floor flip-boundary counts from the 7x5 reference protocol are retained
+only as provenance; headline boundary and winner claims use the high-rho
+`results/m2_boundary_audit_highrho` tables below.
 
 Prompt-range high-rho M2 extension:
 

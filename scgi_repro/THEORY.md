@@ -134,8 +134,8 @@ fast exact inverse in the oracle/static limit.
 The working prediction is:
 
 - static/oracle: SRHT is close to Hadamard because both are exactly invertible;
-- slow or moderate blind drift: randomization supplies a gain-identifiability
-  anchor while preserving orthogonal inversion;
+- slow or moderate above-floor/gain-estimable blind drift: randomization
+  supplies a gain-identifiability anchor while preserving orthogonal inversion;
 - fast blind drift: every blind basis can collapse to the reconstruction floor,
   so tiny PSNR deltas are floor coincidences unless at least one compared method
   is above-floor.

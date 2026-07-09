@@ -29,5 +29,11 @@
   "fast_best_alternatives": [
     "sign_time_interleave"
   ],
+  "above_floor_rel_mse": 0.5,
+  "non_oracle_above_floor_delta_rows": 4,
+  "fast_non_oracle_above_floor_delta_rows": 0,
+  "slow_agc_srht_minus_ordered_db": 5.453267668166454,
+  "slow_agc_perm_only_minus_ordered_db": 5.394263295595984,
+  "slow_agc_sign_only_minus_ordered_db": 5.465613694900529,
   "slow_pairwise_srht_minus_ordered_db": 0.0047083521594970534
 }

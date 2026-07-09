@@ -323,7 +323,7 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   (`rel_mse` about 0.57-0.67), and at `rho>=1` all blind variants are at the
   reconstruction floor; the high-rho fallback deltas are labelled noise-floor
   coincidences rather than effects.
-- `results/m3_random_comparator_fast_r1/`: monitored fast-drift M3 comparator
+- `results/m3_random_comparator_fast_r1/`: monitored sub-floor diagnostic M3 comparator
   adding direct `random_uniform` and `random_binary` baselines at
   `rho=1,10`, `sigma_a=0.30,0.50`; full SRHT is within +0.016 to +0.190 dB of
   the best random basis but remains slightly below ordered Hadamard, so the
