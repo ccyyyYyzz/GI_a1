@@ -104,6 +104,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
 - `results/m2_boundary_audit_highrho/`: rho-coverage audit, log-rho
   interpolated flip-boundary fits, and winner-map summaries for the high-rho M2
   merge.
+- `results/phase_m2_scgi_frozen_dense_r1_highrho_merged/`: 114,750-row dense
+  9x5 M2 output with frozen SCGI-network correction over the full prompt rho
+  range.
+- `results/m2_boundary_audit_frozen_highrho/`: matching frozen-network
+  prompt-range coverage and winner-map audit.
 - `results/phase_m2_scgi_frozen_smoke/`: frozen-network M2 smoke baseline using
   the returned SCGI checkpoint and explicit `scgi_frozen` correction.
 - `results/phase_m2_scgi_frozen_dense_r1_merged/`: 89,250-row dense M2 run with

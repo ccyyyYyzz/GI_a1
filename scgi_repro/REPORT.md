@@ -374,15 +374,17 @@ checkpoint, applies the frozen fully convolutional network to each M2 measuremen
 sequence, and keeps `gain_hat` undefined because it is not a gain-estimator
 proxy. Non-square 2048-frame M2 sequences are padded to the nearest square,
 processed by the network, and cropped back to the original frame count. The
-smoke run writes 1785 rows, including 210 `scgi_frozen` rows. The dense
+smoke run writes 1785 rows, including 210 `scgi_frozen` rows. The initial dense
 Colab-sharded run writes `results/phase_m2_scgi_frozen_dense_r1_merged` with
-89,250 rows, all five shard labels present, and 10,500 `scgi_frozen` rows.
+89,250 rows, all five shard labels present, and 10,500 `scgi_frozen` rows. A
+local high-rho completion adds `rho=3,10` shards and merges them into
+`results/phase_m2_scgi_frozen_dense_r1_highrho_merged`, with 114,750 rows over
+the full 9x5 prompt rho/sigma grid and 13,500 `scgi_frozen` rows.
 Direct cross-domain application of the full-profile `exponential_residual_unet`
-checkpoint is weak in the dense setting: mean equal-frame blind PSNR is
-16.64 dB for `scgi_frozen`, compared with 16.64 dB for `none`, 17.40 dB for
-`scgi_proxy`, and 21.43 dB for `pairwise`. `scgi_frozen` beats `none` in 60.3%
-of matched comparisons but by only +0.0047 dB on average, beats `scgi_proxy` in
-18.8%, and beats `pairwise` on paired bases in 6.5%. This is now a true
+checkpoint remains weak in the 9-rho dense setting: across matched rows,
+`scgi_frozen` is -0.206 dB versus `none` on average, -0.796 dB versus
+`scgi_proxy`, and -1.167 dB versus paired-basis `pairwise`; its win rates are
+47.2%, 14.9%, and 5.0%, respectively. This is now a true prompt-range
 frozen-network dense baseline, but not a successful network-level M2 phase
 diagram.
 
@@ -434,6 +436,21 @@ Across all non-oracle methods, `srht_paired + reference_k2` wins 43/45 cells and
 `srht_paired + pairwise` wins the two highest-amplitude high-rho cells. The
 audit also writes `m2_psnr_rho_curves_sigma_0p30.png` and
 `m2_boundary_fit_curves.png` for selected-curve and boundary-fit review.
+
+Frozen-network prompt-range high-rho completion:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 10 --seeds 5 --rho-values "3,10" --sigma-values "0.05,0.10,0.15,0.30,0.50" --shard i/5 --scgi-checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --scgi-model-kind exponential_residual_unet --output-dir results\phase_m2_scgi_frozen_highrho_o10s5_shardiof5 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_scgi_frozen_dense_r1_merged results\phase_m2_scgi_frozen_highrho_o10s5_shard0of5 results\phase_m2_scgi_frozen_highrho_o10s5_shard1of5 results\phase_m2_scgi_frozen_highrho_o10s5_shard2of5 results\phase_m2_scgi_frozen_highrho_o10s5_shard3of5 results\phase_m2_scgi_frozen_highrho_o10s5_shard4of5 --output-dir results\phase_m2_scgi_frozen_dense_r1_highrho_merged
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m2_boundary_audit.py --phase-dir results\phase_m2_scgi_frozen_dense_r1_highrho_merged --output-dir results\m2_boundary_audit_frozen_highrho
+```
+
+The frozen high-rho merge has 114,750 rows and covers the same 45 rho/sigma
+cells as the proxy high-rho scan. `results/m2_boundary_audit_frozen_highrho`
+again reports `srht_paired + pairwise` as the strict equal-frame non-oracle
+winner in 45/45 cells. The frozen network flattens near 10.6-11.8 dB at
+`rho=3,10`, so the added high-rho coverage reinforces the direct-transfer
+negative result rather than changing the winner map.
 
 Latest M3 protocol-statistics run:
 
@@ -568,7 +585,10 @@ Additional checks:
   `results/m2_boundary_audit_highrho`.
 - Frozen `scgi_frozen` M2 smoke baseline loads the returned SCGI checkpoint and
   writes `results/phase_m2_scgi_frozen_smoke` with 1785 rows; the dense run
-  writes `results/phase_m2_scgi_frozen_dense_r1_merged` with 89,250 rows.
+  writes `results/phase_m2_scgi_frozen_dense_r1_merged` with 89,250 rows, and
+  the high-rho completion writes
+  `results/phase_m2_scgi_frozen_dense_r1_highrho_merged` with 114,750 rows
+  covering `rho=0.001..10`.
 - Full nonideal M2 was split into five Colab L4 shards and merged into
   `results/nonideal_m2_full_r1_merged` with 157,500 rows and all five shard
   labels present.
@@ -612,8 +632,8 @@ Additional checks:
   validated deployable stopping rule.
 - Replace the M2 `scgi_proxy` placeholder with a true pretrained/frozen
   SCGI-network correction that is actually competitive if a network-level phase
-  diagram is required. The direct frozen dense baseline is implemented but
-  underperforms under cross-domain application. The published-channel figure
+  diagram is required. The direct frozen prompt-range dense baseline is
+  implemented but underperforms under cross-domain application. The published-channel figure
   anchors now exist; raw detector/SLM hardware calibration remains outside the
   available PDF data.
 - Finish M4 from paper-r1 fitted-law hooks to paper-grade theory: analytical AGC

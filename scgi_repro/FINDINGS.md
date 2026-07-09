@@ -229,6 +229,16 @@ rho/sigma cells. Mean equal-frame blind PSNR is 16.64 dB for `scgi_frozen`,
 +0.0047 dB on average, beats `scgi_proxy` in 18.8%, and beats pairwise on paired
 bases in 6.5%.
 
+Frozen high-rho prompt-range completion:
+`results/phase_m2_scgi_frozen_dense_r1_highrho_merged/phase_scan.csv` adds five
+local `rho=3,10` shards to the dense frozen baseline. The merged table has
+114,750 rows, covers all 45 rho/sigma cells from `0.001..10`, and contains
+13,500 `scgi_frozen` rows. `results/m2_boundary_audit_frozen_highrho` again
+selects `srht_paired + pairwise` as the strict equal-frame non-oracle winner in
+45/45 cells. Across matched rows, direct frozen transfer is still not
+competitive: `scgi_frozen` averages -0.206 dB versus `none`, -0.796 dB versus
+`scgi_proxy`, and -1.167 dB versus paired-basis `pairwise`.
+
 Supports/refutes: supports the current M2 compact conclusion that
 `srht_paired + pairwise` is the best strict equal-frame blind method across all
 45 sampled prompt-range rho/sigma cells. `srht_paired + reference_k2` is the best

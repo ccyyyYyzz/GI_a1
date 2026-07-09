@@ -1,0 +1,35 @@
+{
+  "rho_min": 0.001,
+  "rho_max": 10.0,
+  "rho_count": 9,
+  "rho_values": [
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0,
+    3.0,
+    10.0
+  ],
+  "sigma_count": 5,
+  "sigma_values": [
+    0.05,
+    0.1,
+    0.15,
+    0.3,
+    0.5
+  ],
+  "covers_prompt_rho_upper_10": true,
+  "covers_prompt_rho_lower_1e-3": true,
+  "fit_status_counts": {
+    "insufficient_observed_points": 32,
+    "ok": 5
+  },
+  "r2_ge_0_9_fits": 5,
+  "figures": [
+    "m2_psnr_rho_curves_sigma_0p30.png",
+    "m2_boundary_fit_curves.png"
+  ]
+}
