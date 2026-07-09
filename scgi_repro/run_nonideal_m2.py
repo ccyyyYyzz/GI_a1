@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import replace
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -24,6 +25,21 @@ def parse_floats(text: str) -> list[float]:
 
 def parse_items(text: str) -> list[str]:
     return [part for part in text.replace(",", " ").split() if part.strip()]
+
+
+def parse_shard(value: str | None) -> tuple[int, int]:
+    if not value:
+        return 0, 1
+    parts = value.split("/", 1)
+    if len(parts) != 2:
+        raise ValueError("--shard must use the form i/k, for example 0/5.")
+    shard_index = int(parts[0])
+    shard_count = int(parts[1])
+    if shard_count <= 0:
+        raise ValueError("Shard count must be positive.")
+    if shard_index < 0 or shard_index >= shard_count:
+        raise ValueError("Shard index must be zero-based and satisfy 0 <= i < k.")
+    return shard_index, shard_count
 
 
 def make_basis_for_scan(name: str, num_pixels: int, frame_budget: int, seed: int) -> MeasurementBasis:
@@ -100,6 +116,32 @@ def summarize(df: pd.DataFrame, out_dir: Path) -> None:
     best_reference.to_csv(out_dir / "nonideal_best_reference_methods.csv", index=False)
 
 
+def write_key_summary(df: pd.DataFrame, out_dir: Path) -> None:
+    summary = pd.read_csv(out_dir / "nonideal_summary.csv")
+    best = pd.read_csv(out_dir / "nonideal_best_equal_frame_blind_methods.csv")
+    payload: dict[str, object] = {
+        "rows": int(len(df)),
+        "conditions": df["condition"].value_counts().to_dict(),
+        "shards": sorted(str(x) for x in df["shard"].dropna().unique()) if "shard" in df.columns else ["0/1"],
+        "best_equal_counts": best.groupby("condition")["correction"].value_counts().unstack(fill_value=0).to_dict("index"),
+        "best_equal_basis_counts": best.groupby("condition")["basis"].value_counts().unstack(fill_value=0).to_dict("index"),
+        "mean_psnr_by_condition_correction": summary.groupby(["condition", "correction"])["psnr_mean"]
+        .mean()
+        .unstack()
+        .round(4)
+        .to_dict("index"),
+    }
+    if set(summary["condition"]) >= {"ideal", "nonideal"}:
+        pivot = summary.pivot_table(index=["rho", "sigma_a", "basis", "correction"], columns="condition", values="psnr_mean")
+        if {"ideal", "nonideal"}.issubset(set(pivot.columns)):
+            pivot["delta_nonideal_minus_ideal"] = pivot["nonideal"] - pivot["ideal"]
+            payload["delta_by_correction_mean"] = pivot.groupby("correction")["delta_nonideal_minus_ideal"].mean().round(4).to_dict()
+    reference_rows = df[df["correction"].astype(str).str.startswith("reference_")]
+    if len(reference_rows):
+        payload["reference_frames"] = sorted(int(x) for x in reference_rows["reference_frames"].unique())
+    (out_dir / "nonideal_key_summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Compact ideal/nonideal M2 digital-twin scan.")
     parser.add_argument("--profile", default="debug")
@@ -116,6 +158,7 @@ def main() -> None:
     parser.add_argument("--slm-levels", type=int, default=256)
     parser.add_argument("--contrast-ratio", type=float, default=1000.0)
     parser.add_argument("--timing-jitter-std", type=float, default=0.05)
+    parser.add_argument("--shard", default="", help="Optional zero-based shard spec i/k, for example 0/5.")
     parser.add_argument("--output-dir", type=Path, default=Path("results/nonideal_m2_compact"))
     args = parser.parse_args()
 
@@ -128,6 +171,7 @@ def main() -> None:
     objects = make_synthetic_objects(args.objects, image_size, int(cfg.get("seed", 0)))
     out_dir = args.output_dir if args.output_dir.is_absolute() else root / args.output_dir
     out_dir.mkdir(parents=True, exist_ok=True)
+    shard_index, shard_count = parse_shard(args.shard)
 
     conditions = [
         {
@@ -153,6 +197,7 @@ def main() -> None:
     ]
 
     rows = []
+    unit_index = 0
     for basis_index, basis_name in enumerate(parse_items(args.bases)):
         nominal_basis = make_basis_for_scan(basis_name, num_pixels, frame_budget, int(cfg.get("seed", 0)) + basis_index * 101)
         corrections = parse_items(args.corrections)
@@ -169,6 +214,10 @@ def main() -> None:
                 for sigma_a in parse_floats(args.sigma_a):
                     for seed_idx in range(args.seeds):
                         for obj_idx, obj in enumerate(objects):
+                            current_unit = unit_index
+                            unit_index += 1
+                            if current_unit % shard_count != shard_index:
+                                continue
                             ideal = basis.measure(obj)
                             channel = make_multiplicative_channel(
                                 basis.num_frames,
@@ -218,13 +267,18 @@ def main() -> None:
                                         "total_physical_frames": basis.num_frames + reference_frames,
                                         "num_coefficients": basis.num_coefficients,
                                         "num_pixels": basis.num_pixels,
+                                        "shard": args.shard or "0/1",
+                                        "unit_index": current_unit,
                                         **metrics,
                                     }
                                 )
 
+    if not rows:
+        raise RuntimeError(f"Shard {args.shard} produced no rows.")
     df = pd.DataFrame(rows)
     df.to_csv(out_dir / "nonideal_phase_scan.csv", index=False)
     summarize(df, out_dir)
+    write_key_summary(df, out_dir)
     print(f"wrote {out_dir / 'nonideal_phase_scan.csv'}")
     print(f"rows={len(df)}")
 
