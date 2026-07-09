@@ -332,9 +332,13 @@ RED denoiser. This is the first strict continuous-output stripe run to clear
 the APL URED minimum: fixed 15-step `nlm_otsu_soft` reaches CNR 12.350 and PSNR
 21.522 while still reporting the continuous `x-u` image rather than a hard mask.
 `results/stage4_trace_audit_r6` folds these results into a 16-sweep, 893-row
-audit. It shows all four objects have target-aware trace points above 10.43, but
-the new soft-Otsu regularizer still needs all-object fixed-step validation before
-it can close the Stage 4 final-output gate.
+audit and shows all four objects have target-aware trace points above 10.43.
+That validation was then run on Colab pro2/L4 at commit `0b6e86e` in
+`results/stage4_ured_otsu_soft_colab_allobjects_r1`. The fixed 15-step
+`nlm_otsu_soft` setting clears the APL URED minimum on all four continuous
+`x-u` outputs: `letter_A=91.762`, `stripe_target=12.341`, `letter_L=54.443`,
+and `ring=16.577`. This is a modified RED regularizer, so it should be reported
+separately from the original NLM URED reproduction.
 `results/stage4_image_audit_r1` then regenerates the best final/trace stripe
 images and audits metric sensitivity. The best standard CNR remains 9.365;
 cropping to the target bounding box lowers it to 7.578, and sweeping the target

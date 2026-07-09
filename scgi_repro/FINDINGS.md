@@ -178,8 +178,11 @@ final report image as continuous `x-u`. In
 stripe CNR `12.350` with PSNR `21.522`, clearing the APL URED minimum for stripe
 without hard thresholding the final image. `results/stage4_trace_audit_r6`
 combines 16 sweeps and 893 detail rows; it now records target-aware trace points
-above `10.43` for all four objects, but all-object fixed-step/final validation
-of the modified soft-Otsu RED path is still pending.
+above `10.43` for all four objects. `results/stage4_ured_otsu_soft_colab_allobjects_r1`
+then validates the fixed 15-step `nlm_otsu_soft` setting on Colab pro2/L4 at
+commit `0b6e86e`: final continuous CNRs are `91.762` for A, `12.341` for
+stripe, `54.443` for L, and `16.577` for ring. This clears the APL URED minimum
+for all four objects under the modified soft-Otsu RED regularizer.
 `results/stage4_image_audit_r1` regenerates the best final/trace stripe outputs
 as image arrays and a visual grid. The best standard CNR remains `9.365`;
 cropping to the target bounding box lowers it to `7.578`, and sweeping the target

@@ -1,0 +1,2 @@
+config_id,objects,mean_cnr,min_cnr,mean_psnr,min_psnr,mean_ssim,steps,lr,beta,xi,x_step,channels,blocks,residual_scale,denoiser,denoise_kernel,nlm_h,nlm_patch_size,nlm_patch_distance,otsu_temperature,binary_prior_weight
+cfg0000,4,43.78078770637512,12.340508460998535,25.601375102996826,21.509124755859375,0.2695656642317772,15,0.0005,0.4,0.5,0.1,24,3,0.08,nlm_otsu_soft,3,0.062,5,6,0.04,0.0

@@ -159,10 +159,13 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   soft-Otsu RED pilots. The fixed-step continuous `x-u` stripe output reaches
   12.350 CNR at 15 steps with `nlm_otsu_soft`, clearing the APL URED minimum
   for stripe under this modified regularizer.
+- `results/stage4_ured_otsu_soft_colab_allobjects_r1/`: Colab pro2/L4
+  all-object fixed-step validation of the same modified soft-Otsu RED path at
+  commit `0b6e86e`. All four continuous `x-u` outputs clear the 10.43 CNR gate
+  with minimum CNR 12.341.
 - `results/stage4_trace_audit_r6/`: combined final-vs-target-aware trace audit
   for 16 Stage 4 sweeps. It records 893 detail rows and adds the soft-Otsu RED
-  evidence; all objects have target-aware trace points above 10.43, while
-  all-object fixed-step/final validation remains open.
+  evidence; all objects have target-aware trace points above 10.43.
 - `results/stage4_image_audit_r1/`: regenerated best stripe Stage 4 images,
   raw arrays, metric table, threshold sweep, and ROI/bounding-box diagnostic.
   It shows the 9.365 CNR miss is not caused by target threshold or far-background

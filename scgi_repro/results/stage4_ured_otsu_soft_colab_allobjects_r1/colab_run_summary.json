@@ -1,0 +1,16 @@
+{
+  "run_id": "stage4_otsu_allobjects_colab_pro2_r1",
+  "account_home": "/var/tmp/codex-colab-accounts/pro2",
+  "accelerator": "NVIDIA L4",
+  "ref": "0b6e86e3fd80152c3451e807bae919a3b5a1f071",
+  "short_ref": "0b6e86e",
+  "python": "3.12.13",
+  "torch": "2.11.0+cu128",
+  "cuda_available": true,
+  "result_root": "results/stage4_ured_otsu_soft_colab_allobjects_r1",
+  "elapsed_seconds": 37.498,
+  "min_cnr": 12.340508460998535,
+  "mean_cnr": 43.78078770637512,
+  "objects": ["letter_A", "stripe_target", "letter_L", "ring"],
+  "completed": true
+}
