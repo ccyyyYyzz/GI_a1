@@ -145,6 +145,19 @@ Gamma sweep on Colab debug 60 epochs:
 This suggests the supervised correction loss can be tuned for contrast, but the
 current gamma sweep does not by itself solve the KS gate.
 
+Physics-informed follow-up:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage0.py --profile smoke --epochs 2 --tag smoke_exp_residual_e2_skipured --model-kind exponential_residual_unet --skip-ured
+```
+
+This optional model first fits the one-dimensional exponential gain implied by
+the APL simulator and then permits a small U-Net residual. On the smoke profile
+it reaches SCGI CNR 3.0587, validation SCGI KS pass rate 1.0, and validation
+MSE 2.69e-6, essentially matching the analytic exponential upper-bound control.
+It is therefore the next full-profile candidate; it does not replace the saved
+plain `gain_unet` results above.
+
 Stage 3 held-out target test:
 
 ```powershell

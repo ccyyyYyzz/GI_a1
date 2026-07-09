@@ -197,6 +197,26 @@ class TestCoreNumerics(unittest.TestCase):
         self.assertLessEqual(model.gain_min, full_tail_gain)
         self.assertGreaterEqual(model.gain_max, 1.0)
 
+    def test_exponential_residual_model_can_remove_known_decay(self):
+        scgi_model = importlib.import_module("src.scgi_model")
+        model = scgi_model.make_scgi_model(
+            {
+                "active": {"lambda_min": 0.99, "lambda_max": 1.0},
+                "scgi": {
+                    "model_kind": "exponential_residual_unet",
+                    "unet_base_channels": 2,
+                    "unet_depth": 1,
+                    "use_coord_channels": False,
+                    "residual_max_blend": 0.0,
+                },
+            }
+        )
+        n = 16 * 16
+        lam = 0.99
+        gains = (lam ** torch.arange(n, dtype=torch.float32)).reshape(1, 1, 16, 16)
+        pred = model(gains)
+        self.assertLess(float(torch.mean((pred - torch.ones_like(pred)) ** 2)), 1.0e-6)
+
     def test_dgi_output_shape_matches_object_shape(self):
         func = _find_function(
             [

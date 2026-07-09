@@ -41,6 +41,12 @@ Gamma sweep: Colab debug 60-epoch sweep over gamma values `{0, 0.1, 1, 10}`
 finds the best SCGI CNR at gamma=1.0 (2.242), but all four gamma settings fail
 the strict KS gate.
 
+Physics-informed model check: `exponential_residual_unet` adds an exponential
+gain fit before a small residual U-Net. A smoke 2-epoch run reaches SCGI CNR
+3.059, validation SCGI KS pass rate 1.0, and validation MSE 2.69e-6, matching
+the analytic exponential control. This is the preferred next full-profile
+repair path rather than adding more epochs to the unconstrained gain U-Net.
+
 ## Stage 3 Held-Out Targets
 
 Experiment: load the saved Stage 0 smoke checkpoint and test letter/stripe/ring

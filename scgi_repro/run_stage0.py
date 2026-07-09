@@ -130,12 +130,15 @@ def main() -> None:
     parser.add_argument("--profile", default=None)
     parser.add_argument("--epochs", type=int, default=None)
     parser.add_argument("--tag", default=None, help="Optional result subdirectory suffix, e.g. debug_e80.")
+    parser.add_argument("--model-kind", default=None, help="Override scgi.model_kind for one run.")
     parser.add_argument("--skip-ured", action="store_true")
     parser.add_argument("--append-report", action="store_true", help="Append a short run block to REPORT.md.")
     args = parser.parse_args()
 
     root = project_root()
     cfg = load_config(root / "config.yaml", args.profile)
+    if args.model_kind:
+        cfg.setdefault("scgi", {})["model_kind"] = str(args.model_kind)
     active = cfg["active"]
     result_name = str(args.tag or cfg["profile"])
     out_dir = root / "results" / "stage_0" / result_name

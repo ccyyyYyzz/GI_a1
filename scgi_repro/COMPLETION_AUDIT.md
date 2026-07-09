@@ -27,11 +27,11 @@ baselines.
 
 | Requirement | Status | Current evidence |
 |---|---|---|
-| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 17 unit tests pass |
+| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 18 unit tests pass |
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
-| Stage 2 SCGI U-Net with Gaussian prior and gamma sweep | Partial | `src/scgi_model.py`, `src/train_scgi.py`, Colab gamma sweep; strict KS pass target not met |
+| Stage 2 SCGI U-Net with Gaussian prior and gamma sweep | Partial | `src/scgi_model.py`, `src/train_scgi.py`, Colab gamma sweep; strict KS pass target not met for plain gain U-Net; `exponential_residual_unet` smoke test matches analytic correction |
 | Stage 3 held-out DGI validation | Partial | `results/stage_3/smoke`; Colab Stage3 extracted; directionality passes, all-target CNR >= 3 fails |
 | Stage 4 SCGI-UNN and SCGI-URED | Partial | Implemented compact URED/UNN path; URED improves Stage0 CNR, but held-out UNN/URED target ranking is not fully validated |
 | Full paper-scale profile, 128x128/N=16384/M=5000/100 epochs | Attempted, not achieved | Colab full e20 and e100 ran; both underfit badly (`SCGI CNR ~0.127` at e100) |
@@ -62,6 +62,7 @@ baselines.
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --shard 1/2 --no-findings --output-dir results\phase_m2_shardcheck_1of2
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' merge_phase_m2_shards.py --inputs results\phase_m2_shardcheck_0of2 results\phase_m2_shardcheck_1of2 --output-dir results\phase_m2_shardcheck_merged
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_phase_m2.py --profile smoke --objects 1 --seeds 1 --output-dir results\phase_m2_scgi_proxy_smoke --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_stage0.py --profile smoke --epochs 2 --tag smoke_exp_residual_e2_skipured --model-kind exponential_residual_unet --skip-ured
 ```
 
 ## Completion Decision

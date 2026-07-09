@@ -41,6 +41,8 @@ M2 scans can be split across Colab or local workers:
 For a closer-to-prompt debug run, use `--profile debug`. For the paper-scale run, use
 `--profile full` on a GPU machine with torchvision/scipy/skimage/matplotlib installed.
 The verified local CUDA environment is `D:\Anacondar\anaconda3\envs\pytorch\python.exe`.
+If the unconstrained gain U-Net underfits at full scale, run the
+physics-informed candidate with `--model-kind exponential_residual_unet`.
 
 ## Main Outputs
 
