@@ -9,6 +9,8 @@ REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
 COLAB_GPU="${COLAB_GPU:-L4}"
 CU_PER_HOUR="${CU_PER_HOUR:-0}"
+PERSIST_ROOT="${PERSIST_ROOT:-}"
+SYNC_SECONDS="${SYNC_SECONDS:-300}"
 RUN_ID="${1:-pro1_gamma_debug_e60}"
 ACCOUNT_HOME="${2:-/var/tmp/codex-colab-accounts/pro1}"
 
@@ -23,6 +25,8 @@ nohup env HOME="$ACCOUNT_HOME" "$COLAB" --auth oauth2 run --gpu "$COLAB_GPU" --t
   --run-id "$RUN_ID" \
   --accelerator "$COLAB_GPU" \
   --cu-per-hour "$CU_PER_HOUR" \
+  --persist-root "$PERSIST_ROOT" \
+  --sync-seconds "$SYNC_SECONDS" \
   --install-requirements \
   --command "python run_gamma_sweep.py --profile debug --epochs 60 --output results/stage_0/gamma_sweep_debug_e60_colab.csv" \
   --artifact-root results/stage_0 \

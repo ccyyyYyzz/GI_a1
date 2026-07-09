@@ -27,7 +27,7 @@ baselines.
 
 | Requirement | Status | Current evidence |
 |---|---|---|
-| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 29 unit tests pass |
+| Configurable project with `config.yaml`, `src/`, `tests/`, `results/` | Done | Expected modules exist under `src/`; `config.yaml`; 30 unit tests pass |
 | Static GI forward model, dynamic exponential scaling, DGI, CNR/PSNR/SSIM/KS | Done | `src/data_sim.py`, `src/dgi.py`, `src/metrics.py`; tests; `results/stage_0/smoke/metrics.json` |
 | Stage 0 debug/smoke full pipeline | Done | `results/stage_0/smoke`, local debug e80, Colab debug e160 |
 | Stage 1 diagnostics: B histogram, R dynamic curve, lambda distribution | Done at smoke scale | `results/stage_1/smoke/*` |
@@ -36,7 +36,7 @@ baselines.
 | Stage 4 SCGI-UNN and SCGI-URED | Partial | Full 500-step matrix now includes SCGI-UNN and SCGI-URED for four held-out targets; URED is above UNN on all four, but mean/min CNRs are only 5.084/2.270 vs APL URED minimum 10.43. Follow-up stripe screens show avg-pool RED final/target-aware trace CNR 2.916/3.831 and NLM RED final/target-aware trace CNR 5.131/8.913. The repaired all-object NLM audit reaches final CNRs 8.453/6.033/10.270/7.842 for A/stripe/L/ring, still below the all-target APL URED gate; `results/stage4_ured_proxy_audit_r1` finds no validated target-free stopping rule |
 | Full paper-scale profile, 128x128/N=16384/M=5000/100 epochs | Partial | Colab full e100 gain-U-Net now reaches SCGI CNR 1.1705 after gain-range fix; full exp-residual e2 reaches analytic/static CNR 2.5353 and KS pass 1.0 |
 | Paper-threshold reproduction: SCGI CNR 3-4, UNN 8-14, URED 10-38 | Not achieved | `results/published_calibration` encodes APL Fig. 6/Fig. 9 targets; authoritative full matrix remains below all APL minima: SCGI min 2.492 vs 3.39, UNN min 2.254 vs 7.93, URED min 2.270 vs 10.43 |
-| Colab durability: checkpoint resume, Drive persistence, CU accounting | Partial | `run_monitored_job.py` adds durable local/Colab CLI logs, `status.json`, git/CUDA metadata, and CU estimates when a rate is supplied; `colab/colab_github_job_runner.py` writes `colab_job_status.json`; `run_phase_m2.py --resume` and `run_nonideal_m2.py --resume` append completed units and skip them on rerun; `run_stage0.py --resume-checkpoint` and `run_m2_scgi_train.py --resume-checkpoint` restore epoch checkpoints. External Drive/GitHub mid-run persistence remains open |
+| Colab durability: checkpoint resume, Drive persistence, CU accounting | Partial to done | `run_monitored_job.py` adds durable local/Colab CLI logs, `status.json`, git/CUDA metadata, and CU estimates when a rate is supplied; `colab/colab_github_job_runner.py` writes `colab_job_status.json` and supports `--persist-root` periodic artifact copies to an already-mounted path; `run_phase_m2.py --resume` and `run_nonideal_m2.py --resume` append completed units and skip them on rerun; `run_stage0.py --resume-checkpoint` and `run_m2_scgi_train.py --resume-checkpoint` restore epoch checkpoints. Automatic Drive authorization or GitHub upload from Colab is not implemented |
 
 ## Task 2: Measurement-Basis Mechanism Study
 

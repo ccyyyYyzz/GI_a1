@@ -70,6 +70,9 @@ the launch scripts pass `COLAB_GPU`/`CU_PER_HOUR` through to that status record.
 For training jobs, `run_stage0.py` writes `checkpoint_latest.pt` and
 `training_progress.json`, while `run_m2_scgi_train.py` writes
 `m2_scgi_checkpoint_latest.pt`; both support `--resume-checkpoint`.
+If a mounted persistence location is available, set `PERSIST_ROOT` in the Colab
+launch scripts to copy the artifact root there every `SYNC_SECONDS` seconds.
+This does not perform Drive authorization; it uses an already-mounted directory.
 
 For a closer-to-prompt debug run, use `--profile debug`. For the paper-scale run, use
 `--profile full` on a GPU machine with torchvision/scipy/skimage/matplotlib installed.

@@ -43,7 +43,26 @@ def write_json_atomic(path: Path, payload: dict) -> None:
     tmp.replace(path)
 
 
-def stream_shell(command: str, cwd: Path, status_path: Path, status_base: dict, heartbeat_seconds: float, cu_per_hour: float) -> int:
+def sync_artifacts(source: Path, persist_root: Path | None, run_id: str) -> dict | None:
+    if persist_root is None or not source.exists():
+        return None
+    target = persist_root / run_id
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source, target, dirs_exist_ok=True)
+    return {"source": str(source), "target": str(target), "time_utc": utc_now()}
+
+
+def stream_shell(
+    command: str,
+    cwd: Path,
+    status_path: Path,
+    status_base: dict,
+    heartbeat_seconds: float,
+    cu_per_hour: float,
+    sync_source: Path,
+    persist_root: Path | None,
+    sync_seconds: float,
+) -> int:
     print("RUN_SHELL", command, flush=True)
     proc = subprocess.Popen(
         command,
@@ -64,21 +83,24 @@ def stream_shell(command: str, cwd: Path, status_path: Path, status_base: dict, 
 
     thread = threading.Thread(target=forward_output, daemon=True)
     thread.start()
+    last_sync = 0.0
     while proc.poll() is None:
         elapsed = time.time() - start
-        write_json_atomic(
-            status_path,
-            {
-                **status_base,
-                "state": "running",
-                "pid": proc.pid,
-                "updated_time_utc": utc_now(),
-                "elapsed_seconds": round(elapsed, 3),
-                "estimated_cu_hours": None
-                if estimate_cu_hours(elapsed, cu_per_hour) is None
-                else round(float(estimate_cu_hours(elapsed, cu_per_hour)), 6),
-            },
-        )
+        payload = {
+            **status_base,
+            "state": "running",
+            "pid": proc.pid,
+            "updated_time_utc": utc_now(),
+            "elapsed_seconds": round(elapsed, 3),
+            "estimated_cu_hours": None
+            if estimate_cu_hours(elapsed, cu_per_hour) is None
+            else round(float(estimate_cu_hours(elapsed, cu_per_hour)), 6),
+        }
+        now = time.time()
+        if persist_root is not None and sync_seconds > 0.0 and now - last_sync >= sync_seconds:
+            payload["last_persist_sync"] = sync_artifacts(sync_source, persist_root, status_base["run_id"])
+            last_sync = now
+        write_json_atomic(status_path, payload)
         time.sleep(max(1.0, float(heartbeat_seconds)))
     thread.join(timeout=5.0)
     return int(proc.returncode)
@@ -141,6 +163,8 @@ def main() -> None:
     parser.add_argument("--accelerator", default="unknown")
     parser.add_argument("--cu-per-hour", type=float, default=0.0)
     parser.add_argument("--heartbeat-seconds", type=float, default=60.0)
+    parser.add_argument("--persist-root", default="", help="Optional mounted directory for periodic artifact copies.")
+    parser.add_argument("--sync-seconds", type=float, default=300.0, help="Artifact sync interval when --persist-root is set.")
     args = parser.parse_args()
 
     print("COLAB_JOB_BEGIN", args.run_id, flush=True)
@@ -171,6 +195,7 @@ def main() -> None:
         status_root = workdir / args.artifact_root if args.artifact_root else workdir / "results" / "colab_runs" / args.run_id
         status_root.mkdir(parents=True, exist_ok=True)
         status_path = status_root / "colab_job_status.json"
+        persist_root = Path(args.persist_root).expanduser() if str(args.persist_root).strip() else None
         status_base = {
             "schema_version": 1,
             "run_id": args.run_id,
@@ -179,6 +204,7 @@ def main() -> None:
             "workdir": args.workdir,
             "accelerator": args.accelerator,
             "cu_per_hour": args.cu_per_hour,
+            "persist_root": None if persist_root is None else str(persist_root),
             "start_time_utc": utc_now(),
         }
         write_json_atomic(status_path, {**status_base, "state": "starting", "updated_time_utc": utc_now()})
@@ -190,6 +216,9 @@ def main() -> None:
             status_base=status_base,
             heartbeat_seconds=float(args.heartbeat_seconds),
             cu_per_hour=float(args.cu_per_hour),
+            sync_source=status_root,
+            persist_root=persist_root,
+            sync_seconds=float(args.sync_seconds),
         )
         command_elapsed = time.time() - command_start
         summary = {
@@ -207,18 +236,21 @@ def main() -> None:
             "status_path": str(status_path.relative_to(workdir)),
             "workdir": args.workdir,
         }
-        write_json_atomic(
-            status_path,
-            {
-                **status_base,
-                "state": "success" if exit_code == 0 else "failed",
-                "return_code": exit_code,
-                "updated_time_utc": utc_now(),
-                "end_time_utc": utc_now(),
-                "elapsed_seconds": round(command_elapsed, 3),
-                "estimated_cu_hours": summary["estimated_cu_hours"],
-            },
-        )
+        final_status = {
+            **status_base,
+            "state": "success" if exit_code == 0 else "failed",
+            "return_code": exit_code,
+            "updated_time_utc": utc_now(),
+            "end_time_utc": utc_now(),
+            "elapsed_seconds": round(command_elapsed, 3),
+            "estimated_cu_hours": summary["estimated_cu_hours"],
+        }
+        write_json_atomic(status_path, final_status)
+        final_sync = sync_artifacts(status_root, persist_root, args.run_id)
+        if final_sync is not None:
+            final_status["last_persist_sync"] = final_sync
+            write_json_atomic(status_path, final_status)
+            sync_artifacts(status_root, persist_root, args.run_id)
         print("COLAB_JOB_SUMMARY_BEGIN", flush=True)
         print(json.dumps(summary, indent=2), flush=True)
         print("COLAB_JOB_SUMMARY_END", flush=True)

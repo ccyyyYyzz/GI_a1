@@ -9,6 +9,8 @@ REPO="https://github.com/ccyyyYyzz/GI_a1.git"
 REF="${REF:-scgi-colab-20260709}"
 COLAB_GPU="${COLAB_GPU:-L4}"
 CU_PER_HOUR="${CU_PER_HOUR:-0}"
+PERSIST_ROOT="${PERSIST_ROOT:-}"
+SYNC_SECONDS="${SYNC_SECONDS:-300}"
 BATCH="${BATCH:-nonideal_m2_full_$(date +%Y%m%d_%H%M%S)}"
 SHARDS="${SHARDS:-5}"
 SHARD_LIST="${SHARD_LIST:-0 1 2 3 4}"
@@ -42,6 +44,8 @@ launch_shard() {
     --run-id "$run_id" \
     --accelerator "$COLAB_GPU" \
     --cu-per-hour "$CU_PER_HOUR" \
+    --persist-root "$PERSIST_ROOT" \
+    --sync-seconds "$SYNC_SECONDS" \
     --install-requirements \
     --command "$command_text" \
     --artifact-root "$output_dir" \

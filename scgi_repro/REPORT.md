@@ -611,7 +611,7 @@ writes:
 & 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' -m unittest discover -s tests -v
 ```
 
-Result: 29 tests passed.
+Result: 30 tests passed.
 
 Additional checks:
 
@@ -635,6 +635,10 @@ Additional checks:
 - The Colab GitHub runner now writes `colab_job_status.json` in the artifact
   root, records accelerator/CU-rate metadata, and all Colab launch scripts pass
   `COLAB_GPU` plus optional `CU_PER_HOUR` through to the runner.
+- The Colab runner also accepts `--persist-root`; launch scripts expose this as
+  `PERSIST_ROOT` and periodically copy the artifact root to that mounted path
+  every `SYNC_SECONDS` seconds. This is a persistence hook, not an automatic
+  Drive authorization flow.
 - Colab L4 via GitHub transfer completed debug 160 epoch + Stage 3, full
   20-epoch probe, gamma sweep, and full 100-epoch SCGI-only probe. Artifacts
   were extracted locally from Colab logs with `extract_colab_artifacts.py`.
@@ -714,10 +718,9 @@ Additional checks:
 - Finish M4 from paper-r2 fitted-law hooks to final paper assets: targeted AGC
   validation beyond the current weak window-law fits and publication-quality
   vector boundary figures.
-- Add an external persistence layer for long Colab jobs if the browser/runtime
-  dies before final log extraction. The local runner, Colab status manifest,
-  M2/nonideal scan resume, and Stage0/M2 training checkpoint restore are now
-  implemented, but Google Drive or GitHub upload-style mid-run persistence is
-  still open.
+- Configure an authenticated mounted persistence target before future long
+  Colab runs if mid-run copies are required. The code path now supports
+  `PERSIST_ROOT`, but it does not perform Google Drive authorization or GitHub
+  uploads by itself.
 
 See `COMPLETION_AUDIT.md` for the strict requirement-by-requirement status.

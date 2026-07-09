@@ -544,6 +544,25 @@ class TestMonitoredJob(unittest.TestCase):
             self.assertEqual(payload["state"], "running")
             self.assertEqual(payload["completed_units"], 1)
 
+    def test_colab_runner_sync_artifacts_copies_status_root(self):
+        spec = importlib.util.spec_from_file_location(
+            "colab_github_job_runner", ROOT / "colab" / "colab_github_job_runner.py"
+        )
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            source = tmp_path / "artifacts"
+            source.mkdir()
+            (source / "colab_job_status.json").write_text('{"state":"running"}', encoding="utf-8")
+            result = module.sync_artifacts(source, tmp_path / "persist", "run123")
+            self.assertIsNotNone(result)
+            copied = tmp_path / "persist" / "run123" / "colab_job_status.json"
+            self.assertTrue(copied.exists())
+            self.assertIn("running", copied.read_text(encoding="utf-8"))
+
 
 class TestChannelMechanisms(unittest.TestCase):
     def setUp(self):
