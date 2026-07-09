@@ -1,0 +1,1 @@
+'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_ceiling_diagnostic.py --profile full --output-dir 'results\ceiling_diagnostic_r1' --heldout-count 8 --n-factors '1 2 4 8 16 32 64' --chunk-patterns 512 --random-ls-max-pixels 4096

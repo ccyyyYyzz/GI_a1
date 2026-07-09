@@ -1,0 +1,32 @@
+{
+  "accelerator": "local_cuda",
+  "command": "'D:\\Anacondar\\anaconda3\\envs\\pytorch\\python.exe' run_ceiling_diagnostic.py --profile full --output-dir 'results\\ceiling_diagnostic_r1' --heldout-count 8 --n-factors '1 2 4 8 16 32 64' --chunk-patterns 512 --random-ls-max-pixels 4096",
+  "cu_per_hour": null,
+  "cwd": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro",
+  "elapsed_seconds": 154.312,
+  "end_time_utc": "2026-07-09T17:40:24Z",
+  "estimated_cu_hours": null,
+  "git": {
+    "branch": "scgi-ceiling-diagnostic-r1",
+    "head": "0a1b9f3a07866d03671d93e3d7e14fe3aafb9690",
+    "origin_head": null,
+    "status_short": "M FINDINGS.md\n M README.md\n M REPORT.md\n?? results/ceiling_diagnostic_r1/\n?? results/ceiling_diagnostic_smoke_r1/\n?? results/ceiling_diagnostic_smoke_r2/\n?? results/ceiling_diagnostic_smoke_r3/\n?? results/colab_imports/pro1_m2_hadamard_order_dense_r1_bg_shard1of5/\n?? results/colab_imports/pro1_m2_hadamard_order_dense_r1_bg_shard3of5/\n?? results/colab_imports/pro1_m2_hadamard_order_dense_r1_shard0of5/\n?? results/colab_imports/pro1_stage4_unn_stripe_puredata_colab_r1_shard0of2/\n?? results/colab_imports/pro1_stage4_ured_continuous_binary_refine_colab_r1_shard0of5/\n?? results/colab_imports/pro1_stage4_ured_continuous_binary_refine_colab_r1_shard1of5/\n?? results/colab_imports/pro1_stage4_ured_continuous_binary_refine_colab_r3grid_shard0of5/\n?? results/colab_imports/pro1_stage4_ured_continuous_binary_refine_colab_r3grid_shard1of5/\n?? results/colab_imports/pro2_m2_hadamard_order_dense_r1_bg_shard2of5/\n?? results/colab_imports/pro2_m2_hadamard_order_dense_r1_bg_shard4of5/\n?? results/colab_imports/pro2_stage4_unn_stripe_puredata_colab_r1_shard1of2/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r1_shard2of5/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r1_shard3of5/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r1_shard4of5/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r3grid_shard2of5/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r3grid_shard3of5/\n?? results/colab_imports/pro2_stage4_ured_continuous_binary_refine_colab_r3grid_shard4of5/\n?? results/colab_runs/\n?? results/stage4_ured_continuous_binary_refine_colab_r3grid_merged/\n?? run_ceiling_diagnostic.py"
+  },
+  "pid": 43892,
+  "python": "3.9.21 (main, Dec 11 2024, 16:35:24) [MSC v.1929 64 bit (AMD64)]",
+  "return_code": 0,
+  "run_id": "ceiling_diagnostic_r1",
+  "schema_version": 1,
+  "shell": false,
+  "start_time_utc": "2026-07-09T17:37:50Z",
+  "state": "success",
+  "stderr_log": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\cli_runs\\ceiling_diagnostic_r1\\stderr.log",
+  "stdout_log": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\cli_runs\\ceiling_diagnostic_r1\\stdout.log",
+  "torch": {
+    "available": true,
+    "cuda_available": true,
+    "cuda_device_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "version": "2.1.0+cu121"
+  },
+  "updated_time_utc": "2026-07-09T17:40:24Z"
+}

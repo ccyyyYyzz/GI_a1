@@ -123,6 +123,24 @@ streaming audit locally to 128P and 256P. At 256P, strict minmax PSNR clears
 affine-aligned PSNR is 34.500/36.938 dB minimum/mean. This converts the static
 DGI PSNR gap from "unclosed" to "sampling-closeable but calibration-sensitive."
 
+Ceiling diagnostic: `results/ceiling_diagnostic_r1` implements the requested
+pure-static "raise the ceiling" audit with no training, no Otsu, and CNR from
+the repository ground-truth mask. It prices the three levers behind the
+`static = SCGI = analytic = oracle` Stage 3 plateau: object effective support,
+random-DGI frame budget, and estimator choice. At N=K=16384, the Stage 3 static
+random-DGI CNRs are `letter_A=3.377`, `stripe_target=2.475`, `letter_L=3.490`,
+and `ring=2.973`, so the binding APL SCGI miss is the static random-DGI ceiling
+for `stripe_target` and `ring`, not another SCGI correction gap. With the paper
+random-DGI estimator preserved, both hard objects first clear the 3.39 APL SCGI
+gate at N=32768, i.e. 2K frames (`stripe_target=3.477`, `ring=4.233`). The
+Hadamard/SRHT exact-inverse rows clear by construction at the paired 2K budget,
+but they are off-protocol information-ceiling controls, not paper reproduction.
+The random-basis LS check is also now a real off-protocol computation rather
+than skipped rows: on 64x64 downsampled hard objects, least squares reaches CNR
+8.836/8.932 for `stripe_target` and 14.345/14.344 for `ring` at N=K/2K in that
+budget, well above the matched DGI controls. Changing to easier/high-CNR
+objects is likewise only a reachability diagnostic.
+
 Full-profile threshold matrix: `results/stage3_threshold_matrix_full_r2_authoritative`
 adds 500-step SCGI-UNN and SCGI-URED for all four full held-out targets using the
 returned exp-residual checkpoint. Mean/min CNRs are SCGI 3.083/2.492, SCGI-UNN
@@ -190,8 +208,15 @@ around that basin. All five shard artifacts succeed and merge to 648 rows, but
 the best final/trace stripe CNR reaches only `9.898` at
 `steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`,
 `nlm_h=0.062`, and `binary_prior_weight=0.02`, still below the APL URED minimum
-of `10.43`. `results/stage4_unn_stripe_puredata_colab_r1_merged` separately
-isolates the SCGI-UNN-like pure data route on Colab L4 with `beta=0`,
+of `10.43`. `results/stage4_ured_continuous_binary_refine_colab_r3grid_merged`
+then expands the strict continuous Colab refinement to 2,916 summary rows and
+97,686 trace rows. Its best final/trace stripe CNR is only `9.933`, with
+`steps=32`, `lr=0.0005`, `beta=0.55`, `x_step=0.16`,
+`residual_scale=0.05`, `nlm_h=0.062`, and `binary_prior_weight=0.025`. This
+slightly improves the strict continuous plateau but still does not clear the
+APL URED minimum, which supports shifting attention from blind URED retuning to
+the static-ceiling diagnosis above. `results/stage4_unn_stripe_puredata_colab_r1_merged`
+separately isolates the SCGI-UNN-like pure data route on Colab L4 with `beta=0`,
 `denoiser=none`, and low/no augmentation. It expands the UNN stripe evidence to
 96 rows, but the best final/target-aware trace CNR is only `2.547`/`2.550`, far
 below the APL UNN minimum of `7.93`. The stronger
@@ -594,7 +619,10 @@ is written to `results/nonideal_m2_full_r1_merged`. The full merged scan has
 Colab shard labels present. The equal-frame winner is pairwise in all 35
 rho/sigma cells for both ideal and nonideal conditions. The winning equal-frame
 basis shifts from 16 Hadamard / 19 SRHT cells under ideal conditions to 23
-Hadamard / 12 SRHT cells under nonideal conditions. Oracle mean PSNR falls from
+Hadamard / 12 SRHT cells under nonideal conditions. These winner counts are
+pre-floor digital-twin diagnostics until the same `rel_mse<0.5` above-floor
+mask is applied, so they should not be promoted as headline phase-map claims
+yet. Oracle mean PSNR falls from
 65.36 dB to 28.35 dB, confirming that the nonideal perturbations are active.
 Pairwise mean PSNR drops only 0.17 dB. Under nonideal matched comparisons,
 `scgi_proxy` improves over `none` in 83.6% of cases and over AGC in 65.8%, but

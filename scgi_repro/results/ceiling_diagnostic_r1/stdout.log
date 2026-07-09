@@ -1,0 +1,67 @@
+{
+  "profile": "full",
+  "image_size": 128,
+  "num_pixels": 16384,
+  "base_patterns": 16384,
+  "device": "cuda",
+  "pattern_distribution": "uniform",
+  "chunk_patterns": 512,
+  "heldout_count": 8,
+  "keff_objects": [
+    "letter_A",
+    "stripe_target",
+    "letter_L",
+    "ring",
+    "mnist_like_0",
+    "mnist_like_1",
+    "mnist_like_2",
+    "mnist_like_3",
+    "mnist_like_4",
+    "mnist_like_5",
+    "mnist_like_6",
+    "mnist_like_7",
+    "filled_disk",
+    "filled_square",
+    "usaf_like_bars",
+    "grayscale_gradient",
+    "grayscale_blob",
+    "fat_cross"
+  ],
+  "n_scan_objects": [
+    "stripe_target",
+    "ring"
+  ],
+  "n_factors": [
+    1.0,
+    2.0,
+    4.0,
+    8.0,
+    16.0,
+    32.0,
+    64.0
+  ],
+  "n_counts": [
+    16384,
+    32768,
+    65536,
+    131072,
+    262144,
+    524288,
+    1048576
+  ],
+  "gate_cnr": 3.39,
+  "read_noise_std": 0.0,
+  "random_ls_max_pixels": 4096,
+  "random_ls_image_size": 64,
+  "random_ls_pixels": 4096,
+  "random_ls_frame_counts": [
+    4096,
+    8192
+  ],
+  "elapsed_seconds": 127.22,
+  "figures": [
+    "ceiling_vs_keff.png",
+    "ceiling_vs_N.png"
+  ]
+}
+wrote E:\GAN_FCC_WORK\github_sync\GI_a1_scgi_20260709_014434\scgi_repro\results\ceiling_diagnostic_r1\ceiling_diagnostic_metrics.csv

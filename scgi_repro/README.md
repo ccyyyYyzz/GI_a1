@@ -25,6 +25,7 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_monitored_job.py --run-id stage1_smoke_refresh_r1 --output-dir results\cli_runs\stage1_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage1_diagnostics.py --profile smoke --samples 3 --output-dir results\stage_1
 & $py run_monitored_job.py --run-id stage3_smoke_refresh_r1 --output-dir results\cli_runs\stage3_smoke_refresh_r1 --heartbeat-seconds 30 --accelerator local_cuda -- $py run_stage3_tests.py --profile smoke --checkpoint results\stage_0\smoke\model_checkpoint.pt --model-kind exponential_residual_unet --output-dir results\stage_3
 & $py run_stage3_tests.py --profile full --checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --model-kind exponential_residual_unet --include-unn-ured --ured-steps 500 --output-dir results\stage3_threshold_matrix_full_r2_authoritative
+& $py run_ceiling_diagnostic.py --profile full --output-dir results\ceiling_diagnostic_r1 --heldout-count 8 --n-factors "1 2 4 8 16 32 64" --chunk-patterns 512 --random-ls-max-pixels 4096
 & $py run_published_calibration.py --output-dir results\published_calibration
 & $py run_published_channel_calibration.py --output-dir results\published_channel_calibration
 & $py run_gamma_sweep.py --profile smoke --epochs 2
@@ -137,6 +138,17 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   affine-aligned PSNR is much higher (minimum/mean 34.500/36.938 dB), confirming
   that the remaining static-DGI issue is calibration/sampling rather than lost
   image information.
+- `results/ceiling_diagnostic_r1/`: pure static ceiling diagnostic requested
+  after repeated SCGI/URED tuning failed to close the APL CNR gates. It scans
+  object effective support, random-DGI frame budget, and estimator/inverse
+  upper bounds without training, Otsu, or post-processing. At N=K, the Stage 3
+  static random-DGI CNRs are `letter_A=3.377`, `stripe_target=2.475`,
+  `letter_L=3.490`, and `ring=2.973`; both hard objects clear the APL SCGI
+  gate of 3.39 at 2K random-DGI frames. Hadamard/SRHT exact inverse rows reach
+  the numerical ceiling but are explicitly off-protocol evidence only. A
+  budgeted 64x64 random-basis least-squares control is also computed for real
+  rather than skipped, confirming that estimator choice can lift the ceiling
+  off protocol.
 - `results/stage4_ured_sweep_r2_stripe_merged/` and
   `results/stage4_ured_sweep_nlm_r1_stripe/`: stripe-target Stage 4 URED
   denoiser/hyperparameter screens.
@@ -173,6 +185,11 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   best stripe basin. It merges 648 rows from five successful shard artifacts;
   the best final/trace stripe CNR is 9.898 at `binary_prior_weight=0.02`, still
   below the APL URED gate of 10.43.
+- `results/stage4_ured_continuous_binary_refine_colab_r3grid_merged/`: larger
+  strict continuous Colab L4 binary-prior refinement with 2,916 summary rows
+  and 97,686 trace rows. The best final/trace stripe CNR is 9.933, still below
+  the APL URED gate, reinforcing that more local NLM/binary-prior tuning is not
+  the primary route to close the strict paper threshold.
 - `results/stage4_unn_stripe_puredata_colab_r1_merged/`: two-shard Colab L4
   strict SCGI-UNN stripe sweep with `beta=0`, `denoiser=none`, and low/no
   augmentation. It merges 96 rows from two successful shard artifacts; the best

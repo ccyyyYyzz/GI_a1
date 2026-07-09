@@ -254,6 +254,38 @@ brute-force sampling can close the static minmax PSNR gate, but the large
 raw/minmax/affine gap still points to calibration and display scaling rather
 than lost object information.
 
+Static ceiling diagnostic:
+
+```powershell
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_ceiling_diagnostic.py --profile full --output-dir results\ceiling_diagnostic_r1 --heldout-count 8 --n-factors "1 2 4 8 16 32 64" --chunk-patterns 512 --random-ls-max-pixels 4096
+```
+
+Outputs:
+
+- `results/ceiling_diagnostic_r1/ceiling_diagnostic_metrics.csv` (44 rows)
+- `results/ceiling_diagnostic_r1/ceiling_diagnostic_report.md`
+- `results/ceiling_diagnostic_r1/ceiling_vs_keff.png`
+- `results/ceiling_diagnostic_r1/ceiling_vs_N.png`
+- `results/ceiling_diagnostic_r1/run_manifest.json`
+
+This pure-static reroute tests the current failure mode directly: because the
+authoritative matrix has `static ~= SCGI ~= analytic ~= oracle`, more SCGI
+training cannot lift `stripe_target` or `ring` above a static random-DGI ceiling.
+At N=K=16384, Stage 3 static random-DGI CNRs are `letter_A=3.377`,
+`stripe_target=2.475`, `letter_L=3.490`, and `ring=2.973`; the two hard objects
+are below the APL SCGI minimum of 3.39 before any dynamic correction enters.
+The cheapest protocol-preserving route found here is random-DGI oversampling to
+2K frames: `stripe_target` first clears at CNR 3.477 and `ring` at CNR 4.233.
+Hadamard/SRHT exact inverse rows hit the numerical ceiling at paired 2K frames,
+but those rows are marked `exact_inverse_off_protocol` and only prove available
+information, not paper-protocol reproduction. Random-basis least squares is now
+a real budgeted off-protocol computation on 64x64 downsampled hard objects,
+with matched random-DGI controls at N=K and N=2K for that budget; it reaches
+CNR 8.836/8.932 on `stripe_target` and 14.345/14.344 on `ring`, while the
+matched DGI controls are much lower. The conclusion is therefore to stop
+treating this as an SCGI training gap; URED's high-CNR behavior is a separate
+denoising/regularization issue.
+
 Full-profile SCGI/UNN/URED threshold matrix:
 
 ```powershell
@@ -356,7 +388,15 @@ binary-prior neighborhood configurations. All five shard jobs return success,
 but the best stripe final/trace CNR is 9.898 at
 `steps=33`, `lr=0.00045`, `x_step=0.15`, `residual_scale=0.06`, `nlm_h=0.062`,
 and `binary_prior_weight=0.02`, so this path still misses the 10.43 APL URED
-minimum. A separate two-shard Colab L4 UNN isolation,
+minimum. A larger strict continuous Colab L4 r3grid merge,
+`results/stage4_ured_continuous_binary_refine_colab_r3grid_merged`, then writes
+2,916 summary rows and 97,686 trace rows around the same NLM/binary-prior basin.
+The best final/trace stripe CNR is 9.933 at `steps=32`, `lr=0.0005`,
+`beta=0.55`, `x_step=0.16`, `residual_scale=0.05`, `nlm_h=0.062`, and
+`binary_prior_weight=0.025`. This improves the strict continuous plateau only
+slightly and still misses the APL URED minimum, reinforcing that another blind
+URED micro-sweep is not the fastest route to close the paper-threshold gap.
+A separate two-shard Colab L4 UNN isolation,
 `results/stage4_unn_stripe_puredata_colab_r1_merged`, keeps `beta=0`,
 `denoiser=none`, and low/no augmentation over 96 stripe configurations. Its
 best final/target-aware trace CNR is only 2.547/2.550, so the original SCGI-UNN
