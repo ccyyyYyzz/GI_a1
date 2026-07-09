@@ -1,0 +1,17 @@
+{
+  "accelerator": "L4",
+  "command": "python run_tall_design_threshold.py --output-dir results/tall_design_threshold_K128_1of2 --K 128 --seeds 30 --shard 1/2",
+  "cu_per_hour": 0.0,
+  "elapsed_seconds": 1380.02,
+  "end_time_utc": "2026-07-09T22:59:56Z",
+  "estimated_cu_hours": null,
+  "persist_root": null,
+  "ref": "3382ee9bd95103893a24d9ca5dfeefe69b065852",
+  "return_code": 0,
+  "run_id": "pro2_threshold_K128_seeds30_shard1of2_r1",
+  "schema_version": 1,
+  "start_time_utc": "2026-07-09T22:36:56Z",
+  "state": "success",
+  "updated_time_utc": "2026-07-09T22:59:56Z",
+  "workdir": "scgi_repro"
+}

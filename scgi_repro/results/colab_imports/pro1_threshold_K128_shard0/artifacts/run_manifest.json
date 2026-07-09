@@ -1,0 +1,63 @@
+{
+  "utc_timestamp": "2026-07-09T22:58:57.802198+00:00",
+  "git_commit": "3382ee9bd95103893a24d9ca5dfeefe69b065852",
+  "hostname": "d894858a74cd",
+  "python_version": "3.12.13",
+  "torch_version": "2.11.0+cu128",
+  "numpy_version": "2.0.2",
+  "args": {
+    "output_dir": "results/tall_design_threshold_K128_0of2",
+    "K": 128,
+    "p_values": [
+      3,
+      5,
+      9,
+      17,
+      33
+    ],
+    "seeds": 30,
+    "seed": 20240709,
+    "n_offset_lo": -8,
+    "n_offset_hi": 16,
+    "n_step": 2,
+    "restarts": 8,
+    "max_iter": 150,
+    "gn_iters": 3,
+    "lm_damping": 1e-08,
+    "resid_tol": 1e-11,
+    "success_relmse": 1e-06,
+    "success_ell_max": 0.001,
+    "ell_clamp": 30.0,
+    "theta_std": 0.3,
+    "rank_rtol": 1e-09,
+    "device": "cpu",
+    "shard": "0/2",
+    "smoke": false
+  },
+  "rows": 975,
+  "units_total": 1950,
+  "shard": "0/2",
+  "offsets": [
+    -8,
+    -6,
+    -4,
+    -2,
+    -1,
+    0,
+    2,
+    4,
+    6,
+    8,
+    10,
+    12,
+    14,
+    16
+  ],
+  "p_values": [
+    3,
+    5,
+    9,
+    17,
+    33
+  ]
+}
