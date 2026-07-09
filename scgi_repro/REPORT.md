@@ -245,8 +245,9 @@ Stage 4 URED stripe-target sweeps:
 - `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`
 - `results/stage4_ured_sweep_nlm_refine_r1_stripe`
 - `results/stage4_ured_sweep_nlm_microrefine_r1_stripe`
+- `results/stage4_ured_sweep_nlm_patch_r1_stripe`
 - `results/stage4_ured_proxy_audit_r1`
-- `results/stage4_trace_audit_r1`
+- `results/stage4_trace_audit_r2`
 
 The stripe target is the binding full-profile APL threshold failure. A 40-config
 avg-pool RED/UNN sweep over `beta`, `xi`, `x_step`, and residual scale confirms
@@ -273,8 +274,13 @@ result: best final stripe CNR is 8.932 at 40 steps and `nlm_h=0.06`. An 81-row
 coarse refinement then reaches final/trace CNRs 9.024/9.214, and a 72-row
 micro-refinement around `beta=0.55`, `x_step=0.11`, and `nlm_h=0.06` raises the
 best fixed-step stripe final/trace CNR to 9.365 at 36 steps, `x_step=0.11`, and
-`nlm_h=0.062`. `results/stage4_trace_audit_r1` combines the NLM stripe,
-all-object, deeper, early-stop, refinement, and micro-refinement sweeps. It
+`nlm_h=0.062`. `run_stage4_ured_sweep.py` now exposes `nlm_patch_size` and
+`nlm_patch_distance`; the 144-config monitored
+`results/stage4_ured_sweep_nlm_patch_r1_stripe` sweep tests patch sizes 3/5/7
+and distances 4/6 around this best region. It does not improve the gap: the
+best row remains 9.365 CNR and uses `patch_size=5`, `patch_distance=6`.
+`results/stage4_trace_audit_r2` combines the NLM stripe,
+all-object, deeper, early-stop, refinement, micro-refinement, and patch sweeps. It
 shows target-aware traces clear the 10.43 APL URED minimum for `letter_A`,
 `letter_L`, and `ring`, but not for `stripe_target`
 (`best_final_cnr=best_trace_cnr=9.365`).
@@ -757,7 +763,9 @@ Additional checks:
   `results/stage4_ured_sweep_nlm_earlystop_r1_stripe`, refinement screens under
   `results/stage4_ured_sweep_nlm_refine_r1_stripe` and
   `results/stage4_ured_sweep_nlm_microrefine_r1_stripe`, and a combined trace
-  audit under `results/stage4_trace_audit_r1`.
+  audit under `results/stage4_trace_audit_r2`; the follow-up NLM
+  patch-size/distance sweep writes `results/stage4_ured_sweep_nlm_patch_r1_stripe`
+  and confirms the previous 9.365 stripe CNR plateau.
 - Published calibration writes APL/OE target tables under
   `results/published_calibration`.
 - Published channel calibration writes APL trace digitizations and OE
@@ -792,8 +800,10 @@ Additional checks:
   dB, so CNR/ROI, reconstruction-basis choice, and URED fidelity are the
   practical levers. NLM-based URED is materially better than the average-pool
   fallback on the binding stripe target, and fixed-step NLM refinement raises
-  stripe final/trace CNR to 9.365, but the best stripe final and target-aware
-  diagnostic trace CNRs remain below the APL URED target. A first target-free proxy audit finds
+  stripe final/trace CNR to 9.365. Exposing NLM patch size/distance and sweeping
+  144 nearby stripe configurations leaves the best value unchanged, so the best
+  stripe final and target-aware diagnostic trace CNRs remain below the APL URED
+  target. A first target-free proxy audit finds
   only partial correlation (`proxy_min` mean within-group Spearman 0.657) and no
   validated deployable stopping rule.
 - Treat the new proxy-input 1D trained M2 dense scan as a secondary network-level

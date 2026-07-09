@@ -110,8 +110,14 @@ and reaches final/trace CNRs `9.024`/`9.214`; the 72-row
 `results/stage4_ured_sweep_nlm_microrefine_r1_stripe` micro-refinement raises the
 best stripe final/trace CNR to `9.365` at 36 steps, `x_step=0.11`, and
 `nlm_h=0.062`, but still remains below the APL URED minimum.
-`results/stage4_trace_audit_r1` records the combined final-vs-trace audit across
-these sweeps.
+`results/stage4_ured_sweep_nlm_patch_r1_stripe` exposes NLM patch size/distance
+as sweep parameters and tests 144 monitored stripe configurations around this
+best region. It does not improve the threshold gap: the best final/trace CNR is
+again `9.365`, with `patch_size=5` and `patch_distance=6`, so the remaining
+failure is not explained by the previously fixed NLM patch defaults.
+`results/stage4_trace_audit_r2` records the combined final-vs-trace audit across
+these sweeps and keeps stripe below the APL URED minimum even with target-aware
+trace selection.
 
 Stage 4 target-free proxy audit:
 `results/stage4_ured_proxy_audit_r1` adds per-step `proxy_*` traces for losses,

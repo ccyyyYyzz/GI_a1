@@ -59,6 +59,8 @@ def build_grid(args: argparse.Namespace, cfg: dict) -> list[dict[str, object]]:
         "denoiser": parse_strings(args.denoiser_values, [str(ured.get("denoiser", "avg_pool"))]),
         "denoise_kernel": parse_ints(args.denoise_kernel_values, [int(ured.get("denoise_kernel", 3))]),
         "nlm_h": parse_floats(args.nlm_h_values, [float(ured.get("nlm_h", 0.08))]),
+        "nlm_patch_size": parse_ints(args.nlm_patch_size_values, [int(ured.get("nlm_patch_size", 5))]),
+        "nlm_patch_distance": parse_ints(args.nlm_patch_distance_values, [int(ured.get("nlm_patch_distance", 6))]),
     }
     keys = list(values.keys())
     grid = []
@@ -93,6 +95,8 @@ def main() -> None:
     parser.add_argument("--denoiser-values", default=None)
     parser.add_argument("--denoise-kernel-values", default=None)
     parser.add_argument("--nlm-h-values", default=None)
+    parser.add_argument("--nlm-patch-size-values", default=None)
+    parser.add_argument("--nlm-patch-distance-values", default=None)
     parser.add_argument("--seed-offset", type=int, default=0)
     parser.add_argument("--fixed-init-seed", type=int, default=None)
     parser.add_argument("--save-traces", action="store_true")
@@ -219,6 +223,8 @@ def main() -> None:
                     "denoiser": str(config["denoiser"]),
                     "denoise_kernel": int(config["denoise_kernel"]),
                     "nlm_h": float(config["nlm_h"]),
+                    "nlm_patch_size": int(config["nlm_patch_size"]),
+                    "nlm_patch_distance": int(config["nlm_patch_distance"]),
                 }
             )
             target = images[object_index]
