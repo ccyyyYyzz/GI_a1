@@ -375,7 +375,8 @@ physical frame budgets; in the current smoke mechanism profile all M2 bases use
 Latest M1 protocol-statistics run:
 
 ```powershell
-& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_mechanism_m1.py --profile debug --objects 10 --seeds 5 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_protocol_o10s5
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_monitored_job.py --run-id mechanism_m1_protocol_o10s5_rerun --output-dir results\cli_runs\mechanism_m1_protocol_o10s5_rerun --heartbeat-seconds 30 --accelerator local_cpu -- D:\Anacondar\anaconda3\envs\pytorch\python.exe run_mechanism_m1.py --profile debug --objects 10 --seeds 5 --output-dir results\mechanism_m1_protocol_o10s5 --no-findings
+& 'D:\Anacondar\anaconda3\envs\pytorch\python.exe' run_m1_mechanism_audit.py --input-dir results\mechanism_m1_protocol_o10s5
 ```
 
 Outputs:
@@ -386,6 +387,8 @@ Outputs:
 - `mechanism_m1_error_scaling_fit.csv` (7 rows)
 - `mechanism_m1_pairwise_failure.csv` (5400 rows)
 - `mechanism_m1_summary.csv` (262 rows)
+- `m1_mechanism_audit_report.md`, `m1_mechanism_audit_summary.json`, and
+  three compact PNG audit views
 
 Key M1 checks:
 

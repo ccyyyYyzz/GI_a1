@@ -1,0 +1,7 @@
+file,rows
+mechanism_m1_oracle_agc.csv,4200
+mechanism_m1_agc_window_sweep.csv,1750
+mechanism_m1_error_propagation.csv,1750
+mechanism_m1_error_scaling_fit.csv,7
+mechanism_m1_pairwise_failure.csv,5400
+mechanism_m1_summary.csv,262

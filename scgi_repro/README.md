@@ -27,6 +27,8 @@ $py = 'D:\Anacondar\anaconda3\envs\pytorch\python.exe'
 & $py run_published_channel_calibration.py --output-dir results\published_channel_calibration
 & $py run_gamma_sweep.py --profile smoke --epochs 2
 & $py run_mechanism_m1.py --profile smoke --objects 1 --seeds 1 --reconstruction correlation --no-findings --output-dir results\mechanism_m1_basis_expanded_quick
+& $py run_monitored_job.py --run-id mechanism_m1_protocol_o10s5_rerun --output-dir results\cli_runs\mechanism_m1_protocol_o10s5_rerun --heartbeat-seconds 30 --accelerator local_cpu -- $py run_mechanism_m1.py --profile debug --objects 10 --seeds 5 --output-dir results\mechanism_m1_protocol_o10s5 --no-findings
+& $py run_m1_mechanism_audit.py --input-dir results\mechanism_m1_protocol_o10s5
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --output-dir results\phase_m2_basis_expanded_quick
 & $py run_phase_m2.py --profile smoke --objects 1 --seeds 1 --no-findings --scgi-checkpoint results\colab_imports\pro2_full_exp_residual_e2_r1\artifacts\model_checkpoint.pt --scgi-model-kind exponential_residual_unet --output-dir results\phase_m2_scgi_frozen_smoke
 & $py run_m2_scgi_train.py --profile smoke --model-kind gain_unet --bases "random_uniform hadamard_paired srht_paired" --rho-values "0.001 0.1 1.0" --sigma-values "0.05 0.30" --objects 3 --seeds 2 --epochs 20 --output-dir results\m2_scgi_finetune_gain_smoke_r1
@@ -239,16 +241,20 @@ physics-informed candidate with `--model-kind exponential_residual_unet`.
   noisy reference samples.
 - `results/nonideal_m2_full_r1_merged/`: 157,500-row full ideal/nonideal M2
   digital-twin scan over the dense 7x5 grid, merged from five Colab L4 shards.
-- `results/mechanism_m1_protocol_o10s5/`,
-  `results/phase_m2_reference_protocol_o10s5/`: 10-object x 5-seed M1/M2
-  mechanism outputs used by the latest figure rendering.
+- `results/mechanism_m1_protocol_o10s5/`: monitored 10-object x 5-seed
+  M1 mechanism run with 4,200 oracle/AGC rows, 1,750 AGC-window rows,
+  1,750 residual-error rows, 5,400 pairwise rows, plus
+  `m1_mechanism_audit_report.md`, summary JSON, and compact PNG audit tables.
+- `results/phase_m2_reference_protocol_o10s5/`: 10-object x 5-seed M2
+  mechanism output used by the latest figure rendering.
 - `results/srht_m3_protocol_o10s5_highrho_r1/`: monitored 10-object x 5-seed
   M3 SRHT ablation at `rho=0.001,0.1,1,10` and `sigma_a=0.30`, with 3,200 raw
   rows and 64 summary rows.
 - `results/srht_m3_audit_highrho_r1/`: M3 high-rho SRHT audit tables, JSON
   summary, PNG table, and Markdown report; full SRHT does not meet the prompt's
   `>=3 dB` advantage gate over ordered Hadamard in the fast-drift rows.
-- `results/figures/`: compact M1-M3 rendered figure outputs.
+- Current M1 audit figures are under `results/mechanism_m1_protocol_o10s5/`;
+  paper-facing M2/M4 and multipanel drafts live under `results/paper_figures_r1/`.
 
 ## Tests
 

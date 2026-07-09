@@ -1,0 +1,180 @@
+{
+  "manifest_rows": {
+    "mechanism_m1_oracle_agc.csv": 4200,
+    "mechanism_m1_agc_window_sweep.csv": 1750,
+    "mechanism_m1_error_propagation.csv": 1750,
+    "mechanism_m1_error_scaling_fit.csv": 7,
+    "mechanism_m1_pairwise_failure.csv": 5400,
+    "mechanism_m1_summary.csv": 262
+  },
+  "oracle_min_psnr_by_basis": [
+    {
+      "basis": "dct_paired",
+      "oracle_min_psnr": 101.3139,
+      "oracle_mean_psnr": 101.3145,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "fourier_fourstep",
+      "oracle_min_psnr": 20.1468,
+      "oracle_mean_psnr": 20.1468,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "hadamard_paired",
+      "oracle_min_psnr": 120.0,
+      "oracle_mean_psnr": 120.0,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "random_binary",
+      "oracle_min_psnr": 15.3917,
+      "oracle_mean_psnr": 15.3917,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "random_gaussian",
+      "oracle_min_psnr": 15.3577,
+      "oracle_mean_psnr": 15.3577,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "random_uniform",
+      "oracle_min_psnr": 15.3852,
+      "oracle_mean_psnr": 15.3852,
+      "oracle_max_gain_rel_mse": 0.0
+    },
+    {
+      "basis": "srht_paired",
+      "oracle_min_psnr": 120.0,
+      "oracle_mean_psnr": 120.0,
+      "oracle_max_gain_rel_mse": 0.0
+    }
+  ],
+  "agc_error_by_basis": [
+    {
+      "basis": "srht_paired",
+      "agc_psnr_mean": 31.17397,
+      "agc_gain_rel_mse_mean": 0.00161,
+      "agc_gain_rel_mse_min": 0.00018,
+      "agc_gain_rel_mse_max": 0.00414
+    },
+    {
+      "basis": "random_uniform",
+      "agc_psnr_mean": 13.63683,
+      "agc_gain_rel_mse_mean": 0.00161,
+      "agc_gain_rel_mse_min": 0.00018,
+      "agc_gain_rel_mse_max": 0.00414
+    },
+    {
+      "basis": "random_binary",
+      "agc_psnr_mean": 14.45564,
+      "agc_gain_rel_mse_mean": 0.00164,
+      "agc_gain_rel_mse_min": 0.00021,
+      "agc_gain_rel_mse_max": 0.00417
+    },
+    {
+      "basis": "hadamard_paired",
+      "agc_psnr_mean": 23.41211,
+      "agc_gain_rel_mse_mean": 0.00479,
+      "agc_gain_rel_mse_min": 0.0033,
+      "agc_gain_rel_mse_max": 0.00739
+    },
+    {
+      "basis": "fourier_fourstep",
+      "agc_psnr_mean": 21.75979,
+      "agc_gain_rel_mse_mean": 0.00479,
+      "agc_gain_rel_mse_min": 0.00331,
+      "agc_gain_rel_mse_max": 0.00739
+    },
+    {
+      "basis": "dct_paired",
+      "agc_psnr_mean": 21.80266,
+      "agc_gain_rel_mse_mean": 0.0048,
+      "agc_gain_rel_mse_min": 0.00331,
+      "agc_gain_rel_mse_max": 0.00739
+    },
+    {
+      "basis": "random_gaussian",
+      "agc_psnr_mean": 15.33731,
+      "agc_gain_rel_mse_mean": 0.00698,
+      "agc_gain_rel_mse_min": 0.00549,
+      "agc_gain_rel_mse_max": 0.00962
+    }
+  ],
+  "error_scaling_fit": [
+    {
+      "basis": "dct_paired",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 0.9336,
+      "intercept": 0.7276,
+      "r2": 0.9129,
+      "points": 4
+    },
+    {
+      "basis": "fourier_fourstep",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 0.7491,
+      "intercept": 0.5148,
+      "r2": 0.9792,
+      "points": 4
+    },
+    {
+      "basis": "hadamard_paired",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 1.1816,
+      "intercept": 0.8681,
+      "r2": 0.9461,
+      "points": 4
+    },
+    {
+      "basis": "random_binary",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 0.3947,
+      "intercept": 0.2061,
+      "r2": 0.9887,
+      "points": 4
+    },
+    {
+      "basis": "random_gaussian",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 0.0103,
+      "intercept": -0.4648,
+      "r2": 0.7626,
+      "points": 4
+    },
+    {
+      "basis": "random_uniform",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 0.3822,
+      "intercept": 0.2711,
+      "r2": 0.9726,
+      "points": 4
+    },
+    {
+      "basis": "srht_paired",
+      "fit": "log_rel_mse_vs_log_sigma_delta",
+      "slope": 1.1791,
+      "intercept": 0.8654,
+      "r2": 0.9462,
+      "points": 4
+    }
+  ],
+  "pairwise_ranges": [
+    {
+      "basis": "dct_paired",
+      "pairwise_min_psnr": 18.207,
+      "pairwise_max_psnr": 41.699
+    },
+    {
+      "basis": "hadamard_paired",
+      "pairwise_min_psnr": 20.846,
+      "pairwise_max_psnr": 44.717
+    },
+    {
+      "basis": "srht_paired",
+      "pairwise_min_psnr": 20.858,
+      "pairwise_max_psnr": 44.729
+    }
+  ]
+}

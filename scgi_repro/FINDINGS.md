@@ -196,8 +196,10 @@ should depend strongly on whether the coefficient sequence supplies a stable
 statistical anchor.
 
 Result: oracle correction restores complete Hadamard/SRHT to near-exact
-reconstruction. The protocol-statistics run writes 4200 oracle/AGC rows and
-1750 AGC-window rows under `results/mechanism_m1_protocol_o10s5`.
+reconstruction. The monitored protocol-statistics rerun writes 4200
+oracle/AGC rows and 1750 AGC-window rows under
+`results/mechanism_m1_protocol_o10s5`; `m1_mechanism_audit_report.md` and
+`m1_mechanism_audit_summary.json` now summarize the o10s5 evidence.
 
 Supports/refutes: supports H1 as a working hypothesis.
 
@@ -225,8 +227,9 @@ random correlation reconstruction should show a different, more averaged error
 profile.
 
 Result: fit table written to
-`results/mechanism_m1_protocol_o10s5/mechanism_m1_error_scaling_fit.csv`.
-Hadamard and SRHT have slopes about 1.18 in this compact diagnostic.
+`results/mechanism_m1_protocol_o10s5/mechanism_m1_error_scaling_fit.csv`,
+with rendered audit table `m1_error_scaling_table.png`. Hadamard and SRHT have
+slopes about 1.18 in this compact diagnostic.
 
 Supports/refutes: partially supports H2, but the current protocol-statistics run
 is still not a clean N-scaling law. It needs a dedicated N sweep before
