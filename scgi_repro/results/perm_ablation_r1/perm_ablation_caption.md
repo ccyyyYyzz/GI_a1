@@ -11,4 +11,4 @@ pixel_sign: 38/320 = 0.119 reject.
 row_pixel: 19/320 = 0.059 reject.
 row_pixel_sign: 23/320 = 0.072 reject.
 row_sign: 19/320 = 0.059 reject.
-Rows: 2250. Runtime seconds: 24.02.
+Rows: 2250. Runtime seconds: 22.49.
