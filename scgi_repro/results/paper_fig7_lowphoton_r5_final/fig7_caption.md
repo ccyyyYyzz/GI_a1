@@ -10,4 +10,4 @@ At the high-photon end (budget=128) the soft_log log-domain gain-MSE floor shrin
 At the high-photon end (budget=128) the soft_log_calibrated log-domain gain-MSE floor shrinks from 2.434e-04 (rho=0.001) to 1.411e-04 (rho=0.0001), confirming the floor is drift-limited.
 At the high-photon end (budget=128) the soft_log_calibrated_carrier_oracle log-domain gain-MSE floor shrinks from 2.168e-04 (rho=0.001) to 1.125e-04 (rho=0.0001), confirming the floor is drift-limited.
 Calibration interpolation: empirical eps_cal = 1.641e-06 (max |m_alpha - interp| on 2999 midpoint checks), bisection eps_bis <= 1.540e-17; see summary.md.
-Rows: 2500. Runtime seconds: 612.19.
+Rows: 2500. Runtime seconds: 970.84.

@@ -1,6 +1,6 @@
 {
-  "utc_timestamp": "2026-07-10T14:59:23.094919+00:00",
-  "git_commit": "ecc65b8505762f6d60b90a76945bdc9f1800fe05",
+  "utc_timestamp": "2026-07-10T16:09:22.958697+00:00",
+  "git_commit": "bcbb31254c343eb04e8cb96d7c3157bfc9818b36",
   "hostname": "cyz912",
   "python_version": "3.9.21",
   "torch_version": "2.1.0+cu121",
@@ -22,19 +22,15 @@
   },
   "manifest_version": 2,
   "manifest_version_minor": 1,
-  "git_commit_full": "ecc65b8505762f6d60b90a76945bdc9f1800fe05",
+  "git_commit_full": "bcbb31254c343eb04e8cb96d7c3157bfc9818b36",
   "git_branch": "scgi-ceiling-diagnostic-r1",
   "git_dirty": true,
-  "git_diff_sha256": "2fc9685446e6465f670f69ee40ad5d8dd6689059237fa7b14febf0331094ef6b",
+  "git_diff_sha256": "9059eb48af4f8e65b83f8a6089ebf6e826f10d93461bccdca39d67c06281efdc",
   "git_status_porcelain": [
-    " M scgi_repro/paper_draft/APPENDICES.md",
-    " M scgi_repro/paper_draft/latex/appendix_body.tex",
-    " M scgi_repro/paper_draft/latex/supplement.pdf",
-    " M scgi_repro/run_paper_fig7_lowphoton.py",
-    "?? scgi_repro/results/paper_fig7_lowphoton_r5_final/"
+    " M scgi_repro/results/paper_fig7_lowphoton_r5_final/fig7_caption.md"
   ],
   "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_paper_fig7_lowphoton.py",
-  "runner_sha256": "a56ea0420b5f96b6ad6ebe3fcea197f485a5b72b9ff19f2d8ea268e2d8ec5b72",
+  "runner_sha256": "cc25207a6d395d6e795012a5d5d079f38b5888674318188d6c521dbb5abe6fbe",
   "argv": [
     "run_paper_fig7_lowphoton.py",
     "--output-dir",
@@ -63,11 +59,9 @@
     "1e-12"
   ],
   "platform": "Windows-10-10.0.26200-SP0",
-  "git_dirty_excluding_output": null,
-  "untracked_files": [
-    "scgi_repro/results/paper_fig7_lowphoton_r5_final/"
-  ],
-  "provenance_note": null,
+  "git_dirty_excluding_output": false,
+  "untracked_files": [],
+  "provenance_note": "tree clean except this run's own outputs",
   "rows": 2500,
   "methods": [
     "soft_log",
