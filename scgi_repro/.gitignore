@@ -13,3 +13,15 @@ results/colab_imports/**/colab_artifacts.zip
 results/colab_imports/**/colab_text_outputs.json
 results/colab_imports/**/colab_zip_info.json
 results/colab_imports/**/*.pt
+
+# Wave C (P0-7 provenance): local-only artifacts, not result provenance.
+# Keeps `git status --porcelain` / manifest git_dirty free of non-source junk so
+# a clean-tree rerun is not flagged dirty by local build/import leftovers.
+COLAB_CLI_LOCAL_USAGE_GUIDE.md
+paper_draft/latex/*.aux
+paper_draft/latex/*.fdb_latexmk
+paper_draft/latex/*.fls
+paper_draft/latex/*.log
+paper_draft/latex/*.out
+results/colab_imports/*shard*/
+results/perm_ablation_smoke/
