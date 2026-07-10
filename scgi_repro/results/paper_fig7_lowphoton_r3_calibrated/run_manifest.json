@@ -1,0 +1,86 @@
+{
+  "utc_timestamp": "2026-07-10T07:44:35.572050+00:00",
+  "git_commit": "f26da484b4b1b074940b0a8fdb285e2e2365ea7f",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\paper_fig7_lowphoton_r3_calibrated",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "sigma_a": 0.1,
+    "window": 64,
+    "alpha": 0.5,
+    "photon_budgets": "0.25,0.5,1,2,4,8,16,32,64,128",
+    "floor_probe_rho": 0.0001,
+    "calibration_points": 3000,
+    "calibration_tol": 1e-12
+  },
+  "rows": 2000,
+  "methods": [
+    "soft_log",
+    "soft_log_calibrated",
+    "naive_log",
+    "anscombe"
+  ],
+  "calibration": {
+    "alpha": 0.5,
+    "lam_lo": 0.00025,
+    "lam_hi": 12800.0,
+    "num_points": 3000,
+    "truncation_tol": 1e-12,
+    "max_tail_bound": 3.493818336773206e-34,
+    "m_at_lam_lo": -0.692872545855035,
+    "m_at_lam_hi": 9.457200449697321
+  },
+  "slopes_vs_photon_budget": {
+    "soft_log": {
+      "budget_2_32": -0.9102827891709258,
+      "budget_1_16": -0.7296179591704542
+    },
+    "soft_log_calibrated": {
+      "budget_2_32": -0.9742137156234296,
+      "budget_1_16": -0.9813637623181265
+    },
+    "naive_log": {
+      "budget_2_32": -1.8372172316140856,
+      "budget_1_16": -1.9388479617747232
+    },
+    "anscombe": {
+      "budget_2_32": -0.8749568726980753,
+      "budget_1_16": -0.7864241002016183
+    }
+  },
+  "soft_log_mse_peak_budget": 1.0,
+  "low_budget_ratio_ranges": {
+    "naive/soft": [
+      22.91962943073305,
+      46.393830487933926
+    ],
+    "naive/anscombe": [
+      19.478970687393602,
+      29.989392025904518
+    ],
+    "anscombe/soft": [
+      1.1766345254354829,
+      1.5470080369705204
+    ],
+    "naive/calibrated": [
+      3.8416740674228227,
+      10.693584216455207
+    ],
+    "anscombe/calibrated": [
+      0.1281010986853093,
+      0.5489809696862411
+    ],
+    "calibrated/soft": [
+      2.143306581479435,
+      12.07646189491997
+    ]
+  },
+  "slope_convention": "log10(mean gain_rel_mse) vs log10(photon_budget), filtered on the nominal photon_budget design column so the window endpoints are included; emitted natively by this run."
+}

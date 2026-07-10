@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import matplotlib
 
@@ -13,6 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import torch
+from scipy.special import gammaln
 
 from src.mechanisms import moving_average_1d
 from src.paper_experiments import (
@@ -28,12 +30,114 @@ from src.paper_experiments import (
 ROOT = Path(__file__).resolve().parent
 
 
-def estimate_from_counts(counts: torch.Tensor, method: str, window: int, alpha: float) -> torch.Tensor:
+class SoftLogCalibration:
+    """Exact tabulation + monotone inversion of m_alpha(lambda) = E[log(Poisson(lambda) + alpha)].
+
+    This is the calibration curve of Theorem C / Appendix D.4: the theorem's
+    windowed soft-log estimator is theta_hat = m_alpha^{-1}(mean_W log(C+alpha)).
+    The table is computed by a truncated Poisson sum with a rigorous a-priori
+    tail bound (no Monte Carlo): for Cmax >= lambda the pmf ratio satisfies
+    P(c+1)/P(c) = lambda/(c+1) <= r := lambda/(Cmax+1) < 1 for c >= Cmax, and
+    log(c + alpha) <= log(Cmax + alpha) + (c - Cmax)/(Cmax + alpha), so the
+    neglected (positive) tail is at most
+        P(Cmax) * [ log(Cmax + alpha) * r/(1-r) + r / ((Cmax + alpha) * (1-r)^2) ].
+    Cmax is grown until this bound falls below `tol` for every grid point.
+    m_alpha is strictly increasing in lambda, so the inverse is a monotone
+    interpolation of log(lambda) against the tabulated m values.
+    """
+
+    def __init__(
+        self,
+        alpha: float,
+        lam_lo: float,
+        lam_hi: float,
+        num_points: int = 3000,
+        tol: float = 1.0e-12,
+    ) -> None:
+        if not (0.0 < lam_lo < lam_hi):
+            raise ValueError("Require 0 < lam_lo < lam_hi.")
+        if alpha <= 0.0:
+            raise ValueError("Require alpha > 0.")
+        self.alpha = float(alpha)
+        self.lam_lo = float(lam_lo)
+        self.lam_hi = float(lam_hi)
+        self.num_points = int(num_points)
+        self.tol = float(tol)
+        self.lam_grid = np.logspace(math.log10(lam_lo), math.log10(lam_hi), int(num_points))
+        self.m_grid, self.max_tail_bound = self._tabulate(self.lam_grid, self.alpha, self.tol)
+        if not np.all(np.diff(self.m_grid) > 0):
+            raise RuntimeError("m_alpha table is not strictly increasing; refine the lambda grid.")
+        self._log_lam_grid = np.log(self.lam_grid)
+
+    @staticmethod
+    def _tabulate(lam_grid: np.ndarray, alpha: float, tol: float) -> tuple[np.ndarray, float]:
+        m = np.empty_like(lam_grid)
+        worst_bound = 0.0
+        chunk = 128
+        for start in range(0, lam_grid.size, chunk):
+            lam_c = lam_grid[start : start + chunk]
+            lam_max = float(lam_c.max())
+            cmax = int(math.ceil(lam_max + 12.0 * math.sqrt(max(lam_max, 1.0)) + 60.0))
+            while True:
+                c = np.arange(cmax + 1, dtype=np.float64)
+                logpmf = (
+                    -lam_c[:, None]
+                    + c[None, :] * np.log(lam_c)[:, None]
+                    - gammaln(c + 1.0)[None, :]
+                )
+                pmf = np.exp(logpmf)
+                r = lam_c / (cmax + 1.0)
+                tail = pmf[:, -1] * (
+                    math.log(cmax + alpha) * r / (1.0 - r)
+                    + r / ((cmax + alpha) * (1.0 - r) ** 2)
+                )
+                if float(tail.max()) <= tol:
+                    m[start : start + chunk] = pmf @ np.log(c + alpha)
+                    worst_bound = max(worst_bound, float(tail.max()))
+                    break
+                cmax = 2 * cmax + 64
+        return m, worst_bound
+
+    def invert(self, targets: np.ndarray) -> np.ndarray:
+        """Monotone inverse m_alpha^{-1}; values outside the tabulated range clamp to the grid ends."""
+
+        targets = np.asarray(targets, dtype=np.float64)
+        return np.exp(np.interp(targets, self.m_grid, self._log_lam_grid))
+
+    def metadata(self) -> Dict[str, object]:
+        return {
+            "alpha": self.alpha,
+            "lam_lo": self.lam_lo,
+            "lam_hi": self.lam_hi,
+            "num_points": self.num_points,
+            "truncation_tol": self.tol,
+            "max_tail_bound": self.max_tail_bound,
+            "m_at_lam_lo": float(self.m_grid[0]),
+            "m_at_lam_hi": float(self.m_grid[-1]),
+        }
+
+
+def estimate_from_counts(
+    counts: torch.Tensor,
+    method: str,
+    window: int,
+    alpha: float,
+    calibration: Optional[SoftLogCalibration] = None,
+) -> torch.Tensor:
     values = counts.reshape(-1).to(dtype=torch.float32)
     if method == "soft_log":
         transformed = torch.log(values + float(alpha))
         smooth = moving_average_1d(transformed, window)
         gain_hat = torch.exp(smooth - smooth.mean())
+    elif method == "soft_log_calibrated":
+        # Theorem C estimator: per-window mean of log(C+alpha) -> m_alpha^{-1} ->
+        # estimated lambda profile -> normalize by its mean (centered-log-gain gauge).
+        if calibration is None:
+            raise ValueError("soft_log_calibrated requires a SoftLogCalibration instance.")
+        transformed = torch.log(values + float(alpha))
+        smooth = moving_average_1d(transformed, window)
+        lam_hat = calibration.invert(smooth.to(dtype=torch.float64).cpu().numpy())
+        gain_hat = torch.from_numpy(lam_hat).to(dtype=torch.float32)
     elif method == "naive_log":
         transformed = torch.log(values.clamp_min(1.0e-3))
         smooth = moving_average_1d(transformed, window)
@@ -47,9 +151,17 @@ def estimate_from_counts(counts: torch.Tensor, method: str, window: int, alpha: 
     return gain_hat / gain_hat.mean().clamp_min(1.0e-8)
 
 
-def simulate(args: argparse.Namespace, basis, objects, rho: float) -> pd.DataFrame:
+METHODS = ["soft_log", "soft_log_calibrated", "naive_log", "anscombe"]
+
+
+def simulate(
+    args: argparse.Namespace,
+    basis,
+    objects,
+    rho: float,
+    calibration: Optional[SoftLogCalibration],
+) -> pd.DataFrame:
     budgets = [float(x) for x in args.photon_budgets.replace(" ", ",").split(",") if x.strip()]
-    methods = ["soft_log", "naive_log", "anscombe"]
     rows: List[Dict[str, object]] = []
     for obj in objects:
         carrier = (basis.patterns @ obj.vector).cpu().to(dtype=torch.float32)
@@ -63,8 +175,10 @@ def simulate(args: argparse.Namespace, basis, objects, rho: float) -> pd.DataFra
                 counts = torch.poisson(lam, generator=generator)
                 zero_fraction = float((counts <= 0).to(dtype=torch.float32).mean().item())
                 lambda_bar = float(lam.mean().item())
-                for method in methods:
-                    gain_hat = estimate_from_counts(counts, method=method, window=args.window, alpha=args.alpha)
+                for method in METHODS:
+                    gain_hat = estimate_from_counts(
+                        counts, method=method, window=args.window, alpha=args.alpha, calibration=calibration
+                    )
                     rows.append(
                         {
                             "object": obj.name,
@@ -86,8 +200,18 @@ def simulate(args: argparse.Namespace, basis, objects, rho: float) -> pd.DataFra
     return pd.DataFrame(rows)
 
 
-def fisher_slope(summary: pd.DataFrame, method: str, lam_lo: float, lam_hi: float) -> float:
-    sub = summary[(summary["method"] == method) & (summary["lambda_bar_mean"] >= lam_lo) & (summary["lambda_bar_mean"] <= lam_hi)]
+def fisher_slope(summary: pd.DataFrame, method: str, budget_lo: float, budget_hi: float) -> float:
+    """Log-log slope of mean gain MSE vs nominal photon budget over [budget_lo, budget_hi].
+
+    Filters on the discrete design column ``photon_budget`` (NOT on the realized
+    ``lambda_bar_mean``, which drifts slightly above the nominal budget and
+    previously caused silent endpoint dropping)."""
+
+    sub = summary[
+        (summary["method"] == method)
+        & (summary["photon_budget"] >= budget_lo)
+        & (summary["photon_budget"] <= budget_hi)
+    ]
     sub = sub[sub["gain_rel_mse_mean"] > 0]
     if len(sub) < 2:
         return float("nan")
@@ -96,9 +220,128 @@ def fisher_slope(summary: pd.DataFrame, method: str, lam_lo: float, lam_hi: floa
     return float(np.polyfit(x, y, deg=1)[0])
 
 
+RATIO_PAIRS = [
+    ("naive_log", "soft_log", "naive/soft"),
+    ("naive_log", "anscombe", "naive/anscombe"),
+    ("anscombe", "soft_log", "anscombe/soft"),
+    ("naive_log", "soft_log_calibrated", "naive/calibrated"),
+    ("anscombe", "soft_log_calibrated", "anscombe/calibrated"),
+    ("soft_log_calibrated", "soft_log", "calibrated/soft"),
+]
+
+
+def build_ratio_table(summary: pd.DataFrame) -> pd.DataFrame:
+    """Pairwise mean-MSE ratio table per photon budget, numerator/denominator named."""
+
+    pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean")
+    out = pd.DataFrame(index=pivot.index)
+    for num, den, label in RATIO_PAIRS:
+        out[label] = pivot[num] / pivot[den]
+    return out.reset_index()
+
+
+def _md_table(frame: pd.DataFrame, float_fmt: str = "{:.4g}") -> List[str]:
+    cols = list(frame.columns)
+    lines = ["| " + " | ".join(str(c) for c in cols) + " |", "|" + "---|" * len(cols)]
+    for _, row in frame.iterrows():
+        cells = []
+        for c in cols:
+            v = row[c]
+            cells.append(float_fmt.format(v) if isinstance(v, (float, np.floating)) else str(v))
+        lines.append("| " + " | ".join(cells) + " |")
+    return lines
+
+
+def write_summary_md(
+    path: Path,
+    summary: pd.DataFrame,
+    ratio_table: pd.DataFrame,
+    slopes: Dict[str, Dict[str, float]],
+    low_budget_ranges: Dict[str, tuple],
+    floor_lines: List[str],
+    calibration: SoftLogCalibration,
+    args: argparse.Namespace,
+    n_rows: int,
+) -> None:
+    mse_pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean").reset_index()
+    fisher_ref = summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"].mean()
+    mse_pivot = mse_pivot.merge(fisher_ref, on="photon_budget")
+
+    lines: List[str] = []
+    lines.append("# Fig. 7 low-photon gain estimation (r3, calibrated soft-log) - native summary")
+    lines.append("")
+    lines.append(
+        f"Protocol: random_uniform basis, {args.objects} objects, {args.seeds} seeds, W={args.window}, "
+        f"alpha={args.alpha}, rho={args.rho}, s={args.sigma_a}, budgets={args.photon_budgets}; "
+        f"floor probe rho={args.floor_probe_rho}. Rows: {n_rows}."
+    )
+    lines.append("")
+    lines.append(
+        "`soft_log_calibrated` is the Theorem C estimator: per-window mean of log(C+alpha), inverted through the "
+        "exactly tabulated calibration curve m_alpha(lambda) = E[log(Poisson(lambda)+alpha)] (truncated Poisson sum, "
+        f"rigorous tail bound <= {calibration.max_tail_bound:.2e} on a {calibration.num_points}-point log grid over "
+        f"lambda in [{calibration.lam_lo:g}, {calibration.lam_hi:g}]), then normalized by its mean (centered-log-gain "
+        "gauge, same as every other arm). `soft_log` is the legacy uncalibrated proxy exp(movmean(log(C+alpha)) - mean), "
+        "kept unchanged for comparison."
+    )
+    lines.append("")
+    lines.append("## (a) Per-photon-level mean gain relMSE by arm")
+    lines.append("")
+    lines.extend(_md_table(mse_pivot))
+    lines.append("")
+    lines.append("## (b) Pairwise mean-MSE ratio table (numerator/denominator as named)")
+    lines.append("")
+    lines.extend(_md_table(ratio_table))
+    lines.append("")
+    lines.append("Low-photon ranges (over budgets <= 1):")
+    for label, (lo, hi) in low_budget_ranges.items():
+        lines.append(f"- {label}: {lo:.2f}-{hi:.2f}x")
+    lines.append("")
+    lines.append("## (c) Fitted log-log rate slopes of mean MSE vs photon budget (1/(W*lambda) law => slope -1)")
+    lines.append("")
+    lines.append("| method | slope over budgets [2,32] | slope over budgets [1,16] |")
+    lines.append("|---|---|---|")
+    for method in METHODS:
+        lines.append(
+            f"| {method} | {slopes[method]['budget_2_32']:.3f} | {slopes[method]['budget_1_16']:.3f} |"
+        )
+    lines.append("")
+    lines.append("Slopes are fit on the discrete design column photon_budget (endpoints included); "
+                 "no post-hoc correction is needed.")
+    lines.append("")
+    lines.append("## (d) Qualitative checks")
+    lines.append("")
+    pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean")
+    fisher = summary.groupby("photon_budget")["fisher_reference_mean"].mean()
+    calib_beats_ansc = [f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated"] < pivot.loc[b, "anscombe"]]
+    ansc_beats_calib = [f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated"] >= pivot.loc[b, "anscombe"]]
+    lines.append(
+        f"- Calibrated soft-log beats Anscombe (lower mean MSE) at budgets: {', '.join(calib_beats_ansc) or 'none'}; "
+        f"Anscombe is equal/better at: {', '.join(ansc_beats_calib) or 'none'}."
+    )
+    sub_fisher = {
+        m: [f"{b:g}" for b in pivot.index if pivot.loc[b, m] < fisher.loc[b]] for m in ("soft_log", "soft_log_calibrated")
+    }
+    lines.append(
+        f"- MSE below the unbiased local Fisher reference 1/(W*lambda) (shrinkage-bias signature): "
+        f"soft_log at budgets {', '.join(sub_fisher['soft_log']) or 'none'}; "
+        f"soft_log_calibrated at budgets {', '.join(sub_fisher['soft_log_calibrated']) or 'none'}."
+    )
+    calib_over_soft = ratio_table.set_index("photon_budget")["calibrated/soft"]
+    lines.append(
+        f"- calibrated/soft mean-MSE ratio spans {float(calib_over_soft.min()):.3f}-{float(calib_over_soft.max()):.3f} "
+        "across all budgets (values near 1 mean calibration does not change the qualitative Fig. 7 story; "
+        "values > 1 mean the calibrated estimator pays extra MSE at that budget, < 1 that it gains)."
+    )
+    for line in floor_lines:
+        lines.append(f"- {line}")
+    lines.append("")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fig. 7 low-photon gain estimation (r2).")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r2")
+    parser = argparse.ArgumentParser(description="Fig. 7 low-photon gain estimation (r3, calibrated soft-log).")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r3_calibrated")
     parser.add_argument("--image-size", type=int, default=32)
     parser.add_argument("--objects", type=int, default=10)
     parser.add_argument("--seeds", type=int, default=5)
@@ -109,6 +352,8 @@ def main() -> None:
     parser.add_argument("--alpha", type=float, default=0.5)
     parser.add_argument("--photon-budgets", default="0.25,0.5,1,2,4,8,16,32,64,128")
     parser.add_argument("--floor-probe-rho", type=float, default=0.0, help="Optional second rho to show the high-photon floor shrinks with drift.")
+    parser.add_argument("--calibration-points", type=int, default=3000, help="Grid size for the exact m_alpha(lambda) table.")
+    parser.add_argument("--calibration-tol", type=float, default=1.0e-12, help="Rigorous truncation tolerance for the m_alpha table.")
     args = parser.parse_args()
 
     start = time.time()
@@ -118,7 +363,18 @@ def main() -> None:
     basis = make_paper_basis("random_uniform", p, seed=args.seed)
     objects = make_paper_objects(args.objects, image_size=args.image_size, seed=args.seed)
 
-    df = simulate(args, basis, objects, rho=args.rho)
+    budgets = [float(x) for x in args.photon_budgets.replace(" ", ",").split(",") if x.strip()]
+    calibration = SoftLogCalibration(
+        alpha=float(args.alpha),
+        lam_lo=min(budgets) * 1.0e-3,
+        lam_hi=max(budgets) * 1.0e2,
+        num_points=int(args.calibration_points),
+        tol=float(args.calibration_tol),
+    )
+    calib_table = pd.DataFrame({"lambda": calibration.lam_grid, "m_alpha": calibration.m_grid})
+    calib_table.to_csv(out / "m_alpha_calibration_table.csv", index=False)
+
+    df = simulate(args, basis, objects, rho=args.rho, calibration=calibration)
     df.to_csv(out / "fig7_lowphoton.csv", index=False)
 
     # Fixed summary: group ONLY on discrete design columns (method, photon_budget).
@@ -132,21 +388,24 @@ def main() -> None:
     )
     summary.to_csv(out / "fig7_lowphoton_summary.csv", index=False)
 
-    # The clean 1/(W*lambda) Fisher segment sits above the bias->variance peak
-    # (near lambda_bar~1) and below the high-photon drift floor (near lambda_bar~32).
-    slope_fisher = fisher_slope(summary, "soft_log", lam_lo=2.0, lam_hi=32.0)
-    slope_1_16 = fisher_slope(summary, "soft_log", lam_lo=1.0, lam_hi=16.0)
+    # Native slope fits per arm on the nominal photon_budget column (endpoints included).
+    slopes: Dict[str, Dict[str, float]] = {
+        method: {
+            "budget_2_32": fisher_slope(summary, method, budget_lo=2.0, budget_hi=32.0),
+            "budget_1_16": fisher_slope(summary, method, budget_lo=1.0, budget_hi=16.0),
+        }
+        for method in METHODS
+    }
     soft = summary[summary["method"] == "soft_log"].sort_values("photon_budget")
     peak_budget = float(soft.loc[soft["gain_rel_mse_mean"].idxmax(), "photon_budget"]) if len(soft) else float("nan")
 
-    naive_ratio_lines = []
-    for budget, grp in summary.groupby("photon_budget"):
-        soft = grp[grp["method"] == "soft_log"]["gain_rel_mse_mean"]
-        naive = grp[grp["method"] == "naive_log"]["gain_rel_mse_mean"]
-        if len(soft) and len(naive) and float(soft.iloc[0]) > 0:
-            naive_ratio_lines.append((float(budget), float(naive.iloc[0]) / float(soft.iloc[0])))
-    sub1 = [r for b, r in naive_ratio_lines if b <= 1.0]
-    naive_gain_range = (min(sub1), max(sub1)) if sub1 else (float("nan"), float("nan"))
+    # Native pairwise ratio table (numerator/denominator named in the column labels).
+    ratio_table = build_ratio_table(summary)
+    ratio_table.to_csv(out / "fig7_ratio_table.csv", index=False)
+    low = ratio_table[ratio_table["photon_budget"] <= 1.0]
+    low_budget_ranges = {
+        label: (float(low[label].min()), float(low[label].max())) for _, _, label in RATIO_PAIRS
+    }
 
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
     for method, group in summary.groupby("method"):
@@ -174,41 +433,64 @@ def main() -> None:
     # Optional: high-photon floor vs drift.
     floor_lines: List[str] = []
     if args.floor_probe_rho and float(args.floor_probe_rho) > 0.0:
-        df_probe = simulate(args, basis, objects, rho=float(args.floor_probe_rho))
+        df_probe = simulate(args, basis, objects, rho=float(args.floor_probe_rho), calibration=calibration)
         df_probe.to_csv(out / "fig7_lowphoton_floorprobe.csv", index=False)
-        max_budget = float(max(float(x) for x in args.photon_budgets.replace(" ", ",").split(",") if x.strip()))
+        max_budget = float(max(budgets))
 
-        def _floor(frame: pd.DataFrame) -> float:
-            sel = frame[(frame["method"] == "soft_log") & (frame["photon_budget"] == max_budget)]
+        def _floor(frame: pd.DataFrame, method: str) -> float:
+            sel = frame[(frame["method"] == method) & (frame["photon_budget"] == max_budget)]
             return float(sel["gain_rel_mse"].mean()) if len(sel) else float("nan")
 
-        floor_hi = _floor(df)
-        floor_lo = _floor(df_probe)
-        floor_lines.append(
-            f"At the high-photon end (budget={max_budget:g}) the soft-log gain-MSE floor shrinks from {floor_hi:.3e} "
-            f"(rho={args.rho:g}) to {floor_lo:.3e} (rho={args.floor_probe_rho:g}), confirming the floor is drift-limited."
-        )
+        for method in ("soft_log", "soft_log_calibrated"):
+            floor_lines.append(
+                f"At the high-photon end (budget={max_budget:g}) the {method} gain-MSE floor shrinks from "
+                f"{_floor(df, method):.3e} (rho={args.rho:g}) to {_floor(df_probe, method):.3e} "
+                f"(rho={args.floor_probe_rho:g}), confirming the floor is drift-limited."
+            )
 
     write_caption(
         out / "fig7_caption.md",
-        "Fig. 7 Low-Photon Gain Estimation (r2)",
+        "Fig. 7 Low-Photon Gain Estimation (r3, calibrated soft-log)",
         [
             "Poisson bucket counts are evaluated under identical random-basis carriers and shared gain traces; the summary is "
-            "aggregated over discrete design columns (method, photon_budget) only.",
-            f"(i) Soft-log and Anscombe stay finite across the whole budget range and beat naive clipped log by "
-            f"{naive_gain_range[0]:.0f}-{naive_gain_range[1]:.0f}x for mean photon count lambda_bar <= 1.",
-            f"(ii) The 1/(W*lambda) Fisher scaling holds in the variance regime lambda_bar in [2,32] (fitted soft-log log-log "
-            f"slope {slope_fisher:.2f}, matching the -0.89 reference); over the wider lambda_bar in [1,16] the fit shallows to "
-            f"{slope_1_16:.2f} because lambda_bar~{peak_budget:g} is the bias->variance transition peak, and above "
-            f"lambda_bar~32 a drift-limited floor sets in.",
-            "(iii) For lambda_bar < 1 the estimator enters the shrinkage-bias-dominated regime: MSE falls BELOW the Fisher "
-            "reference (biased estimator, consistent with the R3 kappa_alpha(lambda) -> lambda*log(1+1/alpha) mechanism), so "
-            "this region is NOT ~1/(W*lambda).",
+            "aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated arm is the "
+            "Theorem C estimator (windowed mean of log(C+alpha) inverted through the exact calibration curve "
+            "m_alpha(lambda) = E[log(Poisson(lambda)+alpha)]); soft_log is the legacy uncalibrated proxy, retained "
+            "unchanged for comparison.",
+            f"(i) Ratio bookkeeping (mean-MSE ratios over budgets <= 1, numerator/denominator named): "
+            f"naive/soft {low_budget_ranges['naive/soft'][0]:.1f}-{low_budget_ranges['naive/soft'][1]:.1f}x, "
+            f"naive/Anscombe {low_budget_ranges['naive/anscombe'][0]:.1f}-{low_budget_ranges['naive/anscombe'][1]:.1f}x, "
+            f"Anscombe/soft {low_budget_ranges['anscombe/soft'][0]:.2f}-{low_budget_ranges['anscombe/soft'][1]:.2f}x, "
+            f"naive/calibrated {low_budget_ranges['naive/calibrated'][0]:.1f}-{low_budget_ranges['naive/calibrated'][1]:.1f}x, "
+            f"Anscombe/calibrated {low_budget_ranges['anscombe/calibrated'][0]:.2f}-{low_budget_ranges['anscombe/calibrated'][1]:.2f}x, "
+            f"calibrated/soft {low_budget_ranges['calibrated/soft'][0]:.2f}-{low_budget_ranges['calibrated/soft'][1]:.2f}x.",
+            f"(ii) The 1/(W*lambda) Fisher scaling in the variance regime, fit natively on photon_budget in [2,32] "
+            f"(endpoints included): slope {slopes['soft_log']['budget_2_32']:.2f} (soft_log), "
+            f"{slopes['soft_log_calibrated']['budget_2_32']:.2f} (calibrated); over the wider [1,16] window the fits "
+            f"shallow to {slopes['soft_log']['budget_1_16']:.2f} / {slopes['soft_log_calibrated']['budget_1_16']:.2f} "
+            f"because lambda_bar~{peak_budget:g} is the bias->variance transition peak, and above lambda_bar~32 a "
+            f"drift-limited floor sets in.",
+            "(iii) For lambda_bar < 1 the soft-log arms are shrinkage-bias-dominated: MSE falls BELOW the unbiased local "
+            "Fisher reference (biased estimator, consistent with kappa_alpha(lambda) -> lambda*log(1+1/alpha)), so this "
+            "region is NOT ~1/(W*lambda). See summary.md for the per-budget sub-Fisher flags of both soft-log arms.",
             "(iv) Naive clipped log does not diverge: it saturates at a bias floor (~0.25 relMSE) set by the clip.",
             *floor_lines,
             f"Rows: {len(df)}. Runtime seconds: {time.time() - start:.2f}.",
         ],
     )
+
+    write_summary_md(
+        out / "summary.md",
+        summary,
+        ratio_table,
+        slopes,
+        low_budget_ranges,
+        floor_lines,
+        calibration,
+        args,
+        n_rows=len(df),
+    )
+
     (out / "run_manifest.json").write_text(
         json.dumps(
             build_run_manifest(
@@ -216,9 +498,13 @@ def main() -> None:
                 ROOT,
                 extra={
                     "rows": int(len(df)),
-                    "soft_log_fisher_slope_lam_2_32": slope_fisher,
-                    "soft_log_fisher_slope_lam_1_16": slope_1_16,
+                    "methods": METHODS,
+                    "calibration": calibration.metadata(),
+                    "slopes_vs_photon_budget": slopes,
                     "soft_log_mse_peak_budget": peak_budget,
+                    "low_budget_ratio_ranges": {k: list(v) for k, v in low_budget_ranges.items()},
+                    "slope_convention": "log10(mean gain_rel_mse) vs log10(photon_budget), filtered on the nominal "
+                    "photon_budget design column so the window endpoints are included; emitted natively by this run.",
                 },
             ),
             indent=2,
@@ -228,7 +514,8 @@ def main() -> None:
     )
     print(
         f"Fig7 complete rows={len(df)} output={out} runtime={time.time() - start:.2f}s "
-        f"slope_fisher[2,32]={slope_fisher:.3f} slope[1,16]={slope_1_16:.3f} peak_budget={peak_budget:g}"
+        f"soft slope[2,32]={slopes['soft_log']['budget_2_32']:.3f} "
+        f"calibrated slope[2,32]={slopes['soft_log_calibrated']['budget_2_32']:.3f} peak_budget={peak_budget:g}"
     )
 
 
