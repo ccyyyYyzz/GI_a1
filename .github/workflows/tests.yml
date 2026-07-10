@@ -1,0 +1,23 @@
+name: tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+      - name: Install pinned dependencies (CPU torch)
+        run: |
+          pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install numpy==1.26.4 scipy==1.11.4 matplotlib==3.3.3 pandas==1.5.3 pytest==8.4.2
+      - name: Run test suite
+        working-directory: scgi_repro
+        run: python -m pytest tests/ -q
