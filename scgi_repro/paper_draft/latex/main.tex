@@ -1,0 +1,64 @@
+\documentclass[journal,twoside]{IEEEtran}
+% Draft LaTeX rendering of the identifiability manuscript (IEEE-TCI target).
+% Converted from paper_draft/MANUSCRIPT_DRAFT.md + APPENDICES.md at commit c15244c2.
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts,mathtools}
+\usepackage{bm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+
+\graphicspath{{figs/}}
+
+% ---- lightweight named-theorem style (labels are manual: Theorem A, A', B, ...) ----
+\newenvironment{namedthm}[1]{\par\medskip\noindent\textbf{#1.}\itshape\ }{\par\medskip}
+\newenvironment{nameddef}[1]{\par\medskip\noindent\textbf{#1.}\ }{\par\medskip}
+% remark/status blocks
+\newenvironment{statusblock}{\par\smallskip\noindent\small}{\par\smallskip}
+% conventions box
+\newcommand{\conv}[1]{\textbf{#1}}
+
+% ---- shorthand macros used throughout ----
+\newcommand{\Keff}{K_{\mathrm{eff}}}
+\newcommand{\Kinf}{K_{\infty}}
+\newcommand{\rhopair}{\rho_{\mathrm{pair}}}
+\newcommand{\rhobw}{\rho_{\mathrm{bw}}}
+\newcommand{\relMSE}{\mathrm{relMSE}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+
+\begin{document}
+
+\title{Identifiability by Stationarity: Blind Gain--Object Separation in Self-Calibrating Ghost Imaging}
+
+\author{%
+CHEN Yongzi\thanks{Draft rendering; author list and affiliations to be finalized before submission.}%
+}
+
+\markboth{Draft --- for internal review (rendered \today)}{Identifiability by stationarity}
+
+\maketitle
+
+\input{abstract}
+
+\input{body}
+
+\input{bibliography}
+
+\clearpage
+\appendices
+\input{appendix_body}
+
+\end{document}
