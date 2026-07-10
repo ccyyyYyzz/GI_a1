@@ -171,6 +171,56 @@ def mean_agc_gain(measurements: torch.Tensor, window: int, eps: float = 1.0e-8) 
     return gain_hat / gain_hat.mean().clamp_min(eps)
 
 
+def log_agc_gain(measurements: torch.Tensor, window: int) -> tuple[torch.Tensor, float]:
+    """Theorem-B windowed log-domain estimator.
+
+    Theorem B analyzes windowed means of ``Y_n = log R_n``: the window mean
+    estimates ``ell_n + m_T`` and the *centered* log-gain ``ell_n - mean(ell)``
+    is the identifiable estimand (the gauge scalar ``m_T`` cancels). The
+    faithful estimator is therefore
+
+        ``gain_hat_n  proportional to  exp( movmean(log R, W)_n - its mean )``,
+
+    mean-normalised to unit mean (the same gauge convention as
+    :func:`mean_agc_gain`).
+
+    Positivity guard (Theorem B assumption (iv)): the theorem requires
+    ``R_n > 0`` *on the analyzed record* (positivity/offset margin, bucket
+    convention (ii) of the manuscript). The guard implements exactly that
+    restriction: frames with ``R_n <= 0`` are excluded from the analyzed
+    record, i.e. the windowed log-mean is a masked moving average over the
+    positive frames within each window (a hard floor would instead inject a
+    ``log(eps)`` outlier for the exactly-zero complementary DC frame of paired
+    Hadamard, which assumption (iv) never admits into the record). Windows
+    containing no positive frame fall back to the gauge value (relative gain
+    1). For physical nonnegative-intensity arms the mask touches at most the
+    occasional zero bucket; for the raw signed Walsh arms — bucket convention
+    (i), where ``log B_n`` is undefined by construction — about half the
+    frames are excluded, and the returned ``frac_nonpos`` (fraction of frames
+    with ``R_n <= 0``) flags those arms as diagnostic-only, per the
+    manuscript.
+
+    Returns ``(gain_hat, frac_nonpos)``.
+    """
+
+    values = measurements.reshape(-1).to(dtype=torch.float32)
+    mask = (values > 0).to(dtype=torch.float32)
+    frac_nonpos = float(1.0 - mask.mean().item())
+    log_values = torch.log(values.clamp_min(1.0e-30)) * mask
+    weight = moving_average_1d(mask, int(window))
+    smooth_log = moving_average_1d(log_values, int(window)) / weight.clamp_min(1.0e-8)
+    # Windows with no positive frame carry no log-domain information: pin them
+    # to the record-level mean so they contribute the gauge value exp(0)=1.
+    valid = weight > 1.0e-8
+    if bool(valid.any()):
+        record_mean = smooth_log[valid].mean()
+    else:
+        record_mean = torch.zeros((), dtype=smooth_log.dtype)
+    smooth_log = torch.where(valid, smooth_log, record_mean)
+    gain_hat = torch.exp(smooth_log - smooth_log.mean())
+    return gain_hat / gain_hat.mean().clamp_min(1.0e-8), frac_nonpos
+
+
 def scale_aligned_gain_error(estimated: torch.Tensor, true_gains: torch.Tensor, eps: float = 1.0e-8) -> float:
     estimate = estimated.reshape(-1).to(dtype=torch.float64)
     truth = true_gains.reshape(-1).to(dtype=torch.float64)

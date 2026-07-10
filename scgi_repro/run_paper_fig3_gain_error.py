@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+import zlib
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -18,6 +19,7 @@ import torch
 from src.basis import hadamard_matrix
 from src.paper_experiments import (
     build_run_manifest,
+    log_agc_gain,
     logspace_windows,
     make_paper_basis,
     make_paper_objects,
@@ -35,7 +37,37 @@ ROOT = Path(__file__).resolve().parent
 COLLAPSE_ARMS = ("random_uniform", "random_binary", "srht_paired", "hadamard_random_paired")
 # Arms expected to sit inside the acceptance band for the variance-segment slope.
 VARIANCE_SLOPE_ARMS = ("random_binary", "srht_paired", "hadamard_random_paired")
+# Legacy raw arm names (single-pass, num_frames = num_pixels). Kept verbatim so
+# the historical e12/r2 protocols remain reproducible. Fairness (r3) variants
+# append an explicit frame budget: e.g. hadamard_raw_ordered_2048 repeats the
+# signed Walsh sequence twice to match the physical arms' 2N frame budget, and
+# hadamard_raw_ordered_1024 is the clearly-labelled single-pass diagnostic.
 RAW_ARMS = ("hadamard_raw_ordered", "hadamard_raw_shuffled")
+_RAW_PREFIXES = ("hadamard_raw_ordered", "hadamard_raw_shuffled")
+
+
+def _parse_raw_arm(key: str, num_pixels: int) -> Optional[tuple[str, int]]:
+    """Return (prefix, num_frames) if `key` names a raw signed-Walsh arm.
+
+    Accepted forms: the legacy bare names (single pass, num_frames=num_pixels)
+    and explicit-budget names `<prefix>_<frames>` where `<frames>` must be a
+    positive multiple of num_pixels (the sequence is repeated frames/num_pixels
+    times).
+    """
+
+    for prefix in _RAW_PREFIXES:
+        if key == prefix:
+            return prefix, int(num_pixels)
+        if key.startswith(prefix + "_"):
+            suffix = key[len(prefix) + 1 :]
+            if suffix.isdigit():
+                frames = int(suffix)
+                if frames <= 0 or frames % int(num_pixels) != 0:
+                    raise ValueError(
+                        f"Raw arm '{key}': frame budget {frames} must be a positive multiple of num_pixels={num_pixels}."
+                    )
+                return prefix, frames
+    return None
 
 
 @dataclass
@@ -50,11 +82,14 @@ class Fig3Arm:
     signed_rows: Optional[torch.Tensor] = None  # raw arms: (p, p)
     shuffle: bool = False
     perm_seed_base: int = 0
+    repeats: int = 1  # raw arms: number of full passes through the sequence
 
     def carrier(self, obj_vector: torch.Tensor, seed_idx: int) -> torch.Tensor:
         if self.kind == "physical":
             return (self.patterns @ obj_vector).to(dtype=torch.float32)
         coeffs = (self.signed_rows @ obj_vector).to(dtype=torch.float32)
+        if int(self.repeats) > 1:
+            coeffs = coeffs.repeat(int(self.repeats))
         if not self.shuffle:
             return coeffs
         generator = torch.Generator(device="cpu")
@@ -68,17 +103,20 @@ def build_fig3_arms(bases: List[str], num_pixels: int, seed: int) -> List[Fig3Ar
     for idx, name in enumerate(bases):
         key = name.lower().replace("-", "_")
         basis_seed = seed + 17 * idx
-        if key in RAW_ARMS:
+        raw = _parse_raw_arm(key, num_pixels)
+        if raw is not None:
+            prefix, raw_frames = raw
             signed = hadamard_matrix(int(num_pixels)).cpu()
             arms.append(
                 Fig3Arm(
                     name=key,
                     requested=name,
                     kind="raw",
-                    num_frames=int(num_pixels),
+                    num_frames=int(raw_frames),
                     signed_rows=signed,
-                    shuffle=(key == "hadamard_raw_shuffled"),
+                    shuffle=prefix.endswith("shuffled"),
                     perm_seed_base=basis_seed,
+                    repeats=int(raw_frames) // int(num_pixels),
                 )
             )
         else:
@@ -123,6 +161,8 @@ def run(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
                     for window in arm_windows:
                         gain_hat = mean_agc_gain(observed, window)
                         gain_rel_err = scale_aligned_gain_error(gain_hat, gains)
+                        gain_hat_log, frac_nonpos = log_agc_gain(observed, window)
+                        gain_rel_err_log = scale_aligned_gain_error(gain_hat_log, gains)
                         theory_floor = float(np.sqrt(carrier_cv * carrier_cv / max(1, window)))
                         rows.append(
                             {
@@ -140,6 +180,12 @@ def run(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
                                 "carrier_mean": carrier_mean,
                                 "carrier_cv": carrier_cv,
                                 "gain_rel_err": gain_rel_err,
+                                # Estimator-suffixed duplicates: _ratio is the legacy
+                                # movmean(R,W)/mean(R) AGC; _log is the Theorem-B
+                                # windowed log-domain estimator (see log_agc_gain).
+                                "gain_rel_err_ratio": gain_rel_err,
+                                "gain_rel_err_log": gain_rel_err_log,
+                                "frac_nonpos_carrier": frac_nonpos,
                                 "theory_variance_cv2_over_w": float(carrier_cv * carrier_cv / max(1, window)),
                                 "theory_floor": theory_floor,
                                 "err_over_floor": float(gain_rel_err / theory_floor) if theory_floor > 0 else float("nan"),
@@ -263,6 +309,117 @@ def collapse_table(df: pd.DataFrame) -> Dict[str, Dict[str, float]]:
     return stats
 
 
+BOOTSTRAP_SCHEMES = ("naive", "seed_cluster", "two_way")
+
+
+def _bootstrap_median_ci(
+    cells: Dict[tuple, float], scheme: str, n_boot: int, rng: np.random.Generator
+) -> tuple[float, float]:
+    """95% percentile CI of the median of per-(object,seed) cell values.
+
+    naive        - resample the cells i.i.d. (the published convention; treats
+                   the object x seed grid as independent draws).
+    seed_cluster - resample the seed clusters with replacement, keeping every
+                   object within each drawn seed (accounts for the 20 drift
+                   seeds being reused across all 10 objects).
+    two_way      - crossed/two-way cluster bootstrap: resample seeds AND
+                   objects with replacement (both factors are reused fixed
+                   panels, so this is the conservative scheme).
+    """
+
+    keys = list(cells.keys())
+    values = np.asarray([cells[k] for k in keys], dtype=float)
+    objects = sorted({k[0] for k in keys})
+    seeds = sorted({k[1] for k in keys})
+    grid = np.full((len(objects), len(seeds)), np.nan)
+    obj_index = {o: i for i, o in enumerate(objects)}
+    seed_index = {s: i for i, s in enumerate(seeds)}
+    for (obj, seed), value in cells.items():
+        grid[obj_index[obj], seed_index[seed]] = value
+    stats = np.empty(int(n_boot), dtype=float)
+    for b in range(int(n_boot)):
+        if scheme == "naive":
+            sample = values[rng.integers(0, len(values), len(values))]
+        elif scheme == "seed_cluster":
+            cols = rng.integers(0, len(seeds), len(seeds))
+            sample = grid[:, cols].ravel()
+        elif scheme == "two_way":
+            rows_idx = rng.integers(0, len(objects), len(objects))
+            cols = rng.integers(0, len(seeds), len(seeds))
+            sample = grid[np.ix_(rows_idx, cols)].ravel()
+        else:
+            raise ValueError(f"Unknown bootstrap scheme '{scheme}'.")
+        stats[b] = float(np.nanmedian(sample))
+    return float(np.percentile(stats, 2.5)), float(np.percentile(stats, 97.5))
+
+
+def _cell_statistics(
+    group: pd.DataFrame, err_col: str, slope_wmax: int
+) -> tuple[Dict[tuple, float], Dict[tuple, float]]:
+    """Per-(object,seed) fixed-convention statistics for one (basis,rho) block.
+
+    Returns (slopes, log10_best): the W<=slope_wmax log-log slope of err vs W
+    (the manuscript's fixed variance-segment convention) and log10 of the
+    best-window (min over W) error, both computed per cell.
+    """
+
+    slopes: Dict[tuple, float] = {}
+    log10_best: Dict[tuple, float] = {}
+    for (obj, seed), cell in group.groupby(["object", "seed"]):
+        per_w = cell.groupby("W")[err_col].mean().sort_index()
+        positive = per_w[per_w.values > 0]
+        if len(positive):
+            log10_best[(obj, seed)] = float(np.log10(float(positive.min())))
+        seg = positive[positive.index <= int(slope_wmax)]
+        if len(seg) >= 2:
+            x = np.log10(np.asarray(seg.index, dtype=float))
+            y = np.log10(np.asarray(seg.values, dtype=float))
+            slopes[(obj, seed)] = float(np.polyfit(x, y, deg=1)[0])
+    return slopes, log10_best
+
+
+def bootstrap_arm_cis(
+    df: pd.DataFrame,
+    err_cols: tuple = ("gain_rel_err_ratio", "gain_rel_err_log"),
+    slope_wmax: int = 16,
+    n_boot: int = 2000,
+    boot_seed: int = 20240708,
+) -> pd.DataFrame:
+    """Median statistics per arm with 95% CIs under three bootstrap schemes.
+
+    Statistics (per basis, rho, estimator): median over (object,seed) cells of
+    (i) the fixed W<=slope_wmax log-log slope and (ii) log10 best-window error.
+    """
+
+    rows: List[Dict[str, object]] = []
+    err_cols = tuple(c for c in err_cols if c in df.columns)
+    for (basis, rho), group in df.groupby(["basis", "rho"]):
+        for err_col in err_cols:
+            slopes, log10_best = _cell_statistics(group, err_col, slope_wmax)
+            for stat_name, cells in ((f"slope_wle{int(slope_wmax)}", slopes), ("log10_best_err", log10_best)):
+                if not cells:
+                    continue
+                point = float(np.median(list(cells.values())))
+                row: Dict[str, object] = {
+                    "basis": basis,
+                    "rho": float(rho),
+                    "estimator": err_col,
+                    "statistic": stat_name,
+                    "n_cells": int(len(cells)),
+                    "median": point,
+                }
+                for scheme in BOOTSTRAP_SCHEMES:
+                    label = f"{basis}|{rho:.6g}|{err_col}|{stat_name}|{scheme}".encode("utf-8")
+                    rng = np.random.default_rng(
+                        np.random.SeedSequence([int(boot_seed), zlib.crc32(label)])
+                    )
+                    lo, hi = _bootstrap_median_ci(cells, scheme, n_boot, rng)
+                    row[f"ci_lo_{scheme}"] = lo
+                    row[f"ci_hi_{scheme}"] = hi
+                rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def plot_outputs(df: pd.DataFrame, summary: pd.DataFrame, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     bases = list(df["basis"].drop_duplicates())
@@ -363,6 +520,19 @@ def main() -> None:
         ],
     )
     parser.add_argument("--min-window", type=int, default=4)
+    parser.add_argument(
+        "--bootstrap-samples",
+        type=int,
+        default=2000,
+        help="Bootstrap resamples per CI (0 disables the fig3_bootstrap_cis.csv output).",
+    )
+    parser.add_argument("--bootstrap-seed", type=int, default=20240708)
+    parser.add_argument(
+        "--slope-wmax",
+        type=int,
+        default=16,
+        help="Fixed variance-segment convention: per-cell slope fits use W <= this value.",
+    )
     args = parser.parse_args()
 
     start = time.time()
@@ -371,6 +541,14 @@ def main() -> None:
     df, slopes, summary = run(args)
     df.to_csv(out / "fig3_gain_est_error.csv", index=False)
     slopes.to_csv(out / "fig3_slope_fits.csv", index=False)
+    if int(args.bootstrap_samples) > 0:
+        cis = bootstrap_arm_cis(
+            df,
+            slope_wmax=int(args.slope_wmax),
+            n_boot=int(args.bootstrap_samples),
+            boot_seed=int(args.bootstrap_seed),
+        )
+        cis.to_csv(out / "fig3_bootstrap_cis.csv", index=False)
     plot_outputs(df, summary, out)
 
     rho_slow = float(df["rho"].min())
@@ -392,6 +570,11 @@ def main() -> None:
         "Fig. 3 Blind Gain Identifiability (r2)",
         [
             "Sliding-window AGC (movmean(R,W)/mean(R)) is applied identically to every arm and scored only on gain recovery.",
+            "r3 fairness additions: gain_rel_err_ratio / gain_rel_err_log report the movmean-ratio AGC and the Theorem-B "
+            "windowed log-domain estimator (exp of centered movmean(log R, W), positivity-margin guard) on identical records; "
+            "hadamard_raw_*_2048 arms repeat the signed Walsh sequence twice so raw arms match the physical arms' 2048-frame "
+            "budget (hadamard_raw_*_1024 = single-pass diagnostic); fig3_bootstrap_cis.csv reports median stats with naive / "
+            "seed-cluster / two-way (crossed seeds-and-objects) bootstrap CIs.",
             "paired/permuted Hadamard variants confirm the permutation theorem (R2): pairing cancels slow drift, "
             "permutation restores stationarity; only the raw ordered chronology fails.",
             "hadamard_paired = complementary +/- pairing in natural order; hadamard_random_paired = the same pairing under "
