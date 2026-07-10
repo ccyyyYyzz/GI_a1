@@ -1,6 +1,6 @@
 {
-  "utc_timestamp": "2026-07-10T10:45:36.010481+00:00",
-  "git_commit": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "utc_timestamp": "2026-07-10T17:49:54.494306+00:00",
+  "git_commit": "6411279dc122334d8b5d23ca653de81b968a2ead",
   "hostname": "cyz912",
   "python_version": "3.9.21",
   "torch_version": "2.1.0+cu121",
@@ -19,31 +19,16 @@
     "mc_draws": 96
   },
   "manifest_version": 2,
-  "git_commit_full": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "manifest_version_minor": 1,
+  "git_commit_full": "6411279dc122334d8b5d23ca653de81b968a2ead",
   "git_branch": "scgi-ceiling-diagnostic-r1",
   "git_dirty": true,
-  "git_diff_sha256": "954cc86e4a080867f6926ecdd0d627f855cc7de34a71039a4555f2f2bb93ed53",
+  "git_diff_sha256": "5e9164d1deaf2eda442f6640f03f442ded45cd9d6cf6169fbd0a125f29002119",
   "git_status_porcelain": [
-    " M scgi_repro/paper_draft/latex/bibliography.tex",
-    " M scgi_repro/paper_draft/latex/body.tex",
-    " M scgi_repro/paper_draft/latex/main.tex",
-    " M scgi_repro/paper_draft/latex/make_pub_figures.py",
-    " M scgi_repro/results/coherent_residual_e4_r1/e4_caption.md",
-    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/fig3_caption.md",
-    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/run_manifest.json",
-    " M scgi_repro/results/paper_fig7_lowphoton_r3_calibrated/fig7_caption.md",
-    " M scgi_repro/results/paper_fig7_lowphoton_r3_calibrated/run_manifest.json",
-    " M scgi_repro/results/perm_ablation_r1/perm_ablation_caption.md",
-    " M scgi_repro/results/perm_ablation_r1/run_manifest.json",
-    "?? scgi_repro/paper_draft/latex/bibliography_supp.tex",
-    "?? scgi_repro/paper_draft/latex/figs/figS1_perm_whitening.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS2_coherent_residual.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS3_c0_oracle.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS4_flip_floorprobe.png",
-    "?? scgi_repro/paper_draft/latex/macros.tex"
+    " M scgi_repro/results/coherent_residual_e4_r1/e4_caption.md"
   ],
   "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_coherent_residual_e4.py",
-  "runner_sha256": "ad3b0b8cdd7b9f07a6b0b1917d3ab20b108c8cb53c2db909766a8d873bd2f7ef",
+  "runner_sha256": "8d8550c377d46b02e299c4043410f7155418e2e6b286f218432a19efd5ef3ba9",
   "argv": [
     "run_coherent_residual_e4.py",
     "--output-dir",
@@ -70,5 +55,8 @@
     "96"
   ],
   "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": false,
+  "untracked_files": [],
+  "provenance_note": "tree clean except this run's own outputs",
   "rows": 1500
 }
