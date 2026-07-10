@@ -280,7 +280,7 @@ def main() -> None:
     )
     (out / "run_manifest.json").write_text(
         json.dumps(
-            build_run_manifest(args, ROOT, extra={"rows": int(len(df)), "agc_window": int(agc_window)}),
+            build_run_manifest(args, ROOT, extra={"rows": int(len(df)), "agc_window": int(agc_window)}, output_dir=out),
             indent=2,
             default=str,
         ),

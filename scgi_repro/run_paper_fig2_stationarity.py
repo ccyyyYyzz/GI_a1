@@ -238,7 +238,7 @@ def main() -> None:
         ],
     )
     (out / "run_manifest.json").write_text(
-        json.dumps(build_run_manifest(args, ROOT, extra={"rows": int(len(df))}), indent=2, default=str),
+        json.dumps(build_run_manifest(args, ROOT, extra={"rows": int(len(df))}, output_dir=out), indent=2, default=str),
         encoding="utf-8",
     )
     print(f"Fig2 complete rows={len(df)} output={out} runtime={time.time() - start:.2f}s")

@@ -341,7 +341,7 @@ def main() -> None:
     )
     (out / "run_manifest.json").write_text(
         json.dumps(
-            build_run_manifest(args, ROOT, extra={"rows": int(len(c0_df))}),
+            build_run_manifest(args, ROOT, extra={"rows": int(len(c0_df))}, output_dir=out),
             indent=2,
             default=str,
         ),

@@ -286,7 +286,7 @@ def main() -> None:
         "per_arm_reject": {r["arm"]: {"n": int(r["n_reject"]), "N": int(r["N"]), "rate": float(r["rate"])} for r in summary},
     }
     (out / "run_manifest.json").write_text(
-        json.dumps(build_run_manifest(args, ROOT, extra=manifest_extra), indent=2, default=str),
+        json.dumps(build_run_manifest(args, ROOT, extra=manifest_extra, output_dir=out), indent=2, default=str),
         encoding="utf-8",
     )
     write_caption(

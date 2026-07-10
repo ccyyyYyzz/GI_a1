@@ -596,7 +596,7 @@ def main() -> None:
     )
     (out / "run_manifest.json").write_text(
         json.dumps(
-            build_run_manifest(args, ROOT, extra={"rows": int(len(df)), "runtime_seconds": round(time.time() - start, 3)}),
+            build_run_manifest(args, ROOT, extra={"rows": int(len(df)), "runtime_seconds": round(time.time() - start, 3)}, output_dir=out),
             indent=2,
             default=str,
         ),

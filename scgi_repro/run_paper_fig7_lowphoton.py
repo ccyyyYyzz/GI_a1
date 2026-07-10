@@ -986,6 +986,7 @@ def main() -> None:
                     "eps_bis_bound_logtheta": eps_bis_bound,
                     "edge_effect_probe": {k: v for k, v in edge_probe.items() if k != "lines"},
                 },
+                output_dir=out,
             ),
             indent=2,
             default=str,
