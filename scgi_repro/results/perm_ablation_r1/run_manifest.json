@@ -1,0 +1,78 @@
+{
+  "utc_timestamp": "2026-07-10T07:43:25.455230+00:00",
+  "git_commit": "f26da484b4b1b074940b0a8fdb285e2e2365ea7f",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\results\\perm_ablation_r1",
+    "image_size": 64,
+    "objects": 10,
+    "nperm": 32,
+    "seed": 20240708,
+    "window": 64,
+    "chunks": 8,
+    "transient": 128,
+    "reject_alpha": 0.001,
+    "device": "cpu",
+    "smoke": false
+  },
+  "rows": 2250,
+  "K": 4096,
+  "nperm": 32,
+  "arms": [
+    "ordered",
+    "row_perm_only",
+    "pixel_perm_only",
+    "sign_only",
+    "pixel_sign",
+    "row_pixel",
+    "row_pixel_sign",
+    "row_sign"
+  ],
+  "reject_alpha": 0.001,
+  "carrier_verify_max_abs_diff_vs_explicit_basis": 2.842170943040401e-14,
+  "per_arm_reject": {
+    "ordered": {
+      "n": 7,
+      "N": 10,
+      "rate": 0.7
+    },
+    "row_perm_only": {
+      "n": 39,
+      "N": 320,
+      "rate": 0.121875
+    },
+    "pixel_perm_only": {
+      "n": 18,
+      "N": 320,
+      "rate": 0.05625
+    },
+    "sign_only": {
+      "n": 139,
+      "N": 320,
+      "rate": 0.434375
+    },
+    "pixel_sign": {
+      "n": 38,
+      "N": 320,
+      "rate": 0.11875
+    },
+    "row_pixel": {
+      "n": 19,
+      "N": 320,
+      "rate": 0.059375
+    },
+    "row_pixel_sign": {
+      "n": 23,
+      "N": 320,
+      "rate": 0.071875
+    },
+    "row_sign": {
+      "n": 19,
+      "N": 320,
+      "rate": 0.059375
+    }
+  }
+}
