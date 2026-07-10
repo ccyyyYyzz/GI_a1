@@ -408,14 +408,14 @@ The correct CLT small parameter is $K_\infty^{-1/2}$, \textbf{not} $K_{\mathrm{e
 \]
 \end{namedthm}
 
-\noindent\emph{Proof.} (i) Linearity of expectation and independence across $j$ give the mean and (Bienaym\'e) the variance; independence across $n$ gives the i.i.d.\ claim. (ii) Apply the Lindeberg--Feller CLT [Billingsley, \emph{Probability and Measure}, Thm.~27.2] to the triangular array $X_j=T_j(I_{n,j}-\mu_I)$ with $s^2=\sigma_I^2 S_2$. Since $|X_j|\le \|T\|_\infty|I-\mu_I|$, the event $\{|X_j|>\varepsilon s\}$ is contained in $\{|I-\mu_I|>\varepsilon\sigma_I\sqrt{K_\infty}\}$, so the Lindeberg fraction is
+\noindent\emph{Proof.} (i) Linearity of expectation and independence across $j$ give the mean and (Bienaym\'e) the variance; independence across $n$ gives the i.i.d.\ claim. (ii) Apply the Lindeberg--Feller CLT \cite[Thm.~27.2]{Billingsley1995} to the triangular array $X_j=T_j(I_{n,j}-\mu_I)$ with $s^2=\sigma_I^2 S_2$. Since $|X_j|\le \|T\|_\infty|I-\mu_I|$, the event $\{|X_j|>\varepsilon s\}$ is contained in $\{|I-\mu_I|>\varepsilon\sigma_I\sqrt{K_\infty}\}$, so the Lindeberg fraction is
 \[
 \begin{aligned}
 &\frac{1}{\sigma_I^2 S_2}\sum_j T_j^2\,\mathbb{E}\big[(I-\mu_I)^2\mathbf 1\{|X_j|>\varepsilon s\}\big]\\
 &\qquad\le\;\frac{1}{\sigma_I^2}\,\mathbb{E}\big[(I-\mu_I)^2\mathbf 1\{|I-\mu_I|>\varepsilon\sigma_I\sqrt{K_\infty}\}\big]\;\longrightarrow\;0
 \end{aligned}
 \]
-by uniform integrability as $K_\infty\to\infty$. (iii) Esseen's inequality for sums of independent, non-identically distributed variables [Petrov, \emph{Sums of Independent Random Variables}, Ch.~V] gives the bound with third-moment ratio $\nu_3\sum_j|T_j|^3/S_2^{3/2}$, and $\sum_j|T_j|^3\le\|T\|_\infty S_2$ yields the $K_\infty^{-1/2}$ form. (iv) Cumulant homogeneity ($\kappa_r(cX)=c^r\kappa_r(X)$) and additivity over independent summands give the cumulant formula. The log expansion is Taylor's theorem with Lagrange remainder applied to $\log(1+u)$ on the event $\{|u_n|\le\tfrac12\}$. \hfill$\blacksquare$
+by uniform integrability as $K_\infty\to\infty$. (iii) Esseen's inequality for sums of independent, non-identically distributed variables \cite[Ch.~V]{Petrov1975} gives the bound with third-moment ratio $\nu_3\sum_j|T_j|^3/S_2^{3/2}$, and $\sum_j|T_j|^3\le\|T\|_\infty S_2$ yields the $K_\infty^{-1/2}$ form. (iv) Cumulant homogeneity ($\kappa_r(cX)=c^r\kappa_r(X)$) and additivity over independent summands give the cumulant formula. The log expansion is Taylor's theorem with Lagrange remainder applied to $\log(1+u)$ on the event $\{|u_n|\le\tfrac12\}$. \hfill$\blacksquare$
 
 \begin{statusblock}\textbf{Status of the log expansion (flagged).} Step (iv) is a \textbf{controlled moment expansion, not a distribution-free theorem}: making the $O(\mathbb{E}|u_n|^3)$ remainder rigorous, and ensuring integrability of $\log B_n$ near $B_n=0$, requires a high-probability bound $P(|u_n|>\tfrac12)$ decaying fast enough --- e.g.\ sub-exponential pattern entries plus $K_\infty$-driven concentration, or a strictly positive pattern floor $I\ge I_{\min}>0$. This step is a moment calculation; it enters only through the variance scale $\sigma_{\mathrm{abs}}^2=\sigma_{\mathrm{LR}}^2\asymp 1/K_{\mathrm{eff}}$ (per-frame, summable-absolute, and long-run variances all coincide for the i.i.d.\ carrier) entering rate constants, never in identifiability statements. Zero and near-zero buckets are excluded here; the calibrated soft-log $\psi_\alpha(c)=\log(c+\alpha)$ of Appendix~D removes this restriction with a photon-dependent sensitivity factor.\end{statusblock}
 
@@ -574,19 +574,19 @@ P_\perp=I-\frac{\Sigma^{-1/2}\mathbf 1\mathbf 1^{\top}\Sigma^{-1/2}}{\mathbf 1^{
 \end{equation}
 For a linear functional $L\theta$: if $\mathrm{row}(L)\subseteq\mathrm{range}(I_\theta)$, every unbiased estimator obeys $\operatorname{Cov}(L\hat\theta)\succeq L\,I_\theta^{+}L^{\top}$ (Moore--Penrose CRB for singular information~\cite{RaoMitra1971,StoicaMarzetta2001}); if $L$ has a nonzero component along $\ker I_\theta$, \textbf{no unbiased estimator of $L\theta$ exists and the CRB is infinite} --- the functional is not locally estimable.
 
-\emph{(b) Quotient statement.} Let $\Theta$ be the parameter manifold, $G$ the global-scale group $(a,T)\mapsto(ca,T/c)$, and $P_\theta$ a dominated model differentiable in quadratic mean. Define the quotient score operator $S_\theta:T_{[\theta]}(\Theta/G)\to L_0^2(P_\theta)$ and $I_\theta=S_\theta^{*}S_\theta$. Then: $I_\theta\succ0$ on $T_{[\theta]}(\Theta/G)$ \textbf{iff} $[\theta]\mapsto P_\theta$ is an immersion, i.e.\ iff the model is \emph{locally differentially identifiable} modulo scale. Any $C^1$ ambiguity curve $[\theta(t)]$ with $P_{\theta(t)}=P_{\theta(0)}$ satisfies $S_\theta\theta'(0)=0$, hence produces a Fisher null direction. For the Theorem-A ambiguity this implication is \emph{exact}: the explicit data-preserving path $\ell'=\ell+ts$, $T'=M^{-1}(c\odot e^{-ts})$, $s\in S\setminus\mathrm{span}\{1\}$, is a genuine ambiguity curve for a square invertible design, so the Fisher matrix in the full $(\ell,T)$ parameterization is singular along its tangent, and the CRB is $+\infty$ for every functional that varies along it.
+\emph{(b) Quotient statement.} Let $\Theta$ be the parameter manifold, $G$ the global-scale group $(a,T)\mapsto(ca,T/c)$, and $P_\theta$ a dominated model differentiable in quadratic mean. Define the quotient score operator $S_\theta:T_{[\theta]}(\Theta/G)\to L_0^2(P_\theta)$ and $I_\theta=S_\theta^{*}S_\theta$. Then: $I_\theta\succ0$ on $T_{[\theta]}(\Theta/G)$ \textbf{iff} $[\theta]\mapsto P_\theta$ is an immersion, i.e.\ iff the model is \emph{locally differentially identifiable} modulo scale. Any $C^1$ ambiguity curve $[\theta(t)]$ with $P_{\theta(t)}=P_{\theta(0)}$ satisfies $S_\theta\theta'(0)=0$, hence produces a Fisher null direction. For the Theorem-A ambiguity this implication is \emph{exact}: the explicit data-preserving path $\ell'=\ell+ts$, $T'=M^{-1}(c\odot e^{-ts})$, $s\in S\setminus\mathrm{span}\{1\}$ --- the \emph{exact collision curve} $\ell_u=\ell+u$, $T_u=M^{-1}D_{e^{-u}}MT$ in the notation of Appendix~A --- is a genuine ambiguity curve for a square invertible design, so the Fisher matrix in the full $(\ell,T)$ parameterization is singular along its tangent, and the CRB is $+\infty$ for every functional that varies along it. For a \emph{tall} full-column-rank design the exact collision exists for a given $u\in S$ iff the range condition $(I-P_M)D_{e^{-u}}MT=0$ holds ($P_M$ the column-space projector); under the nonvanishing-carrier assumption $T_u\propto T$ only when $u$ is constant, and the quotient tangent null space is $\mathcal N_{\ell,T}=\{(u,h):D_{MT}u+Mh=0\}\supseteq\operatorname{span}\{(\mathbf1,-T)\}$, with local differential identifiability modulo scale exactly when equality holds.
 
 \emph{(c) Local-window corollary.} For a window over which $\ell$ is approximately constant, the Gaussian CRB reduces to $\operatorname{Var}(\hat\ell_n)\ge\sigma_z^2/W_{\mathrm{eff}}$ with $W_{\mathrm{eff}}=W/(1+2\sum_h\rho_z(h))$ under weak dependence (equivalently, $\sigma_z^2$ replaced by the signed long-run variance $\sigma_{\mathrm{LR}}^2$, which is the exact asymptotic constant here) --- the Fisher-side counterpart of the $\sigma_{\mathrm{abs}}^2/W$ upper bound in (D.3).
 
 \paragraph{Proof.} \emph{(a)} The joint Fisher matrix of $(\theta,m)$ in the Gaussian model is the block matrix $\begin{pmatrix}U^{\top}\Sigma^{-1}U & U^{\top}\Sigma^{-1}\mathbf 1\\ \mathbf 1^{\top}\Sigma^{-1}U & \mathbf 1^{\top}\Sigma^{-1}\mathbf 1\end{pmatrix}$. Nuisance elimination is the Schur complement with respect to the $m$-block~\cite{LehmannCasella1998}, which is exactly (D.7). The pseudoinverse CRB for singular FIM is Stoica--Marzetta~\cite{StoicaMarzetta2001}. The infinite-CRB claim is cleanest without CRB machinery: a direction $u\in\ker I_\theta$ that is tangent to an exact ambiguity curve leaves the data law invariant, so any estimator has \emph{identical} distribution under $\theta$ and $\theta+tu$; unbiasedness for a functional with $Lu\neq0$ would force $L\theta=L(\theta+tu)$, a contradiction --- hence no unbiased finite-variance estimator exists.
 
-\emph{(b)} Differentiability in quadratic mean makes $S_\theta$ well defined and $I_\theta=S_\theta^*S_\theta$ the pullback metric [van der Vaart, \emph{Asymptotic Statistics}, Ch.~7]. $I_\theta\succ0$ iff $S_\theta$ is injective iff the differential of $[\theta]\mapsto\sqrt{dP_\theta}$ is injective, i.e.\ an immersion. The ambiguity-curve implication is the chain rule: $t\mapsto P_{\theta(t)}$ constant $\Rightarrow$ its $L^2$ derivative $S_\theta\theta'(0)$ vanishes. For Theorem~A the curve is explicit (see Appendix~A), so no genericity is needed. \hfill$\blacksquare$
+\emph{(b)} Differentiability in quadratic mean makes $S_\theta$ well defined and $I_\theta=S_\theta^*S_\theta$ the pullback metric \cite[Ch.~7]{vanderVaart1998}. $I_\theta\succ0$ iff $S_\theta$ is injective iff the differential of $[\theta]\mapsto\sqrt{dP_\theta}$ is injective, i.e.\ an immersion. The ambiguity-curve implication is the chain rule: $t\mapsto P_{\theta(t)}$ constant $\Rightarrow$ its $L^2$ derivative $S_\theta\theta'(0)$ vanishes. For Theorem~A the curve is explicit (see Appendix~A), so no genericity is needed. \hfill$\blacksquare$
 
 \paragraph{What this does not claim.} The converse direction --- Fisher singularity implying an actual \emph{ambiguity manifold} --- requires constant-rank (or analytic) regularity so that the rank defect integrates (rank theorem); Fisher singularity by itself only defeats \emph{local differential} identifiability. Nonsingular Fisher does not exclude isolated \emph{global} aliases. Part (a) assumes Gaussian noise with known $\Sigma$; part (c) is a Gaussian-model computation used as an order-of-magnitude floor, not a bound proven for the actual log-carrier distribution. No efficiency claim is made for the windowed estimator beyond rate (constants open, Theorem~D).
 
-\subsection{D.4 Theorem C (low-photon calibrated soft-log rate and the \texorpdfstring{$1/(W\bar\lambda)$}{1/(W lambda-bar)} law)}
+\subsection{D.4 Theorem C (low-photon calibrated soft-log rate and the conditional \texorpdfstring{$1/(W\bar\lambda)$}{1/(W lambda-bar)} law)}
 
-\paragraph{Statement (exact finite-window identity with known carriers, weighted form).} Let counts follow the calibrated model $C_n\mid \ell_n\sim\mathrm{Pois}(\lambda_n)$, $\lambda_n=\Lambda_0e^{\ell_n}b_n+d$, with $d\ge0$ dark counts and $\{b_n\}$ the \emph{known} per-frame carrier intensities ($b_n>0$; in the Fig.~7 protocol these are \emph{oracle} values supplied from the simulation truth --- a flat-field-calibrated benchmark, not programmed design intensities --- and $d=0$ --- Remark D.4.1; the unknown-random-carrier variant is Remark D.4.3). Fix $\alpha>0$, let $\psi_\alpha(c)=\log(c+\alpha)$, and let $m_\alpha(\lambda)=\mathbb{E}[\psi_\alpha(C)]$ for $C\sim\mathrm{Pois}(\lambda)$ --- the homogeneous calibration curve, strictly increasing. For a fixed window $n$, let $\mathcal I_n$ be the set of \emph{distinct} frame indices used by the estimator and let $w_{nk}\ge0$, $\sum_{k\in\mathcal I_n}w_{nk}=1$, be its weights (for the implementation's windows, $\mathcal I_n=W_n$ and $w_{nk}=1/W$). If a padding convention repeats a frame, all repeated occurrences are first aggregated into its single weight $w_{nk}$. Put
+\paragraph{Statement (exact finite-window identity with known carriers, weighted form).} Let counts follow the calibrated model $C_n\mid \ell_n\sim\mathrm{Pois}(\lambda_n)$, $\lambda_n=\Lambda_0e^{\ell_n}b_n+d$, with $d\ge0$ dark counts and $\{b_n\}$ the \emph{known} per-frame carrier intensities ($b_n>0$; in the Fig.~5 protocol these are \emph{oracle} values supplied from the simulation truth --- a flat-field-calibrated benchmark, not programmed design intensities --- and $d=0$ --- Remark D.4.1; the unknown-random-carrier and known-law variants are Remarks D.4.3 and D.4.5). Fix $\alpha>0$, let $\psi_\alpha(c)=\log(c+\alpha)$, and let $m_\alpha(\lambda)=\mathbb{E}[\psi_\alpha(C)]$ for $C\sim\mathrm{Pois}(\lambda)$ --- the homogeneous calibration curve, strictly increasing. For a fixed window $n$, let $\mathcal I_n$ be the set of \emph{distinct} frame indices used by the estimator and let $w_{nk}\ge0$, $\sum_{k\in\mathcal I_n}w_{nk}=1$, be its weights (for the implementation's windows, $\mathcal I_n=W_n$ and $w_{nk}=1/W$). If a padding convention repeats a frame, all repeated occurrences are first aggregated into its single weight $w_{nk}$. Put
 \[
 q_k(t)=m_\alpha(\Lambda_0e^t b_k+d),
 \]
@@ -606,21 +606,31 @@ B_n=\sum_{k\in\mathcal I_n}w_{nk}
 \qquad
 V_n=\sum_{k\in\mathcal I_n}w_{nk}^2v_k(\ell_k).
 \]
-Fix a compact operating range $\Theta=[\theta_{\min},\theta_{\max}]$ (in the implementation, the safe tabulated calibration range) and let
+Fix a compact operating range $\Theta=[\theta_{\min},\theta_{\max}]$ and let
 \[
 \underline\kappa_n=\inf_{t\in\Theta}M_n'(t)>0,
 \qquad
 D_\Theta=\theta_{\max}-\theta_{\min}.
 \]
-The estimator is defined \emph{with the clamp}:
+In the implementation $\Theta$ is the \emph{calibration-safe interval}: if the calibration curve is certified only for $\lambda\in[\lambda_-,\lambda_+]$ and $d<\lambda_-$, the largest safe interval before intersection with the physical parameter range is
+\[
+\left[
+\max_{k\in\mathcal I_n}\log\frac{\lambda_--d}{\Lambda_0b_k},
+\quad
+\min_{k\in\mathcal I_n}\log\frac{\lambda_+-d}{\Lambda_0b_k}
+\right],
+\]
+and \textbf{nonemptiness of this interval is an assumption of the theorem} --- a clamp cannot repair an empty calibration-safe interval. The estimator is the \emph{endpoint-clamped generalized inverse} applied to the window statistic:
 \begin{equation}
-\hat\theta_n\;=\;\Pi_\Theta\big[M_n^{-1}(y_n)\big], \tag{D.8a}
+\hat\theta_n\;=\;G_n(y_n),
+\qquad
+G_n(y)\;=\;M_n^{-1}\!\big[\Pi_{M_n(\Theta)}\,y\big], \tag{D.8a}
 \end{equation}
-where $\Pi_\Theta$ clips to $\Theta$ and $M_n^{-1}$ is the generalized monotone inverse, returning the corresponding endpoint of $\Theta$ when $y_n$ falls outside $M_n(\Theta)$ (an all-zero window has $y_n=\log\alpha$ and returns $\theta_{\min}$; without the clamp the inverse would diverge to $-\infty$ there --- the clamp is part of the estimator, not an implementation afterthought). Assume:
+where $\Pi_{M_n(\Theta)}$ projects onto the compact interval $M_n(\Theta)$ before inversion, so $G_n$ returns the corresponding endpoint of $\Theta$ when $y_n$ falls outside $M_n(\Theta)$ (an all-zero window has $y_n=\log\alpha$ and returns $\theta_{\min}$; without the clamp the inverse would diverge to $-\infty$ there --- the clamp is part of the estimator, not an implementation afterthought). Assume:
 \begin{enumerate}
 \item \emph{(Operating range; per-frame sensitivities and noise)} for every $k$ and every $\theta\in\Theta$, $\lambda_k(\theta)=\Lambda_0e^{\theta}b_k+d\in[\lambda_-,\lambda_+]\subset(0,\infty)$; consequently the per-frame sensitivity bound $\overline\kappa_k=\sup_{t\in\Theta}q_k'(t)$ and the per-frame noise $v_k(t)$ are finite, with $v_k(t)\le\bar\sigma_\alpha^2:=\sup_{\lambda\in[\lambda_-,\lambda_+]}\operatorname{Var}[\psi_\alpha(\mathrm{Pois}(\lambda))]<\infty$, $\kappa_{\max}:=\sup_k\overline\kappa_k<\infty$, and $\underline\kappa_n>0$;
 \item \emph{(Smoothness)} $\ell\in H_\beta(L_a)$ with the \emph{pointwise} modulus $|\ell_k-\ell_n|\le L_a|k-n|^{\beta}$ and $\beta\in(0,1]$ (the paper's operative case is $\beta=1$; the precise obstruction above one and its partial repair are Remark D.4.2);
-\item \emph{(Margin)} $\ell_n\in\Theta$ for all $n$, with margin $\Delta:=\min_n\operatorname{dist}(\ell_n,\partial\Theta)>0$.
+\item \emph{(Membership)} $\ell_n\in\Theta$ for all $n$. (A positive margin $\Delta:=\min_n\operatorname{dist}(\ell_n,\partial\Theta)>0$ enters only the clamp-\emph{probability} diagnostic of Remark D.4.4; the risk bound below does not use it.)
 \end{enumerate}
 Then, conditionally on the gain path and known carriers,
 \[
@@ -629,14 +639,14 @@ Then, conditionally on the gain path and known carriers,
 \{\psi_\alpha(C_k)-q_k(\ell_k)\}\right]
 =V_n
 \]
-\emph{exactly}, and no mixing or stationarity assumption is required. If $\mathcal E_n=\{y_n\in M_n(\Theta)\}$, then
+\emph{exactly}, and no mixing or stationarity assumption is required. Then, conditionally on the gain path and the known carriers,
 \begin{equation}
-\mathbb E(\hat\theta_n-\ell_n)^2
+\mathbb E\big[(\hat\theta_n-\ell_n)^2\mid\ell,b\big]
 \le
-\frac{B_n^2+V_n}{\underline\kappa_n^2}
-+D_\Theta^2\,\mathbb P(\mathcal E_n^c).
+\frac{B_n^2+V_n}{\underline\kappa_n^2}.
 \tag{D.8}
 \end{equation}
+There is \textbf{no separate clamp-event risk term}: the endpoint-clamped generalized inverse $G_n$ is globally $\underline\kappa_n^{-1}$-Lipschitz on all of $\mathbb R$ (proof below), so all-zero and out-of-range windows are already covered by (D.8); the clamp probability survives only as a diagnostic (Remark D.4.4). This is a finite-window statement: it requires neither stationarity nor mixing of the known carrier sequence.
 Moreover, the pointwise modulus gives
 \[
 |B_n|
@@ -654,16 +664,19 @@ V_n=\frac{\bar v_{n,\alpha}}{W},
 \]
 while $|B_n|\le C\,\kappa_{\max}L_aW^{\beta}$, so (D.8) specializes to
 \[
-\begin{aligned}
-\mathbb{E}\big(\hat\theta_n-\ell_n\big)^2\;\le\;&C\Big(\tfrac{\kappa_{\max}}{\underline\kappa_n}\Big)^{2}L_a^2W^{2\beta}\\
-&+\frac{\bar\sigma_\alpha^2}{\underline\kappa_n^2\,W}\;+\;D_\Theta^2\,\mathbb{P}(\mathcal E_n^c),
-\end{aligned}
+\mathbb{E}\big(\hat\theta_n-\ell_n\big)^2\;\le\;C\Big(\tfrac{\kappa_{\max}}{\underline\kappa_n}\Big)^{2}L_a^2W^{2\beta}
++\frac{\bar\sigma_\alpha^2}{\underline\kappa_n^2\,W}
 \]
-with $\mathcal E_n$ the no-clamp event; the clamp term is bounded in Remark D.4.4 and is of the same $1/W$ order (or exponentially small under a residual margin), so for fixed $D_\Theta/\Delta$ it is absorbed into the constants. Optimizing over $W$,
+(no clamp term: the global Lipschitz property of $G_n$ already covers clamped windows). Optimizing over $W$,
 \begin{equation}
 \mathrm{MSE}_\alpha^{*}\;\le\;C\,\underline\kappa^{-2}\,\big[\kappa_{\max}L_a\big]^{2/(2\beta+1)}\,\bar\sigma_\alpha^{4\beta/(2\beta+1)} \tag{D.9}
 \end{equation}
---- Theorem~C of the main text, with $\underline\kappa:=\inf_n\underline\kappa_n$. \textbf{The loss throughout is the log-domain squared error}: $\hat\theta_n-\ell_n$ is an increment of log-gain (equivalently log-intensity), the record-mean centering fixes the additive gauge, and this is the metric in which the Fisher comparison below is stated (and which Fig.~7 reports). In the photon-starved regime the variance-to-sensitivity ratio obeys the window-average law $V_n/M_n'(\ell_n)^2=\{1+O_\alpha(\varepsilon)\}/(W\bar\lambda_n)$ (low-photon corollary below), which is minimax-\emph{order} sharp \emph{in this log-domain loss at $d=0$} by the gauge-invariant lower bound following the proof. Zeros only reduce Fisher information; with the clamp (D.8a) they never make the estimator diverge.
+--- Theorem~C of the main text, with $\underline\kappa:=\inf_n\underline\kappa_n$. \textbf{The loss throughout is the log-domain squared error}: $\hat\theta_n-\ell_n$ is an increment of log-gain (equivalently log-intensity), the record-mean centering fixes the additive gauge, and this is the metric in which the Fisher comparison below is stated (and which Fig.~5 reports). In the photon-starved regime the variance-to-sensitivity ratio obeys the \emph{general} window law
+\[
+\frac{V_n}{M_n'(\ell_n)^2}
+=\frac{\sum_kw_{nk}^2\lambda_k(\ell_k)}{\big[\sum_kw_{nk}\lambda_k(\ell_n)\big]^2}\{1+O_\alpha(\varepsilon)\}
+\]
+(low-photon corollary below), with the \emph{actual} intensities $\lambda_k(\ell_k)$ in the numerator and the \emph{anchor} intensities $\lambda_k(\ell_n)$ in the sensitivity denominator; it simplifies to $\{1+O_\alpha(\varepsilon)\}/(W\bar\lambda_n)$ only for distinct equal-weight frames under \emph{local gain flatness} (see the counterexample below), and in that flat regime it is minimax-\emph{order} sharp \emph{in this log-domain loss at $d=0$} by the gauge-invariant lower bound following the proof. Zeros only reduce Fisher information; with the clamp (D.8a) they never make the estimator diverge.
 
 \paragraph{Proof.} \emph{Sensitivity and variance of the soft-log.} The Poisson derivative identity $\frac{d}{d\lambda}\mathbb{E}f(C)=\mathbb{E}[f(C{+}1)-f(C)]$ (differentiate $\sum_c e^{-\lambda}\lambda^c f(c)/c!$ term by term) gives
 \[
@@ -679,25 +692,79 @@ Z_n&=\sum_{k\in\mathcal I_n}w_{nk}
 \{\psi_\alpha(C_k)-q_k(\ell_k)\}.
 \end{aligned}
 \]
-The variables in $Z_n$ are independent and centered conditionally on the gain path and known carriers (Poisson counts are independent across frames given their intensities --- the carrier is known, so no carrier randomness remains), so $\mathbb EZ_n=0$ and $\operatorname{Var}(Z_n)=V_n$ \emph{exactly} --- a finite-window identity requiring no mixing and no long-run variance. On $\mathcal E_n$, the mean value theorem and $M_n'\ge\underline\kappa_n$ imply
-\[
-|\hat\theta_n-\ell_n|
-\le\underline\kappa_n^{-1}|B_n+Z_n|,
-\]
-and clipping to $\Theta\ni\ell_n$ can only decrease the error. On $\mathcal E_n^c$, both $\hat\theta_n$ and $\ell_n$ belong to $\Theta$, so the error is at most $D_\Theta$. Taking expectations and using $\mathbb E(B_n+Z_n)^2=B_n^2+V_n$ gives (D.8). The bound on $B_n$ follows by applying the mean value theorem to each $q_k$ and then the pointwise modulus; for equal weights the triangle inequality gives $|B_n|\le C\kappa_{\max}L_aW^{\beta}$ (valid for the pointwise modulus with $\beta\le1$; no cancellation across the window is invoked --- cf.\ Remark D.4.2), and the standard bias--variance optimization gives (D.9). \hfill$\blacksquare$
+The variables in $Z_n$ are independent and centered conditionally on the gain path and known carriers (Poisson counts are independent across frames given their intensities --- the carrier is known, so no carrier randomness remains; this \emph{conditional count independence} is an assumption of the theorem), so $\mathbb EZ_n=0$ and $\operatorname{Var}(Z_n)=V_n$ \emph{exactly} --- a finite-window identity requiring no mixing and no long-run variance.
 
-\paragraph{Low-photon corollary (window-average sensitivity).} For an unpadded equal-weight window, $d=0$, fixed $\alpha$, and $\max_{k\in W_n}\lambda_k(\ell_n)\le\varepsilon$, the per-frame expansions of the proof average into
+\emph{Global Lipschitz property of the clamped inverse.} $M_n$ is continuous and strictly increasing on the compact $\Theta$ with $M_n'\ge\underline\kappa_n>0$, so its ordinary inverse is $\underline\kappa_n^{-1}$-Lipschitz on $M_n(\Theta)$. Projection onto the interval $M_n(\Theta)$ is nonexpansive, hence the composition $G_n=M_n^{-1}\circ\Pi_{M_n(\Theta)}$ satisfies
 \[
-M_n'(\ell_n)=c_\alpha\bar\lambda_n\{1+O_\alpha(\varepsilon)\},\qquad
-V_n=\frac{c_\alpha^2\bar\lambda_n}{W}\{1+O_\alpha(\varepsilon)\},
+|G_n(y_2)-G_n(y_1)|\le\frac{|y_2-y_1|}{\underline\kappa_n}
+\qquad\text{for \emph{all} }y_1,y_2\in\mathbb R .
 \]
+Since $\ell_n\in\Theta$ gives $G_n\{M_n(\ell_n)\}=\ell_n$,
 \[
-\frac{V_n}{M_n'(\ell_n)^2}
-=\frac{1+O_\alpha(\varepsilon)}{W\bar\lambda_n},
+|\hat\theta_n-\ell_n|=|G_n(y_n)-G_n\{M_n(\ell_n)\}|
+\le\frac{|B_n+Z_n|}{\underline\kappa_n}
+\]
+with no case split on whether $y_n$ lands inside $M_n(\Theta)$: taking conditional second moments and using $\mathbb E[(B_n+Z_n)^2\mid\ell,b]=B_n^2+V_n$ gives (D.8) directly. The bound on $B_n$ follows by applying the mean value theorem to each $q_k$ and then the pointwise modulus; for equal weights the triangle inequality gives $|B_n|\le C\kappa_{\max}L_aW^{\beta}$ (valid for the pointwise modulus with $\beta\le1$; no cancellation across the window is invoked --- cf.\ Remark D.4.2), and the standard bias--variance optimization gives (D.9). \hfill$\blacksquare$
+
+\paragraph{Approximate calibration and numerical inversion.} Let $\widetilde M_n$ be a continuous strictly increasing approximation to $M_n$ on the same interval $\Theta$ with
+$\sup_{t\in\Theta}|\widetilde M_n(t)-M_n(t)|\le\varepsilon_{\mathrm{cal},n}$,
+let $\widetilde G_n$ be its clamped generalized inverse (same endpoint convention), and suppose the numerical solver returns $\hat\theta_n^{\mathrm{num}}$ with $|\hat\theta_n^{\mathrm{num}}-\widetilde G_n(y_n)|\le\varepsilon_{\mathrm{bis},n}$, where $\varepsilon_{\mathrm{bis},n}$ is measured in the \emph{log-parameter} domain. Inverse bracketing under the shared endpoint convention gives $G_n(y-\varepsilon_{\mathrm{cal},n})\le\widetilde G_n(y)\le G_n(y+\varepsilon_{\mathrm{cal},n})$, hence $\sup_y|\widetilde G_n(y)-G_n(y)|\le\varepsilon_{\mathrm{cal},n}/\underline\kappa_n$, and the conservative implementation bound is the RMSE (Minkowski) form
+\begin{equation}
+\big\{\mathbb E[(\hat\theta_n^{\mathrm{num}}-\ell_n)^2\mid\ell,b]\big\}^{1/2}
+\le\frac{\sqrt{B_n^2+V_n}}{\underline\kappa_n}
++\frac{\varepsilon_{\mathrm{cal},n}}{\underline\kappa_n}
++\varepsilon_{\mathrm{bis},n}.
+\tag{D.8b}
+\end{equation}
+The quantities with the same (log-parameter) units are $\varepsilon_{\mathrm{cal},n}/\underline\kappa_n$ and $\varepsilon_{\mathrm{bis},n}$; a response-domain calibration error and a log-parameter bisection error must \emph{not} be added before division by the sensitivity. If tabulation and interpolation have separately certified forward-error budgets, replace $\varepsilon_{\mathrm{cal},n}$ by their sum. For $J$ midpoint bisections on a log-parameter interval of diameter $D_n$, the numerical error is certified by $\varepsilon_{\mathrm{bis},n}\le D_n/2^{J+1}$.
+
+\paragraph{A theorem-level interpolation certificate.} A midpoint probe of the interpolation error is an empirical diagnostic, not by itself a uniform bound over the calibration interval. Put $x=\log\lambda$ and $f_\alpha(x)=m_\alpha(e^x)$. For a log-intensity grid of maximum spacing $\Delta_x$, piecewise-linear interpolation from exact node values obeys
+\begin{equation}
+\|f_\alpha-I_{\Delta_x}f_\alpha\|_\infty
+\le\frac{\Delta_x^2}{8}\,\|f_\alpha''\|_\infty ,
+\tag{D.8c}
+\end{equation}
+and with $\Delta g(c)=g(c{+}1)-g(c)$ the Poisson difference identities give
+\[
+f_\alpha''(x)=\lambda\,\mathbb E\Delta\psi_\alpha(C)+\lambda^2\,\mathbb E\Delta^2\psi_\alpha(C),
+\qquad\lambda=e^x .
+\]
+A certified bound $K_{\alpha,2}\ge\sup_{\lambda\in[\lambda_-,\lambda_+]}|f_\alpha''|$ together with a certified node-evaluation error $\varepsilon_{\mathrm{tab}}$ yields $\varepsilon_{\mathrm{cal}}\le\varepsilon_{\mathrm{tab}}+K_{\alpha,2}\Delta_x^2/8$; the expectations and Poisson tails may be enclosed analytically or by interval arithmetic. \textbf{Until such an enclosure is generated, the measured midpoint maximum of Remark D.4.1 must be labeled empirical}, and the manuscript so labels it.
+
+\paragraph{Low-photon corollary (the general leading term).} Let $d=0$ and define the \emph{anchor} and \emph{actual} per-frame intensities
+\[
+\lambda_{k,n}^{0}=\Lambda_0e^{\ell_n}b_k=\lambda_k(\ell_n),
 \qquad
-\bar\lambda_n=\frac1W\sum_{k\in W_n}\lambda_k(\ell_n),
+\lambda_k^\star=\Lambda_0e^{\ell_k}b_k=\lambda_k(\ell_k),
 \]
-with \emph{no carrier-comparability assumption}: both the sensitivity and the variance linearize frame by frame in $\lambda_k$ and are then averaged, so heteroscedastic carriers are covered. These expansions are stated for fixed $\alpha$; $c_\alpha=\log(1+1/\alpha)\to\infty$ as $\alpha\to0$, so the fixed-$\alpha$ small-$\lambda$ theorem must not be read as a triangular $\alpha\to0$ asymptotic. This window-average law is the $1/(W\bar\lambda)$ statement quoted in the main text.
+\[
+A_n=\sum_kw_{nk}\lambda_{k,n}^{0},\qquad
+D_n=\sum_kw_{nk}^2\lambda_k^\star .
+\]
+Fix $\alpha>0$, put $c_\alpha=\log(1+1/\alpha)$, and suppose $\max_{k\in\mathcal I_n}\{\lambda_{k,n}^{0},\lambda_k^\star\}\le\varepsilon$. The fixed-$\alpha$ Poisson expansions of the proof give, uniformly over arbitrary positive carrier heterogeneity,
+\[
+M_n'(\ell_n)=c_\alpha A_n\{1+O_\alpha(\varepsilon)\},\qquad
+V_n=c_\alpha^2D_n\{1+O_\alpha(\varepsilon)\},
+\]
+and therefore
+\begin{equation}
+\begin{aligned}
+\frac{V_n}{M_n'(\ell_n)^2}
+&=\frac{D_n}{A_n^2}\{1+O_\alpha(\varepsilon)\}\\
+&=\frac{\sum_kw_{nk}^2\lambda_k(\ell_k)}
+      {\big[\sum_kw_{nk}\lambda_k(\ell_n)\big]^2}\{1+O_\alpha(\varepsilon)\}.
+\end{aligned}
+\tag{D.10}
+\end{equation}
+For $m=|\mathcal I_n|$ equal-weight \emph{distinct} frames, writing $I_{n,\mathrm{ref}}=\sum_k\lambda_{k,n}^{0}$ and $I_{n,\mathrm{act}}=\sum_k\lambda_k^\star$, (D.10) reads $I_{n,\mathrm{act}}/I_{n,\mathrm{ref}}^2\cdot\{1+O_\alpha(\varepsilon)\}$, and with $h_{\ell,n}=\max_k|\ell_k-\ell_n|$,
+\[
+e^{-h_{\ell,n}}\le I_{n,\mathrm{act}}/I_{n,\mathrm{ref}}\le e^{h_{\ell,n}} .
+\]
+Only under \emph{local gain flatness} $h_{\ell,n}=o(1)$ may the leading term be simplified to $\{1+O_\alpha(\varepsilon+h_{\ell,n})\}/I_{n,\mathrm{ref}}$; when the gain is constant in the window, $I_{n,\mathrm{act}}=I_{n,\mathrm{ref}}=m\bar\lambda_n$ and only then does (D.10) become $\{1+O_\alpha(\varepsilon)\}/(m\bar\lambda_n)$ --- the $1/(W\bar\lambda)$ statement quoted in the main text. Carrier comparability is \emph{not} needed; local gain flatness \emph{is}. These expansions are stated for fixed $\alpha$; $c_\alpha\to\infty$ as $\alpha\to0$, so the fixed-$\alpha$ small-$\lambda$ statement must not be read as a triangular $\alpha\to0$ asymptotic.
+
+\paragraph{Counterexample to the unqualified $1/(W\bar\lambda)$ claim.} Take two equal-weight frames with equal carriers, target gain $\ell_n=0$, the other frame's gain $\ell=\log2$, and reference intensity $\varepsilon$. Then $I_{n,\mathrm{ref}}=2\varepsilon$ but $I_{n,\mathrm{act}}=3\varepsilon$, so (D.10) gives $3/(4\varepsilon)$ whereas the unqualified formula gives $1/(2\varepsilon)$: the ratio is $3/2$ and does \emph{not} converge to one as $\varepsilon\downarrow0$. The unconditional window-average law asserted in earlier drafts is therefore false as stated and is withdrawn; (D.10) is the correct general statement.
+
+\paragraph{From a variance factor to estimator asymptotics.} Display (D.10) is an algebraic expansion of the local variance-to-sensitivity factor. To identify it with the estimator's leading MSE one additionally needs a local variance regime --- $I_{n,\mathrm{act}}\to\infty$, $|B_n|=o(\sqrt{V_n})$, a Lindeberg condition, negligible clamp probability, and inverse-map linearization such as $\sup_{\Theta}|M_n''|\sqrt{V_n}/M_n'(\ell_n)^2\to0$. For bounded total information the compact clamp makes the risk saturate; one cannot globally identify the MSE with $1/I_n$.
 
 \paragraph{Gauge-invariant low-photon lower bound.}
 The loss corresponding to the unidentifiable global scale is
@@ -710,89 +777,89 @@ d_{\mathrm{quot}}^2(\hat g,g)
 P_N=I-\tfrac1N\mathbf1\mathbf1^\top.
 \end{aligned}
 \]
-This is the centered-log-gain loss reported in Fig.~7. Multiplying
+This is the centered-log-gain loss reported in Fig.~5. Multiplying
 either gain profile by an arbitrary positive scalar leaves the loss
 unchanged.
 
-For the carrier-averaged model, let $B$ have a parameter-independent
-known law and, conditionally on $B$, let
+\emph{Pointwise lower bound (Le Cam two-point).} Let $0<\beta\le1$ and, conditionally on known positive carriers $q_1,\dots,q_N$, observe independent counts $C_i\sim\operatorname{Pois}(q_ie^{\ell_i})$. Estimate the quotient coordinate $P_N\ell$. Fix an interior index $n_0$, a baseline $\ell^{(0)}$ lying strictly inside both the amplitude and H\"older constraints (e.g.\ $\|\ell^{(0)}\|_\infty\le a_0/2$ and seminorm at most $L_a/2$), and a window $A$ of order $W$ containing $n_0$. Choose a contrast $\psi^{(W)}$ with
 \[
-C_k\sim\operatorname{Pois}(s_k(\theta,B_k)+d),\qquad
-s_k(\theta,B_k)=\Lambda_0e^\theta B_k,
+\operatorname{supp}\psi^{(W)}\subseteq A,\quad
+\mathbf1^\top\psi^{(W)}=0,\quad
+\|\psi^{(W)}\|_\infty\le1,
 \]
-independently across frames. The complete-data Fisher information
-for a common log-gain parameter is
 \[
-I_{\mathrm{comp}}(\theta)
-=\sum_{k=1}^W\mathbb E_B\frac{s_k(\theta,B_k)^2}{s_k(\theta,B_k)+d}.
+\psi^{(W)}_{n_0}=1,\quad
+\|\psi^{(W)}\|_2^2\ge cW,
 \]
-The observed mixed-Poisson score is the conditional expectation of
-the complete-data score, so
-$I_{\mathrm{obs}}(\theta)\le I_{\mathrm{comp}}(\theta)$.
-For $d=0$ this becomes
 \[
-I_{\mathrm{comp}}(\theta)=\sum_{k=1}^W\mathbb E_Bs_k(\theta,B_k)
-=W\bar\lambda.
+|\psi^{(W)}_i-\psi^{(W)}_j|\le CW^{-\beta}|i-j|^\beta .
 \]
+Put $\lambda_i^{(0)}=q_ie^{\ell_i^{(0)}}$ and $I_A(\psi)=\sum_{i\in A}\lambda_i^{(0)}\psi_i^2\le W\bar\lambda_A$ with $\bar\lambda_A=W^{-1}\sum_{i\in A}\lambda_i^{(0)}$. For amplitude
+$a\le c_0\min\{a_0,\,L_aW^\beta,\,I_A(\psi)^{-1/2}\}$,
+both $\ell^{(0)}$ and $\ell^{(1)}=\ell^{(0)}+a\psi^{(W)}$ lie in a rescaled $H_\beta(L_a)$ ball; the Poisson KL obeys
+\[
+\operatorname{KL}(P_0,P_1)
+=\sum_i\lambda_i^{(0)}\{e^{a\psi_i}-1-a\psi_i\}
+\le\tfrac{e^{a_0}}{2}a^2I_A(\psi),
+\]
+kept below a numerical constant by the amplitude choice. Because $\mathbf1^\top\psi=0$, quotient projection does not reduce the separation at $n_0$, and Pinsker followed by Le Cam's two-point lemma~\cite{Tsybakov2009} gives
+\begin{equation}
+R_{n_0}^{\mathrm{quot}}
+\ge c\min\left\{a_0^2,\;L_a^2W^{2\beta},\;\frac1{W\bar\lambda_A}\right\}.
+\tag{D.11}
+\end{equation}
+When local photon rates have common order $\bar\lambda$, optimizing $W$ yields
+\[
+R_{n_0}^{\mathrm{quot}}\gtrsim L_a^{2/(2\beta+1)}\bar\lambda^{-2\beta/(2\beta+1)},
+\]
+the direct Poisson counterpart of the upper rate (D.9); these optimized displays assume $1\lesssim W_*\lesssim N$, and otherwise (D.11) stays in the one-frame or finite-record saturation regime. Thus the $1/(W\bar\lambda)$ law is a \emph{local-minimax} statement in the regime $W\bar\lambda\to\infty$; for bounded total information the risk saturates at the squared diameter of the local parameter neighborhood. It does \emph{not} route through Theorem~D's Gaussian bound (a Gaussian model is not a submodel of the mixed-Poisson experiment).
 
-A lower bound valid for biased estimators follows directly from
-Le Cam's method~\cite{Tsybakov2009}. Let $v\perp\mathbf1$ be a bounded contrast supported
-on $O(W)$ frames and compare $\ell^{(0)}=\ell_0$ with
-$\ell^{(1)}=\ell_0+\delta v$. Conditional on the carrier and with
-$d=0$,
+\emph{Integrated lower bound (guarded Assouad hypercube).} Le Cam's two-point argument controls the pointwise loss only; the integrated quotient loss needs a hypercube. Partition an interior fraction of $\{1,\dots,N\}$ into $m\asymp N/W$ cells of length $CW$; inside each cell reserve a guard band of order $W$ and place a translated, rescaled copy $\psi_j$ of one fixed compactly supported, mean-zero $H_\beta$ template that vanishes on the cell boundary, with active supports separated by at least $cW$ and $\|\psi_j\|_2^2\ge cW$. Set $\ell^\omega=\ell^{(0)}+a\sum_j\omega_j\psi_j$, $\omega\in\{0,1\}^m$, with
 \[
+\bar\lambda_*=\max_j|A_j|^{-1}\sum_{i\in A_j}\lambda_i^{(0)},
+\]
+\[
+a\le c_0\min\{a_0,\,L_aW^\beta,\,(W\bar\lambda_*)^{-1/2}\}.
+\]
+The guard bands and the vanishing boundary keep the H\"older constant of the sum bounded independently of $m$, and the interior baseline keeps every vertex in the ball. Adjacent vertices differ on one block with $\operatorname{KL}\le Ca^2W\bar\lambda_*\le\kappa<1$; all pairwise differences are mean-zero, so quotient projection loses no distance, and Assouad's lemma~\cite{Tsybakov2009} gives
+\begin{equation}
 \begin{aligned}
-\operatorname{KL}(P_0(\cdot\mid B),P_1(\cdot\mid B))
-&=\sum_k\lambda_{k,0}\{e^{\delta v_k}-1-\delta v_k\}\\
-&\le C\delta^2\sum_k\lambda_{k,0}v_k^2.
+R_{\mathrm{int}}^{\mathrm{quot}}
+&=\inf_{\hat\ell}\sup_\omega\frac1N\mathbb E_\omega\|P_N(\hat\ell-\ell^\omega)\|_2^2\\
+&\ge c\min\left\{a_0^2,\;L_a^2W^{2\beta},\;\frac1{W\bar\lambda_*}\right\}.
 \end{aligned}
-\]
-Marginalization over the unobserved carrier cannot increase KL, hence
-\[
-\operatorname{KL}(P_0^C,P_1^C)\le C\delta^2W\bar\lambda.
-\]
-Choosing $\delta^2\asymp\min\{\delta_0^2,(W\bar\lambda)^{-1}\}$
-and applying Le Cam's lemma gives the local quotient-risk bound
-\[
-R_{\mathrm{minimax}}\ge c\min\left\{\delta_0^2,\frac1{W\bar\lambda}\right\}.
-\]
-Thus the $1/(W\bar\lambda)$ law is a local-minimax statement in the
-regime $W\bar\lambda\to\infty$; for bounded total information the
-risk saturates at the squared diameter of the local parameter
-neighborhood.
+\tag{D.12}
+\end{equation}
 
-Taking a mean-zero $H_\beta(L_a)$ bump of width $W$ and amplitude
-$\delta\asymp L_aW^\beta$, $0<\beta\le1$, gives
-$\operatorname{KL}\lesssim L_a^2\bar\lambda W^{2\beta+1}$. The choice
-$W_*\asymp(L_a^2\bar\lambda)^{-1/(2\beta+1)}$ therefore yields
+\emph{Random carriers: choose alternatives before observing $B$.} If $q_i=\Lambda_0B_i$ is random with a parameter-independent law and $\mathbb EB_i<\infty$, the alternatives and their amplitude must be chosen \emph{before} observing $B$, using the \emph{expected} block information $\overline{\mathcal I}_A=\mathbb E_B\sum_{i\in A}\lambda_i^{(0)}\psi_i^2$ --- not the realized one. The calculation then applies verbatim to the carrier-observed \emph{joint oracle} experiment $(C,B)$, whose KL is $\operatorname{KL}(P_0^{C,B},P_1^{C,B})=\mathbb E_B\operatorname{KL}(P_0^{C\mid B},P_1^{C\mid B})$; marginalization gives $\operatorname{KL}(P_0^{C},P_1^{C})\le\operatorname{KL}(P_0^{C,B},P_1^{C,B})$, so the oracle lower bound transfers to the less-informative count-only experiment. This transfers \emph{hardness}; it does not construct a blind estimator. For dark count $d>0$, replace the total count information by
 \[
-\inf_{\hat\ell}\sup_{\ell\in H_\beta(L_a)}
-\mathbb E(\hat\ell_n^c-\ell_n^c)^2
-\ge c_\beta L_a^{2/(2\beta+1)}\bar\lambda^{-2\beta/(2\beta+1)},
+\overline{\mathcal I}_A(\psi)=\mathbb E_B\sum_{i\in A}\frac{s_i^2}{s_i+d}\,\psi_i^2,
+\qquad s_i=\Lambda_0e^{\ell_i}b_i,
 \]
-with the usual boundary regimes when $W_*\notin[1,N]$. This is the
-direct Poisson counterpart of the upper rate (D.9), and it remains
-valid after averaging over an unobserved carrier because
-marginalization only decreases KL; in particular it does \emph{not}
-route through Theorem~D's Gaussian bound (a Gaussian model is not a
-submodel of the mixed-Poisson experiment).
+the local quadratic-KL information in the contrast direction (the bounded-perturbation remainder must be controlled uniformly); the identity $I(\theta)=\lambda$ does not hold for log gain in the presence of additive dark counts.
 
-For fixed $\alpha$, $d=0$, and uniformly small per-frame intensities,
+\paragraph{Oracle local-shift information (the Fig.~5 reference line).} For a fixed window $A$, suppose independently $C_k\sim\operatorname{Pois}\{\lambda_k(t)\}$ with $\lambda_k(t)=s_ke^t+d_k$, where $s_k>0$ and $d_k\ge0$ are \emph{known}. The score and Fisher information for the one-dimensional common shift $t$ are
 \[
-M_n'(\ell_n)=c_\alpha\bar\lambda_n\{1+o(1)\},\qquad
-\operatorname{Var}(y_n)=\frac{c_\alpha^2\bar\lambda_n}{W}\{1+o(1)\},
+S_t(C)=\sum_{k\in A}\{C_k-\lambda_k(t)\}\frac{s_ke^t}{\lambda_k(t)},
 \]
-so the calibrated soft-log variance has leading constant
-$1/(W\bar\lambda_n)$. Sharp minimax constants beyond this local
-rare-event calculation are not claimed.
+\begin{equation}
+I_A(t)=\sum_{k\in A}\frac{s_k^2e^{2t}}{s_ke^t+d_k},
+\qquad
+I_A(t)=\sum_{k\in A}\lambda_k(t)\ \ \text{at }d_k=0 .
+\tag{D.13}
+\end{equation}
+Therefore $1/I_A(t)$ is the scalar Cram\'er--Rao reference for a regular unbiased estimator of a \emph{common log-intensity shift} with carriers, offsets, and all other path coordinates held fixed --- an \textbf{oracle common-shift diagnostic}, \emph{not} the nuisance-path quotient CRB. For bias $b(t)=\mathbb E_t\hat t-t$ the biased CR inequality reads
+\[
+\operatorname{MSE}_t(\hat t)\ge b(t)^2+\frac{\{1+b'(t)\}^2}{I_A(t)} :
+\]
+MSE \emph{below} $1/I_A$ is compatible with shrinkage bias, and MSE \emph{above} $1/I_A$ does not establish unbiasedness. For a path model $\ell=U\theta$ at $d=0$ with estimable contrast coordinates separated from the constant direction and $D_\lambda=\operatorname{diag}(\lambda_1,\dots,\lambda_N)$, the information is $I_\theta=U^\top D_\lambda U$; eliminating a common nuisance scale $m$ entering as $\ell+m\mathbf1$ gives the Schur complement
+\[
+I_{\theta\mid m}=U^\top D_\lambda U
+-U^\top D_\lambda\mathbf1(\mathbf1^\top D_\lambda\mathbf1)^{-1}\mathbf1^\top D_\lambda U,
+\]
+the quotient Fisher object of this known-carrier parametric path model. It does not include unknown-object or unknown-carrier nuisance parameters; a contrast outside the range of the information matrix has no finite CR bound, and overlapping windows create cross-window covariance, so an average of $1/I_n$ is not an exact whole-record centered-loss CRB. Sharp minimax constants beyond these local calculations are not claimed.
 
-When $d>0$, every occurrence of $W\bar\lambda$ in the information
-statement must instead be replaced by the effective log-gain
-information $\sum_{k=1}^W\mathbb E_B\,s_k^2/(s_k+d)$; the identity
-$I(\theta)=\lambda$ does not hold for log gain in the presence of
-additive dark counts.
-
-\paragraph{Remark D.4.1 (instantiation in the Fig.~7 protocol).} There $d=0$, the carriers $b_k$ are \emph{oracle} values supplied from the simulation truth --- the noiseless bucket carrier of the simulated object, times the photon budget; operationally a flat-field-calibrated benchmark, \emph{not} programmed design intensities --- and $\Theta$ is the safe tabulated operating range $[\lambda_-/\min_kb_k,\lambda_+/\max_kb_k]$ with $\Lambda_0$ fixed by convention (the record-mean centering absorbs the global gauge). The implemented estimator solves $M_n(\hat\theta_n)=y_n$ per window by monotone bisection on the exactly tabulated homogeneous $m_\alpha$ --- for $C\sim\mathrm{Pois}(\theta b)$, $\mathbb{E}\psi_\alpha(C)=m_\alpha(\theta b)$ with the \emph{same} homogeneous curve, so no carrier-averaged table is needed --- with the clamp of (D.8a); its windows are truncated and renormalized to their distinct in-record members at the record boundaries (the equal-weight instance of the weighted statement; no replicate padding). Calibration accuracy: between grid points the table is evaluated by linear interpolation of $m_\alpha$ against $\log\lambda$, and the measured interpolation error on the dense midpoint check grid is $\varepsilon_{\mathrm{cal}}=\text{XXEPSCALXX}$ (bisection resolution $\varepsilon_{\mathrm{bis}}\le\text{XXEPSBISXX}$), entering (D.8) as a deterministic $(\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}})^2/\underline\kappa_n^2$ term and shrinking the clamp margin by $\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}}$ --- an empirical measurement, honestly labeled, not a certified analytic bound. The earlier (r3) arm inverted the homogeneous curve at the window mean, $m_\alpha^{-1}(y_n)$: a \emph{mean-Poisson calibrated proxy} that ignores the within-window carrier variation and coincides with (D.8a) only for a constant carrier. Both arms are reported in Fig.~7; at the protocol's small carrier coefficient of variation they agree numerically, but only (D.8a) is the estimator this theorem is about.
+\paragraph{Remark D.4.1 (instantiation in the Fig.~5 protocol).} There $d=0$, the carriers $b_k$ are \emph{oracle} values supplied from the simulation truth --- the noiseless bucket carrier of the simulated object, times the photon budget; operationally a flat-field-calibrated benchmark, \emph{not} programmed design intensities --- and $\Theta$ is the safe tabulated operating range $[\lambda_-/\min_kb_k,\lambda_+/\max_kb_k]$ with $\Lambda_0$ fixed by convention (the record-mean centering absorbs the global gauge). The implemented estimator solves $M_n(\hat\theta_n)=y_n$ per window by monotone bisection on the exactly tabulated homogeneous $m_\alpha$ --- for $C\sim\mathrm{Pois}(\theta b)$, $\mathbb{E}\psi_\alpha(C)=m_\alpha(\theta b)$ with the \emph{same} homogeneous curve, so no carrier-averaged table is needed --- with the clamp of (D.8a); its windows are truncated and renormalized to their distinct in-record members at the record boundaries (the equal-weight instance of the weighted statement; no replicate padding; requested width $W=64$ realizes centered odd effective width $65$ in the interior). Calibration accuracy: between grid points the table is evaluated by linear interpolation of $m_\alpha$ against $\log\lambda$; the measured midpoint interpolation error on the dense check grid of all 2999 geometric midpoints is $\varepsilon_{\mathrm{cal}}=1.6410165\times10^{-6}$ (attained near $\lambda\approx0.92$) --- an \textbf{empirical midpoint maximum, not a certified uniform bound over the continuous interval}; the certificate route is (D.8c) --- and the 60-step bisection contributes $\varepsilon_{\mathrm{bis}}\le1.5396755\times10^{-17}$ in \emph{log-parameter} units. Per (D.8b) these enter the RMSE bound as $\varepsilon_{\mathrm{cal}}/\underline\kappa_n+\varepsilon_{\mathrm{bis}}$ (the two terms have the same units only \emph{after} the calibration error is divided by the sensitivity; they must not be summed in the response domain and jointly divided). The earlier (r3) arm inverted the homogeneous curve at the window mean, $m_\alpha^{-1}(y_n)$: a \emph{mean-Poisson calibrated proxy} that ignores the within-window carrier variation and coincides with (D.8a) only for a constant carrier. Both arms are reported in Fig.~5; at the protocol's small carrier coefficient of variation they agree numerically, but only (D.8a) is the estimator this theorem is about.
 
 \paragraph{Remark D.4.2 (the $\beta\le1$ theorem and the precise
 obstruction above one).}
@@ -811,7 +878,7 @@ u_k=\frac{k-n}{N},\quad
 |r_{nk}|\le L|u_k|^\beta,
 \]
 rather than a pointwise modulus of order $\beta$ on the function
-itself. Let $w_k$ be centered weights, $\sum_kw_ku_k=0$, and write
+itself. Let $w_k\ge0$ be the window weights and write
 $q_k(t)=m_\alpha(\Lambda_0e^tb_k+d)$. Taylor's theorem gives
 \[
 \begin{aligned}
@@ -820,37 +887,52 @@ $q_k(t)=m_\alpha(\Lambda_0e^tb_k+d)$. Taylor's theorem gives
 +Q_1L\sum_kw_k|u_k|^\beta\\
 &+Q_2\left\{v_n^2\sum_kw_ku_k^2+L^2\sum_kw_k|u_k|^{2\beta}\right\},
 \end{aligned}
-\tag{D.10}
+\tag{D.14}
 \]
 where $Q_1=\sup_{k,t\in\Theta}q_k'(t)$ and
 $Q_2=\sup_{k,t\in\Theta}|q_k''(t)|$.
 
-The first term in (D.10) is the load-bearing obstruction. Ordinary
-centering cancels $\sum_kw_ku_k$, but it need not cancel the
-carrier-weighted moment $\sum_kw_kq_k'(\ell_n)u_k$. With an
-asymmetric heteroscedastic carrier this term is generally $O(W/N)$,
-so an $O((W/N)^\beta)$ claim is false for $\beta>1$ under the present
-assumptions.
-
-For a constant carrier, or more generally under the
-sensitivity-balance condition
+The first term in (D.14) is the load-bearing obstruction: an
+$O(h_n^\beta)$ deterministic bias requires the
+\emph{sensitivity-weighted first-moment balance}
 \[
-\left|\sum_kw_kq_k'(\ell_n)u_k\right|\lesssim (W/N)^\beta,
+|v_n|\left|\sum_kw_kq_k'(\ell_n)u_k\right|\lesssim\underline\kappa_n(W/N)^\beta .
 \]
-the first term has the desired order. The remaining nonlinear term
+An \emph{internal symmetric equal-weight window with a homogeneous
+carrier} satisfies it exactly ($q_k'$ constant and
+$\sum_kw_ku_k=0$ --- the interior identity). A heterogeneous carrier
+generally does not: ordinary centering cancels $\sum_kw_ku_k$ but not
+the carrier-weighted moment, which is then $O(W/N)$, so an
+$O((W/N)^\beta)$ claim is false for $\beta>1$ under the present
+assumptions. Crucially, a \textbf{truncated one-sided edge window
+fails the balance even with a homogeneous carrier}: for the
+implementation's first truncated window $k=0,\dots,32$ with target
+$n=0$,
+\[
+\frac1{33}\sum_{k=0}^{32}\frac kN=\frac{16}{N},
+\]
+first order in the window radius, so the current local-constant
+estimator cannot support an all-frame uniform $\beta>1$ rate ---
+the $\beta>1$ statement is restricted to \emph{internal balanced
+windows}.
+
+Under the balance condition the remaining nonlinear term
 is $O((W/N)^2)$ and is therefore no larger than $O((W/N)^\beta)$ for
-$1<\beta\le2$, provided the local slope is bounded. Thus the existing
-calibrated inverse does recover the $\beta$-order deterministic bias
-under homogeneous or sensitivity-balanced carriers, with a constant
-depending also on the slope bound and on $Q_2$.
+$1<\beta\le2$, provided the local slope is bounded. Thus the
+calibrated inverse recovers the $\beta$-order deterministic bias
+on internal windows under homogeneous or sensitivity-balanced
+carriers, with a constant depending also on the slope bound and on
+$Q_2$.
 
 A second-order Taylor expansion of $M_n^{-1}$ by itself does not
-remove an unbalanced first moment. For arbitrary carriers, recovery
-of the $\beta>1$ rate requires carrier-adapted moment conditions,
-carrier-adapted local-linear weights, or a local-polynomial
-likelihood fit. Theorem C therefore remains restricted to
-$\beta\le1$, while the homogeneous-carrier and sensitivity-balanced
-extensions above are valid weaker statements.
+remove an unbalanced first moment. For arbitrary carriers, or for
+edge frames, recovery of the $\beta>1$ rate requires carrier-adapted
+moment conditions, carrier-adapted local-linear weights, or a
+separately proved local-polynomial edge estimator (for $\beta>2$,
+moments through order $\lfloor\beta\rfloor$ must be cancelled).
+Theorem C therefore remains restricted to
+$\beta\le1$, while the internal-window homogeneous-carrier and
+sensitivity-balanced extensions above are valid weaker statements.
 
 \paragraph{Remark D.4.3 (unknown random carrier; nonstationary
 finite-$W$ covariance bound).}
@@ -881,7 +963,7 @@ Consequently the exact finite-window identity is
 &+2W^{-2}\sum_{h=1}^{W-1}
 \sum_{i=1}^{W-h}\operatorname{Cov}(z_i,z_{i+h}).
 \end{aligned}
-\tag{D.11}
+\tag{D.15}
 \]
 Let $p=2+\eta$, $r_\eta=\eta/(2+\eta)$, and assume
 \[
@@ -896,7 +978,7 @@ Davydov's inequality~\cite{Davydov1968} gives
 |\operatorname{Cov}(z_i,z_{i+h})|
 \le8\,\alpha_B(h)^{r_\eta}G_p^2.
 \]
-Substitution into (D.11) yields the explicit finite-$W$ bound
+Substitution into (D.15) yields the explicit finite-$W$ bound
 \[
 \begin{aligned}
 &\operatorname{Var}\!\left(W^{-1}\sum_{i=1}^Wz_i\right)\\
@@ -940,10 +1022,17 @@ $\sigma_{\psi,\mathrm{LR}}^2>0$. For
 $z_n=\epsilon_n-\epsilon_{n-1}$ the signed long-run variance is zero
 while the finite-window variance is $2\sigma_\epsilon^2/W^2$.
 
-\paragraph{Remark D.4.4 (clamp probability and its risk
-contribution).}
-Use the notation $B_n,V_n,\underline\kappa_n$ of the finite-window
-proof and put
+\paragraph{Remark D.4.4 (clamp probability: a diagnostic, not an
+extra risk term).}
+By the global Lipschitz property of the clamped inverse, (D.8)
+already covers clamped, all-zero, and out-of-range windows; no term
+$D_\Theta^2\,\mathbb P(\mathcal E_n^c)$ is added to the risk. The
+clamp probability remains useful as a \emph{diagnostic} for whether
+the localized variance regime of the low-photon expansion applies
+(low total information drives clamp saturation, in which case the
+inverse-information reading of (D.10) is off scope). With
+$\mathcal E_n=\{y_n\in M_n(\Theta)\}$, use the notation
+$B_n,V_n,\underline\kappa_n$ of the finite-window proof and put
 \[
 r_n=
 \min\{M_n(\ell_n)-M_n(\theta_{\min}),
@@ -972,14 +1061,10 @@ $r_n-|B_n|$; it is not available merely from a positive parameter
 margin when the deterministic smoothing bias can reach the boundary.
 
 On $\mathcal E_n^c$, both the clamped estimate and the target lie in
-$\Theta$, so
-\[
-\mathbb E\!\left[(\hat\theta_n-\ell_n)^2\mathbf1_{\mathcal E_n^c}\right]
-\le D_\Theta^2\,\mathbb P(\mathcal E_n^c).
-\]
-This is the complete clamp-event contribution to the MSE. The
-corresponding contribution to the squared bias alone is at most
-$D_\Theta^2\mathbb P(\mathcal E_n^c)^2$.
+$\Theta$, so the clamp-event slice of the MSE is trivially at most
+$D_\Theta^2\,\mathbb P(\mathcal E_n^c)$ --- but this bound is
+\emph{never added} to (D.8), which already dominates it through the
+global Lipschitz argument; it is recorded only to size the diagnostic.
 
 For a window containing $W$ distinct, conditionally independent
 Poisson counts,
@@ -998,9 +1083,30 @@ former convention had only 33 distinct frames, so its all-zero
 probability was $e^{-33\lambda}$, not $e^{-65\lambda}$ --- at
 $\lambda=0.25$, $2.6\times10^{-4}$ versus $8.8\times10^{-8}$).
 
-\begin{statusblock}\textbf{Shrinkage-bias caveat (load-bearing, per Sec.~6).} For $\bar\lambda<1$ the windowed soft-log statistic is \emph{bias-fragile}: the mass at $C=0$ pulls the weighted mean of $\psi_\alpha$ toward $\log\alpha$, and the amplification factor $(\kappa_{\max}/\underline\kappa_n)^2$ in the specialized bias term of (D.8) blows up as the window sensitivity vanishes with $\bar\lambda_n\to0$ (at $d=0$; window-average form $M_n'(\ell_n)\approx c_\alpha\bar\lambda_n$). Empirically the MSE of the \emph{uncalibrated} proxy (and of Anscombe) can then sit \emph{below} the Fisher reference curve --- that is bias, not super-efficiency, and it does not contradict the lower bound (which constrains variance-limited, locally unbiased behavior). The $1/(W\bar\lambda)$ law is asserted only in the variance-limited regime above the $\bar\lambda\sim1$ crossover; below it, honest accounting reports the bias floor, and all Fisher comparisons are made in the log-domain loss of this theorem (Fig.~7's \texttt{log\_gain\_mse} metric, against the \emph{local realized} information $I_n=\sum_{k\in W_n}\lambda_k$ at $d=0$) --- the gain-domain relMSE column retained for continuity is a different loss and is not Fisher-comparable. Recovering the rate below the crossover requires the offset-design, Anscombe~\cite{Anscombe1948} ($2\sqrt{C+3/8}$), or full Poisson-mixture MLE variants; for the mixture MLE the claim $\mathrm{MSE}\approx1/(WJ(\theta))$ with $J\sim\mathbb{E}\lambda$ at low photons is standard parametric asymptotics under regularity of the mixture likelihood and is \emph{not} re-proven here.\end{statusblock}
+\paragraph{Remark D.4.5 (scope: oracle carriers, known carrier law, and blind recovery --- three distinct estimators).}
+Theorem C is conditional on the realized per-frame carriers $(b_k)$ being \emph{known}: this is precisely the oracle-known-carrier arm implemented in the low-photon experiment (Fig.~5), and it does \textbf{not} establish blind low-photon recovery from an unknown carrier law. Theorem~B, by contrast, is the \emph{blind high-count} stationary-carrier result; the two must not be merged. If an unobserved carrier $B$ has a fully \emph{known law} $F_B$, one may instead calibrate the different marginal curve
+\[
+\bar q_{F_B}(t)=\mathbb E_{B\sim F_B}\,m_\alpha(\Lambda_0e^tB+d),
+\]
+a \emph{third}, law-calibrated estimator that needs its own variance or long-run-variance theorem (Remark D.4.3 supplies the covariance tool); it is not the per-frame known-carrier estimator above. If $F_B$ is \emph{unknown}, $\bar q_{F_B}$ is an unknown nonlinear function which, unlike the high-count logarithmic model, cannot generally be absorbed into one additive gauge constant: with $s=\Lambda_0e^t$,
+\[
+m_\alpha(sB)=\log\alpha+c_\alpha sB+a_{2,\alpha}s^2B^2+O(s^3B^3),
+\]
+\[
+a_{2,\alpha}=\tfrac12\log\frac{\alpha(\alpha+2)}{(\alpha+1)^2}\ne0,
+\]
+so the laws $B\equiv1$ and $\Pr(B=\tfrac12)=\Pr(B=\tfrac32)=\tfrac12$ --- same mean, different second moments --- produce \emph{different} soft-log response curves. The known-carrier theorem plus one homogeneous calibration inverse therefore does not yield an unknown-law blind theorem (though this does not rule out every joint semiparametric method).
 
-\paragraph{What this does not claim.} No absolute gain scale is estimated (gauge remains). The calibration curve $m_\alpha$ and the carriers $b_k$ are assumed known; in the Fig.~7 protocol the carriers are \emph{oracle} values from the simulation truth (a flat-field-calibrated benchmark), so Fig.~7 upper-bounds what a real flat-field calibration could achieve rather than demonstrating blind carrier recovery. Miscalibration beyond the measured interpolation term $(\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}})$ of Remark D.4.1 adds a bias not covered by (D.8). Constants in (D.8)--(D.9) are not tracked. Smoothness beyond $\beta=1$ is claimed only in the homogeneous-carrier / sensitivity-balanced form of Remark D.4.2 (display (D.10)); for arbitrary carriers the carrier-weighted first moment obstructs every $\beta>1$ rate. The minimax matching of (D.9) is at rate level only, \emph{in the log-domain quotient loss and at $d=0$}, proved by the direct Poisson Le Cam bounds above --- not inherited from Theorem~D, whose Gaussian model is not a submodel of the mixed-Poisson experiment; for $d>0$ every information statement must replace $W\bar\lambda$ by $\sum_k\mathbb{E}_B\,s_k^2/(s_k+d)$. No optimality of any kind is claimed in the gain-domain (linear) metric, and no claim is made that the calibrated estimator beats bias-accepting transforms (e.g.\ Anscombe) in MSE below the $\bar\lambda\sim1$ crossover --- empirically it does not (Sec.~9). As $\Phi\to0$ with no offset and no reference, Fisher information for the gain vanishes --- an information limit no estimator evades (Sec.~10).
+\paragraph{Centered-log quotient risk.}
+Let $e=\hat\ell-\ell$ and $P_N=I-N^{-1}\mathbf1\mathbf1^\top$. Since $P_N$ is an orthogonal projection,
+\[
+\frac1N\,\mathbb E\|P_Ne\|_2^2\le\frac1N\sum_{n=1}^N\mathbb Ee_n^2 ,
+\]
+so the pointwise bounds transfer directly to the record-centered log-gain loss of Fig.~5; overlapping windows need not be independent for this expectation bound.
+
+\begin{statusblock}\textbf{Shrinkage-bias caveat (load-bearing, per Sec.~6).} For $\bar\lambda<1$ the windowed soft-log statistic is \emph{bias-fragile}: the mass at $C=0$ pulls the weighted mean of $\psi_\alpha$ toward $\log\alpha$, and the amplification factor $(\kappa_{\max}/\underline\kappa_n)^2$ in the specialized bias term of (D.8) blows up as the window sensitivity vanishes with $\bar\lambda_n\to0$ (at $d=0$; window-average form $M_n'(\ell_n)\approx c_\alpha\bar\lambda_n$). Empirically the MSE of the \emph{uncalibrated} proxy (and of Anscombe) can then sit \emph{below} the Fisher reference curve --- that is bias, not super-efficiency, and it does not contradict the lower bound (which constrains variance-limited, locally unbiased behavior). The $1/(W\bar\lambda)$ law is asserted only in the variance-limited regime above the $\bar\lambda\sim1$ crossover (and under the local gain flatness of (D.10)); below it, honest accounting reports the bias floor, and all Fisher comparisons are made in the log-domain loss of this theorem (Fig.~5's \texttt{log\_gain\_mse} metric, against the \emph{oracle common-shift diagnostic} $\mathrm{mean}_n[1/I_n]$ with $I_n=\sum_{k\in W_n}\lambda_k$ at $d=0$, per (D.13) --- \emph{not} a nuisance-path quotient CRB) --- the gain-domain relMSE column retained for continuity is a different loss and is not Fisher-comparable. Recovering the rate below the crossover requires the offset-design, Anscombe~\cite{Anscombe1948} ($2\sqrt{C+3/8}$), or full Poisson-mixture MLE variants; for the mixture MLE the claim $\mathrm{MSE}\approx1/(WJ(\theta))$ with $J\sim\mathbb{E}\lambda$ at low photons is standard parametric asymptotics under regularity of the mixture likelihood and is \emph{not} re-proven here.\end{statusblock}
+
+\paragraph{What this does not claim.} No absolute gain scale is estimated (gauge remains). The calibration curve $m_\alpha$ and the carriers $b_k$ are assumed known; in the Fig.~5 protocol the carriers are \emph{oracle} values from the simulation truth (a flat-field-calibrated benchmark), so Fig.~5 upper-bounds what a real flat-field calibration could achieve rather than demonstrating blind carrier recovery --- Theorem C is an oracle-known-carrier result, Theorem~B is the blind high-count result, and the known-law estimator of Remark D.4.5 is a third object; none substitutes for the others. Miscalibration beyond the measured interpolation term ($\varepsilon_{\mathrm{cal}}/\underline\kappa_n+\varepsilon_{\mathrm{bis}}$ of (D.8b), with $\varepsilon_{\mathrm{cal}}$ an empirical midpoint maximum pending the (D.8c) certificate) adds a bias not covered by (D.8). Constants in (D.8)--(D.9) are not tracked. Smoothness beyond $\beta=1$ is claimed only in the internal-window homogeneous-carrier / sensitivity-balanced form of Remark D.4.2 (display (D.14)); for arbitrary carriers the carrier-weighted first moment obstructs every $\beta>1$ rate, and the implementation's truncated edge windows are not covered even under a homogeneous carrier. The unconditional $1/(W\bar\lambda)$ law is withdrawn in favor of (D.10); the flat-gain specialization is the only $1/(W\bar\lambda)$ statement retained. The minimax matching of (D.9) is at rate level only, \emph{in the log-domain quotient loss and at $d=0$}, proved by the direct Poisson Le~Cam/Assouad bounds (D.11)--(D.12) --- not inherited from Theorem~D, whose Gaussian model is not a submodel of the mixed-Poisson experiment; for $d>0$ every information statement must replace $W\bar\lambda$ by $\sum_k\mathbb{E}_B\,s_k^2/(s_k+d)$. The plotted reference $\mathrm{mean}_n[1/I_n]$ is the oracle common-shift diagnostic of (D.13): MSE above it does not establish unbiasedness, and MSE below it signals shrinkage bias, not super-efficiency. No optimality of any kind is claimed in the gain-domain (linear) metric, and no claim is made that the calibrated estimator beats bias-accepting transforms (e.g.\ Anscombe) in MSE below the $\bar\lambda\sim1$ crossover --- empirically it does not (Sec.~9). As $\Phi\to0$ with no offset and no reference, Fisher information for the gain vanishes --- an information limit no estimator evades (Sec.~10).
 
 \section{SRHT whitening: exact Walsh condition and permutation bounds}
 
@@ -1118,7 +1224,22 @@ No matching lower bound of order $1/K_{\mathrm{eff}}$ holds uniformly over objec
 \]
 and $\sum_{i\neq j}\chi_g(i)\chi_g(j)=\big(\sum_i\chi_g(i)\big)^2-K=-K$, giving (E.5); the second form follows from $K_{\mathrm{eff}}=S_1^2/S_2$. For (E.6), $\mathbb{E}_PB_g=\mu S_1$ and $\operatorname{Var}_PB_g=\sigma^2\operatorname{Var}_PZ_g$; divide. The counterexample: if $T_j\equiv t$, every non-DC Walsh sum of a constant vector vanishes identically, while $S_1^2/S_2=K$. Note (E.5) also exhibits the finite-population correction --- the relative variance is $(\sigma/\mu)^2(1/K_{\mathrm{eff}}-1/K)\cdot K/(K-1)$. \hfill$\blacksquare$
 
-\paragraph{What this does not claim.} Theorem E.4 does \emph{not} say permutation-alone whitens: it provides finite-population stationarity (exchangeability of the carrier along the acquisition, the ($\bigstar$) mechanism of Sec.~5) and an $O(1/K_{\mathrm{eff}})$ \emph{upper} variance scale, but it is not equivalent to i.i.d.\ Rademacher or nonnegative random-pattern carrier noise, and it guarantees no $\Theta(1/K_{\mathrm{eff}})$ \emph{excitation} --- a flat object has exactly zero. Two-sided coefficientwise control requires the sign flip \emph{and} the spectral-spread condition (E.4) together (the ``both'' cell of the Fig.~S2 ablation). An earlier claim (R1/v3) that permutation-alone ``cannot attain variance $\sim1/K_{\mathrm{eff}}$'' was too strong as an upper-scale statement and is corrected by (E.6); it is correct only in the two-sided reading.
+\paragraph{What this does not claim.} Theorem E.4 does \emph{not} say permutation-alone whitens: it provides finite-population stationarity (exchangeability of the carrier along the acquisition, the ($\bigstar$) mechanism of Sec.~5) and an $O(1/K_{\mathrm{eff}})$ \emph{upper} variance scale, but it is not equivalent to i.i.d.\ Rademacher or nonnegative random-pattern carrier noise, and it guarantees no $\Theta(1/K_{\mathrm{eff}})$ \emph{excitation} --- a flat object has exactly zero. Two-sided coefficientwise control requires the sign flip \emph{and} the spectral-spread condition (E.4) together (the ``both'' cell of the Fig.~8 ablation). An earlier claim (R1/v3) that permutation-alone ``cannot attain variance $\sim1/K_{\mathrm{eff}}$'' was too strong as an upper-scale statement and is corrected by (E.6); it is correct only in the two-sided reading. Moreover, \textbf{full (joint) exchangeability belongs to acquisition-order randomization, not to a shared pixel permutation}: a uniform reordering of the acquisition sequence makes the frame sequence finite-population exchangeable over its randomization draw (with pair blocks, not frames, as the exchangeable units when complementary masks are kept adjacent), whereas one common pixel permutation $P$ shared by all rows gives every non-DC row the \emph{same one-dimensional} law --- mean zero and variance (E.5) --- but \emph{not} full joint row exchangeability, by the triple-moment counterexample (E.9) below. Once a single permutation draw is conditioned upon, the sequence is deterministic; finite-population/randomization concentration should be invoked, not a claim that every realized order is stationary or mixing.
+
+\begin{namedthm}{Proposition E.4$'$ (Walsh triple-moment counterexample to joint row exchangeability)}
+Let $K=2^m\ge8$, let $\chi_g$ be the Walsh characters, and $Z_g(P)=\sum_{j}\chi_g(j)T_{Pj}$ under one uniform pixel permutation $P$ shared by all rows. Let $\bar T=K^{-1}\sum_jT_j$ and $S_{3,c}=\sum_j(T_j-\bar T)^3$. For distinct nonzero rows $g,h,r$,
+\begin{equation}
+\mathbb E_P[Z_gZ_hZ_r]=
+\begin{cases}
+\frac{K^2}{(K-1)(K-2)}\,S_{3,c}, & g+h+r=0,\\[4pt]
+0, & \text{$g,h,r$ lin.\ indep.}
+\end{cases}
+\tag{E.9}
+\end{equation}
+For a generic object with $S_{3,c}\neq0$, relational triples ($g+h+r=0$) and independent triples therefore have different joint laws, disproving full row exchangeability under a common pixel permutation.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Replace $T_j$ by $x_j=T_j-\bar T$ (non-DC Walsh coefficients unchanged). For the without-replacement sample $X_i=x_{P(i)}$, standard finite-population moments give $\mathbb EX_i^3=S_{3,c}/K$, $\mathbb EX_i^2X_j=-S_{3,c}/\{K(K-1)\}$ for $i\ne j$, and $\mathbb EX_iX_jX_k=2S_{3,c}/\{K(K-1)(K-2)\}$ for distinct $i,j,k$. If $g+h+r=0$, character orthogonality gives sign sums $K$ over the diagonal class, $-K$ over each exactly-two-equal pairing, and $2K$ over the all-distinct class; substitution gives the first line of (E.9). If $g+h+r\neq0$, all the corresponding character sums vanish. \hfill$\blacksquare$
 
 \subsection{E.5 Hanson--Wright window-energy bound}
 
@@ -1237,7 +1358,7 @@ R_{\mathrm{gain}}=\frac{v}{S_2}\sum_{n,m} r_\delta(n-m)\,b_n b_m\,\langle Le_n,L
 
 \noindent\textbf{Proof.} Write $z=b+\mathrm{diag}(b)\,\delta+\xi$, so $\hat T-T=(LA-I)T+L\,\mathrm{diag}(b)\,\delta+L\xi$. Decompose $\delta=m_\delta+(\delta-m_\delta)$. The mean of $\hat T-T$ is $(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta$ (using (H1)); its squared norm is the bias term. By the bias--variance decomposition $\mathbb{E}\|X\|^2=\|\mathbb{E}X\|^2+\mathrm{tr}\,\mathrm{Cov}(X)$ and (H2), the covariance of $\hat T$ is $L\,\mathrm{diag}(b)\,V_\delta\,\mathrm{diag}(b)\,L^\top+L\,\Sigma_\xi L^\top$; taking traces and dividing by $S_2$ gives (F.2). For (a), $V_\delta=vI$ and $\mathrm{tr}(L\,\mathrm{diag}(b)\,\mathrm{diag}(b)\,L^\top)=\sum_n b_n^2\|Le_n\|^2$, giving (F.3). Case (b) is the coordinate expansion of the same trace with $(V_\delta)_{nm}=v\,r_\delta(n-m)$. \hfill$\blacksquare$
 
-\paragraph{Remark F.1.1 (same-record gain estimates violate the hypotheses; scope of the exact identity).} Hypothesis (H3) is not decorative. When $\hat a$ is estimated from the \emph{same} noisy record that carries $\xi$ --- the generic situation for a blind pipeline --- the conditional mean $\mathbb{E}[\xi\mid\text{record}]$ is generically nonzero and $\delta$ is correlated with $\xi$, so (H1)--(H2) fail: the mean of $\hat T-T$ acquires an additional bias term $L\,m_\xi$ (with $m_\xi=\mathbb{E}\,\xi\neq0$) inside the bias norm, and the covariance acquires the cross-term $(2/S_2)\,\operatorname{tr}\!\big[L\,\mathrm{diag}(b)\,C_{\delta\xi}\,L^\top\big]$. Neither term is included in (F.2). The exact identity therefore covers the \textbf{exogenous / injected-residual case} --- which is precisely what the injected-residual protocol of Sec.~9 (experiment E4, Fig.~S3) validates --- and cross-fitted estimates that restore (H1)--(H2) by construction; for same-record blind pipelines, (F.2) is exact only up to the two extra terms above.
+\paragraph{Remark F.1.1 (same-record gain estimates violate the hypotheses; scope of the exact identity).} Hypothesis (H3) is not decorative. When $\hat a$ is estimated from the \emph{same} noisy record that carries $\xi$ --- the generic situation for a blind pipeline --- the conditional mean $\mathbb{E}[\xi\mid\text{record}]$ is generically nonzero and $\delta$ is correlated with $\xi$, so (H1)--(H2) fail: the mean of $\hat T-T$ acquires an additional bias term $L\,m_\xi$ (with $m_\xi=\mathbb{E}\,\xi\neq0$) inside the bias norm, and the covariance acquires the cross-term $(2/S_2)\,\operatorname{tr}\!\big[L\,\mathrm{diag}(b)\,C_{\delta\xi}\,L^\top\big]$. Neither term is included in (F.2). The exact identity therefore covers the \textbf{exogenous / injected-residual case} --- which is precisely what the injected-residual protocol of Sec.~9 (experiment E4, Fig.~10) validates --- and cross-fitted estimates that restore (H1)--(H2) by construction; for same-record blind pipelines, (F.2) is exact only up to the two extra terms above.
 
 \paragraph{What this does not claim.} With (H1)--(H3) now stated \emph{in} the theorem, the caveat is Remark F.1.1: (F.2) is not claimed for same-record blind gain estimation, where the $L\,m_\xi$ bias and the $C_{\delta\xi}$ cross-term appear. Beyond that, (F.2) is a second-moment accounting identity for a \emph{linear} reconstructor with the design held fixed; it does not bound nonlinear or data-adaptive $L$, and for random-pattern pipelines the constants below are obtained by additionally averaging over the pattern draw. It says nothing about how small $v$ can be made --- that is the estimation-rate question of Sec.~6. Finally, the scalar collapse $v\,B_L$ \emph{requires} uncorrelated residuals: for smooth (coherent) residual gain --- the generic output of a windowed blind estimator --- only the matrix form (F.4) is correct. In particular, the simple summary ``orthogonal inversion gives $v$'' holds only for independent coefficient-wise residuals under exact inversion.
 
@@ -1268,65 +1389,182 @@ Exact orthogonal inversion transmits independent coefficient-wise residual gain 
 \begin{equation}
 \hat c_k-c_k=-\,\frac{S_1\,\Delta_k\,(1-x_k^2)}{2+\Delta_k(1-x_k)},\qquad x_k=c_k/S_1, \tag{F.7}
 \end{equation}
-whence, exactly, $R_{\mathrm{pair,gain}}=\dfrac{S_1^2}{KS_2}\displaystyle\sum_k\mathbb{E}\Big[\frac{\Delta_k^2(1-x_k^2)^2}{(2+\Delta_k(1-x_k))^2}\Big]$. For small mismatch with $\Delta_k$ independent of the coefficient index,
-\begin{align*}
-R_{\mathrm{pair,gain}}&=\frac{K_{\mathrm{eff}}}{4}\,D_H(T)\,\mathrm{Var}(\Delta)+O\!\big(K_{\mathrm{eff}}\,\mathbb{E}|\Delta|^3\big),\\
-D_H(T)&=\frac{1}{K}\sum_k(1-x_k^2)^2, \tag{F.8}
-\end{align*}
-by Taylor expansion of (F.7) in $\Delta_k$. For most non-DC Hadamard coefficients of a nonnegative object $|x_k|\ll1$, so $D_H\approx1$; $D_H$ is nevertheless a \emph{pipeline constant to be measured}, not assumed. The $K_{\mathrm{eff}}$ amplification is structural: pairwise normalization converts a differential gain error into a coefficient error of order $S_1$, and Parseval then divides by $S_2$. Noise terms: read noise gives exactly $R_{\mathrm{pair,read}}=2\sigma_{\mathrm{read}}^2/S_2$; for Poisson counts with pair budget $\Phi_{\mathrm{pair}}$, using $B_k^++B_k^-=S_1$, the coefficient shot variance is $\mathrm{Var}(e_k\mid c_k)\approx S_1^2/\Phi_{\mathrm{pair},k}$ --- an approximation, exact only up to the $c_k$-dependent split between the two buckets --- giving $R_{\mathrm{pair,Pois}}=K_{\mathrm{eff}}/\Phi_{\mathrm{pair}}$ (equal-pair budget) or $(K_{\mathrm{eff}}+1)/(2\Phi_{\mathrm{mask}})$ (equal-mask budget); these differ only by allocation convention.
+whence, exactly (Parseval),
+\begin{equation}
+R_{\mathrm{pair,gain}}
+=\frac{K_{\mathrm{eff}}}{K}\sum_{k=1}^K
+\mathbb{E}\!\left[\frac{\Delta_k^2(1-x_k^2)^2}{\{2+\Delta_k(1-x_k)\}^2}\right].
+\tag{F.8a}
+\end{equation}
+\emph{Second-moment expansion (bounded increments).} If $|\Delta_k|\le\eta<1$ almost surely, then for $g_x(t)=\{2+t(1-x)\}^{-2}$ the mean value theorem with $|x|\le1$, $|t|\le\eta$ gives $|g_x(t)-g_x(0)|\le|t|/\{2(1-\eta)^3\}$, whence
+\begin{equation}
+\begin{aligned}
+&\left|R_{\mathrm{pair,gain}}
+-\frac{K_{\mathrm{eff}}}{4K}\sum_{k=1}^K(1-x_k^2)^2\,\mathbb{E}\Delta_k^2\right|\\
+&\qquad\le\frac{K_{\mathrm{eff}}}{2(1-\eta)^3K}\sum_{k=1}^K\mathbb{E}|\Delta_k|^3 .
+\end{aligned}
+\tag{F.8b}
+\end{equation}
+If the pair increments share a common marginal distribution (no cross-pair independence required),
+\begin{equation}
+\begin{aligned}
+R_{\mathrm{pair,gain}}
+&=\frac{K_{\mathrm{eff}}}{4}\,D_H(T)\,\mathbb{E}\Delta^2
++O_\eta\!\big(K_{\mathrm{eff}}\,\mathbb{E}|\Delta|^3\big),\\
+D_H(T)&=\frac{1}{K}\sum_k(1-x_k^2)^2 .
+\end{aligned}
+\tag{F.8}
+\end{equation}
+\textbf{The second moment is $\mathbb{E}\Delta^2$, not $\operatorname{Var}(\Delta)$}: the two may be interchanged only under the \emph{extra} assumption $\mathbb{E}\Delta=0$. A deterministic mismatch $\Delta\equiv\epsilon$ is the immediate counterexample --- its $\operatorname{Var}(\Delta)=0$, yet (F.8a) gives a strictly positive risk of order $K_{\mathrm{eff}}\epsilon^2$. For most non-DC Hadamard coefficients of a nonnegative object $|x_k|\ll1$, so $D_H\approx1$; $D_H$ is nevertheless a \emph{pipeline constant to be measured}, not assumed.
+
+\emph{OU increment corollary (exact lognormal moments).} For a stationary Gaussian OU/AR(1) log gain with $\operatorname{Var}(\ell_n)=s^2$ and adjacent correlation $e^{-\rho}$, put $r(\rho)=1-e^{-\rho}$ and $u=s^2r(\rho)$. The adjacent log increment $X=\ell_{n+1}-\ell_n$ is $\mathcal N(0,2u)$ and $\Delta=e^X-1$, so
+\begin{equation}
+\mathbb{E}\Delta=e^{u}-1,\qquad
+\mathbb{E}\Delta^2=e^{4u}-2e^{u}+1=2u+7u^2+O(u^3),
+\tag{F.8c}
+\end{equation}
+with $\operatorname{Var}(\Delta)=e^{4u}-e^{2u}$ and $\mathbb{E}\Delta^2-\operatorname{Var}(\Delta)=(e^{u}-1)^2$. The bounded-increment proposition does not apply directly to this lognormal $\Delta$; instead, split (F.8a) on $\{|X|\le c\}$: on the central event Taylor's theorem gives $\Delta^2(1-x^2)^2/\{2+\Delta(1-x)\}^2=\tfrac14(1-x^2)^2X^2+O_c(|X|^3)$ uniformly in $x\in[-1,1]$, while on the complement the exact fraction admits an exponential envelope $C_c(1+e^{2|X|})$ whose Gaussian-tail expectation is $o(u^m)$ for every $m$. Since $\mathbb{E}X^2=2u$ and $\mathbb{E}|X|^3=O(u^{3/2})$,
+\begin{equation}
+R_{\mathrm{pair,gain}}
+=\tfrac12K_{\mathrm{eff}}D_H(T)\,s^2r(\rho)
++O\!\big(K_{\mathrm{eff}}\,u^{3/2}\big):
+\tag{F.8d}
+\end{equation}
+the leading pair law survives, but its proof must begin from $\mathbb{E}\Delta^2$. The $K_{\mathrm{eff}}$ amplification is structural: pairwise normalization converts a differential gain error into a coefficient error of order $S_1$, and Parseval then divides by $S_2$. Noise terms: read noise gives exactly $R_{\mathrm{pair,read}}=2\sigma_{\mathrm{read}}^2/S_2$; for Poisson counts with pair budget $\Phi_{\mathrm{pair}}$, using $B_k^++B_k^-=S_1$, the coefficient shot variance is $\mathrm{Var}(e_k\mid c_k)\approx S_1^2/\Phi_{\mathrm{pair},k}$ --- an approximation, exact only up to the $c_k$-dependent split between the two buckets --- giving $R_{\mathrm{pair,Pois}}=K_{\mathrm{eff}}/\Phi_{\mathrm{pair}}$ (equal-pair budget) or $(K_{\mathrm{eff}}+1)/(2\Phi_{\mathrm{mask}})$ (equal-mask budget); these differ only by allocation convention.
 
 \paragraph{What F.3.2 does not claim.} (F.7)--(F.8) presuppose a stable DC/$S_1$ normalization; at low photons the denominator bucket sum can be noisy or zero, and a robust implementation needs offset/clipping or a likelihood-ratio estimator. The exact law (F.7) is algebra; only the moment step (F.8) invokes small $\Delta$ and index-independence.
 
-\paragraph{F.3.3 Random patterns / DGI: the one-sample constant $C_0$.} Let $I_n=\mu\mathbf 1+\sigma x_n$ with iid coordinates, $\mathbb{E}x=0$, $\mathbb{E}x^2=1$, $\mathbb{E}x^3=\gamma_3$, $\mathbb{E}x^4=\beta_4$, and the ideal correlator $\hat T_{\mathrm{DGI}}=(N\sigma)^{-1}\sum_n x_n z_n$. Define the one-sample vector $Z=\sigma^{-1}x\,(\mu S_1+\sigma x^\top T)$; then $\mathbb{E}Z=T$ and, with known gain and no detector noise,
+\paragraph{F.3.3 Random patterns / DGI: floor, leverage, and population-moment constants.} \textbf{Three distinct constants must carry three distinct names; no generic ``pipeline $C_0$'' label is permitted.} For a \emph{fixed} design $A$, linear reconstruction $L$, object $T$, and $b=AT$, define the \emph{raw fixed-design sampling floor} and the \emph{residual leverage}
+\begin{align}
+C_0^{\mathrm{floor}}(A,L,T)&:=\frac{N}{S_2}\,\|(LA-I)T\|_2^2, \tag{F.9a}\\
+\Lambda_{\mathrm{lev}}(A,L,T)&:=N\,B_L(A,T)=\frac{N}{S_2}\sum_{n=1}^Nb_n^2\|Le_n\|_2^2, \tag{F.9b}\\
+C_0^{\mathrm{lev}}(A,L,T)&:=\Lambda_{\mathrm{lev}}-1. \tag{F.9c}
+\end{align}
+The first is the raw-MSE sampling floor of the fixed operator; the second propagates exogenous multiplicative residuals and equal-count Poisson noise ($C_0^{\mathrm{lev}}$ is merely the shifted notation $\Lambda_{\mathrm{lev}}-1$). Third, for $N$ iid pattern draws $I_n=\mu\mathbf 1+\sigma x_n$ with iid coordinates ($\mathbb{E}x=0$, $\mathbb{E}x^2=1$, $\mathbb{E}x^3=\gamma_3$, $\mathbb{E}x^4=\beta_4$), the ideal known-$(\mu,\sigma)$ correlator $\hat T_{\mathrm{DGI}}=(N\sigma)^{-1}\sum_nx_nz_n$ and one-sample vector $Z=\sigma^{-1}x(\mu S_1+\sigma x^\top T)$ define the \emph{population raw-moment constant}
 \begin{equation}
-\frac{\mathbb{E}\|\hat T_{\mathrm{DGI}}-T\|^2}{S_2}=\frac{C_0}{N},\qquad C_0:=\frac{\mathbb{E}\|Z-T\|^2}{S_2}, \tag{F.9}
+\begin{aligned}
+\frac{\mathbb{E}\|\hat T_{\mathrm{DGI}}-T\|^2}{S_2}&=\frac{C_0^{\mathrm{raw,moment}}}{N},\\
+C_0^{\mathrm{raw,moment}}&:=\frac{\mathbb{E}\|Z-T\|^2}{S_2},
+\end{aligned}
+\tag{F.9}
 \end{equation}
-which is the implementation-independent \emph{definition} of $C_0$. \textbf{The evaluation of $C_0$ for iid patterns is a moment calculation}: expanding $\mathbb{E}\|Z\|^2$ with $Z=(\mu S_1/\sigma)x+xx^\top T$ gives the three terms $K(\mu/\sigma)^2S_1^2$, $2(\mu/\sigma)\gamma_3S_1^2$, and $(K+\beta_4-1)S_2$; subtracting $\|\mathbb{E}Z\|^2=S_2$,
+whose evaluation is a moment calculation: expanding $\mathbb{E}\|Z\|^2$ with $Z=(\mu S_1/\sigma)x+xx^\top T$ and subtracting $\|\mathbb{E}Z\|^2=S_2$,
 \begin{align*}
-C_0&=K+\beta_4-2+K_{\mathrm{eff}}\big[K(\mu/\sigma)^2+2\gamma_3(\mu/\sigma)\big]\\
+C_0^{\mathrm{raw,moment}}&=K+\beta_4-2+K_{\mathrm{eff}}\big[K(\mu/\sigma)^2+2\gamma_3(\mu/\sigma)\big]\\
 &\;\xrightarrow[\ \mu=0,\ \gamma_3=0\ ]{}\; K+\beta_4-2. \tag{F.10}
 \end{align*}
-The $K_{\mathrm{eff}}K(\mu/\sigma)^2$ term is the familiar nonnegative-background penalty. Residual gain, read, and Poisson terms (equal-count convention $\Phi_n=\Phi_{\mathrm{frame}}$):
+The $K_{\mathrm{eff}}K(\mu/\sigma)^2$ term is the familiar nonnegative-background penalty. For the ideal correlator, independence and unbiasedness give $\mathbb{E}_AC_0^{\mathrm{floor}}=C_0^{\mathrm{raw,moment}}$ and $\mathbb{E}_A\Lambda_{\mathrm{lev}}=1+C_0^{\mathrm{raw,moment}}$; \textbf{for a mean-subtracted or scale-aligned implementation these are not definition-level identities} --- each constant must be measured for the pipeline that is actually run. On the published grid the mean-subtracted pipeline's \emph{raw} fixed-design floor sits near $10^3$ (\texttt{results/prop3\_raw\_metric\_r1/}: $C_0^{\mathrm{floor,raw,fix}}=980.110$--$1114.529$, consistent with the centered-moment value $K+\beta_4-2=1023.800$ to $0.8\%$), its \emph{scale-aligned} floor near $6.2$--$7.2\times10^2$, and its nonnegative-background drift leverage near $10^6$; conflating any two of these is a factor-$1.5$ to factor-$10^3$ error.
+
+\begin{namedthm}{Proposition (exact pipeline specialization)}
+Suppose the residuals are exogenous to detector noise and design, with common mean $m_\delta$, common second moment $q_\delta=\mathbb{E}\delta_n^2$, and $\operatorname{Cov}(\delta)=(q_\delta-m_\delta^2)I$. Under the hypotheses of Theorem~1,
+\begin{align}
+\frac{\mathbb{E}\|\hat T-T\|_2^2}{S_2}
+={}&\frac{\|(LA-I)T+m_\delta LAT\|_2^2}{S_2}\notag\\
+&+\frac{\Lambda_{\mathrm{lev}}}{N}(q_\delta-m_\delta^2)+R_\xi,
+\tag{F.10a}
+\end{align}
+with $R_\xi=\operatorname{tr}(L\Sigma_\xi L^\top)/S_2$. If $m_\delta=0$,
+\begin{equation}
+\frac{\mathbb{E}\|\hat T-T\|_2^2}{S_2}
+=\frac{C_0^{\mathrm{floor}}}{N}
++\frac{1+C_0^{\mathrm{lev}}}{N}\,q_\delta+R_\xi ;
+\tag{F.10b}
+\end{equation}
+and if $\Sigma_\xi=\tau_G^2I+\Phi_{\mathrm{frame}}^{-1}\operatorname{diag}(b^2)$,
+\begin{equation}
+R_\xi=\frac{\tau_G^2\operatorname{tr}(LL^\top)}{S_2}
++\frac{1+C_0^{\mathrm{lev}}}{N\,\Phi_{\mathrm{frame}}}.
+\tag{F.10c}
+\end{equation}
+\end{namedthm}
+
+\noindent\textbf{Proof.} The residual mean vector is $m_\delta\mathbf1$ and $L\operatorname{diag}(b)\mathbf1=Lb=LAT$; substitute this mean and the stated covariance into the exact identity (F.2). The Poisson specialization uses $(S_2\Phi_{\mathrm{frame}})^{-1}\sum_nb_n^2\|Le_n\|_2^2=\Lambda_{\mathrm{lev}}/(N\Phi_{\mathrm{frame}})$. \hfill$\blacksquare$
+
+For the ideal iid correlator with centered residuals the pattern-averaged bookkeeping is the familiar display
 \begin{align*}
-\mathrm{relMSE}_{\mathrm{DGI}}=\;&\frac{C_0}{N}+\frac{(1+C_0)v}{N}\\
-&+\frac{K\tau_G^2}{N\sigma^2S_2}+\frac{1+C_0}{N\,\Phi_{\mathrm{frame}}}. \tag{F.11}
+\mathrm{relMSE}_{\mathrm{DGI}}=\;&\frac{C_0^{\mathrm{floor}}}{N}+\frac{(1+C_0^{\mathrm{lev}})\,v}{N}\\
+&+\frac{K\tau_G^2}{N\sigma^2S_2}+\frac{1+C_0^{\mathrm{lev}}}{N\,\Phi_{\mathrm{frame}}}, \tag{F.11}
 \end{align*}
-The gain term follows from Theorem~1(a) with the \emph{leverage $\times N$ framing}: for the correlator, $\|Le_n\|^2=\|x_n\|^2/(N^2\sigma^2)$, so averaging over pattern draws, $N\,\mathbb{E}B_L=\mathbb{E}\|Z\|^2/S_2=1+C_0$ --- i.e., $R_{\mathrm{DGI,gain}}=(1+C_0)v/N$, and in residual-injection experiments the measurable slope is $N B_L\to 1+C_0$. \textbf{Status (labeled).} This pattern-averaging step treats the residuals $\delta$ as independent of the pattern draw --- exact for injected residuals (the Fig.~S3 protocol), a heuristic decoupling for blind pipelines, where $\hat a$ is computed from the same record the patterns generated. Correlated residuals multiply $v$ by $\chi_\delta=1+2\sum_{h\ge1}\mathrm{corr}(\delta_0,\delta_h)$ --- a heuristic long-run-variance correction valid only when correlations are weak enough that pattern cross-terms still average; the rigorous object remains (F.4).
+where for the ideal correlator $\mathbb{E}_A\Lambda_{\mathrm{lev}}=1+C_0^{\mathrm{raw,moment}}$, so in residual-injection experiments the measurable slope is $NB_L\to\Lambda_{\mathrm{lev}}$. \textbf{Status (labeled).} This pattern-averaging step treats the residuals $\delta$ as independent of the pattern draw --- exact for injected residuals (the Fig.~10 protocol), a heuristic decoupling for blind pipelines, where $\hat a$ is computed from the same record the patterns generated. Correlated residuals multiply $v$ by $\chi_\delta=1+2\sum_{h\ge1}\mathrm{corr}(\delta_0,\delta_h)$ --- a heuristic long-run-variance correction valid only when correlations are weak enough that pattern cross-terms still average; the rigorous object remains (F.4).
 
-\paragraph{Correction (drift-leverage constant of the gain term; measured, no fitted parameters).} As previously written, the gain term $(1+C_0)v/N$ of (F.11) --- with the \emph{pipeline} constant $C_0$ of definition (F.9) --- is \textbf{wrong for mean-subtracted DGI pipelines} under time-structured (drift-like) residual gain: on the published grid it underpredicts the measured random-arm drift excess by a median factor $\approx1.4\times10^3$ (1364 / 1527 / 1521 across the none / AGC / SCGI-proxy corrections; white-drift diagnostic, \texttt{results/prop3\_nofreeparam\_r1/}). The correct leverage carries the \textbf{raw-correlator constant} $1+C_0^{\mathrm{raw}}$, where $C_0^{\mathrm{raw}}$ is (F.10) evaluated for the ideal correlator at the measured raw pattern moments (at the grid's operating point $C_0^{\mathrm{raw}}\approx0.7$--$1.2\times10^6$, versus pipeline $C_0\approx6.2$--$7.2\times10^2$); with it the measured excess is reproduced to 0.3--4.7\% (median ratios 1.003 / 1.047 / 1.039), still with zero fitted parameters. Mechanism: mean subtraction removes the $K_{\mathrm{eff}}K(\mu/\sigma)^2$ background penalty from the \textbf{sampling floor} --- hence the small pipeline $C_0$ in the $C_0/N$ term, confirmed exactly by the flat oracle arm at $C_0/N$ --- but \textbf{not} from the \textbf{drift leverage}: a time-varying gain modulates the large DC background coherently, and the correlator pays the full raw-correlator constant. For mean-subtracted pipelines the gain term of (F.11) must therefore read $(1+C_0^{\mathrm{raw}})\,v/N$, while the sampling-floor term keeps the pipeline $C_0$. This vindicates --- and extends to the gain term --- the ``no universal $C_0$'' warning below, which earlier versions applied to the floor term only.
+\paragraph{Correction (drift-leverage constant of the gain term; measured, no fitted parameters).} As previously written, the gain term of (F.11) evaluated with the \emph{scale-aligned floor} constant in place of the leverage is \textbf{wrong for mean-subtracted DGI pipelines} under time-structured (drift-like) residual gain: on the published grid it underpredicts the measured random-arm drift excess by a median factor $\approx1.4\times10^3$ (1364 / 1527 / 1521 across the none / AGC / SCGI-proxy corrections; white-drift diagnostic, \texttt{results/prop3\_nofreeparam\_r1/}). The correct leverage is the \textbf{nonnegative-background constant} $\Lambda_{\mathrm{lev}}=1+C_0^{\mathrm{lev,raw\ background}}$, obtained from (F.10) evaluated at the measured raw pattern moments (at the grid's operating point $C_0^{\mathrm{lev,raw\ background}}\approx0.7$--$1.2\times10^6$, versus the scale-aligned floor $\approx6.2$--$7.2\times10^2$ and the \emph{raw} fixed-design floor $\approx1.0$--$1.1\times10^3$); with it the measured excess is reproduced to 0.3--4.7\% (median ratios 1.003 / 1.047 / 1.039), still with zero fitted parameters. Mechanism: mean subtraction removes the $K_{\mathrm{eff}}K(\mu/\sigma)^2$ background penalty from the \textbf{sampling floor} --- hence the small floor constant in the $C_0^{\mathrm{floor}}/N$ term, confirmed exactly by the flat oracle arm --- but \textbf{not} from the \textbf{drift leverage}: a time-varying gain modulates the large DC background coherently, and the correlator pays the full background leverage. For mean-subtracted pipelines the gain term of (F.11) must therefore carry $\Lambda_{\mathrm{lev}}=1+C_0^{\mathrm{lev,raw\ background}}$, while the sampling-floor term keeps the (raw or aligned, \emph{consistently chosen}) floor constant. This vindicates --- and extends to the gain term --- the ``no universal $C_0$'' warning below, which earlier versions applied to the floor term only.
 
-\paragraph{What F.3.3 does not claim.} There is \textbf{no universal $C_0$}: (F.10) is exact only for the ideal known-$(\mu,\sigma)$ correlator with iid coordinates. Mean subtraction, reference normalization, and photon allocation all change the constant (not the $C_0/N$ structure), so $C_0$ must be measured from the pipeline via definition (F.9). Moreover --- per the correction above --- the sampling-floor constant and the drift-leverage constant of the \emph{same} pipeline are different measured numbers whenever the pipeline subtracts a background; quoting one for the other is a $\sim10^3$ error at nonnegative-background operating points. The flux-limited convention $\Phi_n=\gamma b_n$ replaces the last term of (F.11) by $(N\sigma^2S_2)^{-1}\mathbb{E}[\|x\|^2 b_n/\gamma]$.
+\paragraph{What F.3.3 does not claim.} There is \textbf{no universal $C_0$}: (F.10) is exact only for the ideal known-$(\mu,\sigma)$ correlator with iid coordinates. Mean subtraction, reference normalization, and photon allocation all change the constants (not the $C_0/N$ structure), so each of the three constants of (F.9a)--(F.9c)/(F.9) must be measured from the pipeline that is run. The sampling-floor constant and the drift-leverage constant of the \emph{same} pipeline are different measured numbers whenever the pipeline subtracts a background --- quoting one for the other is a $\sim10^3$ error at nonnegative-background operating points --- and the \emph{raw} and \emph{scale-aligned} floors of the same pipeline differ by a further factor $\approx1.54$ (the metric-mismatch audit of F.4 below). Table~I's residual-probe value $\Lambda_{\mathrm{lev}}=NB_L\in[7.38\times10^5,7.68\times10^5]$ is a Monte Carlo mean over the bridge experiment's object-by-seed residual probes, \emph{not} a deterministic statistic and \emph{not} the Prop.~3 floor constant. The flux-limited convention $\Phi_n=\gamma b_n$ replaces the last term of (F.11) by $(N\sigma^2S_2)^{-1}\mathbb{E}[\|x\|^2 b_n/\gamma]$.
 
 \subsection{F.4 Prop 3: the finite-\texorpdfstring{$N$}{N} flip boundary}
 
-\paragraph{Drift model and assumptions.} Let $s^2$ be the variance scale of the log-gain process $\ell$ and let $\rho_{\mathrm{pair}}$ be the \textbf{adjacent-pair decorrelation parameter}, meaning the paired-mask gain increment obeys $\mathrm{Var}(\Delta_k)\approx\mathrm{Var}(\ell_k^--\ell_k^+)=2s^2\,r(\rho_{\mathrm{pair}})$ with $r(\rho)=\rho+O(\rho^2)$ small-$\rho$; for an Ornstein--Uhlenbeck log-gain, $r(\rho)=1-e^{-\rho}$. Assume the small-mismatch regime of (F.8) (so $R_{\mathrm{pair,gain}}(\rho_{\mathrm{pair}})\approx\tfrac12 K_{\mathrm{eff}}D_H(T)\,s^2\,r(\rho_{\mathrm{pair}})$) and the DGI decomposition (F.11) with blind residual variance $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$ --- the window-optimized output of the Sec.-6 rate theorem, $v_{\mathrm{blind}}\lesssim\min_{W\in[1,N]}[\sigma_{\mathrm{eff}}^2/W+C(s\rho_{\mathrm{pair}} W)^2]\lesssim C\,\sigma_{\mathrm{eff}}^{4/3}(s\rho_{\mathrm{pair}})^{2/3}$ when the optimizer is interior.
+\paragraph{Drift model and assumptions.} Let $s^2$ be the variance scale of the log-gain process $\ell$ and let $\rho_{\mathrm{pair}}$ be the \textbf{adjacent-pair decorrelation parameter}: for an Ornstein--Uhlenbeck log-gain the paired-mask gain increment obeys $\mathbb{E}[\Delta_k^2]=2s^2r(\rho_{\mathrm{pair}})+O(s^4r^2)$ with $r(\rho)=1-e^{-\rho}$ (exact moments: (F.8c); $r(\rho)=\rho+O(\rho^2)$ at small $\rho$). Assume the small-mismatch regime of (F.8) (so $R_{\mathrm{pair,gain}}(\rho_{\mathrm{pair}})\approx\tfrac12 K_{\mathrm{eff}}D_H(T)\,s^2\,r(\rho_{\mathrm{pair}})$, per (F.8d)) and the DGI decomposition (F.11) with blind residual variance $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$, treated here as an \textbf{externally measured function of $(\rho_{\mathrm{pair}},N)$} (the runner measures it on the grid). \textbf{No deterministic-Lipschitz $\rho^{2/3}$ rate is attributed to the OU drift}: OU paths are not Lipschitz, and the correct interior OU window analysis (lemma below, (F.14)--(F.16)) gives stochastic drift error $s^2\rho W/6$ to first order and window-optimized risk $\propto\rho^{1/2}$, not $\rho^{2/3}$.
 
-\begin{namedthm}{Prop 3 (implicit flip boundary)}
-Define $\rho^*=\inf\{\rho_{\mathrm{pair}}\ge0: R_{\mathrm{pair}}(\rho_{\mathrm{pair}})\ge R_{\mathrm{rand}}(\rho_{\mathrm{pair}},N)\}$, where $R_{\mathrm{pair}}=R_{\mathrm{pair,gain}}+R_{\mathrm{pair,read}}+R_{\mathrm{pair,Pois}}$ and $R_{\mathrm{rand}}$ is (F.11) with $v=v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$. \textbf{Assume single crossing:} since $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$ itself varies with $\rho_{\mathrm{pair}}$, both sides of the comparison move with $\rho_{\mathrm{pair}}$, and we assume the difference $R_{\mathrm{pair}}-R_{\mathrm{rand}}$ changes sign exactly once on the range considered --- existence and uniqueness of the crossing is an assumption at the same heuristic level as the small-drift expansion, not a proven property. Under the small-drift expansion and this assumption, $\rho^*$ solves the implicit equation
+\begin{namedthm}{Prop 3 (raw-MSE flip boundary; fixed-point form)}
+\textbf{All risks in this proposition are raw relative MSEs of Theorem~1} (the metric caution below explains why a scale-aligned analogue is a different number). Define $\rho^*=\inf\{\rho_{\mathrm{pair}}\ge0: R_{\mathrm{pair}}(\rho_{\mathrm{pair}})\ge R_{\mathrm{rand}}(\rho_{\mathrm{pair}},N)\}$, where $R_{\mathrm{pair}}=R_{\mathrm{pair,gain}}+R_{\mathrm{pair,read}}+R_{\mathrm{pair,Pois}}$ and, for the random arm,
 \begin{equation}
-\begin{aligned}
-r(\rho^*)=\frac{2}{K_{\mathrm{eff}}\,D_H(T)\,s^2}\Big[&\frac{C_0}{N}+\frac{(1+C_0^{\mathrm{lev}})\,v_{\mathrm{blind}}(\rho^*,N)}{N}\\
-&+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\Big],
-\end{aligned}
-\tag{F.12}
+R_{\mathrm{rand}}(\rho,N)
+=\frac{C_0^{\mathrm{floor}}}{N}
++\Gamma_{\mathrm{blind}}(\rho,N)
++R_{\mathrm{rand,noise}} . \tag{F.12a}
 \end{equation}
-where $C_0^{\mathrm{lev}}$ is the pipeline's \textbf{drift-leverage} constant: $C_0^{\mathrm{lev}}=C_0^{\mathrm{raw}}$ of (F.10) for mean-subtracted DGI pipelines (the F.3.3 correction), and $C_0^{\mathrm{lev}}=C_0$ only for pipelines without background subtraction. For the OU convention this is explicit: $\rho^*=-\log(1-Q)$ with $Q=2\Delta_R/(K_{\mathrm{eff}}D_Hs^2)$, $\Delta_R$ the bracket of (F.12). If $Q\le0$, the random/DGI arm is already at least as good as the pairwise arm at $\rho=0$ (the bracket $\Delta_R\le0$: the pairwise arm's noise overhead exceeds the random arm's sampling/noise floor), so $\rho^*=0$ --- the flip is immediate, not absent; if $Q\ge1$, pairwise never flips within the OU small-to-moderate range.
+For an \emph{oracle-known-gain} arm, $\Gamma_{\mathrm{blind}}=0$ (the validated skeleton below). For an \emph{exogenous, centered, frame-uncorrelated} residual with $q_{\mathrm{blind}}(\rho,N)=\mathbb{E}\delta_n^2$,
+\begin{equation}
+\Gamma_{\mathrm{blind}}(\rho,N)
+=\frac{1+C_0^{\mathrm{lev}}}{N}\,q_{\mathrm{blind}}(\rho,N),
+\tag{F.12b}
+\end{equation}
+with $C_0^{\mathrm{lev}}$ the pipeline's drift-leverage constant of (F.9c) (equal to $C_0^{\mathrm{lev,raw\ background}}\approx10^6$ for the mean-subtracted pipeline --- the F.3.3 correction). \textbf{No scalar representation is asserted for a same-record blind estimator}: there the full covariance, nonzero-mean, and residual--noise cross terms of Theorem~1 are required, and any scalar display must be labeled a conditional proxy. At first order define
+\[
+A_T=\tfrac12K_{\mathrm{eff}}D_H(T)s^2,
+\qquad
+Q(\rho)=\frac{\Delta_R(\rho)}{A_T},
+\]
+\[
+\Delta_R(\rho)=\frac{C_0^{\mathrm{floor}}}{N}+\Gamma_{\mathrm{blind}}(\rho,N)
++R_{\mathrm{rand,noise}}-R_{\mathrm{pair,noise}} .
+\]
+Assume $A_T>0$ (equivalently $s>0$ and $D_H(T)>0$) and that the risks, hence $Q$, are continuous in $\rho$ on the comparison interval. Then the leading boundary is the \textbf{fixed-point equation}
+\begin{equation}
+1-e^{-\rho^*}=Q(\rho^*), \tag{F.12}
+\end{equation}
+up to the remainder in (F.8d). If $\Delta_R(0)\le0$ then $\rho^*=0$ (the flip is immediate, not absent). If $\Delta_R(0)>0$, a finite crossing on $[0,\rho_{\max}]$ \emph{exists} when $1-e^{-\rho}\ge Q(\rho)$ somewhere on that interval, and is \emph{unique} only under an additional single-crossing condition (e.g.\ strict increase of $1-e^{-\rho}-Q(\rho)$); if the difference stays negative, no crossing occurs in range. Only if $Q(\rho)\equiv Q_0$ is \emph{constant} may one write the explicit solution: $Q_0\le0\Rightarrow\rho^*=0$; $0<Q_0<1\Rightarrow\rho^*=-\log(1-Q_0)$; $Q_0\ge1\Rightarrow$ no finite crossing in the leading OU model. When $q_{\mathrm{blind}}$ depends on $\rho$, the logarithmic display is a fixed point, \textbf{not an explicit solution}.
 \end{namedthm}
 
-\noindent\textbf{Proof.} At the boundary, $R_{\mathrm{pair}}(\rho^*)=R_{\mathrm{rand}}(\rho^*,N)$. Substituting $R_{\mathrm{pair,gain}}=\tfrac12K_{\mathrm{eff}}D_Hs^2\,r(\rho^*)$ (from F.8 with $\mathrm{Var}\Delta=2s^2r$) and (F.11) with the corrected leverage constant, and solving for $r(\rho^*)$, gives (F.12); monotonicity of $r$ makes the crossing the infimum. The OU form inverts $r(\rho)=1-e^{-\rho}$. Note (F.12) is a fixed-point equation because $v_{\mathrm{blind}}$ is evaluated at $\rho^*$; the single-crossing assumption stated in the proposition is what makes the crossing exist and be unique. The monotonicity intuition --- $R_{\mathrm{pair,gain}}$ increasing in $\rho_{\mathrm{pair}}$ while the right side varies slowly ($v_{\mathrm{blind}}\propto\rho_{\mathrm{pair}}^{2/3}$) --- motivates the assumption but does not prove it. \hfill$\blacksquare$
+\noindent\textbf{Proof.} At the boundary, $R_{\mathrm{pair}}(\rho^*)=R_{\mathrm{rand}}(\rho^*,N)$. Substituting $R_{\mathrm{pair,gain}}=\tfrac12K_{\mathrm{eff}}D_Hs^2\,r(\rho^*)$ (from (F.8d), whose proof starts from $\mathbb{E}\Delta^2$, \emph{not} $\operatorname{Var}\Delta$) and (F.12a)--(F.12b), and solving for $r(\rho^*)=1-e^{-\rho^*}$, gives (F.12). Existence under the stated sign/continuity conditions is the intermediate value theorem applied to $\rho\mapsto1-e^{-\rho}-Q(\rho)$; the infimum is a crossing by continuity; uniqueness is exactly the single-crossing assumption and is not otherwise proven. \hfill$\blacksquare$
 
-\begin{statusblock}\textbf{Empirical status of Prop 3 (two regimes; corrected constant; \texttt{results/prop3\_nofreeparam\_r1/}).} The published equal-frame grid ($N=2048$, $K=1024$, OU drift, 10 objects, all constants measured, zero fitted parameters) splits the proposition's status in two:
+\begin{statusblock}\textbf{Empirical status of Prop 3 (two regimes; corrected constant \emph{and} corrected metric; \texttt{results/prop3\_nofreeparam\_r1/}, \texttt{results/prop3\_raw\_metric\_r1/}).} The published equal-frame grid ($N=2048$, $K=1024$, OU drift, 10 objects, all constants measured, zero fitted parameters) splits the proposition's status in two:
 
-\emph{(a) The $v=0$ skeleton is VALIDATED, no-free-parameter.} For a gain-known random arm ($v=0$: oracle gains, so only the $C_0/N$ floor competes with the pair term), the predicted boundary $\rho^*=-\log\!\big(1-2(C_0/N)/(K_{\mathrm{eff}}D_Hs^2)\big)$ lands within a \textbf{median factor 1.54} of the 42 observed crossings; restricted to $\sigma_a\ge0.1$ (small-drift expansion intact), \textbf{40/40 cells within factor 2} (max 1.73). The empirical $\sigma$-scaling exponent is $-2.11$ ($R^2=0.976$) versus $-2.07$ predicted --- the leading-order $\sigma^{-2}$ law is correct. The prediction is systematically early (median $\log_{10}$ ratio $-0.187$), consistent with (F.8)'s $O(\Delta^3)$ corrections. Ingredients check out separately: the pair law (F.8) is essentially exact (median measured/predicted $0.997$ over 639 cells), and the oracle random arm sits flat at $C_0/N$ ($0.3286$) across the whole grid.
+\emph{(a) The $v=0$ skeleton is VALIDATED, no-free-parameter --- in the raw metric, at the few-percent level.} For a gain-known random arm ($v=0$: oracle gains, so only the floor competes with the pair term), comparing \textbf{raw prediction with raw observation} --- the raw fixed-design floor $C_0^{\mathrm{floor,raw,fix}}=980.110$--$1114.529$ in $Q_{\mathrm{raw}}=2(C_0^{\mathrm{floor,raw,fix}}/N)/(K_{\mathrm{eff}}D_H\sigma_a^2)$, $\rho^*_{\mathrm{pred}}=-\log(1-Q_{\mathrm{raw}})$, against raw pair-versus-raw oracle crossings on the same OU paths --- gives, for the 40 cells with $\sigma_a\ge0.1$: \textbf{40/40 observed raw crossings, median factor 1.04387, maximum factor 1.19985} (median signed $\log_{10}$ ratio $-0.0172$; all within factor 2). The earlier aligned-metric analysis reported a median factor $1.54$: that factor is a \textbf{raw/aligned metric mismatch} --- the raw/aligned floor ratio on the same objects is $1.5398517$ --- \emph{not} evidence for the (F.8) cubic remainder, and the former ``consistent with the $O(\Delta^3)$ correction'' explanation is deleted. The two $\sigma_a=0.05$ aligned crossings become $Q_{\mathrm{raw}}\ge1$ with no raw crossing; they were already outside the claimed small-mismatch validation range. The empirical $\sigma$-scaling exponent is $-2.11$ ($R^2=0.976$) versus $-2.07$ predicted --- the leading-order $\sigma^{-2}$ law is correct. The residual discrepancy grows toward $\approx20\%$ at $\sigma_a=0.5$; only that residual may plausibly be associated with higher-order small-mismatch terms, and even that reading is offered cautiously. Ingredients check out separately: the pair law (F.8) is essentially exact (median measured/predicted $0.997$ over 639 cells), and the oracle random arm sits flat at its floor across the whole grid.
 
-\emph{(b) The blind-arm flip prediction, as previously stated, is WITHDRAWN --- the corrected theory predicts no flip, and none occurs.} With the erroneous pipeline-$C_0$ leverage, (F.12) predicted flips at $\rho^*=0.007$--$0.33$ for $\sigma_a\ge0.1$; empirically ordered pairwise Hadamard stays strictly better than blind random+DGI in \textbf{all 100} (source $\times$ correction $\times$ $\sigma$ $\times$ object) cells over the entire scanned range $\rho\in[10^{-3},20]$. With the corrected constant $C_0^{\mathrm{lev}}=C_0^{\mathrm{raw}}$, the bracket satisfies $Q(\rho)>r(\rho)$ for every $\rho$ at every grid ($\sigma_a$, object) for both blind corrections --- the theory then predicts \textbf{no flip in range}, exactly matching the 100/100 empirical no-flip. The failure of the original prediction was localized to one constant (the F.3.3 leverage correction, verified to 0.3--4.7\% at white drift), not to the functional form of (F.12); the boundary curves previously shown in Fig.~4 are SRHT-paired-versus-ordered-Hadamard crossovers --- a comparison Prop 3 explicitly does not rank --- summarized by free two-parameter power-law fits, and are not a test of (F.12).\end{statusblock}
+\emph{(b) The blind-arm flip prediction, as previously stated, is WITHDRAWN --- the corrected theory predicts no flip, and none occurs.} With the erroneous pipeline-$C_0$ leverage, (F.12) predicted flips at $\rho^*=0.007$--$0.33$ for $\sigma_a\ge0.1$; empirically ordered pairwise Hadamard stays strictly better than blind random+DGI in \textbf{all 100} (source $\times$ correction $\times$ $\sigma$ $\times$ object) cells over the entire scanned range $\rho\in[10^{-3},20]$. With the corrected leverage $C_0^{\mathrm{lev}}=C_0^{\mathrm{lev,raw\ background}}$, the bracket satisfies $Q(\rho)>1-e^{-\rho}$ for every $\rho$ at every grid ($\sigma_a$, object) for both blind corrections --- the fixed-point equation (F.12) then has no solution in range, i.e.\ the theory predicts \textbf{no flip in range}, exactly matching the 100/100 empirical no-flip. The failure of the original prediction was localized to one constant (the F.3.3 leverage correction, verified to 0.3--4.7\% at white drift), not to the functional form of (F.12); the boundary curves previously shown in Fig.~4 are SRHT-paired-versus-ordered-Hadamard crossovers --- a comparison Prop 3 explicitly does not rank --- summarized by free two-parameter power-law fits, and are not a test of (F.12).\end{statusblock}
 
-\paragraph{Leading-order heuristic (labeled as such).} If $r(\rho)=\rho$, $D_H=1$, noise differences are negligible, $v_{\mathrm{blind}}$ is negligible (or absorbed into $C_0$), and $\rho$ \emph{means} adjacent-pair decorrelation, (F.12) collapses to the engineering rule
+\paragraph{Leading-order heuristic (labeled as such).} If $r(\rho)=\rho$, $D_H=1$, noise differences are negligible, $v_{\mathrm{blind}}$ is negligible, $Q$ is treated as constant, and $\rho$ \emph{means} adjacent-pair decorrelation, (F.12) collapses to the engineering rule
 \begin{equation}
-\rho^*\approx\frac{2C_0}{N\,K_{\mathrm{eff}}\,s^2}, \tag{F.13}
+\rho^*\approx\frac{2C_0^{\mathrm{floor}}}{N\,K_{\mathrm{eff}}\,s^2}, \tag{F.13}
 \end{equation}
-with first corrections $\rho^*\approx 2\big(C_0+(1+C_0^{\mathrm{lev}})v_{\mathrm{blind}}\big)/[NK_{\mathrm{eff}}D_Hs^2]+2(R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}})/(K_{\mathrm{eff}}D_Hs^2)$ and the nonlinear replacement $\rho\mapsto r^{-1}(\cdot)$ when adjacent increments are not infinitesimal. Note that for mean-subtracted pipelines ``negligible $v_{\mathrm{blind}}$'' means $(1+C_0^{\mathrm{raw}})v_{\mathrm{blind}}\ll C_0$ --- a far stronger requirement than $v_{\mathrm{blind}}\ll C_0$, and the reason the blind-arm flip vanished on the published grid (empirical-status point (b) above). (F.13) is a \emph{leading-order heuristic}, not a theorem; the theorem is (F.12).
+with first corrections $\rho^*\approx 2\big(C_0^{\mathrm{floor}}+(1+C_0^{\mathrm{lev}})v_{\mathrm{blind}}\big)/[NK_{\mathrm{eff}}D_Hs^2]+2(R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}})/(K_{\mathrm{eff}}D_Hs^2)$ and the nonlinear replacement $\rho\mapsto r^{-1}(\cdot)$ when adjacent increments are not infinitesimal. Note that for mean-subtracted pipelines ``negligible $v_{\mathrm{blind}}$'' means $(1+C_0^{\mathrm{lev,raw\ background}})v_{\mathrm{blind}}\ll C_0^{\mathrm{floor}}$ --- a far stronger requirement than $v_{\mathrm{blind}}\ll C_0^{\mathrm{floor}}$, and the reason the blind-arm flip vanished on the published grid (empirical-status point (b) above). (F.13) is a \emph{leading-order heuristic}, not a theorem; the theorem is (F.12).
+
+\paragraph{Lemma (OU window risk; not a Lipschitz-path theorem).} Let $\ell_n$ be stationary Gaussian with $\operatorname{Cov}(\ell_n,\ell_{n+h})=s^2e^{-\rho|h|}$, and let $\varepsilon_n$ be an independent centered stationary carrier-noise sequence with autocovariance $\gamma_\varepsilon(h)$. For an interior centered window $W=2m+1$ and $\hat\ell_n=W^{-1}\sum_{j=-m}^m(\ell_{n+j}+\varepsilon_{n+j})$,
+\begin{align}
+\mathbb E(\hat\ell_n-\ell_n)^2
+={}&s^2\Big[1-\tfrac2W\sum_{j=-m}^me^{-\rho|j|}\notag\\
+&\qquad+\tfrac1{W^2}\sum_{i,j=-m}^me^{-\rho|i-j|}\Big]\notag\\
+&+\tfrac1{W^2}\sum_{i,j=-m}^m\gamma_\varepsilon(i-j).
+\tag{F.14}
+\end{align}
+If $\rho W\to0$, the OU contribution is
+\begin{equation}
+s^2\rho\,\frac{W^2-1}{6W}+O(s^2\rho^2W^2), \tag{F.15}
+\end{equation}
+and if $\sum_h|\gamma_\varepsilon(h)|\le\sigma_{\mathrm{abs}}^2$,
+\begin{equation}
+\mathbb E(\hat\ell_n-\ell_n)^2\le\frac{\sigma_{\mathrm{abs}}^2}{W}+Cs^2\rho W .
+\tag{F.16}
+\end{equation}
+An interior optimizer therefore has $W^*\asymp\sigma_{\mathrm{abs}}/(s\sqrt\rho)$ and $\mathrm{MSE}^*\asymp\sigma_{\mathrm{abs}}\,s\sqrt\rho$ (for iid carrier noise, $W^*\sim\sqrt6\,\sigma_\varepsilon/(s\sqrt\rho)$ and $\mathrm{MSE}^*\sim\sqrt{2/3}\,\sigma_\varepsilon s\sqrt\rho$). \textbf{The deterministic Lipschitz $\rho^{2/3}$ rate is therefore not an OU output.} Prop~3 may treat $q_{\mathrm{blind}}(\rho,N)$ as an externally measured function --- as the empirical analysis does --- but any OU \emph{estimator theorem} must use this stochastic $\rho^{1/2}$ analysis instead.
+
+\paragraph{Metric and implementation cautions (raw versus scale-aligned).} The Prop.-3 runner's scale-aligned gain error $\min_c\|c\hat a-a\|^2/\|a\|^2$ is not $q_\delta=N^{-1}\sum_n(a_n/\hat a_n-1)^2$ and is not $\operatorname{Var}(\delta)$; they agree only to first order after a fixed small-error gauge. Likewise, a scale-aligned reconstruction floor is not the raw $C_0^{\mathrm{floor}}$ required by Prop.~3. If $\hat T=T+e$, put $a=\langle e,T\rangle/S_2$ and $b=\|e\|^2/S_2$; the implementation's scale-aligned error, minimizing over $c\in\mathbb R$, is
+\begin{equation}
+R_{\mathrm{align}}=\frac{b-a^2}{1+2a+b}, \tag{F.17}
+\end{equation}
+which is not generally proportional to the raw risk $b$ (even for $e\perp T$ it is $b/(1+b)$, not $b$). Therefore a raw-MSE theorem and an aligned-MSE empirical boundary must not be called an exact no-free-parameter validation of one another; the raw re-export of \texttt{results/prop3\_raw\_metric\_r1/} exists precisely to compare raw with raw.
 
 \paragraph{$\rho$-convention warning.} Throughout, $\rho_{\mathrm{pair}}$ (adjacent-pair decorrelation) is the variable of (F.12)--(F.13); it is \textbf{not} the normalized bandwidth $\rho_{\mathrm{bw}}$ of the tall-design thresholds ($p\approx\rho_{\mathrm{bw}}N$, Sec.~4). If a bandwidth parameter with adjacent-increment variance $\sim2s^2\rho_{\mathrm{bw}}/N$ is substituted, the explicit $1/N$ in (F.13) cancels and the boundary reads $\rho^*_{\mathrm{bw}}\approx2C_0/(K_{\mathrm{eff}}s^2)$ --- same physics, different symbol. Every phase-diagram axis must declare its convention.
 
-\paragraph{What Prop 3 does not claim.} The boundary compares two \emph{specific} pipelines (pairwise-normalized Hadamard vs.\ blind random+DGI with the ideal correlator); it does not rank SRHT-paired pipelines, externally calibrated systems, or prior-regularized reconstructions, each of which shifts $\Delta_R$. It inherits every assumption of its ingredients: small mismatch (F.8), measured constants $C_0$, $C_0^{\mathrm{lev}}$, and $D_H$ (with the floor/leverage distinction of the F.3.3 correction), a stationary drift with a declared $r(\rho)$, and a $v_{\mathrm{blind}}$ from the window rate theorem whose constants are implementation-specific. It is a mean-square crossing, not a guarantee about any single realization; the single-crossing property itself is assumed, not derived; and at $\rho_{\mathrm{pair}}$ beyond the small-drift expansion only the defining infimum --- not (F.12) --- is meaningful. Finally, the validated regime is the $v=0$ skeleton (empirical-status point (a)); no flip prediction is currently claimed for the blind arm --- the corrected constant predicts, and the data confirm, no flip on the published grid.
+\paragraph{What Prop 3 does not claim.} The boundary compares two \emph{specific} pipelines (pairwise-normalized Hadamard vs.\ blind random+DGI with the ideal correlator); it does not rank SRHT-paired pipelines, externally calibrated systems, or prior-regularized reconstructions, each of which shifts $\Delta_R$. It inherits every assumption of its ingredients: small mismatch (F.8b)--(F.8d), measured constants $C_0^{\mathrm{floor}}$, $C_0^{\mathrm{lev}}$, and $D_H$ (with the floor/leverage distinction of the F.3.3 correction \emph{and} the raw/aligned metric distinction of (F.17)), a stationary drift with a declared $r(\rho)$, and a $q_{\mathrm{blind}}$ that is an externally measured function, not an OU theorem (the $\rho^{2/3}$ attribution is withdrawn; the OU lemma gives $\rho^{1/2}$). Every prediction and every observation must be stated in the \emph{same} raw or aligned metric --- the strict no-free-parameter claim attaches only to the raw-vs-raw comparison of \texttt{results/prop3\_raw\_metric\_r1/}; a purely aligned comparison is a scale-aligned empirical analogue. It is a mean-square crossing, not a guarantee about any single realization; the single-crossing property itself is assumed, not derived; and at $\rho_{\mathrm{pair}}$ beyond the small-drift expansion only the defining infimum --- not (F.12) --- is meaningful. Finally, the validated regime is the $v=0$ skeleton (empirical-status point (a)); no flip prediction is currently claimed for the blind arm --- the corrected constant predicts, and the data confirm, no flip on the published grid.

@@ -1,0 +1,40 @@
+{
+  "pattern_moments": {
+    "mu": 0.4998724162578583,
+    "sigma": 0.28865545988082886,
+    "gamma3": 0.0002485171426087618,
+    "beta4": 1.8000977039337158
+  },
+  "moment_prediction_K_beta4_minus_2": 1023.8000977039337,
+  "aligned_floor_range": [
+    623.9756088745963,
+    715.1718238053052
+  ],
+  "raw_floor_range": [
+    980.1100321625128,
+    1114.5293830571654
+  ],
+  "raw_floor_median": 1026.4702400984156,
+  "raw_floor_mean": 1031.8717839193278,
+  "raw_over_aligned_ratio_median": 1.53985171090027,
+  "aligned_reproduction": {
+    "n_rows": 900,
+    "max_abs_diff": 1.244929261345895e-07,
+    "median_abs_diff": 1.9636897691244215e-08
+  },
+  "raw_skeleton_sigma_ge_0p1": {
+    "n_cells": 40,
+    "n_observed_crossings": 40,
+    "median_log10_ratio": -0.017206900803854026,
+    "median_abs_log10_ratio": 0.018645432763220105,
+    "factor_median": 1.043867635531442,
+    "factor_max": 1.1998533109600058,
+    "frac_within_factor2": 1.0
+  },
+  "sigma_0p05_cells": {
+    "n_cells": 10,
+    "n_Q_raw_ge_1": 10,
+    "n_raw_crossing_observed": 0
+  },
+  "runtime_seconds": 56.161527156829834
+}
