@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import datetime
 import hashlib
 import math
+import os
 import platform
 import subprocess
 import sys
@@ -308,6 +309,46 @@ def git_status_porcelain(root: Optional[Path] = None) -> List[str]:
     return [line for line in text.splitlines() if line.strip()]
 
 
+def _output_pathspec(output_dir, root: Optional[Path]) -> Optional[str]:
+    """Express ``output_dir`` as a POSIX path relative to ``root``.
+
+    ``git status`` (invoked with ``cwd=root``) reports and matches pathspecs
+    relative to that directory, so an ``:(exclude)`` pathspec must be expressed
+    relative to ``root``. Absolute paths are relativised against ``root``;
+    relative paths are assumed already relative to ``root``. Returns None if the
+    path cannot be expressed (e.g. different drive).
+    """
+
+    if output_dir is None:
+        return None
+    try:
+        p = Path(output_dir)
+        base = Path(root) if root is not None else Path.cwd()
+        rel = os.path.relpath(str(p), str(base)) if p.is_absolute() else str(p)
+        return Path(rel).as_posix()
+    except Exception:
+        return None
+
+
+def git_status_porcelain_excluding(output_dir, root: Optional[Path] = None) -> Optional[List[str]]:
+    """``git status --porcelain`` lines with ``output_dir`` (and its subtree) excluded.
+
+    Returns None when ``output_dir`` is None, when git is unavailable, or when the
+    output path cannot be relativised — signalling "not evaluated" rather than
+    "clean". An empty list means the tree is clean once the run's own output dir
+    is set aside.
+    """
+
+    rel = _output_pathspec(output_dir, root)
+    if rel is None:
+        return None
+    out = _run_git(["status", "--porcelain", "--", ".", f":(exclude){rel}"], root)
+    if out is None:
+        return None
+    text = out.decode("utf-8", "replace")
+    return [line for line in text.splitlines() if line.strip()]
+
+
 def git_diff_sha256(root: Optional[Path] = None) -> Optional[str]:
     """SHA256 of ``git diff HEAD`` (tracked working-tree changes).
 
@@ -354,8 +395,13 @@ def _main_runner_path() -> Optional[str]:
     return None
 
 
-def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] = None) -> dict:
-    """Provenance manifest (schema v2).
+def build_run_manifest(
+    args,
+    root: Optional[Path] = None,
+    extra: Optional[dict] = None,
+    output_dir=None,
+) -> dict:
+    """Provenance manifest (schema v2; additive minor bump ``.1``).
 
     Additive upgrade over v1: every original key is preserved (``utc_timestamp``,
     ``git_commit``, ``hostname``, ``python_version``, ``torch_version``,
@@ -363,12 +409,40 @@ def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] 
     v2 also records the working-tree dirty state, a ``git diff HEAD`` fingerprint,
     the runner file's own SHA256, the full command line, and the platform string
     so a recorded manifest pins the *exact* code+tree that produced a result.
+
+    ``manifest_version`` stays ``2`` (the schema is only ever extended). The
+    minor bump ``.1`` adds three honesty fields so a ``git_dirty: true`` manifest
+    no longer masquerades as a claim of a soiled tree:
+
+    * ``git_dirty_excluding_output`` — bool if ``output_dir`` is supplied
+      (``git status --porcelain`` with the run's own output subtree excluded),
+      else ``None``. ``git_dirty`` conflates the run's own tracked outputs and any
+      concurrent doc edits; this field isolates *external* dirtiness.
+    * ``untracked_files`` — the ``??`` subset of ``git_status_porcelain`` surfaced
+      explicitly (the diff fingerprint in ``git_diff_sha256`` covers only tracked
+      changes, so untracked paths would otherwise be easy to miss).
+    * ``provenance_note`` — auto-set to a plain-language note when the *only* dirty
+      paths are inside ``output_dir`` (i.e. the tree is clean except this run's own
+      outputs); ``None`` otherwise.
     """
 
     commit_full = git_commit(root)
     porcelain = git_status_porcelain(root)
     diff_sha = git_diff_sha256(root)
     runner_path = _main_runner_path()
+    git_dirty = bool(porcelain) or (diff_sha is not None)
+    untracked = [line[3:] for line in porcelain if line[:2] == "??"]
+
+    porcelain_excl = git_status_porcelain_excluding(output_dir, root)
+    if porcelain_excl is None:
+        git_dirty_excluding_output: Optional[bool] = None
+    else:
+        git_dirty_excluding_output = bool(porcelain_excl)
+
+    provenance_note: Optional[str] = None
+    if git_dirty and git_dirty_excluding_output is False:
+        provenance_note = "tree clean except this run's own outputs"
+
     manifest = {
         # --- v1 keys (preserved for backward compatibility) ---
         "utc_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -380,15 +454,20 @@ def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] 
         "args": vars(args) if hasattr(args, "__dict__") else dict(args),
         # --- v2 additions ---
         "manifest_version": 2,
+        "manifest_version_minor": 1,
         "git_commit_full": commit_full,
         "git_branch": git_branch(root),
-        "git_dirty": bool(porcelain) or (diff_sha is not None),
+        "git_dirty": git_dirty,
         "git_diff_sha256": diff_sha,
         "git_status_porcelain": porcelain,
         "runner_path": runner_path,
         "runner_sha256": sha256_file(runner_path) if runner_path else None,
         "argv": list(sys.argv),
         "platform": platform.platform(),
+        # --- v2.1 honesty additions ---
+        "git_dirty_excluding_output": git_dirty_excluding_output,
+        "untracked_files": untracked,
+        "provenance_note": provenance_note,
     }
     if extra:
         manifest.update(extra)

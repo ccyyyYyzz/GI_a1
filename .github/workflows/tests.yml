@@ -17,7 +17,11 @@ jobs:
       - name: Install pinned dependencies (CPU torch)
         run: |
           pip install torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu
-          pip install numpy==1.26.4 scipy==1.11.4 matplotlib==3.3.3 pandas==1.5.3 pytest==8.4.2
+          # pyyaml is imported at module scope by run_mechanism_m1.py (pulled in by
+          # two test_core.py cases via run_srht_m3); pillow is imported directly by
+          # src/plotting.py. Both must be installed explicitly or the suite errors
+          # with ModuleNotFoundError even though the deps resolve fine.
+          pip install numpy==1.26.4 scipy==1.11.4 matplotlib==3.3.3 pandas==1.5.3 pytest==8.4.2 pyyaml==6.0.2 pillow==10.2.0
       - name: Run test suite
         working-directory: scgi_repro
         run: python -m pytest tests/ -q

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -87,6 +88,87 @@ class TestManifestV2(unittest.TestCase):
         manifest = self._manifest()
         if manifest["runner_path"] is not None:
             self.assertEqual(manifest["runner_sha256"], sha256_file(manifest["runner_path"]))
+
+    def test_v2_1_honesty_fields_are_additive(self):
+        """v2.1 adds fields only; the schema *version* stays 2 (never rev'd)."""
+        manifest = self._manifest()  # built with no output_dir
+        self.assertEqual(manifest["manifest_version"], 2)
+        self.assertEqual(manifest["manifest_version_minor"], 1)
+        # untracked_files: a (possibly empty) list of str, a subset of porcelain
+        self.assertIsInstance(manifest["untracked_files"], list)
+        for entry in manifest["untracked_files"]:
+            self.assertIsInstance(entry, str)
+        untracked_from_porcelain = {
+            line[3:] for line in manifest["git_status_porcelain"] if line[:2] == "??"
+        }
+        self.assertEqual(set(manifest["untracked_files"]), untracked_from_porcelain)
+        # no output_dir supplied -> "excluding output" is not evaluated (None), and
+        # the plain-language note is only emitted when it can be justified.
+        self.assertIsNone(manifest["git_dirty_excluding_output"])
+        self.assertIsNone(manifest["provenance_note"])
+
+
+class TestManifestOutputDirHonesty(unittest.TestCase):
+    """v2.1: ``git_dirty_excluding_output`` + ``provenance_note`` isolate the run's
+    own outputs from external working-tree dirt (self-dirtying overclaim fix)."""
+
+    def _git(self, *cmd, cwd):
+        subprocess.run(
+            ["git", *cmd], cwd=str(cwd), check=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        )
+
+    def _init_repo(self, tmp: Path):
+        try:
+            self._git("init", cwd=tmp)
+        except Exception as exc:  # pragma: no cover - git always present in CI
+            self.skipTest(f"git unavailable: {exc}")
+        self._git("config", "user.email", "t@example.com", cwd=tmp)
+        self._git("config", "user.name", "tester", cwd=tmp)
+        (tmp / "out").mkdir()
+        (tmp / "keep.txt").write_text("root\n", encoding="utf-8")
+        (tmp / "out" / "tracked.txt").write_text("x\n", encoding="utf-8")
+        self._git("add", "-A", cwd=tmp)
+        self._git("commit", "-m", "init", cwd=tmp)
+
+    def test_only_output_dir_dirty_sets_note(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            self._init_repo(tmp)
+            # dirty ONLY inside the run's own output dir (tracked + untracked)
+            (tmp / "out" / "tracked.txt").write_text("changed\n", encoding="utf-8")
+            (tmp / "out" / "untracked.csv").write_text("a,b\n", encoding="utf-8")
+            manifest = build_run_manifest(argparse.Namespace(x=1), tmp, output_dir="out")
+            self.assertTrue(manifest["git_dirty"])  # the tree *is* dirty ...
+            self.assertFalse(manifest["git_dirty_excluding_output"])  # ... only in out/
+            self.assertEqual(
+                manifest["provenance_note"], "tree clean except this run's own outputs"
+            )
+            self.assertIn("out/untracked.csv", manifest["untracked_files"])
+
+    def test_external_dirt_clears_note(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            self._init_repo(tmp)
+            (tmp / "out" / "tracked.txt").write_text("changed\n", encoding="utf-8")  # inside
+            (tmp / "keep.txt").write_text("edited\n", encoding="utf-8")  # OUTSIDE out/
+            manifest = build_run_manifest(argparse.Namespace(x=1), tmp, output_dir="out")
+            self.assertTrue(manifest["git_dirty_excluding_output"])
+            self.assertIsNone(manifest["provenance_note"])
+
+    def test_absolute_output_dir_is_relativised(self):
+        with tempfile.TemporaryDirectory() as td:
+            tmp = Path(td)
+            self._init_repo(tmp)
+            (tmp / "out" / "tracked.txt").write_text("changed\n", encoding="utf-8")
+            # pass an ABSOLUTE output dir -> must be relativised against root
+            manifest = build_run_manifest(
+                argparse.Namespace(x=1), tmp, output_dir=str(tmp / "out")
+            )
+            self.assertFalse(manifest["git_dirty_excluding_output"])
+            self.assertEqual(
+                manifest["provenance_note"], "tree clean except this run's own outputs"
+            )
 
 
 class TestSha256File(unittest.TestCase):

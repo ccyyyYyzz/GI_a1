@@ -23,6 +23,7 @@ measured by run_prop3_boundary.py:
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 from pathlib import Path
@@ -32,6 +33,7 @@ import pandas as pd
 import torch
 
 from run_mechanism_m1 import make_synthetic_objects
+from src.paper_experiments import build_run_manifest
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "results" / "prop3_nofreeparam_r1"
@@ -191,6 +193,28 @@ def main() -> None:
     (OUT / "prop3_verdict_summary.json").write_text(json.dumps(summary, indent=2),
                                                     encoding="utf-8")
     print(json.dumps(summary, indent=2))
+
+    # Standard v2 provenance manifest. Written to a distinct filename so it does
+    # not clobber run_prop3_boundary.py's run_manifest.json in the shared out dir.
+    manifest = build_run_manifest(
+        argparse.Namespace(N=N, K=K, config_seed=CONFIG_SEED),
+        ROOT,
+        extra=dict(
+            script="run_prop3_verdict_tables.py",
+            output_dir=str(OUT),
+            inputs=[
+                "results/m2_hadamard_order_dense_r1_merged/phase_scan.csv",
+                "prop3_constants.csv",
+                "prop3_curves_local.csv",
+                "prop3_pair_gain_ingredient.csv",
+            ],
+            N=N, K=K, config_seed=CONFIG_SEED,
+            pattern_moments=dict(mu=mu, sigma=sig, gamma3=gamma3, beta4=beta4),
+        ),
+        output_dir=OUT,
+    )
+    (OUT / "verdict_tables_run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, default=str), encoding="utf-8")
 
 
 if __name__ == "__main__":

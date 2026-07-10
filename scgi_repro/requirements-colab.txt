@@ -7,8 +7,10 @@ matplotlib==3.3.3
 scipy==1.11.4
 pytest==8.4.2
 pandas==1.5.3
-# unpinned auxiliaries
-pyyaml
-pillow
-scikit-image
-torchvision
+# auxiliaries, pinned to the local reference env (Wave E3)
+pyyaml==6.0.2
+pillow==10.2.0
+scikit-image==0.24.0
+# local build is 0.16.0+cu121 (the CUDA variant paired with torch 2.1.0);
+# 0.16.0 is the base version and the CPU wheel Colab/CI resolve to.
+torchvision==0.16.0

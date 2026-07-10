@@ -45,6 +45,7 @@ import torch
 from run_mechanism_m1 import make_synthetic_objects, object_metrics
 from src.basis import basis_frame_budget, hadamard_matrix, make_basis
 from src.mechanisms import apply_correction, gain_error_stats, make_multiplicative_channel
+from src.paper_experiments import build_run_manifest
 
 ROOT = Path(__file__).resolve().parent
 GRID_RHOS = [0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1.0, 3.0, 10.0]
@@ -460,7 +461,9 @@ def main() -> None:
     with pd.option_context("display.width", 250):
         print(agreement.to_string(), flush=True)
 
-    manifest = dict(
+    # Standard v2 provenance manifest (git commit/branch/dirty, runner sha256,
+    # argv, env versions) with the bespoke constants/runtime folded in as extras.
+    manifest_extra = dict(
         script="run_prop3_boundary.py",
         phase_dir=str(phase_dir), output_dir=str(out_dir),
         config_seed=CONFIG_SEED, image_size=IMAGE_SIZE, num_objects=NUM_OBJECTS,
@@ -472,9 +475,10 @@ def main() -> None:
                           "demeaned, exp, mean-normalized; identical to run_phase_m2.py"),
         above_floor_rel_mse=ABOVE_FLOOR_REL_MSE,
         runtime_seconds=float(time.time() - t_start),
-        torch_version=torch.__version__,
     )
-    (out_dir / "run_manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    manifest = build_run_manifest(args, ROOT, extra=manifest_extra, output_dir=out_dir)
+    (out_dir / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2, default=str), encoding="utf-8")
     print(f"[done] {time.time()-t_start:.1f}s -> {out_dir}", flush=True)
 
 
