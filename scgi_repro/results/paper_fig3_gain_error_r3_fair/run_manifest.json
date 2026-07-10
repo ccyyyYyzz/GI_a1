@@ -1,6 +1,6 @@
 {
-  "utc_timestamp": "2026-07-10T10:39:07.259825+00:00",
-  "git_commit": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "utc_timestamp": "2026-07-10T15:41:57.917134+00:00",
+  "git_commit": "68e510d0ebda8a4977e6d73aac73a0e0e5513956",
   "hostname": "cyz912",
   "python_version": "3.9.21",
   "torch_version": "2.1.0+cu121",
@@ -33,20 +33,16 @@
     "slope_wmax": 16
   },
   "manifest_version": 2,
-  "git_commit_full": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "manifest_version_minor": 1,
+  "git_commit_full": "68e510d0ebda8a4977e6d73aac73a0e0e5513956",
   "git_branch": "scgi-ceiling-diagnostic-r1",
   "git_dirty": true,
-  "git_diff_sha256": "b0ceb2a8923d2c06bf6214349b30729bf1977afd64c39a565232a3ba60234a14",
+  "git_diff_sha256": "2a85be49a0ae41d0f028197855e4c37e9c4ebc4953a7cae52ea326c3d74a1349",
   "git_status_porcelain": [
-    " M scgi_repro/paper_draft/latex/bibliography.tex",
-    " M scgi_repro/paper_draft/latex/body.tex",
-    " M scgi_repro/paper_draft/latex/main.tex",
-    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/fig3_caption.md",
-    "?? scgi_repro/paper_draft/latex/bibliography_supp.tex",
-    "?? scgi_repro/paper_draft/latex/macros.tex"
+    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/fig3_caption.md"
   ],
   "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_paper_fig3_gain_error.py",
-  "runner_sha256": "eb23a215c71c307bd3c5bd0b91c0b06c2844c6028dcedb175801290b029330d8",
+  "runner_sha256": "74b04c9206fbeb20fc2b05239a3215d1cfdc21ef92ba2e6e798905ddfa4072ba",
   "argv": [
     "run_paper_fig3_gain_error.py",
     "--output-dir",
@@ -84,6 +80,9 @@
     "16"
   ],
   "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": false,
+  "untracked_files": [],
+  "provenance_note": "tree clean except this run's own outputs",
   "rows": 31600,
-  "runtime_seconds": 122.961
+  "runtime_seconds": 124.596
 }
