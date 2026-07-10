@@ -1,6 +1,14 @@
+# Pinned to the versions of the local reference environment used for the paper
+# runs and figure generation (Wave D2). The CPU build of torch suffices for all
+# runners and for make_pub_figures.py; CUDA is optional (Colab shards only).
+torch==2.1.0
+numpy==1.26.4
+matplotlib==3.3.3
+scipy==1.11.4
+pytest==8.4.2
+pandas==1.5.3
+# unpinned auxiliaries
 pyyaml
-pandas
 pillow
-scipy
 scikit-image
 torchvision

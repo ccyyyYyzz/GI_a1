@@ -1,0 +1,27 @@
+% macros.tex --- shared preamble macros for main.tex and supplement.tex.
+% Keep every macro used by body.tex / appendix_body.tex here so both documents compile.
+
+\graphicspath{{figs/}}
+
+% ---- lightweight named-theorem style (labels are manual: Theorem A, A', B, ...) ----
+\newenvironment{namedthm}[1]{\par\smallskip\noindent\textbf{#1.}\itshape\ }{\par\smallskip}
+\newenvironment{nameddef}[1]{\par\smallskip\noindent\textbf{#1.}\ }{\par\smallskip}
+% remark/status blocks
+\newenvironment{statusblock}{\par\smallskip\noindent\small}{\par\smallskip}
+% conventions box
+\newcommand{\conv}[1]{\textbf{#1}}
+
+% ---- shorthand macros used throughout ----
+\newcommand{\Keff}{K_{\mathrm{eff}}}
+\newcommand{\Kinf}{K_{\infty}}
+\newcommand{\rhopair}{\rho_{\mathrm{pair}}}
+\newcommand{\rhobw}{\rho_{\mathrm{bw}}}
+\newcommand{\relMSE}{\mathrm{relMSE}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}

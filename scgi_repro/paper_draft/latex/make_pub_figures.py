@@ -300,7 +300,7 @@ def fig2_carrier_traces() -> Path:
         ("hadamard_ordered", "hadamard_paired", "(b) ordered Hadamard carrier"),
     ]
 
-    fig, axes = plt.subplots(2, 1, figsize=(3.5, 4.1), sharex=True)
+    fig, axes = plt.subplots(1, 2, figsize=(7.16, 2.2), sharex=True)
     band_a = None
     for idx, (ax, (req_name, series_key, title)) in enumerate(zip(axes, arms)):
         basis = make_paper_basis(req_name, num_pixels, seed=seed)
@@ -336,14 +336,15 @@ def fig2_carrier_traces() -> Path:
     top.legend(loc="upper left", fontsize=7.2, ncol=2, handlelength=1.3,
                columnspacing=0.9, borderaxespad=0.3)
     mu, sd, n = band_a
-    top.annotate(r"$\pm1\,\mathrm{SD}$ variance envelope", xy=(int(0.80 * n), mu + sd),
-                 xytext=(int(0.55 * n), mu + 2.9 * sd), textcoords="data",
+    top.annotate(r"$\pm1\,\mathrm{SD}$ variance envelope", xy=(int(0.80 * n), mu - sd),
+                 xytext=(int(0.55 * n), mu - 2.9 * sd), textcoords="data",
                  fontsize=6.6, color=TICK_INK, style="italic", ha="center", va="center",
                  arrowprops=dict(arrowstyle="->", color=TICK_INK, lw=0.7))
-    axes[1].set_xlabel("frame index $n$")
+    for ax in axes:
+        ax.set_xlabel("frame index $n$")
     fig.suptitle(f"Noiseless bucket carriers  ({obj_name}, 8192 frames)",
-                 fontsize=9, color=TITLE_INK, y=0.995)
-    fig.tight_layout(rect=(0, 0, 1, 0.98))
+                 fontsize=9, color=TITLE_INK, y=1.0)
+    fig.tight_layout(rect=(0, 0, 1, 0.97), w_pad=1.4)
     return save(fig, "fig2_carrier_traces.png")
 
 
@@ -918,6 +919,302 @@ def fig8_threshold() -> Path:
 
 
 # --------------------------------------------------------------------------------------
+# Fig S1  --  permutation-whitening power / factorized randomization ablation
+# (Supplementary Material S1; data: results/perm_ablation_r1/perm_ablation.csv)
+# --------------------------------------------------------------------------------------
+def figS1_perm_whitening() -> Path:
+    from scipy.stats import spearmanr
+
+    apply_rcparams()
+    d = pd.read_csv(RESULTS / "perm_ablation_r1" / "perm_ablation.csv")
+    rates = d.groupby("arm")["levene_reject"].mean()
+
+    # Display order: baseline first, then single ingredients, then combinations.
+    arm_disp = [
+        ("ordered", "ordered (baseline)"),
+        ("sign_only", "pixel signs $D$ only"),
+        ("row_perm_only", "$P_{\\mathrm{row}}$ only"),
+        ("pixel_sign", "$P_{\\mathrm{col}}{+}D$ (theory)"),
+        ("row_pixel_sign", "$P_{\\mathrm{col}}{+}P_{\\mathrm{row}}{+}D$"),
+        ("row_sign", "$P_{\\mathrm{row}}{+}D$ (code SRHT)"),
+        ("row_pixel", "$P_{\\mathrm{col}}{+}P_{\\mathrm{row}}$ (hist.)"),
+        ("pixel_perm_only", "$P_{\\mathrm{col}}$ only (theory's $P$)"),
+    ]
+
+    fig, axes = plt.subplots(1, 2, figsize=(3.5, 2.3), gridspec_kw={"width_ratios": [1.55, 1.0]})
+
+    # Panel (a): Levene rejection rate per arm.
+    ax = axes[0]
+    ypos = np.arange(len(arm_disp))[::-1]
+    for y, (arm, disp) in zip(ypos, arm_disp):
+        r = float(rates[arm])
+        if arm == "ordered":
+            c, edge, lw = P6, TITLE_INK, 0.9
+        elif arm == "sign_only":
+            c, edge, lw = P3, "white", 0.6
+        elif arm in ("pixel_sign", "row_sign"):
+            c, edge, lw = P5, TITLE_INK, 0.9
+        else:
+            c, edge, lw = tint(P5, 0.42), "white", 0.6
+        ax.barh(y, r, color=c, edgecolor=edge, linewidth=lw, height=0.68, zorder=3)
+        ax.text(r + 0.012, y, f"{r:.3f}", va="center", ha="left", fontsize=6.0,
+                color=TICK_INK)
+    ax.set_yticks(ypos)
+    ax.set_yticklabels([disp for _, disp in arm_disp], fontsize=5.9)
+    ax.set_xlabel("Levene rejection rate ($p<10^{-3}$)", fontsize=7.5)
+    ax.set_xlim(0, 0.85)
+    ax.set_title("(a) factorized attribution", fontsize=8, loc="left")
+    style_ax(ax)
+    ax.grid(True, axis="x", color=GRID, linewidth=0.6)
+    ax.grid(False, axis="y")
+
+    # Panel (b): per-draw certificate null --- Walsh flatness does not predict rejection.
+    # Arm: the historical whitening-power arm (P_col + P_row), the one whose Spearman
+    # null (0.092, p = 0.10) is quoted in Sec. 9.6 of the main text.
+    ax = axes[1]
+    pc = d[d["arm"] == "row_pixel"]
+    rho, pval = spearmanr(pc["walsh_flatness_ratio"], pc["levene_p"])
+    rej = pc["levene_reject"].astype(bool)
+    # Colors documented in the caption: violet = accepted draws, red = rejected draws.
+    ax.scatter(pc.loc[~rej, "walsh_flatness_ratio"], pc.loc[~rej, "levene_p"], s=8,
+               color=tint(P5, 0.45), edgecolors="none", zorder=4)
+    ax.scatter(pc.loc[rej, "walsh_flatness_ratio"], pc.loc[rej, "levene_p"], s=12,
+               color=P6, edgecolors="white", linewidths=0.3, zorder=5)
+    ax.axhline(1e-3, color=INK_GRAY, lw=0.9, linestyle=(0, (3, 2)), zorder=3)
+    ax.set_yscale("log")
+    ax.set_ylim(float(pc["levene_p"].min()) * 3e-3, 2.0)
+    ax.set_xlabel(r"max non-DC $|\widehat{w^P}|/S_2$", fontsize=7.5)
+    ax.set_ylabel("Levene $p$", fontsize=7.5)
+    ax.set_title("(b) certificate null", fontsize=8, loc="left")
+    ax.text(0.03, 0.03, f"Spearman {rho:.3f} ($p={pval:.2f}$)",
+            transform=ax.transAxes, fontsize=6.0, color=TICK_INK, ha="left", va="bottom")
+    style_ax(ax)
+
+    fig.tight_layout(w_pad=1.0)
+    return save(fig, "figS1_perm_whitening.png")
+
+
+# --------------------------------------------------------------------------------------
+# Fig S2  --  coherent-residual (E4) validation of Theorem 1: matrix law vs scalar law
+# (Supplementary Material S2; data: results/coherent_residual_e4_r1/)
+# --------------------------------------------------------------------------------------
+def figS2_coherent_residual() -> Path:
+    apply_rcparams()
+    e4 = pd.read_csv(RESULTS / "coherent_residual_e4_r1" / "e4_coherent_residual_summary.csv")
+    basis_disp = {
+        "orthogonal_inverse": "orthogonal",
+        "srht_inverse": "SRHT",
+        "random_dgi": "random/DGI",
+    }
+
+    fig, axes = plt.subplots(1, 2, figsize=(3.5, 2.15))
+
+    # Panel (a): matrix-law prediction vs measurement, all 150 cells.
+    ax = axes[0]
+    lo = float(min(e4["matrix_law_pred"].min(), e4["measured_mean"].min())) * 0.7
+    hi = float(max(e4["matrix_law_pred"].max(), e4["measured_mean"].max())) * 1.4
+    ax.plot([lo, hi], [lo, hi], linestyle=(0, (4, 3)), lw=1.0, color=INK_GRAY, zorder=2)
+    for basis in ("orthogonal_inverse", "srht_inverse", "random_dgi"):
+        g = e4[e4["basis"] == basis]
+        c = SERIES_COLOR[basis]
+        ax.scatter(g["matrix_law_pred"], g["measured_mean"], s=11, color=c,
+                   edgecolors="white", linewidths=0.3, zorder=zorder_for(c) + 1,
+                   label=basis_disp[basis])
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(lo, hi)
+    ax.set_xlabel("matrix-law predicted relMSE", fontsize=7.5)
+    ax.set_ylabel("measured relMSE", fontsize=7.5)
+    ax.set_title("(a) matrix law (150 cells)", fontsize=8, loc="left")
+    style_ax(ax)
+    ax.legend(loc="upper left", fontsize=5.8, handlelength=1.0, labelspacing=0.25,
+              handletextpad=0.3, borderaxespad=0.2)
+
+    # Panel (b): measured / scalar-law ratio by residual structure (the coherent clause).
+    ax = axes[1]
+    structures = ["iid", "ar1", "sinusoidal", "lowpass_ou", "blockwise"]
+    struct_disp = {"iid": "iid", "ar1": "AR(1)", "sinusoidal": "sin.",
+                   "lowpass_ou": "LP-OU", "blockwise": "block"}
+    xpos = np.arange(len(structures))
+    for k, basis in enumerate(("orthogonal_inverse", "srht_inverse", "random_dgi")):
+        c = SERIES_COLOR[basis]
+        for j, s in enumerate(structures):
+            g = e4[(e4["basis"] == basis) & (e4["structure"] == s)]
+            x = np.full(len(g), xpos[j] + (k - 1) * 0.22)
+            ax.scatter(x, g["scalar_ratio"], s=9, color=c, edgecolors="white",
+                       linewidths=0.3, zorder=zorder_for(c) + 1)
+    ax.axhline(1.0, color=INK_GRAY, lw=0.9, linestyle=(0, (3, 2)), zorder=2)
+    dgi_lp = e4[(e4["basis"] == "random_dgi") & (e4["structure"] == "lowpass_ou")]
+    worst = float(dgi_lp["scalar_ratio"].min())
+    ax.annotate(f"scalar law off\nby ${1.0 / worst:.2f}\\times$ (DGI)",
+                xy=(xpos[3] + 0.22, worst * 1.18), xytext=(xpos[1] - 0.3, 0.42),
+                fontsize=5.9, color=tuple(np.array(mcolors.to_rgb(P1)) * 0.8),
+                ha="center", va="center",
+                arrowprops=dict(arrowstyle="->", color=P1, lw=0.8), zorder=8)
+    ax.set_yscale("log")
+    ax.set_ylim(0.2, 1.45)
+    ax.set_xlim(-0.6, len(structures) - 0.4)
+    ax.set_xticks(xpos)
+    ax.set_xticklabels([struct_disp[s] for s in structures], fontsize=5.7)
+    ax.set_ylabel(r"measured / scalar-law", fontsize=7.5)
+    ax.set_title("(b) coherent clause", fontsize=8, loc="left")
+    style_ax(ax)
+
+    fig.tight_layout(w_pad=1.2)
+    return save(fig, "figS2_coherent_residual.png")
+
+
+# --------------------------------------------------------------------------------------
+# Fig S3  --  C0 audit (moment formula vs measurement) + oracle-to-blind baselines
+# (Supplementary Material S3; data: results/c0_audit_e9_r1/, results/oracle_baselines_e11_r1/)
+# --------------------------------------------------------------------------------------
+def figS3_c0_oracle() -> Path:
+    apply_rcparams()
+    c0 = pd.read_csv(RESULTS / "c0_audit_e9_r1" / "e9_c0_audit.csv")
+    e11 = pd.read_csv(RESULTS / "oracle_baselines_e11_r1" / "e11_oracle_baselines_summary.csv")
+
+    fig, axes = plt.subplots(1, 2, figsize=(3.5, 2.2), gridspec_kw={"width_ratios": [1.0, 1.3]})
+
+    # Panel (a): measured C0 vs the Appendix-F moment formula, four ensembles.
+    ax = axes[0]
+    ens_color = {"rademacher": P6, "binary": P2, "uniform": P1, "gaussian_clipped": P8}
+    ens_disp = {"rademacher": "Rademacher", "binary": "binary",
+                "uniform": "uniform", "gaussian_clipped": "clipped Gauss."}
+    lo = float(c0["C0_formula"].min()) * 0.5
+    hi = float(c0["C0_formula"].max()) * 2.0
+    ax.plot([lo, hi], [lo, hi], linestyle=(0, (4, 3)), lw=1.0, color=INK_GRAY, zorder=2)
+    for ens in ("rademacher", "binary", "uniform", "gaussian_clipped"):
+        g = c0[c0["ensemble"] == ens]
+        c = ens_color[ens]
+        ax.scatter(g["C0_formula"], g["C0_measured"], s=14, color=c,
+                   edgecolors="white", linewidths=0.4, zorder=zorder_for(c) + 1,
+                   label=ens_disp[ens])
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlim(lo, hi)
+    ax.set_ylim(lo, hi)
+    ax.set_xlabel("$C_0$ (moment formula)", fontsize=7.5)
+    ax.set_ylabel("$C_0$ (measured)", fontsize=7.5)
+    ax.set_title("(a) $C_0$ audit", fontsize=8, loc="left")
+    style_ax(ax)
+    ax.legend(loc="upper left", fontsize=5.6, handlelength=1.0, labelspacing=0.25,
+              handletextpad=0.3, borderaxespad=0.15)
+
+    # Panel (b): accountability ordering static >= oracle >= blind-AGC >= none (CNR).
+    ax = axes[1]
+    treatments = ["static_reference", "oracle", "metered_noisy", "blind_agc", "no_correction"]
+    treat_disp = {"static_reference": "static ref.", "oracle": "gain oracle",
+                  "metered_noisy": "metered", "blind_agc": "blind AGC",
+                  "no_correction": "none"}
+    treat_color = {"static_reference": INK_GRAY, "oracle": P4, "metered_noisy": P2,
+                   "blind_agc": P5, "no_correction": P6}
+    objects = ["letter_A", "letter_L", "ring", "stripe"]
+    obj_disp = {"letter_A": "A", "letter_L": "L", "ring": "ring", "stripe": "stripe"}
+    xpos = np.arange(len(objects))
+    width = 0.16
+    for k, t in enumerate(treatments):
+        g = e11[e11["treatment"] == t].set_index("object").reindex(objects)
+        ax.bar(xpos + (k - 2) * width, g["cnr_mean"], width=width * 0.92,
+               color=treat_color[t], edgecolor="white", linewidth=0.4,
+               yerr=g["cnr_std"], error_kw=dict(elinewidth=0.7, ecolor=TICK_INK, capsize=1.5),
+               zorder=4, label=treat_disp[t])
+    ax.set_ylim(0, float(e11["cnr_mean"].max()) * 1.42)
+    ax.set_xticks(xpos)
+    ax.set_xticklabels([obj_disp[o] for o in objects], fontsize=6.4)
+    ax.set_ylabel("GT-mask CNR", fontsize=7.5)
+    ax.set_title("(b) oracle-to-blind baselines", fontsize=8, loc="left")
+    style_ax(ax)
+    ax.grid(True, axis="y", color=GRID, linewidth=0.6)
+    ax.grid(False, axis="x")
+    ax.legend(loc="upper left", fontsize=5.3, ncol=2, handlelength=0.9, labelspacing=0.25,
+              handletextpad=0.3, columnspacing=0.7, borderaxespad=0.15)
+
+    fig.tight_layout(w_pad=1.0)
+    return save(fig, "figS3_c0_oracle.png")
+
+
+# --------------------------------------------------------------------------------------
+# Fig S4  --  extended flip-boundary detail (corrected-C0 no-flip margins) + the
+# low-photon drift-limited floor probe
+# (Supplementary Material S4; data: results/prop3_nofreeparam_r1/,
+#  results/paper_fig7_lowphoton_r3_calibrated/fig7_lowphoton_floorprobe.csv)
+# --------------------------------------------------------------------------------------
+def figS4_flip_floorprobe() -> Path:
+    apply_rcparams()
+    nf = pd.read_csv(RESULTS / "prop3_nofreeparam_r1" / "prop3_correctedC0_noflip_consistency.csv")
+    main7 = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton.csv")
+    probe = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton_floorprobe.csv")
+
+    fig, axes = plt.subplots(1, 2, figsize=(3.5, 2.2))
+
+    # Panel (a): per-cell no-flip margin min_sigma(Q - r) for the blind random+DGI arm
+    # under the corrected drift-leverage constant 1 + C0_raw; all 100 cells positive.
+    ax = axes[0]
+    corr_color = {"agc": P1, "scgi_proxy": P8}
+    corr_disp = {"agc": "AGC", "scgi_proxy": "SCGI proxy"}
+    rng = np.random.default_rng(20240708)
+    for corr in ("agc", "scgi_proxy"):
+        g = nf[nf["correction"] == corr]
+        x = g["sigma_a"].to_numpy(dtype=float) * 10 ** rng.uniform(-0.03, 0.03, len(g))
+        c = corr_color[corr]
+        ax.scatter(x, g["min_Q_minus_r"], s=10, color=c, edgecolors="white",
+                   linewidths=0.3, zorder=zorder_for(c) + 1, label=corr_disp[corr])
+    ax.axhline(0.0, color=P6, lw=1.0, linestyle=(0, (3, 2)), zorder=3)
+    ax.text(0.97, 0.55, "flip would need $<0$;\n100/100 cells $>0$",
+            transform=ax.transAxes, fontsize=5.9, color=TICK_INK, ha="right", va="center")
+    ax.set_xscale("log")
+    ax.set_ylim(-0.12, 1.62)
+    ax.set_xlabel(r"gain amplitude $\sigma_a$", fontsize=7.5)
+    ax.set_ylabel(r"no-flip margin $\min_\rho(Q-r)$", fontsize=7.5)
+    ax.set_title("(a) corrected-$C_0$ no-flip", fontsize=8, loc="left")
+    style_ax(ax)
+    ax.legend(loc="upper right", fontsize=5.8, handlelength=1.0, labelspacing=0.25,
+              handletextpad=0.3, borderaxespad=0.2)
+
+    # Panel (b): high-photon floor probe --- drift-limited, not photon-limited.
+    ax = axes[1]
+    runs = [(main7, 1e-3, "-", "o"), (probe, 1e-4, (0, (4, 2)), "s")]
+    for df, rho, ls, mk in runs:
+        for method, c in (("soft_log", P1), ("soft_log_calibrated", P5)):
+            sel = df[df["method"] == method]
+            if "rho" in sel.columns:
+                sel = sel[np.isclose(sel["rho"], rho)]
+            g = sel.groupby("photon_budget", as_index=False).agg(
+                y=("gain_rel_mse", "mean"), lam=("lambda_bar", "mean"))
+            g = g[g["lam"] >= 4.0].sort_values("lam")
+            ax.plot(g["lam"], g["y"], marker=mk, ms=3.6, lw=1.4, linestyle=ls, color=c,
+                    markeredgecolor="white", markeredgewidth=0.3, zorder=zorder_for(c))
+    # Floor annotations from the two runs' highest-budget calibrated points.
+    hi_main = main7[(main7["method"] == "soft_log_calibrated")]
+    hi_main = float(hi_main[hi_main["lambda_bar"] > 100]["gain_rel_mse"].mean())
+    hi_probe = probe[(probe["method"] == "soft_log_calibrated")]
+    hi_probe = float(hi_probe[hi_probe["lambda_bar"] > 100]["gain_rel_mse"].mean())
+    place_end_labels(ax, [(128.0, hi_main, TICK_INK, r"$\rho{=}10^{-3}$"),
+                          (128.0, hi_probe, TICK_INK, r"$\rho{=}10^{-4}$")],
+                     log_y=True, min_gap=0.16, dx=3, fontsize=5.7)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_ylim(hi_probe * 0.55, None)
+    ax.set_xlim(3.4, 260.0)
+    ax.set_xlabel(r"mean photon budget $\bar\lambda$", fontsize=7.5)
+    ax.set_ylabel("gain MSE", fontsize=7.5)
+    ax.set_title("(b) drift-limited floor", fontsize=8, loc="left")
+    style_ax(ax)
+    handles = [
+        plt.Line2D([0], [0], color=P1, lw=1.4, label="proxy"),
+        plt.Line2D([0], [0], color=P5, lw=1.4, label="calibrated (Thm C)"),
+        plt.Line2D([0], [0], color=TICK_INK, lw=1.2, linestyle="-", label=r"$\rho=10^{-3}$"),
+        plt.Line2D([0], [0], color=TICK_INK, lw=1.2, linestyle=(0, (4, 2)), label=r"$\rho=10^{-4}$"),
+    ]
+    ax.legend(handles=handles, loc="lower left", fontsize=5.5, handlelength=1.3,
+              labelspacing=0.25, handletextpad=0.4, borderaxespad=0.15)
+
+    fig.tight_layout(w_pad=1.0)
+    return save(fig, "figS4_flip_floorprobe.png")
+
+
+# --------------------------------------------------------------------------------------
 def main() -> None:
     import sys
 
@@ -934,7 +1231,16 @@ def main() -> None:
         ("fig6_ablation.png", fig6_ablation),
         ("fig7_gainMSE_vs_photon.png", fig7_gainMSE_vs_photon),
         ("fig8_threshold.png", fig8_threshold),
+        # Supplementary Material S1--S4 panels.
+        ("figS1_perm_whitening.png", figS1_perm_whitening),
+        ("figS2_coherent_residual.png", figS2_coherent_residual),
+        ("figS3_c0_oracle.png", figS3_c0_oracle),
+        ("figS4_flip_floorprobe.png", figS4_flip_floorprobe),
     ]
+    # Optional filter: any CLI substring selects a subset (e.g. "figS" builds S-figures only).
+    filters = [a for a in sys.argv[1:] if not a.startswith("-")]
+    if filters:
+        builders = [(n, f) for (n, f) in builders if any(s in n for s in filters)]
     for name, fn in builders:
         out = fn()
         size = out.stat().st_size

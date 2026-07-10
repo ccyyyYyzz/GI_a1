@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this code or its results, please cite the manuscript below."
+title: "Identifiability by Stationarity: Blind Gain-Object Separation in Self-Calibrating Ghost Imaging"
+authors:
+  - family-names: "CHEN"
+    given-names: "Yongzi"
+repository-code: "https://github.com/ccyyyYyzz/GI_a1"
+license: MIT
+type: software
+keywords:
+  - ghost imaging
+  - single-pixel imaging
+  - blind calibration
+  - identifiability
+  - bilinear inverse problems
+preferred-citation:
+  type: article
+  title: "Identifiability by Stationarity: Blind Gain-Object Separation in Self-Calibrating Ghost Imaging"
+  authors:
+    - family-names: "CHEN"
+      given-names: "Yongzi"
+  year: 2026
+  notes: "Manuscript in preparation (IEEE-TCI target); author list and affiliations to be finalized before submission."
