@@ -96,7 +96,10 @@ by differentiating $e^{-tu} = \mathbf 1 - tu + O(t^2)$ inside $M_{tu}$. The gaug
 \]
 For gauge-fixed $s = s_\perp \in S_\perp$ (any $s$ may be reduced to this form using $F(s + t\mathbf 1) = e^{-t}F(s)$, which rescales but never annihilates $F$),
 \[
-\lVert F(s_\perp)\rVert_2 \;\ge\; \gamma\,\lVert s_\perp\rVert_2 - C_H\,\lVert s_\perp\rVert_2^2 \;>\; 0 \quad\text{for } 0 < \lVert s_\perp\rVert_2 < \gamma / C_H .
+\begin{gathered}
+\lVert F(s_\perp)\rVert_2 \;\ge\; \gamma\,\lVert s_\perp\rVert_2 - C_H\,\lVert s_\perp\rVert_2^2 \;>\; 0\\
+\text{for } 0 < \lVert s_\perp\rVert_2 < \gamma / C_H .
+\end{gathered}
 \]
 A nonzero $F(s)$ means $M_sT \notin \mathcal T_\Omega$ (support constraint violated), so no non-gauge ambiguity exists in that ball. This is the quantitative inverse-function-theorem argument in explicit constants. \hfill$\blacksquare$\ \textnormal{(ii)}
 
@@ -118,7 +121,10 @@ This appendix proves the tall-design identifiability thresholds quoted as \textb
 
 The bucket record is $R_n=a_nB_n$ with $B=MT$, i.e. in vector form
 \begin{equation}
-y=\operatorname{diag}(e^{\ell})\,M\,T,\qquad M\in\mathbb R^{N\times K},\ N>K,\qquad \ell\in S,\ T\in\mathbb R^{K}\setminus\{0\},
+\begin{gathered}
+y=\operatorname{diag}(e^{\ell})\,M\,T,\qquad M\in\mathbb R^{N\times K},\ N>K,\\
+\ell\in S,\ T\in\mathbb R^{K}\setminus\{0\},
+\end{gathered}
 \tag{B.1}
 \end{equation}
 where $\ell=\log a$ is the log-gain trajectory, confined to the drift class $S\subset\mathbb R^{N}$ with $p=\dim S$. Set
@@ -153,7 +159,10 @@ This diagonal structure is why the generic bilinear counts of Kech--Krahmer (arX
 
 Let $B=\exp(S)/\mathbb R_{+}$ be the nonconstant gain-ratio manifold (dimension $r=p-1$), parametrizing the classes $b=e^{s}$ modulo positive scalars, $s$ nonconstant. For a \textbf{fixed} design $M$, stratify $B$ by the level sets of the rank function:
 \[
-B=\bigsqcup_{\alpha}B_{\alpha},\qquad \rho_\alpha := \operatorname{rank}[\,M,-D_bM\,]\ \text{constant for }b\in B_\alpha,\qquad r_\alpha:=\dim B_\alpha .
+\begin{gathered}
+B=\bigsqcup_{\alpha}B_{\alpha},\qquad r_\alpha:=\dim B_\alpha,\\
+\rho_\alpha := \operatorname{rank}[\,M,-D_bM\,]\ \text{constant for }b\in B_\alpha .
+\end{gathered}
 \]
 Such a finite stratification into locally closed strata exists for every $M$: after the substitution $u=e^{s}$ the rank function is semialgebraic in $u$, its finitely many level sets are semialgebraic, and finite semialgebraic stratification is standard (Bochnak--Coste--Roy, \emph{Real Algebraic Geometry}, Ch.~9). Define the \textbf{projective collision dimension}
 \begin{equation}
@@ -241,7 +250,10 @@ In the setting of Theorem~A$'$(ii), every nonzero object is identifiable modulo 
 
 The clean thresholds above rest on the rank identity (B.5), asserted generically. The physical drift space is not generic --- it is the Fourier low-pass space
 \begin{equation}
-S_{\mathrm{LP}}=\operatorname{span}\Bigl\{\mathbf 1,\ \cos\tfrac{2\pi qn}{N},\ \sin\tfrac{2\pi qn}{N}\ :\ q=1,\dots,m\Bigr\},\qquad p=\dim S_{\mathrm{LP}}=2m+1,
+\begin{gathered}
+S_{\mathrm{LP}}=\operatorname{span}\Bigl\{\mathbf 1,\ \cos\tfrac{2\pi qn}{N},\ \sin\tfrac{2\pi qn}{N}\ :\ q=1,\dots,m\Bigr\},\\
+p=\dim S_{\mathrm{LP}}=2m+1,
+\end{gathered}
 \tag{B.8}
 \end{equation}
 with $r=p-1=2m$ and the below-Nyquist condition $p\le N$. The next two lemmas verify (B.5) for this space \emph{without} any genericity assumption on $S$.
@@ -283,7 +295,10 @@ together with the trivial bounds $\le N$ and $\le 2K$. This is the right-hand si
 \begin{namedthm}{Proposition B.7 (low-pass transfer: a three-level hierarchy)}
 Let $S=S_{\mathrm{LP}}$ as in (B.8), $p=2m+1<N$, and suppose the generic-point threshold $N\ge K+p$ holds. The transfer of the clean thresholds of Theorem~A$'$(i)--(iii),
 \[
-\text{local: } N\ge K+p-1,\qquad \text{generic: } N\ge K+p,\qquad \text{uniform: } N\ge 2K+p-1 ,
+\begin{gathered}
+\text{local: } N\ge K+p-1,\qquad \text{generic: } N\ge K+p,\\
+\text{uniform: } N\ge 2K+p-1 ,
+\end{gathered}
 \]
 to the physical low-pass drift space holds at three distinct levels, which we state --- and use --- separately.
 
@@ -399,9 +414,10 @@ so a union bound over the $\le N$ windows yields ($\bigstar$)$(W,\epsilon,\delta
 \end{namedthm}
 
 \noindent\emph{Proof.} (a) Decompose exactly
-\[
-\hat g_n-(\ell_n+m_T)\;=\;\underbrace{\Big(W^{-1}\!\!\sum_{k\in W_n}\ell_k-\ell_n\Big)}_{\text{drift bias}}\;+\;\underbrace{\Big(W^{-1}\!\!\sum_{k\in W_n}\log B_k-m_T\Big)}_{\text{carrier deviation}} .
-\]
+\begin{align*}
+\hat g_n-(\ell_n+m_T)\;=\;&\underbrace{\Big(W^{-1}\!\!\sum_{k\in W_n}\ell_k-\ell_n\Big)}_{\text{drift bias}}\\
+&+\;\underbrace{\Big(W^{-1}\!\!\sum_{k\in W_n}\log B_k-m_T\Big)}_{\text{carrier deviation}} .
+\end{align*}
 The drift bias is $\le C_\beta L\,(W/N)^\beta\to0$ deterministically by (B3). Hence $\max_n|\hat g_n-(\ell_n+m_T)|\to0$ in probability iff the maximal carrier deviation does --- which is verbatim the asymptotic form of ($\bigstar$). Both implications are immediate from this identity. (b) Theorem~A$'$ (see Appendix~B) is proved without any distributional assumption on the carrier order; the support-zero criterion is Corollary~2 (see Appendix~A). (c1) Theorem~A (see Appendix~A) holds for \emph{any} invertible $M$, in particular a random draw, conditionally on the realization; ($\bigstar$), a statement about the temporal law, is unaffected. (c2) Serfling's bound plus the union over windows; the multiset $\{g_k\}$, hence every order-independent (algebraic) functional of the data, is invariant under $\pi$. \hfill$\blacksquare$
 
 \paragraph{What this does not claim.} Part (a) is an equivalence for \emph{one estimator family} (windowed local averages of $\log R_n$; the same proof covers kernel weights of matching order). It is not a characterization of identifiability by all mechanisms --- (b) and (c) are precisely the two failure modes of that over-reading. Nor does ($\bigstar$) by itself bound the \emph{rate}: rates require the variance model of Theorem~B, and reconstruction quality after gain correction additionally requires the corrected linear inverse problem to be well posed (see Appendix~F).
@@ -494,7 +510,11 @@ the infimum over all measurable estimators of the gauge-fixed log-gain. In norma
 
 \emph{(Sobolev / van Trees--Pinsker.)} In the Gaussian sequence formulation --- expand $\ell(t)=\sum_j\theta_j\varphi_j(t)$ in a Fourier basis and impose the Sobolev ellipsoid $\sum_j j^{2\beta}\theta_j^2\le L^2$ --- the integrated risk obeys
 \begin{equation}
-\inf_{\hat\ell}\ \sup_{\|\ell\|_{H^\beta}\le L}\ \frac1N\sum_n\mathbb{E}(\hat\ell_n-\ell_n)^2\;\ge\;c_\beta\,L^{2/(2\beta+1)}(\sigma^2/N)^{2\beta/(2\beta+1)}, \tag{D.6}
+\begin{aligned}
+&\inf_{\hat\ell}\ \sup_{\|\ell\|_{H^\beta}\le L}\ \frac1N\sum_n\mathbb{E}(\hat\ell_n-\ell_n)^2\\
+&\qquad\ge\;c_\beta\,L^{2/(2\beta+1)}(\sigma^2/N)^{2\beta/(2\beta+1)},
+\end{aligned}
+\tag{D.6}
 \end{equation}
 with the gauge direction (the constant mode, confounded with $m_T$) excluded from the risk. Consequently the windowed estimator of Lemma D.1 is \textbf{minimax-rate optimal} over $H_\beta(L_a)$ for $\beta\le1$ with one-sided windows and for $\beta\le 2$ with centered symmetric windows. \textbf{Sharp minimax constants are open} (this is Theorem~D of the main text).
 
@@ -547,9 +567,10 @@ and optimizing over $W$,
 with the expansions $\kappa_\alpha(\lambda)=1+O(1/\lambda)$ for $\lambda\gg1$ and $\kappa_\alpha(\lambda)=\lambda\log(1+1/\alpha)+O(\lambda^2)$ for $\lambda\ll1$. The Poisson Poincar\'e inequality [Klaassen 1985; Bobkov--Ledoux 1998], $\operatorname{Var}f(C)\le\lambda\,\mathbb{E}[(f(C{+}1)-f(C))^2]$, yields $\operatorname{Var}[\psi_\alpha(C)]=O(1/\lambda)$ at high $\lambda$ and $=\lambda\log^2(1+1/\alpha)+O(\lambda^2)$ at low $\lambda$. These verify that hypothesis 3 holds with $\kappa_{\min}\asymp c_\alpha\bar\lambda$ in the starved regime and $\kappa_{\min}\approx\kappa_{\max}\approx1$ at high counts.
 
 \emph{Rate.} Write $Y_k=\psi_\alpha(C_k)$ and decompose
-\[
-W^{-1}\!\!\sum_{k\in W_n}\!Y_k-m_\alpha(\ell_n)=\Big[W^{-1}\!\!\sum_k m_\alpha(\ell_k)-m_\alpha(\ell_n)\Big]+\Big[W^{-1}\!\!\sum_k\big(Y_k-m_\alpha(\ell_k)\big)\Big].
-\]
+\begin{align*}
+W^{-1}\!\!\sum_{k\in W_n}\!Y_k-m_\alpha(\ell_n)=\;&\Big[W^{-1}\!\!\sum_k m_\alpha(\ell_k)-m_\alpha(\ell_n)\Big]\\
+&+\Big[W^{-1}\!\!\sum_k\big(Y_k-m_\alpha(\ell_k)\big)\Big].
+\end{align*}
 Since $m_\alpha$ is $\kappa_{\max}$-Lipschitz on the gain range, $m_\alpha\circ\ell$ inherits the discrete H\"older modulus scaled by $\kappa_{\max}$, so the first bracket is $\le C\kappa_{\max}L_aW^{\beta}$ by (D.1). The second bracket is a window average of centered stationary $\beta$-mixing variables; the expectation bound of Lemma D.1 controls its variance by $C\sigma_{\alpha,\mathrm{LR}}^2/W$. Because $m_\alpha'\ge\kappa_{\min}>0$, $m_\alpha$ is strictly increasing and $m_\alpha^{-1}$ is $1/\kappa_{\min}$-Lipschitz (inverse function theorem); composing and squaring gives (D.8), and the standard bias--variance optimization gives (D.9).
 
 \emph{Photon-starved limit.} Substituting $\kappa_{\min}\asymp c_\alpha\bar\lambda$ and $\sigma_{\alpha,\mathrm{LR}}^2\asymp c_\alpha^2\bar\lambda$ into the variance term of (D.8) gives $\sigma_{\alpha,\mathrm{LR}}^2/(\kappa_{\min}^2W)\asymp1/(W\bar\lambda)$. \textbf{This substitution is a leading-order moment calculation}: it identifies the long-run variance with the single-count variance (neglecting residual temporal correlation of the carrier at low counts) and uses the small-$\lambda$ expansions above; the \emph{order} is what is claimed, not the constant. Sharpness at rate level: for $\theta=\log$-intensity, $I(\theta)=(\partial_\theta\lambda)^2/\lambda=\lambda$; independence across frames gives total information $\asymp W\bar\lambda$, and the van Trees inequality converts this into a $c/(W\bar\lambda)$ lower bound on the local MSE of any estimator. \hfill$\blacksquare$
@@ -583,7 +604,10 @@ Under (E1)--(E3) with $P$ fixed (in particular $P=\mathrm{id}$), $\mathbb{E}_D Z
 
 \noindent\textbf{Proof.} $\mathbb{E}\eta_j=0$ gives the mean. Since $\mathbb{E}\,\eta_i\eta_j=\delta_{ij}$,
 \[
-\mathbb{E}_D Z_gZ_h=\sum_{i,j}\chi_g(i)\chi_h(j)(PT)_i(PT)_j\,\mathbb{E}\eta_i\eta_j=\sum_j \chi_g(j)\chi_h(j)(PT)_j^2,
+\begin{aligned}
+\mathbb{E}_D Z_gZ_h&=\sum_{i,j}\chi_g(i)\chi_h(j)(PT)_i(PT)_j\,\mathbb{E}\eta_i\eta_j\\
+&=\sum_j \chi_g(j)\chi_h(j)(PT)_j^2,
+\end{aligned}
 \]
 and $\chi_g\chi_h=\chi_{g+h}$ by the character property of the Walsh group. \hfill$\blacksquare$
 
@@ -624,7 +648,11 @@ Under (E1)--(E3), there exist universal constants $c,C>0$ such that for every fi
 \end{equation}
 and by the union bound over the $K-1$ nonzero frequencies,
 \begin{equation}
-\Pr_P\!\big(\max_{q\neq0}|\widehat{w^P}(q)|\ge\varepsilon S_2\big)\;\le\;2(K-1)\exp\!\big[-c\min(\varepsilon^2K_4,\ \varepsilon K_\infty)\big]. \tag{E.3}
+\begin{aligned}
+&\Pr_P\!\big(\max_{q\neq0}|\widehat{w^P}(q)|\ge\varepsilon S_2\big)\\
+&\qquad\le\;2(K-1)\exp\!\big[-c\min(\varepsilon^2K_4,\ \varepsilon K_\infty)\big].
+\end{aligned}
+\tag{E.3}
 \end{equation}
 In particular, pairwise $\varepsilon$-whitening (Theorem E.2(2) for $w^P$) holds with probability at least $1-\delta$ whenever
 \begin{equation}
@@ -670,14 +698,21 @@ and $\sum_{i\neq j}\chi_g(i)\chi_g(j)=\big(\sum_i\chi_g(i)\big)^2-K=-K$, giving 
 
 Whitening of window \emph{energy} --- the quantity the window estimator of Sec.~6 actually averages --- admits a direct quadratic-form bound. For a window $A$ of $W$ rows let $P_A$ select those rows and set
 \[
-Q_A=\|P_A\,U D P T\|_2^2=\eta^\top M\eta,\qquad M=\mathrm{diag}(PT)\,U_A^\top U_A\,\mathrm{diag}(PT),
+\begin{gathered}
+Q_A=\|P_A\,U D P T\|_2^2=\eta^\top M\eta,\\
+M=\mathrm{diag}(PT)\,U_A^\top U_A\,\mathrm{diag}(PT),
+\end{gathered}
 \]
 with $\eta$ the Rademacher sign vector and $U_A$ the selected rows of $U$.
 
 \begin{namedthm}{Proposition E.5 (window-energy concentration)}
 Condition on any realized $P$. Then $\mathbb{E}_DQ_A=(W/K)S_2$, and there is a universal $c>0$ with
 \begin{equation}
-\Pr_D\!\Big(\big|Q_A-\tfrac{W}{K}S_2\big|\ge\varepsilon\,\tfrac{W}{K}S_2\Big)\;\le\;2\exp\!\Big[-c\min\Big(\varepsilon^2\,\tfrac{WK_\infty}{K},\ \varepsilon\,\tfrac{WK_\infty}{K}\Big)\Big]. \tag{E.7}
+\begin{aligned}
+&\Pr_D\!\Big(\big|Q_A-\tfrac{W}{K}S_2\big|\ge\varepsilon\,\tfrac{W}{K}S_2\Big)\\
+&\qquad\le\;2\exp\!\Big[-c\min\Big(\varepsilon^2\,\tfrac{WK_\infty}{K},\ \varepsilon\,\tfrac{WK_\infty}{K}\Big)\Big].
+\end{aligned}
+\tag{E.7}
 \end{equation}
 Over a specified family of $M$ windows, uniform relative energy whitening at tolerance $\varepsilon\le1$ holds with probability $\ge1-\delta$ once
 \begin{equation}
@@ -790,7 +825,11 @@ The gain term follows from Theorem~1(a) with the \emph{leverage $\times N$ frami
 \begin{namedthm}{Prop 3 (implicit flip boundary)}
 Define $\rho^*=\inf\{\rho_{\mathrm{pair}}\ge0: R_{\mathrm{pair}}(\rho_{\mathrm{pair}})\ge R_{\mathrm{rand}}(\rho_{\mathrm{pair}},N)\}$, where $R_{\mathrm{pair}}=R_{\mathrm{pair,gain}}+R_{\mathrm{pair,read}}+R_{\mathrm{pair,Pois}}$ and $R_{\mathrm{rand}}$ is (F.11) with $v=v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$. \textbf{Assume single crossing:} since $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$ itself varies with $\rho_{\mathrm{pair}}$, both sides of the comparison move with $\rho_{\mathrm{pair}}$, and we assume the difference $R_{\mathrm{pair}}-R_{\mathrm{rand}}$ changes sign exactly once on the range considered --- existence and uniqueness of the crossing is an assumption at the same heuristic level as the small-drift expansion, not a proven property. Under the small-drift expansion and this assumption, $\rho^*$ solves the implicit equation
 \begin{equation}
-r(\rho^*)=\frac{2\Big[\dfrac{C_0}{N}+\dfrac{(1+C_0)\,v_{\mathrm{blind}}(\rho^*,N)}{N}+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\Big]}{K_{\mathrm{eff}}\,D_H(T)\,s^2}. \tag{F.12}
+\begin{aligned}
+r(\rho^*)=\frac{2}{K_{\mathrm{eff}}\,D_H(T)\,s^2}\Big[&\frac{C_0}{N}+\frac{(1+C_0)\,v_{\mathrm{blind}}(\rho^*,N)}{N}\\
+&+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\Big].
+\end{aligned}
+\tag{F.12}
 \end{equation}
 For the OU convention this is explicit: $\rho^*=-\log(1-Q)$ with $Q=2\Delta_R/(K_{\mathrm{eff}}D_Hs^2)$, $\Delta_R$ the bracket of (F.12). If $Q\le0$, random/DGI is already worse at $\rho=0$ (sampling/noise floor dominates); if $Q\ge1$, pairwise never flips within the OU small-to-moderate range.
 \end{namedthm}

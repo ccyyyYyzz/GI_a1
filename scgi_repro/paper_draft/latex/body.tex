@@ -26,8 +26,10 @@ The paper is organized as follows. Section~2 fixes the model and the three notio
 
 \begin{figure}[t]
 \centering
-\fbox{\parbox{0.9\columnwidth}{\centering\vspace{2em} Fig. 1 placeholder: two-axis conceptual map (conditioning vs identifiability) --- to be drawn \vspace{2em}}}
-\caption{Two-axis map of inversion conditioning against blind identifiability. Ordered Hadamard, i.i.d.-random (DGI), tall random, and SRHT acquisitions occupy visibly different corners: ordered Hadamard is well-conditioned yet blindly non-identifiable, while randomized and tall designs trade toward identifiability. The separation is explained by Secs.~4 and 5. (Draft placeholder; figure to be drawn.)}
+\IfFileExists{figs/fig1_conceptmap.png}%
+  {\includegraphics[width=\columnwidth]{fig1_conceptmap.png}}%
+  {\fbox{\parbox{0.9\columnwidth}{\centering\vspace{2em} Fig. 1 placeholder: two-axis conceptual map (conditioning vs identifiability) --- to be drawn \vspace{2em}}}}
+\caption{Two-axis map of inversion conditioning against blind identifiability. Ordered Hadamard, i.i.d.-random (DGI), tall random, and SRHT acquisitions occupy visibly different corners: ordered Hadamard is well-conditioned yet blindly non-identifiable, while randomized and tall designs trade toward identifiability. The separation is explained by Secs.~4 and 5.}
 \end{figure}
 
 \section{Problem setup and three notions of identifiability}
@@ -125,7 +127,12 @@ The log-domain record can be described by $Y_n=\log R_n=\ell_n+\log B_n$. The an
 
 \begin{nameddef}{Condition ($\star$) (stationary carrier, quantitative form)}
 There is a scalar $m_T$ --- depending on the object but not on time, and absorbed by the global-scale gauge --- such that the windowed carrier averages over windows $W_n$ of length $W$ satisfy
-\[\max_n \Big| W^{-1}\!\!\sum_{k\in W_n}\!\log B_k \;-\; m_T \Big| \;\longrightarrow\; 0 \quad \text{in probability as } W\to\infty,\ W/N\to 0 .\]
+\[
+\begin{gathered}
+\max_n \Big| W^{-1}\!\!\sum_{k\in W_n}\!\log B_k \;-\; m_T \Big| \;\longrightarrow\; 0\\
+\text{in probability as } W\to\infty,\ W/N\to 0 .
+\end{gathered}
+\]
 The condition presupposes a positive carrier on the analyzed record --- physically, a positivity/offset margin, or the soft-log $\psi_\alpha$ of Sec.~6 in the photon-counting case.
 \end{nameddef}
 
@@ -240,7 +247,11 @@ The corrected bucket record can be described by $z_n=(1+\delta_n)b_n+\xi_n$ with
 
 \begin{namedthm}{Theorem 1 (master finite-noise relMSE identity)}
 Assume the residual gain $\delta$ and the additive noise $\xi$ are uncorrelated, $C_{\delta\xi}:=\operatorname{Cov}(\delta,\xi)=0$. Then, without Gaussian or small-noise approximation,
-\[\frac{\mathbb{E}\|\hat T-T\|^2}{S_2}\;=\;\underbrace{\frac{\|(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta\|^2}{S_2}}_{\text{bias}}\;+\;\underbrace{\frac{\operatorname{tr}\!\big(L\,\mathrm{diag}(b)\,V_\delta\,\mathrm{diag}(b)\,L^\top\big)}{S_2}}_{\text{residual gain}}\;+\;\underbrace{\frac{\operatorname{tr}\!\big(L\,\Sigma_\xi L^\top\big)}{S_2}}_{\text{read + Poisson}}.\]
+\begin{align*}
+\frac{\mathbb{E}\|\hat T-T\|^2}{S_2}\;=\;&\underbrace{\frac{\|(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta\|^2}{S_2}}_{\text{bias}}\\
+&+\;\underbrace{\frac{\operatorname{tr}\!\big(L\,\mathrm{diag}(b)\,V_\delta\,\mathrm{diag}(b)\,L^\top\big)}{S_2}}_{\text{residual gain}}\\
+&+\;\underbrace{\frac{\operatorname{tr}\!\big(L\,\Sigma_\xi L^\top\big)}{S_2}}_{\text{read + Poisson}}.
+\end{align*}
 If the residual gains are independent with $\mathrm{Var}\,\delta_n=v$, the gain term collapses to $v\,B_L$ with the \textbf{leverage} $B_L=(1/S_2)\sum_n b_n^2\|Le_n\|^2$; coherent (smooth) residuals require the full matrix form. Without the uncorrelatedness hypothesis the identity acquires exactly one additional term, $(2/S_2)\,\operatorname{tr}\!\big[L\,\mathrm{diag}(b)\,C_{\delta\xi}\,L^{\top}\big]$; it vanishes under the stated hypothesis, but \emph{not} automatically when the gain estimate $\hat a$ is computed from the same noisy record that carries $\xi$ (same-record dependence). (Proof: Appendix~F.)
 \end{namedthm}
 
@@ -258,7 +269,13 @@ The competition between these closed forms produces a finite-$N$ flip boundary.
 
 \begin{namedthm}{Prop 3 (finite-$N$ flip boundary)}
 $\rho^{*}=\inf\{\rho_{\mathrm{pair}}: R_{\mathrm{pair}}(\rho_{\mathrm{pair}})\ge R_{\mathrm{rand}}(\rho_{\mathrm{pair}},N)\}$ satisfies, in the small-drift regime,
-\[r(\rho^{*})=\frac{2\big[C_0(\mathrm{pipeline})/N+(1+C_0(\mathrm{pipeline}))v_{\mathrm{blind}}/N+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\big]}{K_{\mathrm{eff}}\,D_H\,s^{2}},\]
+\[
+\begin{aligned}
+r(\rho^{*})=\frac{2}{K_{\mathrm{eff}}\,D_H\,s^{2}}\big[&C_0(\mathrm{pipeline})/N\\
+&+(1+C_0(\mathrm{pipeline}))v_{\mathrm{blind}}/N\\
+&+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\big],
+\end{aligned}
+\]
 whose leading order ($r(\rho)=\rho$, $D_H=1$, negligible noise and $v_{\mathrm{blind}}$) is the heuristic $\rho^{*}\approx 2C_0(\mathrm{pipeline})/(N K_{\mathrm{eff}} s^{2})$. (Proof: Appendix~F.)
 \end{namedthm}
 
