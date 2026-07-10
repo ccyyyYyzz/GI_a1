@@ -60,10 +60,6 @@
     "note": "log-gain AR(1), phi=exp(-rho), stationary std sigma_a, demeaned, exp, mean-normalized; identical to run_phase_m2.py"
   },
   "above_floor_rel_mse": 0.5,
-  "runtime_seconds": 121.48750615119934,
-  "torch_version": "2.1.0+cu121",
-  "companion_scripts": [
-    "run_prop3_verdict_tables.py"
-  ],
-  "verdict_pointer": "summary.md + prop3_verdict_summary.json"
+  "runtime_seconds": 115.55279469490051,
+  "torch_version": "2.1.0+cu121"
 }

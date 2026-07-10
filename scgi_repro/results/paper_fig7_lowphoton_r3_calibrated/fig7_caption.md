@@ -7,4 +7,4 @@ Poisson bucket counts are evaluated under identical random-basis carriers and sh
 (iv) Naive clipped log does not diverge: it saturates at a bias floor (~0.25 relMSE) set by the clip.
 At the high-photon end (budget=128) the soft_log gain-MSE floor shrinks from 2.778e-04 (rho=0.001) to 1.725e-04 (rho=0.0001), confirming the floor is drift-limited.
 At the high-photon end (budget=128) the soft_log_calibrated gain-MSE floor shrinks from 2.777e-04 (rho=0.001) to 1.725e-04 (rho=0.0001), confirming the floor is drift-limited.
-Rows: 2000. Runtime seconds: 27.67.
+Rows: 2000. Runtime seconds: 11.03.

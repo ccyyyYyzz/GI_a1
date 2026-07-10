@@ -20,4 +20,4 @@ Variance-segment slope of log(err) vs log(W) (strict-below-argmin fit, argmin po
   random_binary: slope (all rho) -0.353 [IQR 0.100], slow-drift (rho=0.001) -0.396
   random_uniform: slope (all rho) -0.327 [IQR 0.214], slow-drift (rho=0.001) -0.384
   srht_paired: slope (all rho) -0.570 [IQR 0.135], slow-drift (rho=0.001) -0.596
-Rows: 31600. Runtime seconds: 153.01.
+Rows: 31600. Runtime seconds: 122.95.
