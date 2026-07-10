@@ -1,7 +1,7 @@
 # Project Audit Guide — identifiability paper (code / results / manuscript)
 
 > Written 2026-07-10 as the single entry point for a full human audit.
-> **GitHub**: https://github.com/ccyyyYyzz/GI_a1 — branch **`scgi-ceiling-diagnostic-r1`** (manifest-provenance baseline `214fabf`; branch tip advances with ongoing audit waves).
+> **GitHub**: https://github.com/ccyyyYyzz/GI_a1 — branch **`scgi-ceiling-diagnostic-r1`** (manifest-provenance baseline `214fabf`; quiescent-tree provenance sweep = Wave E5b, commits `68e510d`–branch tip; branch tip advances with ongoing audit waves).
 > **Local**: `E:\GAN_FCC_WORK\github_sync\GI_a1_scgi_20260709_014434\scgi_repro`
 > Theory-development side branch: **`mathdive-note`** (notes v2–v5; superseded by the paper but kept as ledger).
 > Python for any re-run: `D:\Anacondar\anaconda3\envs\pytorch\python.exe` (never the bare `python`).
@@ -34,16 +34,18 @@ Theory notes (development history, superseded by the paper): branch `mathdive-no
 
 ## 3. Paper experiments — code ↔ results ↔ manuscript section
 
-Provenance: every local authoritative result dir below carries a **manifest v2**
+Provenance: every local authoritative result dir below carries a **manifest v2.1**
 `run_manifest.json` (UTC time, git commit+branch, `git_dirty` + `git diff` SHA256,
-argv, runner SHA256, python/torch/numpy versions). The v2 manifests were
-re-executed around commit `214fabf` with byte-identical outputs; each manifest
-records the working-tree state **at run time**. A recorded `git_dirty: true` is
-not a clean-tree contradiction: it reflects concurrent documentation edits and the
-run's *own* tracked outputs (captions/CSVs the runner rewrites during the run), not
-a modified result-producing code path — the code that produced each result matches
-HEAD via `runner_sha256`, and the v2.1 fields `git_dirty_excluding_output` /
-`provenance_note` isolate the run's own outputs from any external dirt. The heavy
+argv, runner SHA256, python/torch/numpy versions, plus the v2.1 honesty fields
+`git_dirty_excluding_output` / `untracked_files` / `provenance_note`). The Wave
+E5b sweep re-executed each locally-produced authoritative dir
+(`paper_fig3_gain_error_r3_fair`, `paper_fig7_lowphoton_r5_final`,
+`coherent_residual_e4_r1`, `c0_audit_e9_r1`, `oracle_baselines_e11_r1`,
+`paper_fig2_stationarity_r2b`, `paper_fig4_bridge_r2b`, `perm_ablation_r1`) on a
+**quiescent committed tree** with identical args: all CSVs reproduced
+**byte-identical** and every manifest now records
+`git_dirty_excluding_output: false` (tree clean except the run's own outputs; the
+`perm_ablation_r1` manifest even recorded a fully clean tree, `git_dirty: false`). The heavy
 Colab-era dirs (`tall_design_threshold_*_merged`, `m2_boundary_audit_*`,
 `srht_m3_audit_*`) carry a `PROVENANCE.md` instead. The Prop-3 runners
 (`run_prop3_boundary.py`, `run_prop3_verdict_tables.py`) now emit the standard v2
