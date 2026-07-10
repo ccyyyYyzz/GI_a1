@@ -183,7 +183,7 @@ At every zero of $F$ with $(M,T)\in\mathcal U$ and $d\in S_0\setminus\{0\}$, the
 
 Only $\delta M$ is used: no genericity of $S$, no structure of $d$ beyond nonconstancy, and the object is untouched. This rowwise witness is uniform over the whole zero set --- the ingredient the superseded route lacked.
 
-\subsection{B.3 A measure lemma, and generic exact identifiability at $N\ge K+p$}
+\subsection{B.3 A measure lemma, and generic exact identifiability at \texorpdfstring{$N\ge K+p$}{N >= K+p}}
 
 \begin{namedthm}{Lemma B.3 ($C^1$ image of a lower-dimensional manifold is null)}
 Let $X$ be a second-countable $C^1$ manifold with $\dim X=m<q$, and $f:X\to\mathbb R^q$ a $C^1$ map. Then $f(X)$ has $q$-dimensional Lebesgue measure zero.
@@ -217,7 +217,7 @@ and the full non-identifiable set is contained in $(\mathcal R\times\mathbb R^K)
 
 \paragraph{What this does not claim.} No claim of uniformity over objects for a fixed design (see Theorem B.5 and its counterexample); no claim at the boundary $N=K+p-1$ (necessity is open --- Sec.~B.8, sharpness paragraph); nothing about conditioning, noise, or estimators; deterministic structured designs are not covered by any a.e.\ statement.
 
-\subsection{B.4 Uniform identifiability on the nonvanishing-carrier set at $N\ge 2K+p-1$}
+\subsection{B.4 Uniform identifiability on the nonvanishing-carrier set at \texorpdfstring{$N\ge 2K+p-1$}{N >= 2K+p-1}}
 
 \begin{namedthm}{Theorem B.5 (uniform sufficiency on $\mathcal U_M$; Theorem A$'$(iii))}
 Fix $S\ni\mathbf 1$, $\dim S=p\ge2$. If $N\ge 2K+p-1$, there is a Lebesgue-null set $E_{\mathrm{unif}}\subset\mathbb R^{N\times K}$ such that for every $M\notin E_{\mathrm{unif}}$: every $T\in\mathcal U_M$ is identifiable, for every $s\in S$ simultaneously.
@@ -279,7 +279,7 @@ No genericity of $S$ is assumed or used --- only $\mathbf 1\in S$.
 
 \paragraph{What this does not claim.} (B.3) is an a.e.\ statement over $(M,T)$; it says nothing about any \emph{particular} design (e.g.\ structured $M$), and nothing about the conditioning of the intersection, only its dimension.
 
-\subsection{B.6 The generic local threshold ($K\ge2$) and genuine failure below the wall}
+\subsection{B.6 The generic local threshold (\texorpdfstring{$K\ge2$}{K >= 2}) and genuine failure below the wall}
 
 \paragraph{Kernel derivation (independent; no import from the superseded route).} Fix $(M,T)\in\mathcal U$ with $\operatorname{rank}M=K$ and any $s\in S$. The differential of $\Phi_M$ at $(T,s)$ is
 \begin{equation}
@@ -326,7 +326,7 @@ so that $MT'(d)=D_ye^{d}$ ($D_ye^{d}=D_{e^{d}}y\in\operatorname{col}(M)$ precise
 
 \paragraph{What this does not claim.} The local iff is generic in $(M,T)$ --- a particular structured design must be checked separately. Local identifiability at $N\ge K+p-1$ does not imply global uniqueness (far aliases at the boundary are exactly the open sharpness question, Sec.~B.8). Nothing about the singular values of the Jacobian, i.e.\ conditioning.
 
-\subsection{B.7 The $K=1$ stratum}
+\subsection{B.7 The \texorpdfstring{$K=1$}{K=1} stratum}
 
 \begin{namedthm}{Theorem B.8 ($K=1$: global identifiability; Theorem A$'$(iv))}
 Let $K=1$. For every $M$, every $T\in\mathcal U_M$, and every $s\in S$, the pair $(T,s)$ is globally identifiable modulo gauge, for every admissible $N$.
@@ -336,7 +336,7 @@ Let $K=1$. For every $M$, every $T\in\mathcal U_M$, and every $s\in S$, the pair
 
 The local threshold at $K=1$ reads $N\ge K+p-1=p$, which is \textbf{automatically satisfied} ($S\subseteq\mathbb R^N$ forces $p\le N$) --- the threshold is vacuous, not ``inapplicable''. Consequently neither $N\ge K+p$ nor $N\ge2K+p-1$ is necessary at $K=1$: corner strata break naive universal-necessity claims, which is why all necessity statements in this appendix are restricted to $K\ge2$.
 
-\subsection{B.8 Theorem A$'$ --- the manuscript statement, and sharpness status}
+\subsection{B.8 Theorem A\texorpdfstring{$'$}{'} --- the manuscript statement, and sharpness status}
 
 \begin{namedthm}{Theorem A$'$ (proved tall-design identifiability results)}
 Let $K\ge1$, $N\ge K$, and let $S\le\mathbb R^N$ be a fixed, known linear subspace of dimension $p\ge2$ with $\mathbf 1\in S$. For $M\in\mathbb R^{N\times K}$ define $\Phi_M(T,s)=D_{e^{s}}MT$ and $\mathcal U_M=\{T\in\mathbb R^K:(MT)_n\neq0$ for every $n\}$. Parameters are identified modulo the positive global-scale gauge $(T,s)\sim(cT,\,s-\log c\,\mathbf 1)$, $c>0$.
@@ -421,7 +421,7 @@ by uniform integrability as $K_\infty\to\infty$. (iii) Esseen's inequality for s
 
 \paragraph{What this does not claim.} The proposition does not say the carrier law is determined by $(\mu_B,\sigma_B)$ --- that reduction holds only at the Gaussian-approximation level; the exact law feels every weighted cumulant of $T$. For gain recovery this residual object dependence enters $m_T=\mathbb{E}\log B_n$ only as a \emph{time-constant} scalar, absorbed by the global-scale gauge. It also does not assert cross-row decorrelation or window-energy whitening for structured (SRHT) carriers --- those require the Walsh-spectrum/$K_4$ conditions of Appendix~E, where $K_{\mathrm{eff}}$ alone is again insufficient.
 
-\subsection{C.2 The quantitative stationarity condition ($\bigstar$)}
+\subsection{C.2 The quantitative stationarity condition (\texorpdfstring{$\bigstar$}{*})}
 
 \begin{nameddef}{Definition ($\bigstar$)$(W,\epsilon,\delta)$}
 Let $\{B_n\}_{n\le N}$ be the carrier and $W_n$ length-$W$ windows covering $\{1,\dots,N\}$. The carrier satisfies the \emph{quantitative stationarity anchor} with tolerance $\epsilon$ and confidence $1-\delta$ if there exists a scalar $m_T\in\mathbb R$ (allowed to depend on $T$, not on $n$) such that
@@ -431,7 +431,7 @@ P\Big(\max_{1\le n\le N}\Big|\,W^{-1}\!\!\sum_{k\in W_n}\log B_k-m_T\Big|\le \ep
 We say \textbf{($\bigstar$) holds asymptotically} if for every $\delta>0$ there are windows $W=W_N\to\infty$, $W/N\to0$, with $\epsilon=\epsilon_{W,N,\delta}\to0$. The scalar $m_T$ is exactly the quantity absorbed by the global-scale gauge $a\mapsto ca$, $T\mapsto T/c$ (which shifts $m_T\mapsto m_T-\log c$, $\ell\mapsto\ell+\log c$, leaving $Y$ invariant).
 \end{nameddef}
 
-\subsection{C.3 Proposition 2 --- ($\bigstar$) is a window-estimator criterion, not a universal one}
+\subsection{C.3 Proposition 2 --- (\texorpdfstring{$\bigstar$}{*}) is a window-estimator criterion, not a universal one}
 
 \begin{namedthm}{Proposition 2}
 Assume the drift is slow in the sense of hypothesis (B3) below, with $C_\beta L\,(W/N)^\beta\to0$. Then:
@@ -562,7 +562,7 @@ with the gauge direction (the constant mode, confounded with $m_T$) excluded fro
 
 \paragraph{What this does not claim.} (i) Constants: neither $c_\beta$ nor a Pinsker-type sharp constant is claimed for our model; the exact Pinsker constant transfers only where the acquisition is genuinely the Gaussian sequence model --- for mixing, non-Gaussian carriers the statement is at rate level only (a Brown--Low-type asymptotic-equivalence argument~\cite{BrownLow1996} would be needed for more, and is not attempted). (ii) The lower bound is proven inside the i.i.d.\ Gaussian \emph{submodel}; this suffices for minimaxity of the full class (sup over the class dominates sup over the submodel, while the upper bound (D.3) holds over the full class), but no lower bound is claimed \emph{within} every fixed mixing law. (iii) No adaptivity claim: rate optimality is for known $(\beta,L_a)$.
 
-\subsection{D.3 Proposition D.4 (quotient Fisher geometry: singularity $\Leftrightarrow$ the Theorem-A ambiguity)}
+\subsection{D.3 Proposition D.4 (quotient Fisher geometry: singularity \texorpdfstring{$\Leftrightarrow$}{<=>} the Theorem-A ambiguity)}
 
 \paragraph{Statement.} \emph{(a) Linear-Gaussian window model.} Let $\ell=U\theta$ with $U\in\mathbb R^{N\times p'}$, and observe $Y=U\theta+m\mathbf 1+z$, $z\sim\mathcal N(0,\Sigma)$, $\Sigma\succ0$ known, $m\in\mathbb R$ the unknown carrier log-mean (confounded with global gain scale). The Fisher information for $\theta$ after eliminating the nuisance $m$ is
 \begin{equation}
@@ -584,7 +584,7 @@ For a linear functional $L\theta$: if $\mathrm{row}(L)\subseteq\mathrm{range}(I_
 
 \paragraph{What this does not claim.} The converse direction --- Fisher singularity implying an actual \emph{ambiguity manifold} --- requires constant-rank (or analytic) regularity so that the rank defect integrates (rank theorem); Fisher singularity by itself only defeats \emph{local differential} identifiability. Nonsingular Fisher does not exclude isolated \emph{global} aliases. Part (a) assumes Gaussian noise with known $\Sigma$; part (c) is a Gaussian-model computation used as an order-of-magnitude floor, not a bound proven for the actual log-carrier distribution. No efficiency claim is made for the windowed estimator beyond rate (constants open, Theorem~D).
 
-\subsection{D.4 Theorem C (low-photon calibrated soft-log rate and the $1/(W\bar\lambda)$ law)}
+\subsection{D.4 Theorem C (low-photon calibrated soft-log rate and the \texorpdfstring{$1/(W\bar\lambda)$}{1/(W lambda-bar)} law)}
 
 \paragraph{Statement.} Let counts follow the calibrated model $C_n\mid \ell_n\sim\mathrm{Pois}(\lambda_n)$, $\lambda_n=\Lambda_0e^{\ell_n}b_n+d$, with $d\ge0$ dark counts and $\{b_n\}$ the \emph{known} per-frame carrier intensities ($b_n>0$; in the Fig.~7 protocol these are the programmed design values and $d=0$ --- Remark D.4.1; the unknown-random-carrier variant is Remark D.4.3). Fix $\alpha>0$, let $\psi_\alpha(c)=\log(c+\alpha)$, and let $m_\alpha(\lambda)=\mathbb{E}[\psi_\alpha(C)]$ for $C\sim\mathrm{Pois}(\lambda)$ --- the homogeneous calibration curve, strictly increasing. For each window $W_n$ define the strictly increasing \emph{window calibration function}
 \[
@@ -799,7 +799,7 @@ For dense objects of bounded dynamic range, $K_\infty\asymp K_4\asymp K_{\mathrm
 
 \paragraph{What this does not claim.} Proposition E.5 controls window \emph{energy} over the sign draw for a pre-specified finite window family; it is a sufficient concentration tool, not the deterministic necessary-and-sufficient condition (which remains the spectral condition of Theorem E.2(3) applied to $w^P$), and it does not cover all $\binom{K}{W}$ windows simultaneously without paying for the larger union. The constants $c,C$ are universal but not optimized, and no claim is made that (E.8) is tight in its $W$- or $K_\infty$-dependence --- Hanson--Wright and matrix-Bernstein refinements can improve window-family dependence for structured $\mathcal{A}$, but they do not change the deterministic criterion. Finally, all of Appendix~E concerns the carrier statistics of the \emph{design}; the translation of whitening into gain-estimation rates ($1/W$ per window) and into image error (leverage $B_L=1$ for full SRHT inversion) is carried out in Appendix~D and Appendix~F respectively.
 
-\subsection{E.6 Two randomization semantics: pixel randomization ($P_{\mathrm{col}}$, $D$) vs.\ acquisition-order randomization ($P_{\mathrm{row}}$)}
+\subsection{E.6 Two randomization semantics: pixel randomization (\texorpdfstring{$P_{\mathrm{col}}$}{Pcol}, \texorpdfstring{$D$}{D}) vs.\ acquisition-order randomization (\texorpdfstring{$P_{\mathrm{row}}$}{Prow})}
 
 \textbf{This subsection separates two operations that earlier drafts conflated under the single word ``permutation''.} Write $P_{\mathrm{col}}$ for a uniformly random \textbf{pixel (column) permutation} of the object --- the $P$ of assumption (E3) --- write $D$ for the i.i.d.\ Rademacher \textbf{pixel sign} diagonal of (E3), and write $P_{\mathrm{row}}$ for a uniformly random reordering of the \textbf{acquisition (Hadamard row / time) order}. These control different claims:
 
@@ -940,7 +940,7 @@ The gain term follows from Theorem~1(a) with the \emph{leverage $\times N$ frami
 
 \paragraph{What F.3.3 does not claim.} There is \textbf{no universal $C_0$}: (F.10) is exact only for the ideal known-$(\mu,\sigma)$ correlator with iid coordinates. Mean subtraction, reference normalization, and photon allocation all change the constant (not the $C_0/N$ structure), so $C_0$ must be measured from the pipeline via definition (F.9). Moreover --- per the correction above --- the sampling-floor constant and the drift-leverage constant of the \emph{same} pipeline are different measured numbers whenever the pipeline subtracts a background; quoting one for the other is a $\sim10^3$ error at nonnegative-background operating points. The flux-limited convention $\Phi_n=\gamma b_n$ replaces the last term of (F.11) by $(N\sigma^2S_2)^{-1}\mathbb{E}[\|x\|^2 b_n/\gamma]$.
 
-\subsection{F.4 Prop 3: the finite-$N$ flip boundary}
+\subsection{F.4 Prop 3: the finite-\texorpdfstring{$N$}{N} flip boundary}
 
 \paragraph{Drift model and assumptions.} Let $s^2$ be the variance scale of the log-gain process $\ell$ and let $\rho_{\mathrm{pair}}$ be the \textbf{adjacent-pair decorrelation parameter}, meaning the paired-mask gain increment obeys $\mathrm{Var}(\Delta_k)\approx\mathrm{Var}(\ell_k^--\ell_k^+)=2s^2\,r(\rho_{\mathrm{pair}})$ with $r(\rho)=\rho+O(\rho^2)$ small-$\rho$; for an Ornstein--Uhlenbeck log-gain, $r(\rho)=1-e^{-\rho}$. Assume the small-mismatch regime of (F.8) (so $R_{\mathrm{pair,gain}}(\rho_{\mathrm{pair}})\approx\tfrac12 K_{\mathrm{eff}}D_H(T)\,s^2\,r(\rho_{\mathrm{pair}})$) and the DGI decomposition (F.11) with blind residual variance $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$ --- the window-optimized output of the Sec.-6 rate theorem, $v_{\mathrm{blind}}\lesssim\min_{W\in[1,N]}[\sigma_{\mathrm{eff}}^2/W+C(s\rho_{\mathrm{pair}} W)^2]\lesssim C\,\sigma_{\mathrm{eff}}^{4/3}(s\rho_{\mathrm{pair}})^{2/3}$ when the optimizer is interior.
 
