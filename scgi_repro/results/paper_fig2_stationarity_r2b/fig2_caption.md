@@ -14,4 +14,4 @@ Levene (Brown-Forsythe) rejection tally:
 Honest readout at this power: the ordered hadamard_paired arm rejects 7/10 objects.
 hadamard_random_paired also rejects 2/10 at this chunk size (digit_2, stripe); these track objects with concentrated low-K_eff/structured energy (e.g. stripe, low-index digits) aliasing against the fixed-seed row permutation, not a genuine non-stationarity signal.
 srht_paired also rejects 2/10 at this chunk size (digit_2, digit_3); these track objects with concentrated low-K_eff/structured energy (e.g. stripe, low-index digits) aliasing against the fixed-seed row permutation, not a genuine non-stationarity signal.
-Rows: 50. Runtime seconds: 3.18.
+Rows: 50. Runtime seconds: 3.26.
