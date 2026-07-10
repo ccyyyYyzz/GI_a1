@@ -1,0 +1,43 @@
+{
+  "max_raw_identity_abs_error": 2.277630428062366e-07,
+  "measured_over_theory_by_basis": {
+    "orthogonal_inverse": {
+      "min": 0.913064338786555,
+      "median": 0.9981564479084136,
+      "max": 1.1634798697862179
+    },
+    "random_dgi": {
+      "min": 0.9818961453998705,
+      "median": 0.9973129325975244,
+      "max": 1.009748266231226
+    },
+    "srht_inverse": {
+      "min": 0.9922033329270391,
+      "median": 1.0,
+      "max": 1.0208324207428965
+    }
+  },
+  "slope_range_by_basis": {
+    "orthogonal_inverse": {
+      "min": -0.11689326482396682,
+      "median": -0.012758974023927672,
+      "max": 0.11222033517478856
+    },
+    "random_dgi": {
+      "min": -1.0045117717656062,
+      "median": -0.978392906118409,
+      "max": -0.9715193448776638
+    },
+    "srht_inverse": {
+      "min": -0.014381585729384307,
+      "median": -0.004336060186681744,
+      "max": 0.008811194092273336
+    }
+  },
+  "random_dgi_leverage_times_N": {
+    "1024": 753380.3959127867,
+    "2048": 754427.068182072,
+    "4096": 752708.0947912135
+  },
+  "authority_status": "submission_authoritative_clean_commit"
+}

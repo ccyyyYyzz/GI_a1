@@ -1,0 +1,54 @@
+{
+  "mode": "all",
+  "num_seeds": 5,
+  "pair_contract": {
+    "max_coefficient_identity_abs_over_S1": 6.014881606577715e-07,
+    "max_risk_decomposition_abs_error": 3.1690494422618315e-06,
+    "max_denominator_clipped": 0,
+    "true_s1": {
+      "validation_role": "same_estimator_theorem_validation",
+      "n_observed_crossings": 40,
+      "factor_median": 1.0204053421864154,
+      "factor_max": 1.036856686111303,
+      "empirical_pooled_fit": {
+        "n_cells": 40,
+        "slope": -2.1204437450679423,
+        "intercept": -2.5312215214977183,
+        "r_squared": 0.9766944626194464
+      },
+      "prediction_pooled_fit": {
+        "n_cells": 40,
+        "slope": -2.1137107459028566,
+        "intercept": -2.519276343490586,
+        "r_squared": 0.9780684754352126
+      }
+    },
+    "median_pair_sum": {
+      "validation_role": "production_robustness_check",
+      "n_observed_crossings": 40,
+      "factor_median": 1.043940449300683,
+      "factor_max": 1.1998533100898752,
+      "empirical_pooled_fit": {
+        "n_cells": 40,
+        "slope": -2.0065598297397407,
+        "intercept": -2.424385116868273,
+        "r_squared": 0.9727062619179748
+      },
+      "prediction_pooled_fit": {
+        "n_cells": 40,
+        "slope": -2.1137107459028566,
+        "intercept": -2.519276343490586,
+        "r_squared": 0.9780684754352126
+      }
+    }
+  },
+  "blind_contract": {
+    "interpretation": "noiseless same-record conditional proxy; xi absent",
+    "max_trace_identity_abs_error": 5.09979469143218e-05,
+    "max_projected_identity_abs_error": 1.7336976810611304e-05,
+    "qdelta_over_aligned_median": 1.0187927511586363,
+    "delta_lag1_corr_median": 0.8821534160850543
+  },
+  "runtime_seconds": 99.17761087417603,
+  "authority_status": "submission_authoritative_clean_commit"
+}

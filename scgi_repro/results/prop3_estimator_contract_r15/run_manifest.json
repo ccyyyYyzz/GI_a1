@@ -1,0 +1,81 @@
+{
+  "utc_timestamp": "2026-07-10T22:40:08.126988+00:00",
+  "git_commit": "e4d499666809efbd7970c2728b9c0cb9a40b115a",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\prop3_estimator_contract_r15",
+    "mode": "all",
+    "num_seeds": 5,
+    "overwrite": true
+  },
+  "manifest_version": 2,
+  "manifest_version_minor": 1,
+  "git_commit_full": "e4d499666809efbd7970c2728b9c0cb9a40b115a",
+  "git_branch": "scgi-ceiling-diagnostic-r1",
+  "git_dirty": true,
+  "git_diff_sha256": null,
+  "git_status_porcelain": [
+    "?? scgi_repro/results/prop3_estimator_contract_r15/"
+  ],
+  "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_prop3_estimator_contract_r15.py",
+  "runner_sha256": "e81158ab61deabff76a6ec20d335f3d3357b7ac177c3733fd8e42da6aa13c29d",
+  "argv": [
+    "run_prop3_estimator_contract_r15.py",
+    "--output-dir",
+    "results/prop3_estimator_contract_r15",
+    "--mode",
+    "all",
+    "--num-seeds",
+    "5",
+    "--overwrite"
+  ],
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": false,
+  "untracked_files": [
+    "scgi_repro/results/prop3_estimator_contract_r15/"
+  ],
+  "provenance_note": "tree clean except this run's own outputs",
+  "script": "run_prop3_estimator_contract_r15.py",
+  "config_seed": 20240708,
+  "image_size": 32,
+  "num_objects": 10,
+  "num_seeds": 5,
+  "frame_budget": 2048,
+  "agc_window": 102,
+  "rho_values": [
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0,
+    3.0,
+    10.0
+  ],
+  "sigma_values": [
+    0.05,
+    0.1,
+    0.15,
+    0.3,
+    0.5
+  ],
+  "pair_estimators": [
+    "true_s1",
+    "median_pair_sum"
+  ],
+  "metrics": {
+    "primary": "raw relative MSE",
+    "secondary": "least-squares scale-aligned relative MSE"
+  },
+  "detector_noise": "absent",
+  "channel": {
+    "model": "ou",
+    "seed_rule": "9000+seed_index"
+  },
+  "authority_status": "submission_authoritative_clean_commit",
+  "purpose": "R15 submission-authoritative theorem-contract clean-commit rerun"
+}

@@ -1,0 +1,55 @@
+{
+  "utc_timestamp": "2026-07-10T22:41:45.765263+00:00",
+  "git_commit": "e4d499666809efbd7970c2728b9c0cb9a40b115a",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\paper_fig4_bridge_r3_raw",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 15,
+    "seed": 20240708,
+    "v_values": "0.0001,0.0003,0.001,0.003,0.01",
+    "n_factors": "1,2,4",
+    "orthogonal_pixels": "1024,2048,4096"
+  },
+  "manifest_version": 2,
+  "manifest_version_minor": 1,
+  "git_commit_full": "e4d499666809efbd7970c2728b9c0cb9a40b115a",
+  "git_branch": "scgi-ceiling-diagnostic-r1",
+  "git_dirty": true,
+  "git_diff_sha256": null,
+  "git_status_porcelain": [
+    "?? scgi_repro/results/paper_fig4_bridge_r3_raw/"
+  ],
+  "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_paper_fig4_bridge.py",
+  "runner_sha256": "57a836ca477d219caff0bbd0fcd4716cf223fce97ea2cc3af789cb1b037b9247",
+  "argv": [
+    "run_paper_fig4_bridge.py",
+    "--output-dir",
+    "results/paper_fig4_bridge_r3_raw",
+    "--seeds",
+    "15",
+    "--v-values",
+    "0.0001,0.0003,0.001,0.003,0.01",
+    "--n-factors",
+    "1,2,4",
+    "--orthogonal-pixels",
+    "1024,2048,4096"
+  ],
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": false,
+  "untracked_files": [
+    "scgi_repro/results/paper_fig4_bridge_r3_raw/"
+  ],
+  "provenance_note": "tree clean except this run's own outputs",
+  "rows": 8100,
+  "primary_metric": "raw relative MSE total",
+  "secondary_metric": "least-squares scale-aligned relative MSE total",
+  "detector_noise": "absent",
+  "max_raw_identity_abs_error": 2.277630428062366e-07,
+  "audit_file": "fig4_bridge_audit.json",
+  "authority_status": "submission_authoritative_clean_commit"
+}

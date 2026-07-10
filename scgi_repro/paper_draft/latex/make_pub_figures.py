@@ -487,7 +487,7 @@ def fig3c_collapse() -> Path:
 # --------------------------------------------------------------------------------------
 def fig4_relmse_theory_vs_sim() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig4_bridge_r3_raw_provisional" / "fig4_bridge.csv")
+    df = pd.read_csv(RESULTS / "paper_fig4_bridge_r3_raw" / "fig4_bridge.csv")
     summary = df.groupby(["basis", "N", "v"], as_index=False).agg(
         rel_mse_mean=("rel_mse_raw_total", "mean"),
         theory_mean=("theory_rel_mse_raw_total", "mean"),
@@ -566,7 +566,7 @@ def fig5_flip_boundary() -> Path:
     winners = pd.read_csv(prop3 / "winner_table_cells.csv")
     winners = winners[winners["scope"] == "equal_frame_non_oracle"].copy()
     skel = pd.read_csv(
-        RESULTS / "prop3_estimator_contract_r15_provisional" / "pair_boundary.csv"
+        RESULTS / "prop3_estimator_contract_r15" / "pair_boundary.csv"
     )
     audit = RESULTS / "m2_boundary_audit_hadamard_order_dense_r1"
     fits = pd.read_csv(audit / "m2_boundary_fit.csv")
