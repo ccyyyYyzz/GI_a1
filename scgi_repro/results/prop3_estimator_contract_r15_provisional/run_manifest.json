@@ -1,0 +1,100 @@
+{
+  "utc_timestamp": "2026-07-10T21:16:46.782085+00:00",
+  "git_commit": "402c8d6db9d8fc4dce225700f0b6a3561885009e",
+  "hostname": "cyz912",
+  "python_version": "3.11.5",
+  "torch_version": "2.2.1+cu121",
+  "numpy_version": "1.24.4",
+  "args": {
+    "output_dir": "results\\prop3_estimator_contract_r15_provisional",
+    "mode": "all",
+    "num_seeds": 5,
+    "overwrite": true
+  },
+  "manifest_version": 2,
+  "manifest_version_minor": 1,
+  "git_commit_full": "402c8d6db9d8fc4dce225700f0b6a3561885009e",
+  "git_branch": "scgi-ceiling-diagnostic-r1",
+  "git_dirty": true,
+  "git_diff_sha256": "2146301c68f5259b4d314de27bd7d56d2b48362d3dc266af97315cd127a25a19",
+  "git_status_porcelain": [
+    " M scgi_repro/paper_draft/APPENDICES.md",
+    " M scgi_repro/paper_draft/MANUSCRIPT_DRAFT.md",
+    " M scgi_repro/paper_draft/latex/abstract.tex",
+    " M scgi_repro/paper_draft/latex/appendix_body.tex",
+    " M scgi_repro/paper_draft/latex/body.tex",
+    " M scgi_repro/paper_draft/latex/figs/fig4_relmse_theory_vs_sim.png",
+    " M scgi_repro/paper_draft/latex/figs/fig5_flip_boundary.png",
+    " M scgi_repro/paper_draft/latex/make_pub_figures.py",
+    " M scgi_repro/paper_draft/latex/supplement.tex",
+    " M scgi_repro/run_paper_fig4_bridge.py",
+    " M scgi_repro/src/mechanisms.py",
+    "?? scgi_repro/paper_draft/REVIEWS/GPT_R14_THEORY_AUDIT/",
+    "?? scgi_repro/results/paper_fig4_bridge_r3_raw_provisional/",
+    "?? scgi_repro/results/prop3_estimator_contract_r15_provisional/",
+    "?? scgi_repro/run_prop3_estimator_contract_r15.py",
+    "?? scgi_repro/tests/test_r15_theory_contract.py"
+  ],
+  "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_prop3_estimator_contract_r15.py",
+  "runner_sha256": "6508e7dadd3bf9c49251743bffd358788c91f49617a2de720873fec73d35f8c4",
+  "argv": [
+    "run_prop3_estimator_contract_r15.py",
+    "--output-dir",
+    "results/prop3_estimator_contract_r15_provisional",
+    "--mode",
+    "all",
+    "--num-seeds",
+    "5",
+    "--overwrite"
+  ],
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": true,
+  "untracked_files": [
+    "scgi_repro/paper_draft/REVIEWS/GPT_R14_THEORY_AUDIT/",
+    "scgi_repro/results/paper_fig4_bridge_r3_raw_provisional/",
+    "scgi_repro/results/prop3_estimator_contract_r15_provisional/",
+    "scgi_repro/run_prop3_estimator_contract_r15.py",
+    "scgi_repro/tests/test_r15_theory_contract.py"
+  ],
+  "provenance_note": null,
+  "script": "run_prop3_estimator_contract_r15.py",
+  "purpose": "R15 provisional theorem-contract QA; not submission-authoritative",
+  "authority_status": "provisional_dirty_tree_qa",
+  "config_seed": 20240708,
+  "image_size": 32,
+  "num_objects": 10,
+  "num_seeds": 5,
+  "frame_budget": 2048,
+  "agc_window": 102,
+  "rho_values": [
+    0.001,
+    0.003,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0,
+    3.0,
+    10.0
+  ],
+  "sigma_values": [
+    0.05,
+    0.1,
+    0.15,
+    0.3,
+    0.5
+  ],
+  "pair_estimators": [
+    "true_s1",
+    "median_pair_sum"
+  ],
+  "metrics": {
+    "primary": "raw relative MSE",
+    "secondary": "least-squares scale-aligned relative MSE"
+  },
+  "detector_noise": "absent",
+  "channel": {
+    "model": "ou",
+    "seed_rule": "9000+seed_index"
+  }
+}

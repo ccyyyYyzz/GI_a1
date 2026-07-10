@@ -174,33 +174,30 @@ def mean_agc_gain(measurements: torch.Tensor, window: int, eps: float = 1.0e-8) 
 
 
 def log_agc_gain(measurements: torch.Tensor, window: int) -> tuple[torch.Tensor, float]:
-    """Theorem-B windowed log-domain estimator.
+    """Windowed log-domain implementation with diagnostic masking.
 
     Theorem B analyzes windowed means of ``Y_n = log R_n``: the window mean
     estimates ``ell_n + m_T`` and the *centered* log-gain ``ell_n - mean(ell)``
     is the identifiable estimand (the gauge scalar ``m_T`` cancels). The
-    faithful estimator is therefore
+    Theorem B's estimator is therefore
 
         ``gain_hat_n  proportional to  exp( movmean(log R, W)_n - its mean )``,
 
     mean-normalised to unit mean (the same gauge convention as
     :func:`mean_agc_gain`).
 
-    Positivity guard (Theorem B assumption (iv)): the theorem requires
-    ``R_n > 0`` *on the analyzed record* (positivity/offset margin, bucket
-    convention (ii) of the manuscript). The guard implements exactly that
-    restriction: frames with ``R_n <= 0`` are excluded from the analyzed
-    record, i.e. the windowed log-mean is a masked moving average over the
-    positive frames within each window (a hard floor would instead inject a
-    ``log(eps)`` outlier for the exactly-zero complementary DC frame of paired
-    Hadamard, which assumption (iv) never admits into the record). Windows
-    containing no positive frame fall back to the gauge value (relative gain
-    1). For physical nonnegative-intensity arms the mask touches at most the
-    occasional zero bucket; for the raw signed Walsh arms — bucket convention
-    (i), where ``log B_n`` is undefined by construction — about half the
-    frames are excluded, and the returned ``frac_nonpos`` (fraction of frames
-    with ``R_n <= 0``) flags those arms as diagnostic-only, per the
-    manuscript.
+    The implementation coincides with that estimator only when the original
+    analyzed carrier is strictly positive and the mask below is therefore all
+    one (with the remaining B1--B4 conditions checked separately). If any
+    ``R_n <= 0``, excluding such frames changes the estimand: the result is an
+    endogenous masked diagnostic, not a Theorem-B estimate. A hard floor would
+    instead inject a ``log(eps)`` outlier for an exactly-zero complementary DC
+    frame. Windows containing no positive frame fall back to the gauge value
+    (relative gain 1). On an arm intended to satisfy the positive-carrier
+    theorem, any nonzero returned ``frac_nonpos`` is an applicability-failure
+    flag. For raw signed Walsh arms — bucket convention (i), where ``log B_n``
+    is undefined by construction — about half the frames are excluded, so the
+    result is diagnostic-only, as stated in the manuscript.
 
     Returns ``(gain_hat, frac_nonpos)``.
     """
@@ -472,6 +469,24 @@ def build_run_manifest(
     if extra:
         manifest.update(extra)
     return manifest
+
+
+def classify_run_authority(manifest: dict) -> str:
+    """Classify result authority from provenance, never from a directory name.
+
+    A run is submission-authoritative only when it is anchored to a commit and
+    the worktree is clean after excluding the run's own output subtree.  The
+    raw ``git_dirty`` field may still be true because the newly written output
+    directory is itself untracked; manifest schema v2.1 records that case via
+    ``git_dirty_excluding_output`` and ``provenance_note``.
+    """
+
+    if (
+        bool(manifest.get("git_commit_full"))
+        and manifest.get("git_dirty_excluding_output") is False
+    ):
+        return "submission_authoritative_clean_commit"
+    return "provisional_dirty_tree_qa"
 
 
 def _rect_shape_for_pixels(num_pixels: int) -> tuple[int, int]:

@@ -181,8 +181,9 @@ def run(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFr
                                 "carrier_cv": carrier_cv,
                                 "gain_rel_err": gain_rel_err,
                                 # Estimator-suffixed duplicates: _ratio is the legacy
-                                # movmean(R,W)/mean(R) AGC; _log is the Theorem-B
-                                # windowed log-domain estimator (see log_agc_gain).
+                                # movmean(R,W)/mean(R) AGC; _log is a log-window
+                                # implementation that equals the Theorem-B estimator
+                                # only when the original positivity mask is all one.
                                 "gain_rel_err_ratio": gain_rel_err,
                                 "gain_rel_err_log": gain_rel_err_log,
                                 "frac_nonpos_carrier": frac_nonpos,
@@ -570,8 +571,9 @@ def main() -> None:
         "Fig. 3 Blind Gain Identifiability (r2)",
         [
             "Sliding-window AGC (movmean(R,W)/mean(R)) is applied identically to every arm and scored only on gain recovery.",
-            "r3 fairness additions: gain_rel_err_ratio / gain_rel_err_log report the movmean-ratio AGC and the Theorem-B "
-            "windowed log-domain estimator (exp of centered movmean(log R, W), positivity-margin guard) on identical records; "
+            "r3 fairness additions: gain_rel_err_ratio / gain_rel_err_log report the movmean-ratio AGC and a log-window "
+            "implementation on identical records; it equals the Theorem-B estimator only when the original carrier is "
+            "strictly positive (all-one mask), while signed/nonpositive arms are endogenous masked diagnostics; "
             "hadamard_raw_*_2048 arms repeat the signed Walsh sequence twice so raw arms match the physical arms' 2048-frame "
             "budget (hadamard_raw_*_1024 = single-pass diagnostic); fig3_bootstrap_cis.csv reports median stats with naive / "
             "seed-cluster / two-way (crossed seeds-and-objects) bootstrap CIs.",

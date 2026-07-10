@@ -216,7 +216,7 @@ def place_end_labels(ax, entries, *, log_y: bool, min_gap: float, dx: int = 4,
 def save(fig, name: str) -> Path:
     out = FIGS / name
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out, dpi=300, bbox_inches="tight")
+    fig.savefig(out, dpi=300, bbox_inches="tight", facecolor="white")
     plt.close(fig)
     return out
 
@@ -355,7 +355,8 @@ def fig2_carrier_traces() -> Path:
 # Fig 3a  --  median blind gain error vs W (log-log), one line per arm, rho = 1e-3.
 # Source: the audited frame-matched rerun (r3_fair): raw signed-Walsh arms at the same
 # 2048-frame budget as the physical arms.  Solid/filled = ratio AGC; dashed/open = the
-# windowed log-domain estimator of Theorem B (masked to the R>0 record).  Error bars at
+# log-window implementation; it equals the Theorem-B estimator only when the original
+# carrier is strictly positive (all-one mask), otherwise it is a masked diagnostic. Error bars at
 # each arm's best window = two-way (seeds-and-objects) clustered 95% bootstrap CI of the
 # median best-window error (fig3_bootstrap_cis.csv, scheme "two_way").
 # --------------------------------------------------------------------------------------
@@ -389,7 +390,7 @@ def fig3a_error_vs_W() -> Path:
         ax.plot(curve["W"], curve["gain_rel_err_ratio"], marker="o", ms=4.5, lw=1.8,
                 color=color, zorder=zorder_for(color),
                 markeredgecolor="white", markeredgewidth=0.5)
-        # Theorem-B log-domain estimator: thin dashed line, open markers, same colour.
+        # Log-window implementation: thin dashed line, open markers, same colour.
         logc = sub.groupby("W", as_index=False)["gain_rel_err_log"].median().sort_values("W")
         ax.plot(logc["W"], logc["gain_rel_err_log"], marker="o", ms=3.4, lw=0.9,
                 linestyle=(0, (3, 2)), color=color, zorder=zorder_for(color) - 1,
@@ -421,7 +422,7 @@ def fig3a_error_vs_W() -> Path:
                markeredgecolor="white", markeredgewidth=0.5, label="ratio AGC"),
         Line2D([], [], color=TICK_INK, lw=0.9, linestyle=(0, (3, 2)), marker="o", ms=3.4,
                markerfacecolor="white", markeredgecolor=TICK_INK, markeredgewidth=0.8,
-               label="log estimator (Thm B)"),
+               label="log-window / masked diagnostic"),
     ]
     ax.legend(handles=style_handles, loc="lower left", fontsize=6.0,
               handlelength=1.7, labelspacing=0.3, borderaxespad=0.2)
@@ -486,10 +487,10 @@ def fig3c_collapse() -> Path:
 # --------------------------------------------------------------------------------------
 def fig4_relmse_theory_vs_sim() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig4_bridge_r2b" / "fig4_bridge.csv")
+    df = pd.read_csv(RESULTS / "paper_fig4_bridge_r3_raw_provisional" / "fig4_bridge.csv")
     summary = df.groupby(["basis", "N", "v"], as_index=False).agg(
-        rel_mse_mean=("rel_mse", "mean"),
-        theory_mean=("theory_rel_mse", "mean"),
+        rel_mse_mean=("rel_mse_raw_total", "mean"),
+        theory_mean=("theory_rel_mse_raw_total", "mean"),
     )
     order = ["orthogonal_inverse", "srht_inverse", "random_dgi"]
     label = {"orthogonal_inverse": "orthogonal", "srht_inverse": "SRHT", "random_dgi": "random / DGI"}
@@ -516,7 +517,7 @@ def fig4_relmse_theory_vs_sim() -> Path:
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("residual gain var. $v$")
-    ax.set_ylabel("relative MSE")
+    ax.set_ylabel("raw relative MSE")
     style_ax(ax)
     ax.legend(loc="upper left", fontsize=6.2, handlelength=1.3, borderaxespad=0.2, labelspacing=0.3)
 
@@ -540,7 +541,7 @@ def fig4_relmse_theory_vs_sim() -> Path:
     ax.set_xscale("log", base=2)
     ax.set_yscale("log")
     ax.set_xlabel("frames / size $N$")
-    ax.set_ylabel("relMSE")
+    ax.set_ylabel("raw relative MSE")
     style_ax(ax)
     # Panel (b) shares (a)'s series->colour mapping and is fully filled by the
     # 15 (basis x v) curves, so no separate legend is drawn (colours carry identity):
@@ -564,8 +565,9 @@ def fig5_flip_boundary() -> Path:
     prop3 = RESULTS / "prop3_nofreeparam_r1"
     winners = pd.read_csv(prop3 / "winner_table_cells.csv")
     winners = winners[winners["scope"] == "equal_frame_non_oracle"].copy()
-    skel = pd.read_csv(prop3 / "prop3_skeleton_oracle_test.csv")
-    consts = pd.read_csv(prop3 / "prop3_constants.csv")
+    skel = pd.read_csv(
+        RESULTS / "prop3_estimator_contract_r15_provisional" / "pair_boundary.csv"
+    )
     audit = RESULTS / "m2_boundary_audit_hadamard_order_dense_r1"
     fits = pd.read_csv(audit / "m2_boundary_fit.csv")
     boundaries = pd.read_csv(audit / "m2_boundary_interpolated.csv")
@@ -615,18 +617,6 @@ def fig5_flip_boundary() -> Path:
             if i + 1 < len(sigmas) and above[i, j] != above[i + 1, j]:
                 ax.plot([xe[j], xe[j + 1]], [ye[i + 1], ye[i + 1]],
                         color=TICK_INK, lw=1.4, zorder=5)
-    # Prop-3 gain-known skeleton boundary from median measured constants (dashed).
-    C0_over_N = float((consts["C0_pipeline"] / 2048.0).median())
-    KD = float((consts["K_eff"] * consts["D_H"]).median())
-    sig_curve = np.geomspace(ye[0], ye[-1], 200)
-    q = 2.0 * C0_over_N / (KD * sig_curve ** 2)
-    valid = q < 1.0
-    rho_curve = np.full_like(sig_curve, np.nan)
-    rho_curve[valid] = -np.log1p(-q[valid])
-    ax.plot(rho_curve, sig_curve, linestyle=(0, (4, 3)), lw=1.3, color=INK_GRAY, zorder=7,
-            label="Prop 3 skeleton\n(gain-known arm)")
-    ax.legend(loc="upper left", fontsize=5.6, handlelength=1.5, borderaxespad=0.25,
-              labelspacing=0.3)
     # In-panel category labels.
     ax.text(0.006, 0.10, "SRHT-paired\n+ pairwise\n(28 cells)", fontsize=6.2,
             color=tuple(np.array(mcolors.to_rgb(P5)) * 0.75), fontweight="bold",
@@ -684,38 +674,45 @@ def fig5_flip_boundary() -> Path:
 
     # ---------------- Panel (c): no-free-parameter Prop-3 skeleton test ----------------
     ax = axes[2]
-    obs = skel[skel["emp_status"] == "observed"].copy()
+    obs_true = skel[(skel["estimator"] == "true_s1") & (skel["emp_status"] == "observed")].copy()
+    obs_prod = skel[(skel["estimator"] == "median_pair_sum") & (skel["emp_status"] == "observed")].copy()
     cens = skel[skel["emp_status"] != "observed"].copy()
     # Median predicted rho*(sigma) curve across objects, with its factor-2 band.
-    med_pred = skel.groupby("sigma_a")["rho_star_pred"].median()
+    med_pred = skel[skel["estimator"] == "true_s1"].groupby("sigma_a")["rho_star_pred_f7_leading"].median()
     sig_v = med_pred.index.to_numpy(dtype=float)
     pred_v = med_pred.to_numpy(dtype=float)
     fin = np.isfinite(pred_v)
     ax.fill_between(sig_v[fin], pred_v[fin] / 2.0, pred_v[fin] * 2.0,
                     color=tint(P1, 0.75), zorder=1, label="factor-2 band")
     ax.plot(sig_v[fin], pred_v[fin], linestyle=(0, (4, 3)), lw=1.4, color=INK_GRAY,
-            zorder=3, label=r"predicted $\rho^{*}(\sigma_a)$ (no free param.)")
-    # Observed crossings (42 cells), jittered slightly in sigma for visibility.
+            zorder=3, label="prediction (no fit)")
+    # Same traces, two estimator contracts; jitter slightly for visibility.
     rng = np.random.default_rng(20240708)
-    jitter = 10 ** (rng.uniform(-0.02, 0.02, size=len(obs)))
-    ax.scatter(obs["sigma_a"].to_numpy() * jitter, obs["rho_star_emp"], s=22, color=P1,
+    jitter_true = 10 ** (rng.uniform(-0.014, -0.004, size=len(obs_true)))
+    jitter_prod = 10 ** (rng.uniform(0.004, 0.014, size=len(obs_prod)))
+    ax.scatter(obs_true["sigma_a"].to_numpy() * jitter_true, obs_true["rho_star_emp_raw"], s=22, color=P1,
                edgecolors="white", linewidths=0.4, zorder=5,
-               label="observed crossings (42 cells)")
+               label=r"true-$S_1$")
+    ax.scatter(obs_prod["sigma_a"].to_numpy() * jitter_prod, obs_prod["rho_star_emp_raw"], s=22,
+               marker="s", facecolors="white", edgecolors=P8, linewidths=0.8, zorder=5,
+               label="median norm.")
     # Censored cells at sigma_a = 0.05 (no crossing reached): open markers at top edge.
     if len(cens):
-        ytop = float(np.nanmax([np.nanmax(obs["rho_star_emp"]), np.nanmax(pred_v[fin])])) * 2.6
+        ytop = float(np.nanmax([np.nanmax(obs_true["rho_star_emp_raw"]),
+                                np.nanmax(obs_prod["rho_star_emp_raw"]),
+                                np.nanmax(pred_v[fin])])) * 2.6
         ax.scatter(cens["sigma_a"], np.full(len(cens), ytop), marker="^", s=20,
                    facecolors="white", edgecolors=TICK_INK, linewidths=0.8, zorder=5,
                    label="censored (no crossing)")
-    ax.text(0.03, 0.05, "median factor 1.54;\n40/40 within 2$\\times$ for $\\sigma_a\\geq0.1$",
+    ax.text(0.03, 0.05, "true $S_1$: 1.020 / 1.037\nmedian norm.: 1.044 / 1.200\n(median / max factor)",
             transform=ax.transAxes, fontsize=6.0, color=TICK_INK, ha="left", va="bottom")
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"gain amplitude $\sigma_a$")
-    ax.set_ylabel(r"$\rho^{*}$ (gain-known arm)")
+    ax.set_ylabel(r"raw $\rho^{*}$ (gain-known arm)")
     ax.set_title("(c) Prop 3 skeleton test", fontsize=7.6, loc="left")
     style_ax(ax)
-    ax.legend(loc="upper right", fontsize=5.6, handlelength=1.2, labelspacing=0.3,
+    ax.legend(loc="upper right", fontsize=5.2, handlelength=1.1, labelspacing=0.25,
               handletextpad=0.4, borderaxespad=0.2)
 
     fig.tight_layout(w_pad=1.3)

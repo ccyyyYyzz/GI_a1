@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 import re
 from typing import Callable, Optional
 
@@ -397,12 +398,16 @@ def apply_correction(
     reference_read_noise: float = 0.0,
     reference_seed: int = 0,
     scgi_corrector: Optional[Callable[[torch.Tensor], torch.Tensor]] = None,
+    pair_total_intensity: Optional[float] = None,
 ) -> CorrectedMeasurements:
     """Apply oracle, none, blind gain corrections, or paired-ratio correction.
 
     For paired-ratio correction the returned ``values`` are signed coefficients,
     not frame measurements, because the ratio directly estimates
-    ``<signed_pattern, object>`` up to a global total-intensity scale.
+    ``<signed_pattern, object>`` up to a global total-intensity scale.  The
+    default ``pair_total_intensity=None`` preserves the production
+    ``median(pair_sum)`` normalization.  Supplying a finite positive scalar
+    enables the theorem-faithful known-total-intensity QA arm.
     """
 
     key = correction.lower()
@@ -485,7 +490,13 @@ def apply_correction(
         plus = values[0::2]
         minus = values[1::2]
         pair_sum = plus + minus
-        total_estimate = pair_sum.median().abs().clamp_min(eps)
+        if pair_total_intensity is None:
+            total_estimate = pair_sum.median().abs().clamp_min(eps)
+        else:
+            total_value = float(pair_total_intensity)
+            if not math.isfinite(total_value) or total_value <= 0.0:
+                raise ValueError("pair_total_intensity must be finite and positive.")
+            total_estimate = values.new_tensor(total_value)
         coefficients = total_estimate * (plus - minus) / pair_sum.clamp_min(eps)
         gain_hat = estimate_pair_gain_from_sums(values, eps=eps)
         return CorrectedMeasurements(
