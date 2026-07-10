@@ -1,0 +1,350 @@
+% R13 THEORY PREWORK -- NEW FILE ONLY; not included by main.tex or supplement.tex.
+% Base: branch scgi-ceiling-diagnostic-r1, HEAD bcbb31254c343eb04e8cb96d7c3157bfc9818b36.
+% Purpose: paste-ready replacement material for F.8, DGI constants, Prop. 3,
+% and the OU window-risk scope.
+
+\paragraph{F.3.2 Pairwise Hadamard: exact law and correct second moment.}
+Let $c_k=h_k^\top T$, $x_k=c_k/S_1$, and assume $T\ge0$ with
+$S_1>0$, so $|x_k|\le1$.  Write
+$a_k^-=a_k^+(1+\Delta_k)$, where $\Delta_k>-1$ almost surely.  The
+pairwise-normalized coefficient error is exactly
+\begin{equation}
+ e_k:=\widehat c_k-c_k
+ =-\,{S_1\Delta_k(1-x_k^2)\over
+       2+\Delta_k(1-x_k)}. \tag{F.7-R13}
+\end{equation}
+Consequently,
+\begin{equation}
+ R_{\mathrm{pair,gain}}
+ ={K_{\mathrm{eff}}\over K}\sum_{k=1}^K
+ \mathbb E\!\left[
+ {\Delta_k^2(1-x_k^2)^2\over
+  \{2+\Delta_k(1-x_k)\}^2}\right]. \tag{F.8a-R13}
+\end{equation}
+
+\paragraph{Proposition (pairwise second-moment expansion).}
+Suppose $|\Delta_k|\le\eta<1$ almost surely.  Then
+\begin{align}
+ \left|R_{\mathrm{pair,gain}}
+ -{K_{\mathrm{eff}}\over4K}\sum_{k=1}^K
+  (1-x_k^2)^2\mathbb E\Delta_k^2\right|
+ \le {K_{\mathrm{eff}}\over2(1-\eta)^3K}
+ \sum_{k=1}^K\mathbb E|\Delta_k|^3. \tag{F.8b-R13}
+\end{align}
+If the pair increments have a common marginal distribution, with no
+cross-pair independence required, then
+\begin{equation}
+ R_{\mathrm{pair,gain}}
+ ={K_{\mathrm{eff}}\over4}D_H(T)\mathbb E\Delta^2
+ +O_\eta\!\left(K_{\mathrm{eff}}\mathbb E|\Delta|^3\right),
+ \qquad
+ D_H(T)={1\over K}\sum_{k=1}^K(1-x_k^2)^2. \tag{F.8-R13}
+\end{equation}
+Thus $\operatorname{Var}(\Delta)$ may replace
+$\mathbb E\Delta^2$ only under the extra assumption
+$\mathbb E\Delta=0$.
+
+\paragraph{Proof.}
+Parseval gives
+$\|\widehat T-T\|_2^2=K^{-1}\sum_ke_k^2$, proving
+(F.8a-R13).  For $g_x(t)=\{2+t(1-x)\}^{-2}$, the mean-value theorem,
+$|x|\le1$, and $|t|\le\eta$ give
+\[
+ |g_x(t)-g_x(0)|\le {|t|\over2(1-\eta)^3}.
+\]
+Multiplication by $\Delta_k^2(1-x_k^2)^2$, expectation, and summation
+prove (F.8b-R13).  The common-marginal specialization is the definition
+of $D_H(T)$.
+\hfill$\blacksquare$
+
+\paragraph{OU increment corollary.}
+For a stationary Gaussian OU/AR(1) log gain with
+$\operatorname{Var}(\ell_n)=s^2$ and
+$\operatorname{Corr}(\ell_n,\ell_{n+1})=e^{-\rho}$, put
+\[
+ r(\rho)=1-e^{-\rho},\qquad u=s^2r(\rho).
+\]
+The adjacent log increment $X=\ell_{n+1}-\ell_n$ is
+$\mathcal N(0,2u)$ and $\Delta=e^X-1$.  Hence
+\[
+ \mathbb E\Delta=e^u-1,
+\]
+\begin{equation}
+ \mathbb E\Delta^2=e^{4u}-2e^u+1
+ =2u+7u^2+O(u^3), \tag{F.8c-R13}
+\end{equation}
+\[
+ \operatorname{Var}(\Delta)=e^{4u}-e^{2u},
+ \qquad
+ \mathbb E\Delta^2-\operatorname{Var}(\Delta)=(e^u-1)^2.
+\]
+The bounded-increment proposition does not directly apply to this
+lognormal $\Delta$.  Instead, use the exact expression (F.8a-R13) and
+split on $|X|\le c$ for a fixed $c>0$.  On the central event, Taylor's
+theorem, uniformly for $x\in[-1,1]$, gives
+\[
+ {\Delta^2(1-x^2)^2\over\{2+\Delta(1-x)\}^2}
+ ={(1-x^2)^2\over4}X^2+O_c(|X|^3).
+\]
+On the complement, the exact fraction admits an exponential envelope
+$C_c(1+e^{2|X|})$; Gaussian tail integration makes its expectation
+$o(u^m)$ for every fixed $m$ as $u\downarrow0$.  Since
+$\mathbb EX^2=2u$ and $\mathbb E|X|^3=O(u^{3/2})$, summing uniformly
+over $k$ gives
+\begin{equation}
+ R_{\mathrm{pair,gain}}
+ ={1\over2}K_{\mathrm{eff}}D_H(T)s^2r(\rho)
+ +O\!\left(K_{\mathrm{eff}}u^{3/2}\right). \tag{F.8d-R13}
+\end{equation}
+Thus the existing leading pair law survives, but its proof must begin
+with $\mathbb E\Delta^2$.  A deterministic
+$\Delta\equiv\epsilon$ is the immediate counterexample to a formula
+using only $\operatorname{Var}(\Delta)$.
+
+\paragraph{Random/DGI pipelines: floor, leverage, and population-moment constants.}
+For a fixed design $A$, linear reconstruction $L$, object $T$, and
+$b=AT$, define the raw known-gain floor and residual leverage by
+\begin{align}
+ C_0^{\mathrm{floor}}(A,L,T)
+ &:={N\over S_2}\|(LA-I)T\|_2^2, \tag{F.9a-R13}\\
+ \Lambda_{\mathrm{lev}}(A,L,T)
+ &:=NB_L(A,T)
+ ={N\over S_2}\sum_{n=1}^Nb_n^2\|Le_n\|_2^2, \tag{F.9b-R13}\\
+ C_0^{\mathrm{lev}}(A,L,T)&:=\Lambda_{\mathrm{lev}}-1.
+ \tag{F.9c-R13}
+\end{align}
+The first is a raw-MSE sampling-floor constant for the fixed operator.
+The second propagates exogenous multiplicative residuals and
+equal-count Poisson noise; $C_0^{\mathrm{lev}}$ is merely the shifted
+notation $\Lambda_{\mathrm{lev}}-1$.  These fixed-design quantities
+must also be distinguished from the population raw-moment constant
+defined below.  They must not share one generic ``pipeline $C_0$'' label.
+
+\paragraph{Proposition (exact pipeline specialization).}
+Suppose residuals are exogenous to detector noise and the design, have
+common mean $m_\delta$, common second moment
+$q_\delta=\mathbb E\delta_n^2$, and
+\[
+ \operatorname{Cov}(\delta)=(q_\delta-m_\delta^2)I.
+\]
+Under the linear-reconstruction hypotheses of Theorem~1,
+\begin{align}
+ {\mathbb E\|\widehat T-T\|_2^2\over S_2}
+ ={}&{\|(LA-I)T+m_\delta LAT\|_2^2\over S_2}\notag\\
+ &+{\Lambda_{\mathrm{lev}}\over N}
+   (q_\delta-m_\delta^2)
+ +{\operatorname{tr}(L\Sigma_\xi L^\top)\over S_2}.
+ \tag{F.10a-R13}
+\end{align}
+Write
+\[
+ R_\xi={\operatorname{tr}(L\Sigma_\xi L^\top)\over S_2}.
+\]
+If $m_\delta=0$,
+\begin{equation}
+ {\mathbb E\|\widehat T-T\|_2^2\over S_2}
+ ={C_0^{\mathrm{floor}}\over N}
+ +{1+C_0^{\mathrm{lev}}\over N}q_\delta+R_\xi.
+ \tag{F.10b-R13}
+\end{equation}
+If
+$\Sigma_\xi=\tau_G^2I+\Phi_{\mathrm{frame}}^{-1}
+\operatorname{diag}(b^2)$, then
+\begin{equation}
+ R_\xi={\tau_G^2\operatorname{tr}(LL^\top)\over S_2}
+ +{1+C_0^{\mathrm{lev}}\over N\Phi_{\mathrm{frame}}}.
+ \tag{F.10c-R13}
+\end{equation}
+
+\paragraph{Proof.}
+The residual mean vector is $m_\delta\mathbf1$, and
+$L\operatorname{diag}(b)\mathbf1=Lb=LAT$.  Substitute its mean and
+covariance into the exact matrix identity of Theorem~1.  The Poisson
+specialization uses
+\[
+ {1\over S_2\Phi_{\mathrm{frame}}}
+ \sum_nb_n^2\|Le_n\|_2^2
+ ={\Lambda_{\mathrm{lev}}\over N\Phi_{\mathrm{frame}}}.
+\]
+\hfill$\blacksquare$
+
+For $N$ iid pattern draws with known population moments and the raw
+correlator
+$I=\mu\mathbf1+\sigma x$ and
+\[
+ Z=\sigma^{-1}x(\mu S_1+\sigma x^\top T),
+\]
+define
+\[
+ C_0^{\mathrm{raw,moment}}
+ :={\mathbb E\|Z-T\|_2^2\over S_2}.
+\]
+If the coordinates of $x$ are iid with
+$\mathbb Ex=0$, $\mathbb Ex^2=1$,
+$\mathbb Ex^3=\gamma_3$, and $\mathbb Ex^4=\beta_4$, then
+\begin{equation}
+ C_0^{\mathrm{raw,moment}}
+ =K+\beta_4-2
+ +K_{\mathrm{eff}}\{K(\mu/\sigma)^2
+                    +2\gamma_3(\mu/\sigma)\}. \tag{F.10-R13}
+\end{equation}
+where $L=L(A)$ has rows $x_n^\top/(N\sigma)$ and the corresponding
+bucket coefficient is $\mu S_1+\sigma x_n^\top T$, independence and
+unbiasedness give
+\[
+ \mathbb E_A C_0^{\mathrm{floor}}
+ =C_0^{\mathrm{raw,moment}},
+ \qquad
+ \mathbb E_A\Lambda_{\mathrm{lev}}
+ =1+C_0^{\mathrm{raw,moment}}.
+\]
+For a mean-subtracted or scale-aligned implementation these are not
+definition-level identities.  The fixed-design raw floor near $10^3$
+must also not be confused with the nonnegative-background drift
+leverage near $10^6$.
+
+\paragraph{Prop. 3$'$ (raw-MSE flip boundary).}
+Let
+\[
+ \rho^*=\inf\{\rho\ge0:
+ R_{\mathrm{pair}}(\rho)\ge R_{\mathrm{rand}}(\rho,N)\}.
+\]
+All risks in this proposition are raw relative MSEs of Theorem~1.  For
+the random arm write
+\begin{equation}
+ R_{\mathrm{rand}}(\rho,N)
+ ={C_0^{\mathrm{floor}}\over N}
+ +\Gamma_{\mathrm{blind}}(\rho,N)
+ +R_{\mathrm{rand,noise}}. \tag{F.12a-R13}
+\end{equation}
+For an oracle-known-gain arm, $\Gamma_{\mathrm{blind}}=0$.  For an
+exogenous, centered, frame-uncorrelated residual with
+$q_{\mathrm{blind}}(\rho,N)=\mathbb E\delta_n^2$,
+\begin{equation}
+ \Gamma_{\mathrm{blind}}(\rho,N)
+ ={1+C_0^{\mathrm{lev}}\over N}
+ q_{\mathrm{blind}}(\rho,N). \tag{F.12b-R13}
+\end{equation}
+No scalar representation is asserted for a same-record blind estimator;
+there the full covariance, nonzero-mean, and residual--noise cross terms
+of Theorem~1 are required.
+
+For OU adjacent increments put
+$u(\rho)=s^2(1-e^{-\rho})$ and
+\[
+ q_\Delta(\rho)=e^{4u(\rho)}-2e^{u(\rho)}+1.
+\]
+The second-moment approximation to the boundary is
+\begin{equation}
+ {K_{\mathrm{eff}}D_H(T)\over4}q_\Delta(\rho^*)
+ ={C_0^{\mathrm{floor}}\over N}
+ +\Gamma_{\mathrm{blind}}(\rho^*,N)
+ +R_{\mathrm{rand,noise}}-R_{\mathrm{pair,noise}},
+ \tag{F.12c-R13}
+\end{equation}
+up to the remainder in (F.8d-R13).  At first order define
+\[
+ A_T={1\over2}K_{\mathrm{eff}}D_H(T)s^2,
+\]
+\[
+ \Delta_R(\rho)={C_0^{\mathrm{floor}}\over N}
+ +\Gamma_{\mathrm{blind}}(\rho,N)
+ +R_{\mathrm{rand,noise}}-R_{\mathrm{pair,noise}},
+ \qquad Q(\rho)={\Delta_R(\rho)\over A_T}.
+\]
+Assume $A_T>0$ (equivalently $s>0$ and $D_H(T)>0$) and that the risks,
+hence $Q$, are continuous in $\rho$ on the comparison interval.  Then
+the leading boundary is the fixed-point equation
+\begin{equation}
+ 1-e^{-\rho^*}=Q(\rho^*). \tag{F.12-R13}
+\end{equation}
+If $\Delta_R(0)\le0$, then $\rho^*=0$.  If
+$\Delta_R(0)>0$, a finite crossing on $[0,\rho_{\max}]$ exists when
+$1-e^{-\rho}\ge Q(\rho)$ somewhere on that interval and is unique
+only under an additional single-crossing condition, for example strict
+increase of $1-e^{-\rho}-Q(\rho)$.  If that difference remains
+negative, no crossing occurs in the range.
+
+Only if $Q(\rho)\equiv Q_0$ is constant may one write
+\[
+ Q_0\le0\Rightarrow\rho^*=0,
+\]
+\[
+ 0<Q_0<1\Rightarrow\rho^*=-\log(1-Q_0),
+\]
+\[
+ Q_0\ge1\Rightarrow\text{no finite crossing in the leading OU model}.
+\]
+When $q_{\mathrm{blind}}$ depends on $\rho$, the logarithmic display is
+only a fixed-point equation, not an explicit solution.
+
+\paragraph{Lemma (OU window risk; not a Lipschitz-path theorem).}
+Let $\ell_n$ be stationary Gaussian with
+\[
+ \operatorname{Cov}(\ell_n,\ell_{n+h})=s^2e^{-\rho|h|},
+\]
+and let $\varepsilon_n$ be an independent centered stationary
+carrier-noise sequence with autocovariance $\gamma_\varepsilon(h)$.
+For an interior centered window $W=2m+1$, define
+\[
+ \widehat\ell_n={1\over W}\sum_{j=-m}^m
+ (\ell_{n+j}+\varepsilon_{n+j}).
+\]
+Then
+\begin{align}
+ \mathbb E(\widehat\ell_n-\ell_n)^2
+ ={}&s^2\left[1-{2\over W}\sum_{j=-m}^me^{-\rho|j|}
+ +{1\over W^2}\sum_{i,j=-m}^me^{-\rho|i-j|}\right]\notag\\
+ &+{1\over W^2}\sum_{i,j=-m}^m\gamma_\varepsilon(i-j).
+ \tag{F.14-R13}
+\end{align}
+If $\rho W\to0$, the OU contribution is
+\begin{equation}
+ s^2\rho{W^2-1\over6W}+O(s^2\rho^2W^2). \tag{F.15-R13}
+\end{equation}
+If $\sum_h|\gamma_\varepsilon(h)|\le\sigma_{\mathrm{abs}}^2$, then
+\begin{equation}
+ \mathbb E(\widehat\ell_n-\ell_n)^2
+ \le {\sigma_{\mathrm{abs}}^2\over W}+Cs^2\rho W. \tag{F.16-R13}
+\end{equation}
+Thus an interior optimizer has
+\[
+ W^*\asymp{\sigma_{\mathrm{abs}}\over s\sqrt\rho},
+ \qquad
+ \mathrm{MSE}^*\asymp\sigma_{\mathrm{abs}}s\sqrt\rho.
+\]
+For iid carrier noise the leading constants are
+\[
+ W^*\sim{\sqrt6\,\sigma_\varepsilon\over s\sqrt\rho},
+ \qquad
+ \mathrm{MSE}^*\sim\sqrt{2/3}\,\sigma_\varepsilon s\sqrt\rho.
+\]
+The deterministic Lipschitz $\rho^{2/3}$ rate is therefore not an OU
+output.  Prop. 3 may treat $q_{\mathrm{blind}}(\rho,N)$ as an externally
+measured function; an OU estimator theorem must use the stochastic
+$\rho^{1/2}$ analysis instead.
+
+\paragraph{Metric and implementation cautions.}
+The current Prop. 3 runner's scale-aligned gain error
+\[
+ \min_c{\|c\widehat a-a\|^2\over\|a\|^2}
+\]
+is not $q_\delta=N^{-1}\sum_n(a_n/\widehat a_n-1)^2$ and is not
+$\operatorname{Var}(\delta)$.  They agree only to first order after a
+fixed small-error gauge.  Likewise, a scale-aligned reconstruction
+floor is not the raw $C_0^{\mathrm{floor}}$ required by Prop. 3$'$.
+If $\widehat T=T+e$, let
+\[
+ a={\langle e,T\rangle\over S_2},\qquad
+ b={\|e\|^2\over S_2}.
+\]
+The scale-aligned error used by the implementation, minimizing over
+$c\in\mathbb R$, is
+\begin{equation}
+ R_{\mathrm{align}}={b-a^2\over1+2a+b}, \tag{F.17-R13}
+\end{equation}
+which is not generally proportional to the raw risk $b$.  Therefore a
+raw-MSE theorem and an aligned-MSE empirical boundary must not be called
+an exact no-free-parameter validation of one another.
+
+% End of paste-ready Appendix F replacement material.

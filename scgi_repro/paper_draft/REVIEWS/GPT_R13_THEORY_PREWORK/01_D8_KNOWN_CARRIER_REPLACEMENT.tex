@@ -1,0 +1,428 @@
+% R13 THEORY PREWORK -- NEW FILE ONLY; not included by main.tex or supplement.tex.
+% Base: branch scgi-ceiling-diagnostic-r1, HEAD bcbb31254c343eb04e8cb96d7c3157bfc9818b36.
+% Purpose: paste-ready replacement material for Appendix D.4 after author review.
+% This file deliberately does not preserve claims that are false as stated at bcbb312.
+
+\paragraph{Theorem C$'$ (known-carrier calibrated soft-log; exact finite-window bound).}
+Fix a frame $n$ and let $\mathcal I_n$ be the set of distinct frames
+used in its window.  Let $w_{nk}\ge0$ and
+$\sum_{k\in\mathcal I_n}w_{nk}=1$.  Conditional on the gain path
+$\ell=(\ell_k)$ and known positive carriers $(b_k)$, assume that the
+counts are independent and
+\[
+ C_k\mid(\ell,b)\sim\operatorname{Pois}\{\lambda_k(\ell_k)\},
+ \qquad
+ \lambda_k(t)=\Lambda_0e^t b_k+d,
+ \qquad d\ge0.
+\]
+For fixed $\alpha>0$, put
+\[
+ \psi_\alpha(c)=\log(c+\alpha),\qquad
+ m_\alpha(\lambda)
+ =\mathbb E_{\operatorname{Pois}(\lambda)}\psi_\alpha(C),
+\]
+and define
+\[
+ q_k(t)=m_\alpha\{\lambda_k(t)\},\qquad
+ v_k(t)=\operatorname{Var}_{\operatorname{Pois}(\lambda_k(t))}
+             \{\psi_\alpha(C)\},
+\]
+\[
+ M_n(t)=\sum_{k\in\mathcal I_n}w_{nk}q_k(t),\qquad
+ Y_n=\sum_{k\in\mathcal I_n}w_{nk}\psi_\alpha(C_k).
+\]
+Let $\Theta_n=[\theta_{n,-},\theta_{n,+}]$ be a compact operating
+interval containing every $\ell_k$, $k\in\mathcal I_n$, and suppose
+\[
+ \underline\kappa_n:=\inf_{t\in\Theta_n}M_n'(t)>0.
+\]
+If the calibration curve is certified only on
+$[\lambda_-,\lambda_+]$ and $d<\lambda_-$, the largest safe interval
+before intersection with a physical parameter range is
+\[
+ \left[
+ \max_{k\in\mathcal I_n}
+  \log{\lambda_--d\over\Lambda_0b_k},
+ \quad
+ \min_{k\in\mathcal I_n}
+  \log{\lambda_+-d\over\Lambda_0b_k}
+ \right].
+\]
+Nonemptiness is an assumption of the theorem; a clamp cannot repair an
+empty calibration-safe interval.
+Extend the inverse of $M_n$ to all $y\in\mathbb R$ by the clamped
+generalized inverse
+\[
+ G_n(y)=M_n^{-1}\!\left\{\Pi_{M_n(\Theta_n)}y\right\}.
+\]
+The exact calibrated estimator is $\widehat\ell_n=G_n(Y_n)$.  Define
+\[
+ B_n=\sum_{k\in\mathcal I_n}w_{nk}
+       \{q_k(\ell_k)-q_k(\ell_n)\},
+ \qquad
+ V_n=\sum_{k\in\mathcal I_n}w_{nk}^2v_k(\ell_k).
+\]
+Then, conditionally on $(\ell,b)$,
+\begin{equation}
+ \boxed{
+ \mathbb E\!\left[(\widehat\ell_n-\ell_n)^2\mid\ell,b\right]
+ \le {B_n^2+V_n\over\underline\kappa_n^2}.}
+ \tag{D.8-R13}
+\end{equation}
+This is a finite-window statement.  It requires neither stationarity
+nor mixing of the known carrier sequence.
+
+\paragraph{Proof.}
+The Poisson derivative identity gives
+\[
+ {d\over d\lambda}\mathbb E f(C)
+ =\mathbb E\{f(C+1)-f(C)\}.
+\]
+Consequently
+\[
+ q_k'(t)=\Lambda_0e^tb_k\,
+   \mathbb E_{\operatorname{Pois}(\lambda_k(t))}
+   \log{C+1+\alpha\over C+\alpha}>0,
+\]
+so $M_n$ is strictly increasing.  Projection onto an interval is
+nonexpansive, and the ordinary inverse of $M_n$ is
+$\underline\kappa_n^{-1}$-Lipschitz.  Hence its clamped extension is
+globally Lipschitz:
+\[
+ |G_n(y_2)-G_n(y_1)|
+ \le {|y_2-y_1|\over\underline\kappa_n}
+ \qquad(y_1,y_2\in\mathbb R).
+\]
+Write
+\[
+ Y_n-M_n(\ell_n)=B_n+Z_n,
+\]
+where
+\[
+ Z_n=\sum_{k\in\mathcal I_n}w_{nk}
+ \{\psi_\alpha(C_k)-q_k(\ell_k)\}.
+\]
+Conditional independence gives
+\[
+ \mathbb E(Z_n\mid\ell,b)=0,\qquad
+ \operatorname{Var}(Z_n\mid\ell,b)=V_n.
+\]
+Since $G_n\{M_n(\ell_n)\}=\ell_n$, global inverse Lipschitzness yields
+\[
+ |\widehat\ell_n-\ell_n|
+ \le {|B_n+Z_n|\over\underline\kappa_n}.
+\]
+Taking conditional second moments proves (D.8-R13).
+\hfill$\blacksquare$
+
+\paragraph{Clamp diagnostic (not an extra risk term).}
+All-zero and out-of-range windows are already covered by
+(D.8-R13).  If a separate diagnostic is desired, let
+\[
+ r_n=\min\{M_n(\ell_n)-M_n(\theta_{n,-}),
+           M_n(\theta_{n,+})-M_n(\ell_n)\}.
+\]
+Then
+\[
+ \Pr\{Y_n\notin M_n(\Theta_n)\}
+ \le\min\left\{1,{B_n^2+V_n\over r_n^2}\right\},
+\]
+and, when $|B_n|<r_n$,
+\[
+ \Pr\{Y_n\notin M_n(\Theta_n)\}
+ \le\min\left\{1,{V_n\over(r_n-|B_n|)^2}\right\}.
+\]
+No term $D_\Theta^2\Pr(\mathcal E_n^c)$ is needed in the risk bound.
+
+\paragraph{Approximate calibration and numerical inversion.}
+Let $\widetilde M_n$ be a continuous strictly increasing approximation
+on the same interval
+$\Theta_n$, with
+\[
+ \sup_{t\in\Theta_n}|\widetilde M_n(t)-M_n(t)|
+ \le\varepsilon_{\mathrm{cal},n}.
+\]
+Let $\widetilde G_n$ be its clamped generalized inverse, and suppose
+the numerical solver returns $\widehat\ell_n^{\mathrm{num}}$ satisfying
+\[
+ |\widehat\ell_n^{\mathrm{num}}-\widetilde G_n(Y_n)|
+ \le\varepsilon_{\mathrm{bis},n},
+\]
+where $\varepsilon_{\mathrm{bis},n}$ is measured in the log-parameter
+domain.  A conservative implementation bound is
+\begin{equation}
+ \boxed{
+ \left\{\mathbb E[(\widehat\ell_n^{\mathrm{num}}-\ell_n)^2
+                    \mid\ell,b]\right\}^{1/2}
+ \le {\sqrt{B_n^2+V_n}\over\underline\kappa_n}
+ +{\varepsilon_{\mathrm{cal},n}\over\underline\kappa_n}
+ +\varepsilon_{\mathrm{bis},n}.}
+ \tag{D.8b-R13}
+\end{equation}
+Indeed, using the same endpoint-clamped inverse convention for both
+curves, inverse bracketing gives
+\[
+ G_n(y-\varepsilon_{\mathrm{cal},n})
+ \le\widetilde G_n(y)
+ \le G_n(y+\varepsilon_{\mathrm{cal},n}).
+\]
+If tabulation and interpolation have separate certified forward-error
+budgets, replace $\varepsilon_{\mathrm{cal},n}$ by their sum.  The
+quantities that have the same units are
+\[
+ \varepsilon_{\mathrm{cal},n}/\underline\kappa_n
+ \quad\hbox{and}\quad \varepsilon_{\mathrm{bis},n};
+\]
+one must not add them in the response domain and divide both by
+$\underline\kappa_n$.
+
+\paragraph{A theorem-level interpolation certificate.}
+The reported midpoint probe is an empirical diagnostic, not by itself
+a uniform bound on every point of the calibration interval.  Put
+\[
+ x=\log\lambda,\qquad f_\alpha(x)=m_\alpha(e^x).
+\]
+For a log-intensity grid of maximum spacing $\Delta_x$, piecewise-linear
+interpolation from exact node values obeys
+\begin{equation}
+ \|f_\alpha-I_{\Delta_x}f_\alpha\|_\infty
+ \le {\Delta_x^2\over8}\|f_\alpha''\|_\infty. \tag{D.cal-R13}
+\end{equation}
+With $\Delta g(c)=g(c+1)-g(c)$, the Poisson difference identities give
+\[
+ f_\alpha''(x)
+ =\lambda\,\mathbb E\Delta\psi_\alpha(C)
+ +\lambda^2\,\mathbb E\Delta^2\psi_\alpha(C),
+ \qquad \lambda=e^x.
+\]
+Hence a certified bound
+\[
+ K_{\alpha,2}\ge
+ \sup_{\lambda\in[\lambda_-,\lambda_+]}
+ \left|\lambda\mathbb E\Delta\psi_\alpha(C)
+ +\lambda^2\mathbb E\Delta^2\psi_\alpha(C)\right|
+\]
+and a certified node-evaluation error $\varepsilon_{\mathrm{tab}}$
+yield
+\[
+ \varepsilon_{\mathrm{cal}}
+ \le\varepsilon_{\mathrm{tab}}
+ +{K_{\alpha,2}\Delta_x^2\over8}.
+\]
+The expectations and Poisson tails may be enclosed analytically or by
+interval arithmetic.  Until such an enclosure is generated, the measured
+$1.6410165\times10^{-6}$ midpoint maximum must be labeled empirical; the
+measured log-parameter bisection bound is
+$1.5396755\times10^{-17}$.
+For $J$ midpoint bisections on a log-parameter interval of diameter
+$D_n$, the parameter-domain numerical error is certified by
+\[
+ \varepsilon_{\mathrm{bis},n}\le {D_n\over2^{J+1}}.
+\]
+
+\paragraph{H\"older bias and truncated windows.}
+Suppose $\ell_k=f(k/N)$ and, for $0<\beta\le1$,
+\[
+ |f(x)-f(y)|\le L|x-y|^\beta.
+\]
+Let
+\[
+ h_n=\max_{k\in\mathcal I_n}{|k-n|\over N},\qquad
+ \overline\kappa_k=\sup_{t\in\Theta_n}q_k'(t),\qquad
+ W_{\mathrm{eff},n}={1\over\sum_kw_{nk}^2}.
+\]
+Put $\kappa_{\max,n}=\max_{k\in\mathcal I_n}\overline\kappa_k$.
+Then
+\[
+ |B_n|
+ \le L\sum_{k\in\mathcal I_n}w_{nk}\overline\kappa_k
+       \left({|k-n|\over N}\right)^\beta
+ \le\kappa_{\max,n}Lh_n^\beta,
+\]
+and, if $v_k(\ell_k)\le\bar\sigma_\alpha^2$,
+\[
+ V_n\le{\bar\sigma_\alpha^2\over W_{\mathrm{eff},n}}.
+\]
+Therefore
+\begin{equation}
+ \mathbb E(\widehat\ell_n-\ell_n)^2
+ \le {1\over\underline\kappa_n^2}
+ \left\{\kappa_{\max,n}^2L^2h_n^{2\beta}
+       +{\bar\sigma_\alpha^2\over W_{\mathrm{eff},n}}\right\}.
+ \tag{D.9-R13}
+\end{equation}
+For a truncated-renormalized equal-weight window,
+$W_{\mathrm{eff},n}=|\mathcal I_n|$.  Thus an edge window has a larger
+variance constant than an interior window, but the same rate.
+
+\paragraph{Low-photon expansion: the general leading term.}
+Let $d=0$ and define
+\[
+ \lambda_{k,n}^{0}=\Lambda_0e^{\ell_n}b_k,\qquad
+ \lambda_k^\star=\Lambda_0e^{\ell_k}b_k,
+\]
+\[
+ A_n=\sum_kw_{nk}\lambda_{k,n}^{0},\qquad
+ D_n=\sum_kw_{nk}^2\lambda_k^\star.
+\]
+Fix $\alpha>0$, put $c_\alpha=\log(1+1/\alpha)$, and suppose
+\[
+ \max_{k\in\mathcal I_n}\{\lambda_{k,n}^{0},\lambda_k^\star\}
+ \le\varepsilon.
+\]
+The fixed-$\alpha$ Poisson expansions give, uniformly over arbitrary
+positive carrier heterogeneity,
+\[
+ M_n'(\ell_n)=c_\alpha A_n\{1+O_\alpha(\varepsilon)\},
+\]
+\[
+ V_n=c_\alpha^2D_n\{1+O_\alpha(\varepsilon)\},
+\]
+and therefore
+\begin{equation}
+ \boxed{
+ {V_n\over M_n'(\ell_n)^2}
+ ={D_n\over A_n^2}\{1+O_\alpha(\varepsilon)\}.}
+ \tag{D.10-R13}
+\end{equation}
+For $m=|\mathcal I_n|$ equal-weight distinct frames, write
+\[
+ I_{n,\mathrm{ref}}=\sum_k\lambda_{k,n}^{0},\qquad
+ I_{n,\mathrm{act}}=\sum_k\lambda_k^\star.
+\]
+Then
+\[
+ {V_n\over M_n'(\ell_n)^2}
+ ={I_{n,\mathrm{act}}\over I_{n,\mathrm{ref}}^2}
+ \{1+O_\alpha(\varepsilon)\}.
+\]
+If $h_{\ell,n}=\max_k|\ell_k-\ell_n|$, then
+\[
+ e^{-h_{\ell,n}}
+ \le {I_{n,\mathrm{act}}\over I_{n,\mathrm{ref}}}
+ \le e^{h_{\ell,n}}.
+\]
+Only under local gain flatness $h_{\ell,n}=o(1)$ may the leading term
+be simplified to
+\[
+ {1+O_\alpha(\varepsilon+h_{\ell,n})
+  \over I_{n,\mathrm{ref}}}
+ ={1+O_\alpha(\varepsilon+h_{\ell,n})
+  \over I_{n,\mathrm{act}}}.
+\]
+When the gain is constant in the window,
+$I_{n,\mathrm{act}}=I_{n,\mathrm{ref}}=m\bar\lambda_n$, and only then
+does this become $\{1+O_\alpha(\varepsilon)\}/(m\bar\lambda_n)$.
+Carrier comparability is not needed; local gain flatness is.
+
+\paragraph{Counterexample to the unqualified $1/(W\bar\lambda)$ claim.}
+Take two equal-weight frames with equal carriers, target $\ell_n=0$,
+the other gain $\ell=\log2$, and reference intensity $\varepsilon$.
+Then
+\[
+ I_{n,\mathrm{ref}}=2\varepsilon,\qquad
+ I_{n,\mathrm{act}}=3\varepsilon,
+\]
+so (D.10-R13) gives $3/(4\varepsilon)$, whereas the unqualified formula
+gives $1/(2\varepsilon)$.  Their ratio is $3/2$ and does not converge
+to one as $\varepsilon\downarrow0$.
+
+\paragraph{From a variance factor to estimator asymptotics.}
+Equation (D.10-R13) is an algebraic expansion of the local
+variance-to-sensitivity factor.  To identify it with the estimator's
+leading MSE, one additionally needs a local variance regime such as
+\[
+ I_{n,\mathrm{act}}\to\infty,\qquad
+ |B_n|=o(\sqrt{V_n}),
+\]
+a Lindeberg condition, negligible clamp probability, and inverse-map
+linearization, for example
+\[
+ {\sup_{\Theta_n}|M_n''|\sqrt{V_n}
+  \over M_n'(\ell_n)^2}\to0.
+\]
+For bounded total information the compact clamp makes risk saturate;
+one cannot globally identify the MSE with $1/I_n$.
+
+\paragraph{First-moment obstruction for $1<\beta\le2$.}
+Let $u_k=(k-n)/N$ and suppose locally
+\[
+ \ell_k-\ell_n=a_nu_k+r_{nk},\qquad
+ |r_{nk}|\le L|u_k|^\beta.
+\]
+If $Q_j$ uniformly bounds the first two derivatives of $q_k$, Taylor's
+theorem gives
+\begin{align}
+ |B_n|\le{}&
+ |a_n|\left|\sum_kw_{nk}q_k'(\ell_n)u_k\right|
+ +Q_1L\sum_kw_{nk}|u_k|^\beta\notag\\
+ &+{Q_2\over2}\sum_kw_{nk}
+   \{|a_n||u_k|+L|u_k|^\beta\}^2.
+ \tag{D.11-R13}
+\end{align}
+Thus a local-constant estimator has $O(h_n^\beta)$ deterministic bias
+only if the slope-weighted carrier first moment satisfies
+\[
+ |a_n|\left|\sum_kw_{nk}q_k'(\ell_n)u_k\right|
+ \lesssim\underline\kappa_n h_n^\beta.
+\]
+An internal symmetric window with a homogeneous carrier satisfies this
+condition.  A heterogeneous carrier generally does not.  A truncated
+one-sided edge window fails even with a homogeneous carrier: for the
+first current window $k=0,\ldots,32$, target $n=0$,
+\[
+ {1\over33}\sum_{k=0}^{32}{k\over N}={16\over N},
+\]
+which is first order in the window radius.  Therefore the current
+local-constant estimator cannot support an all-frame uniform
+$\beta>1$ rate.  A valid claim must be restricted to internal balanced
+windows or must introduce a separately proved local-polynomial edge
+estimator.  For $\beta>2$, moments through order $\lfloor\beta\rfloor$
+must be cancelled.
+
+\paragraph{Scope: oracle carriers, known carrier law, and blind recovery.}
+The theorem above is conditional on the realized per-frame carriers
+$(b_k)$ being known.  This is precisely the oracle-known-carrier arm
+implemented in the low-photon experiment.  It does not establish blind
+low-photon recovery from an unknown carrier law.
+
+If an unobserved carrier $B$ has a fully known law $F_B$, one may instead
+calibrate the different marginal curve
+\[
+ \bar q_{F_B}(t)=\mathbb E_{B\sim F_B}
+ m_\alpha(\Lambda_0e^tB+d).
+\]
+That estimator needs a separate variance or long-run-variance theorem;
+it is not the per-frame known-carrier estimator above.  If $F_B$ is
+unknown, $\bar q_{F_B}$ is an unknown nonlinear function.  Unlike the
+high-count logarithmic model, it cannot generally be absorbed into one
+additive gauge constant.  For example, with $s=\Lambda_0e^t$,
+\[
+ m_\alpha(sB)=\log\alpha+c_\alpha sB
+ +a_{2,\alpha}s^2B^2+O(s^3B^3),
+\]
+where
+\[
+ a_{2,\alpha}={1\over2}
+ \log{\alpha(\alpha+2)\over(\alpha+1)^2}\ne0.
+\]
+The laws $B\equiv1$ and
+$\Pr(B=1/2)=\Pr(B=3/2)=1/2$ have the same mean but different second
+moments, hence different soft-log response curves.  This proves that
+the known-carrier theorem and one homogeneous calibration inverse do
+not automatically yield an unknown-law blind theorem.  It does not
+rule out every possible joint semiparametric method.
+
+\paragraph{Centered-log quotient risk.}
+Let $e=\widehat\ell-\ell$ and
+$P_N=I-N^{-1}\mathbf1\mathbf1^\top$.  Since $P_N$ is an orthogonal
+projection,
+\[
+ {1\over N}\mathbb E\|P_Ne\|_2^2
+ \le {1\over N}\sum_{n=1}^N\mathbb Ee_n^2.
+\]
+Thus the pointwise bounds transfer directly to record-centered
+log-gain loss; overlapping windows need not be independent for this
+expectation bound.
+
+% End of paste-ready D.4 replacement material.

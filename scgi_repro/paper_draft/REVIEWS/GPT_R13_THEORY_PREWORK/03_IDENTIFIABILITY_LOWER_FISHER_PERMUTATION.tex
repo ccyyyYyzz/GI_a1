@@ -1,0 +1,399 @@
+% R13 THEORY PREWORK -- NEW FILE ONLY; not included by main.tex or supplement.tex.
+% Base: branch scgi-ceiling-diagnostic-r1, HEAD bcbb31254c343eb04e8cb96d7c3157bfc9818b36.
+% Purpose: paste-ready material for the gauge, direct Poisson lower bound,
+% oracle Fisher reference, and permutation-scope repairs.
+
+\paragraph{Proposition (exact collision and quotient tangent).}
+Let
+\[
+ \mu(\ell,T)=D_{e^\ell}MT,
+ \qquad \ell\in S\le\mathbb R^N,
+ \qquad T\in\mathbb R^K,
+\]
+where $S$ is a known linear subspace, $\mathbf1\in S$, and suppose
+$c=MT$ has no zero entries.  For
+any $u\in S$, the pair $(\ell+u,T_u)$ produces the same noiseless
+record as $(\ell,T)$ if and only if
+\begin{equation}
+ MT_u=D_{e^{-u}}MT. \tag{G.1-R13}
+\end{equation}
+Consequently, in the square case $N=K$, if
+$M\in\mathbb R^{K\times K}$ is invertible, every
+$u\in S$ generates the exact collision
+\begin{equation}
+ \ell_u=\ell+u,\qquad
+ T_u=M^{-1}D_{e^{-u}}MT. \tag{G.2-R13}
+\end{equation}
+If $M\in\mathbb R^{N\times K}$ is tall with full column rank, such a
+collision exists if and only if
+\begin{equation}
+ D_{e^{-u}}MT\in\operatorname{range}(M), \tag{G.3-R13}
+\end{equation}
+equivalently $(I-P_M)D_{e^{-u}}MT=0$.  The global-scale gauge is the
+special case $u=t\mathbf1$, for which $T_u=e^{-t}T$.  Under the
+nonvanishing-carrier assumption, $T_u$ is proportional to $T$ only
+when $u$ is constant.
+
+The differential of the mean map in a direction
+$(u,h)\in S\times\mathbb R^K$ is
+\[
+ D\mu_{(\ell,T)}[u,h]
+ =D_{e^\ell}\{D_{MT}u+Mh\}.
+\]
+Its null space is
+\[
+ \mathcal N_{\ell,T}
+ =\{(u,h):D_{MT}u+Mh=0\},
+\]
+and always contains the gauge tangent
+$\operatorname{span}\{(\mathbf1,-T)\}$.  The model is locally
+differentially identifiable modulo scale if and only if
+\begin{equation}
+ \mathcal N_{\ell,T}
+ =\operatorname{span}\{(\mathbf1,-T)\}. \tag{G.4-R13}
+\end{equation}
+
+\paragraph{Proof.}
+Equality of records is
+$D_{e^{\ell+u}}MT_u=D_{e^\ell}MT$; multiplication by
+$D_{e^{-\ell-u}}$ gives (G.1-R13).  Square inversion gives
+(G.2-R13), while tall solvability is exactly (G.3-R13).  If
+$T_u=\gamma T$, then $D_{e^{-u}}c=\gamma c$; because every $c_n\ne0$,
+$e^{-u_n}=\gamma$ for every $n$, so $u$ is constant.  Differentiation
+at zero gives the tangent formula and (G.4-R13).
+\hfill$\blacksquare$
+
+\paragraph{Quotient Fisher consequence.}
+Let $J$ be the Jacobian above.  In a regular Poisson model with
+strictly positive mean,
+\[
+ I=J^\top D_\mu^{-1}J,
+\]
+and in a Gaussian model with known positive-definite covariance
+$\Sigma$,
+\[
+ I=J^\top\Sigma^{-1}J.
+\]
+The weighting matrix is positive definite, hence
+\[
+ \ker I=\ker J=\mathcal N_{\ell,T}.
+\]
+The Fisher metric is positive definite on the quotient tangent space
+precisely when (G.4-R13) holds.  An exact collision curve implies a
+Fisher-null direction.  The converse yields only differential
+nonidentifiability unless an appropriate constant-rank/fibre condition
+or an explicit construction shows that the null direction integrates
+to an exact collision curve.
+
+The collision statement is on the unconstrained object domain
+$\mathbb R^K$.  For a nonnegative object class it gives a local
+nonidentifiability statement only at strictly positive interior objects
+and for sufficiently small perturbations; it does not automatically
+preserve boundary objects with zero pixels.
+
+\paragraph{Theorem (oracle Poisson pointwise lower bound).}
+Let $0<\beta\le1$ and, conditionally on known positive carriers
+$q_1,\ldots,q_N$, observe independent counts
+\[
+ C_i\sim\operatorname{Pois}(q_i e^{\ell_i}),
+ \qquad i=1,\ldots,N.
+\]
+Let $P_N=I-N^{-1}\mathbf1\mathbf1^\top$, and estimate $P_N\ell$.
+Fix an interior index $n_0$, a baseline $\ell^{(0)}$ lying strictly
+inside both the amplitude and H\"older constraints (for example,
+$\|\ell^{(0)}\|_\infty\le a_0/2$ and seminorm at most $L_a/2$), and a
+window $A$ of order $W$
+containing $n_0$.  Choose a contrast
+$\psi^{(W)}$ satisfying
+\[
+ \operatorname{supp}\psi^{(W)}\subseteq A,\quad
+ \mathbf1^\top\psi^{(W)}=0,quad
+ \|\psi^{(W)}\|_\infty\le1,quad
+ \psi^{(W)}_{n_0}=1,
+\]
+\[
+ \|\psi^{(W)}\|_2^2\ge cW,\qquad
+ |\psi^{(W)}_i-\psi^{(W)}_j|
+ \le C W^{-\beta}|i-j|^\beta.
+\]
+Put $\lambda_i^{(0)}=q_i e^{\ell_i^{(0)}}$ and
+\[
+ I_A(\psi)=\sum_{i\in A}\lambda_i^{(0)}\psi_i^2
+ \le W\bar\lambda_A,
+ \qquad
+ \bar\lambda_A={1\over W}\sum_{i\in A}\lambda_i^{(0)}.
+\]
+For
+\[
+ a\le c_0\min\{a_0,L_aW^\beta,I_A(\psi)^{-1/2}\},
+\]
+both $\ell^{(0)}$ and
+$\ell^{(1)}=\ell^{(0)}+a\psi^{(W)}$ belong to a rescaled
+$H_\beta(L_a)$ ball, and
+\begin{equation}
+ \inf_{\widehat\ell}\max_{r\in\{0,1\}}
+ \mathbb E_r\!\left[
+  \{(P_N\widehat\ell)_{n_0}-(P_N\ell^{(r)})_{n_0}\}^2
+ \right]
+ \ge ca^2. \tag{L.1-R13}
+\end{equation}
+In particular,
+\begin{equation}
+ R_{n_0}^{\mathrm{quot}}
+ \ge c\min\left\{a_0^2,L_a^2W^{2\beta},
+                   {1\over W\bar\lambda_A}\right\}. \tag{L.2-R13}
+\end{equation}
+
+\paragraph{Proof.}
+For Poisson means
+$\lambda_i^{(1)}=\lambda_i^{(0)}e^{a\psi_i}$,
+\[
+ \operatorname{KL}(P_0,P_1)
+ =\sum_i\lambda_i^{(0)}
+   \{e^{a\psi_i}-1-a\psi_i\}
+ \le {e^{a_0}\over2}a^2I_A(\psi).
+\]
+The chosen amplitude keeps the divergence below a numerical constant.
+Because $\mathbf1^\top\psi=0$, quotient projection does not reduce the
+separation at $n_0$.  Pinsker followed by Le Cam's two-point lemma gives
+(L.1-R13), and $I_A(\psi)\le W\bar\lambda_A$ gives (L.2-R13).
+\hfill$\blacksquare$
+
+When local photon rates have common order $\bar\lambda$, optimizing
+$W$ yields
+\[
+ R_{n_0}^{\mathrm{quot}}
+ \gtrsim L_a^{2/(2\beta+1)}
+          \bar\lambda^{-2\beta/(2\beta+1)}.
+\]
+In normalized time, $L_a=LN^{-\beta}$, this is
+\[
+ R_{n_0}^{\mathrm{quot}}
+ \gtrsim L^{2/(2\beta+1)}
+ (N\bar\lambda)^{-2\beta/(2\beta+1)}.
+\]
+These optimized displays assume $1\lesssim W_*\lesssim N$; otherwise
+the lower bound remains in the one-frame or finite-record saturation
+regime already visible in (L.2-R13).
+
+\paragraph{Theorem (integrated Poisson--Assouad lower bound).}
+Assume the baseline lies strictly inside the amplitude and H\"older
+ball, for example with seminorm at most $L_a/2$.  Partition an interior
+fraction of $\{1,\ldots,N\}$ into $m\asymp N/W$ cells of length $CW$.
+Inside each cell reserve a guard band of order $W$ and place a translated,
+rescaled copy $\psi_j$ of one fixed compactly supported, mean-zero
+$H_\beta$ template.  Require that $\psi_j$ vanish on the cell boundary,
+that the active supports be separated by at least $cW$, and that
+$\|\psi_j\|_2^2\ge cW$.  Define
+\[
+ \ell^\omega=\ell^{(0)}
+ +a\sum_{j=1}^m\omega_j\psi_j,
+ \qquad \omega\in\{0,1\}^m,
+\]
+where
+\[
+ \bar\lambda_*=\max_j |A_j|^{-1}
+  \sum_{i\in A_j}\lambda_i^{(0)},
+\]
+and
+\[
+ a\le c_0\min\{a_0,L_aW^\beta,(W\bar\lambda_*)^{-1/2}\}.
+\]
+Then
+\begin{equation}
+ \inf_{\widehat\ell}\sup_\omega
+ {1\over N}\mathbb E_\omega
+ \|P_N(\widehat\ell-\ell^\omega)\|_2^2
+ \ge ca^2, \tag{A.1-R13}
+\end{equation}
+and hence
+\begin{equation}
+ R_{\mathrm{int}}^{\mathrm{quot}}
+ \ge c\min\left\{a_0^2,L_a^2W^{2\beta},
+                   {1\over W\bar\lambda_*}\right\}. \tag{A.2-R13}
+\end{equation}
+
+\paragraph{Proof.}
+Construct the fixed template from two smooth bumps with opposite signs.
+Its discrete sum is zero, its squared norm after rescaling is order $W$,
+and its H\"older seminorm is order $W^{-\beta}$.  Within one active
+support the scaled-template bound applies.  Across distinct supports,
+the guard-band separation is at least $cW$, while the perturbation
+amplitude is at most $a\le cL_aW^\beta$; pairs involving a guard band
+use the template's vanishing boundary.  Hence the H\"older constant of
+the complete sum is bounded independently of $m$, and the interior
+baseline assumption keeps every alternative in the parameter ball.
+Adjacent hypercube
+vertices differ on one block, and the preceding Poisson calculation
+gives
+\[
+ \operatorname{KL}(P_\omega,P_{\omega^{(j)}})
+ \le Ca^2W\bar\lambda_*\le\kappa<1.
+\]
+All pairwise differences have zero mean, so quotient projection loses
+no distance:
+\[
+ \|P_N(\ell^\omega-\ell^{\omega'})\|_2^2
+ \ge ca^2W d_H(\omega,\omega').
+\]
+Assouad's lemma then gives
+\[
+ {1\over N}\inf_{\widehat\ell}\sup_\omega
+ \mathbb E_\omega\|P_N(\widehat\ell-\ell^\omega)\|_2^2
+ \ge c{mW\over N}a^2\ge c'a^2.
+\]
+\hfill$\blacksquare$
+
+If $q_i=\Lambda_0B_i$ is random with a parameter-independent law and
+$\mathbb EB_i<\infty$, choose every alternative and its amplitude
+before observing $B$, using the expected block information
+\[
+ \overline{\mathcal I}_A
+ =\mathbb E_B\sum_{i\in A}\lambda_i^{(0)}\psi_i^2.
+\]
+The same calculation then applies to the carrier-observed oracle
+experiment $(C,B)$ because its joint KL is
+\[
+ \operatorname{KL}(P_0^{C,B},P_1^{C,B})
+ =\mathbb E_B\operatorname{KL}
+   (P_0^{C\mid B},P_1^{C\mid B}).
+\]
+Marginalization gives
+\[
+ \operatorname{KL}(P_0^C,P_1^C)
+ \le\operatorname{KL}(P_0^{C,B},P_1^{C,B}),
+\]
+so the oracle lower bound transfers to the less-informative count-only
+experiment.  This transfers hardness; it does not construct a blind
+estimator.  For dark count $d>0$, replace total count information by
+\[
+ \overline{\mathcal I}_A(\psi)
+ =\mathbb E_B\sum_{i\in A}{s_i^2\over s_i+d}\psi_i^2,
+ \qquad s_i=\Lambda_0e^{\ell_i}b_i.
+\]
+This is the local quadratic-KL information in the contrast direction;
+the bounded-perturbation remainder must be controlled uniformly.
+
+\paragraph{Proposition (oracle local-shift information).}
+For a fixed window $A$, suppose independently
+\[
+ C_k\sim\operatorname{Pois}\{\lambda_k(t)\},
+ \qquad \lambda_k(t)=s_ke^t+d_k,
+\]
+where $s_k>0$ and $d_k\ge0$ are known.  The score and Fisher information
+for the one-dimensional common shift $t$ are
+\[
+ S_t(C)=\sum_{k\in A}(C_k-\lambda_k(t))
+        {s_ke^t\over\lambda_k(t)},
+\]
+\begin{equation}
+ I_A(t)=\sum_{k\in A}{s_k^2e^{2t}\over s_ke^t+d_k}. \tag{F.1-R13}
+\end{equation}
+When $d_k=0$, $I_A(t)=\sum_{k\in A}\lambda_k(t)$.  Therefore
+$1/I_A(t)$ is the scalar CR reference for a regular unbiased estimator
+of a common log-intensity shift with carriers, offsets, and all other
+path coordinates held fixed.  It is not the nuisance-path quotient
+CRB.
+
+For bias $b(t)=\mathbb E_t\widehat t-t$, the biased CR inequality is
+\[
+ \operatorname{MSE}_t(\widehat t)
+ \ge b(t)^2+{\{1+b'(t)\}^2\over I_A(t)}.
+\]
+Thus MSE below $1/I_A$ is compatible with shrinkage bias, while MSE
+above $1/I_A$ does not establish unbiasedness.
+
+For a path model $\ell=U\theta$ at $d=0$, where the columns of $U$
+represent estimable contrast coordinates separated from the constant
+direction, and with
+$D_\lambda=\operatorname{diag}(\lambda_1,\ldots,\lambda_N)$,
+\[
+ I_\theta=U^\top D_\lambda U.
+\]
+If a common nuisance scale $m$ enters as $\ell+m\mathbf1$, eliminating
+$m$ gives
+\[
+ I_{\theta\mid m}=U^\top D_\lambda U
+ -U^\top D_\lambda\mathbf1
+  (\mathbf1^\top D_\lambda\mathbf1)^{-1}
+  \mathbf1^\top D_\lambda U.
+\]
+This matrix, or its pseudoinverse for an estimable contrast, is the
+quotient Fisher object in this known-carrier parametric path model.  It
+does not include unknown-object or unknown-carrier nuisance parameters;
+a contrast outside the range of the information matrix has no finite CR
+bound.  Overlapping windows also create
+cross-window covariance, so an average of $1/I_n$ is not an exact
+whole-record centered-loss CRB.
+
+\paragraph{Proposition (two permutation semantics).}
+Let $z=(z_1,\ldots,z_K)$ be fixed.  If $\Pi$ is uniform on all
+permutations and $Z_n=z_{\Pi(n)}$, then $(Z_1,\ldots,Z_K)$ is
+exchangeable over the randomization draw.  Writing
+$\sigma_z^2=K^{-1}\sum_j(z_j-\bar z)^2$,
+\[
+ \operatorname{Var}(Z_i)=\sigma_z^2,
+ \qquad
+ \operatorname{Cov}(Z_i,Z_j)=-{\sigma_z^2\over K-1}\quad(i\ne j),
+\]
+and for a fixed set of $W$ time positions,
+\[
+ \operatorname{Var}\left({1\over W}\sum_{i\in A}Z_i\right)
+ ={\sigma_z^2\over W}{K-W\over K-1}.
+\]
+
+Now let $G=\mathbb F_2^m$, $K=2^m$, let $\chi_g$ be Walsh characters,
+and let
+\[
+ Z_g(P)=\sum_{j\in G}\chi_g(j)T_{Pj},
+\]
+where one uniform pixel permutation $P$ is shared by all rows.  For
+every nonzero $g$, the one-dimensional distribution of $Z_g(P)$ is
+the same, with
+\[
+ \mathbb E_PZ_g=0,
+ \qquad
+ \operatorname{Var}_PZ_g={KS_2-S_1^2\over K-1}.
+\]
+However, the vector $\{Z_g(P):g\ne0\}$ is not exchangeable in general.
+Let $\bar T=K^{-1}\sum_jT_j$ and
+$S_{3,c}=\sum_j(T_j-\bar T)^3$.  For distinct nonzero rows $g,h,r$,
+\begin{equation}
+ \mathbb E_P[Z_gZ_hZ_r]=
+ \begin{cases}
+ \displaystyle {K^2\over(K-1)(K-2)}S_{3,c},&g+h+r=0,\\[5pt]
+ 0,&g,h,r\text{ linearly independent}.
+ \end{cases} \tag{P.1-R13}
+\end{equation}
+For $K\ge8$ and a generic object with $S_{3,c}\ne0$, relational and
+independent triples therefore have different joint laws, disproving
+full row exchangeability under a common pixel permutation.
+
+\paragraph{Proof of (P.1-R13).}
+Replace $T_j$ by $x_j=T_j-\bar T$ without changing non-DC Walsh
+coefficients.  For the without-replacement sample $X_i=x_{P(i)}$,
+\[
+ \mathbb EX_i^3={S_{3,c}\over K},\qquad
+ \mathbb EX_i^2X_j=-{S_{3,c}\over K(K-1)}\quad(i\ne j),
+\]
+\[
+ \mathbb EX_iX_jX_k={2S_{3,c}\over K(K-1)(K-2)}
+ \quad(i,j,k\text{ distinct}).
+\]
+If $g+h+r=0$, character orthogonality gives sign sums $K$, $-K$ for
+each exactly-two-equal pairing, and $2K$ for the all-distinct class.
+Substitution gives the first line of (P.1-R13).  If $g+h+r\ne0$, all
+corresponding character sums vanish.
+\hfill$\blacksquare$
+
+\paragraph{Safe permutation scope.}
+Pixel permutation gives identical non-DC one-row marginal laws and the
+variance above, but not joint temporal exchangeability.  Uniform
+acquisition-order permutation gives finite-population exchangeability
+over its randomization draw.  If complementary masks are kept adjacent,
+the exchangeable units are pair blocks, not individual frames.  Once a
+single permutation is conditioned upon, the sequence is deterministic;
+finite-population or randomization concentration should be invoked
+rather than claiming that every realized order is stationary or mixing.
+
+% End of paste-ready identifiability/lower-bound/Fisher/permutation material.

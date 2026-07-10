@@ -1,0 +1,165 @@
+# R13 Prop. 3 metric-consistency re-audit
+
+Status: independent read-only recomputation; no existing project file was changed.
+
+Base: `scgi-ceiling-diagnostic-r1` at
+`bcbb31254c343eb04e8cb96d7c3157bfc9818b36`.
+
+## Finding
+
+The previously reported median factor `1.54` between the no-free-parameter
+oracle-skeleton boundary and the observed boundary is almost entirely a
+raw-MSE versus scale-aligned-MSE mismatch.  It is not evidence for the cubic
+remainder in F.8.
+
+The project currently mixes three distinct quantities:
+
+1. `C0_floor_align_fix = 623.976--715.172`: the scale-aligned fixed-design
+   floor stored in `results/prop3_nofreeparam_r1/prop3_constants.csv`;
+2. `C0_floor_raw_fix = 980.110--1114.529`: the raw fixed-design floor required
+   by the raw reconstruction identity in Appendix F;
+3. `C0_lev_raw_background ~= 0.72--1.23e6`: the nonnegative-background
+   residual-gain leverage constant.  This is the quantity behind the Table I
+   values near `7.5e5` and must not be abbreviated to the same `C0_raw` name
+   as item 2.
+
+## Code path establishing the mismatch
+
+- `run_prop3_boundary.py:132--137` says it measures the F.9 constant, but
+  obtains the error from `object_metrics()` and multiplies it by `N`.
+- `run_mechanism_m1.py:77--86` computes the least-squares scale
+  \[
+  s^\star={\langle\widehat T,T\rangle\over\|\widehat T\|^2}
+  \]
+  before returning
+  \[
+  e_{\rm align}={\|s^\star\widehat T-T\|^2\over S_2}.
+  \]
+- Therefore the CSV field called `C0_pipeline` is
+  `N * e_align`, not the raw quantity
+  \[
+  N e_{\rm raw}=N{\|\widehat T-T\|^2\over S_2}
+  \]
+  used by the F.2/F.9 reconstruction identity.
+- The fixed random/DGI operator is the column-centered, bucket-centered,
+  column-variance-normalized correlation operator in `src/basis.py:245--254`.
+
+For \(\widehat T=T+e\), define
+\[
+a={\langle e,T\rangle\over S_2},\qquad
+b={\|e\|^2\over S_2}.
+\]
+The implemented aligned metric is
+\[
+R_{\rm align}={b-a^2\over1+2a+b},
+\]
+so it is not generally a constant multiple of the raw risk \(b\).  Even when
+\(e\perp T\), it becomes \(b/(1+b)\), not \(b\).
+
+## Deterministic recomputation
+
+Using the same ten objects, fixed basis/operator, and seed as the authoritative
+Prop. 3 run gives:
+
+| quantity | result |
+|---|---:|
+| aligned fixed-design floor | `623.976--715.172` |
+| raw fixed-design floor | `980.110--1114.529` |
+| raw floor median | `1026.470` |
+| raw floor mean | `1031.872` |
+| raw/aligned ratio median | `1.5398517` |
+
+The centered-uniform moment prediction is
+\[
+K+\beta_4-2=1023.800098,
+\]
+only about `0.79%` below the mean raw fixed-design floor.  This is an
+independent consistency check.
+
+Minimal reproduction logic, expressed without writing output files, is:
+
+```python
+objects = make_synthetic_objects(10, 32, 20240708)
+basis = make_basis(
+    "random_uniform",
+    num_pixels=1024,
+    num_frames=2048,
+    seed=20240708,
+    reconstruction="correlation",
+)
+for T in objects:
+    T_hat = basis.reconstruct(basis.measure(T))
+    C_align = 2048 * object_metrics(T_hat, T)["rel_mse"]
+    C_raw = 2048 * (((T_hat - T) ** 2).sum() / (T ** 2).sum())
+```
+
+## Boundary recomputation
+
+The originally published aligned analysis reports:
+
+- 42 aligned crossings: median absolute factor `1.538309`;
+- the declared small-mismatch subset, \(\sigma_a\ge0.1\), 40 crossings:
+  median factor `1.533678`;
+- a systematically early prediction.
+
+The raw/aligned floor ratio `1.5398517` nearly exactly matches that reported
+factor.
+
+As a stronger check, the phase scan was reconstructed in memory on the same
+OU paths, five seeds, and nine \(\rho\) values.  The regenerated aligned pair
+curves reproduce `phase_scan.csv` with maximum absolute difference
+`7.34e-7` and median absolute difference `1.72e-8`.
+
+The raw oracle prediction used
+\[
+Q_{\rm raw}
+={2(C_{0,\rm floor}^{\rm raw,fix}/N)
+ \over K_{\rm eff}D_H\sigma_a^2},
+\qquad
+\rho_{\rm pred}=-\log(1-Q_{\rm raw}),
+\]
+and was compared to raw pair-versus-raw random crossings using the same
+log-\(\rho\) interpolation convention.
+
+For the 40 cells with \(\sigma_a\ge0.1\):
+
+| raw-vs-raw check | result |
+|---|---:|
+| observed raw crossings | `40/40` |
+| median signed `log10(pred/emp)` | `-0.01721` |
+| median absolute factor | **`1.04387`** |
+| maximum factor | **`1.19985`** |
+
+The two \(\sigma_a=0.05\) aligned crossings become \(Q_{\rm raw}\ge1\)
+with no raw crossing; they were already outside the claimed small-mismatch
+validation range.
+
+## Consequences for the manuscript
+
+1. Delete the explanation that the factor `1.54` is “consistent with the
+   \(O(\Delta^3)\) correction.”  The factor is a metric mismatch.
+2. A strict no-free-parameter skeleton validation must compare raw prediction
+   with raw observed risk.  On the existing generated trajectories this gives
+   median factor `1.044` and maximum `1.200`; no physical simulation needs to
+   be rerun, but a provenance-bearing export should be generated by the main
+   agent if these numbers are published.
+3. If the existing aligned results are retained without a raw export, label
+   them a “scale-aligned empirical analogue,” not a direct validation of the
+   raw-MSE theorem.
+4. Reserve unambiguous names:
+   - \(C_{0,\mathrm{floor}}^{\mathrm{align,fix}}\);
+   - \(C_{0,\mathrm{floor}}^{\mathrm{raw,fix}}\);
+   - \(C_{0,\mathrm{lev}}^{\mathrm{raw\ background}}\).
+5. The remaining discrepancy grows toward about `20%` at
+   \(\sigma_a=0.5\); only that residual may plausibly be associated with the
+   small-mismatch higher-order term, and even that wording should remain
+   cautious.
+
+## Confidence
+
+- Classification of the CSV constant as scale-aligned rather than raw:
+  `>99.9%`.
+- Raw fixed-design floor values and ratio: deterministic recomputation,
+  `>99.9%`.
+- Metric mismatch as the explanation of the former factor `1.54`: raw-vs-raw
+  boundary reconstruction, approximately `99%` confidence.
