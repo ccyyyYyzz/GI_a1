@@ -1,0 +1,21 @@
+{
+  "all_non_oracle": {
+    "total_cells": 45,
+    "above_floor_cells": 31,
+    "noise_floor_cells": 14,
+    "winners": {
+      "srht_paired+reference_k2": 31,
+      "noise_floor+noise_floor": 14
+    }
+  },
+  "equal_frame_non_oracle": {
+    "total_cells": 45,
+    "above_floor_cells": 29,
+    "noise_floor_cells": 16,
+    "winners": {
+      "srht_paired+pairwise": 28,
+      "noise_floor+noise_floor": 16,
+      "hadamard_random_paired+scgi_proxy": 1
+    }
+  }
+}

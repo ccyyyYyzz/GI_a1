@@ -1,0 +1,131 @@
+[1/5] recount winner map ...
+{
+  "all_non_oracle": {
+    "total_cells": 45,
+    "above_floor_cells": 31,
+    "noise_floor_cells": 14,
+    "winners": {
+      "srht_paired+reference_k2": 31,
+      "noise_floor+noise_floor": 14
+    }
+  },
+  "equal_frame_non_oracle": {
+    "total_cells": 45,
+    "above_floor_cells": 29,
+    "noise_floor_cells": 16,
+    "winners": {
+      "srht_paired+pairwise": 28,
+      "noise_floor+noise_floor": 16,
+      "hadamard_random_paired+scgi_proxy": 1
+    }
+  }
+}
+[2/5] build objects and measure constants ...
+   object          S1          S2       K_eff       D_H  C0_pipeline  dgi_clean_rel_mse  pairwise_clean_rel_mse
+0       0  148.978263   86.574789  256.362422  0.993894   623.975609           0.304676            9.048101e-13
+1       1  144.430232   81.668807  255.423004  0.993367   678.498103           0.331298            7.984090e-13
+2       2  145.703487   72.360025  293.387215  0.994342   700.807190           0.342191            9.927812e-13
+3       3  165.089948   96.540747  282.312822  0.994034   715.171824           0.349205            9.921829e-13
+4       4   92.166667   36.243979  234.375333  0.992645   666.739828           0.325557            6.010661e-13
+5       5  197.748663  118.296920  330.562568  0.995073   684.396784           0.334178            8.071356e-13
+6       6  217.807292  136.309543  348.031512  0.995414   653.728837           0.319204            1.006742e-12
+7       7  229.467837  131.430220  400.634561  0.996057   690.875096           0.337341            8.927056e-13
+8       8  208.901314  116.006620  376.183349  0.995786   660.920037           0.322715            8.312333e-13
+9       9  157.698795   81.375889  305.605384  0.994613   654.709515           0.319682            7.736994e-13
+[3/5] reproduction check vs dense grid ...
+              basis  correction   rho  sigma_a  seed  object  local_rel_mse  grid_rel_mse     ratio
+0   hadamard_paired    pairwise  0.01      0.1     0       0       0.012454      0.012454  1.000000
+1    random_uniform         agc  0.01      0.1     0       0       0.521806      0.521806  1.000000
+2    random_uniform  scgi_proxy  0.01      0.1     0       0       0.521413      0.521413  1.000000
+3   hadamard_paired    pairwise  0.01      0.1     0       5       0.015963      0.015963  1.000000
+4    random_uniform         agc  0.01      0.1     0       5       0.602034      0.602034  1.000000
+5    random_uniform  scgi_proxy  0.01      0.1     0       5       0.602424      0.602424  1.000000
+6   hadamard_paired    pairwise  0.01      0.1     1       0       0.013039      0.013039  0.999999
+7    random_uniform         agc  0.01      0.1     1       0       0.523796      0.523796  1.000000
+8    random_uniform  scgi_proxy  0.01      0.1     1       0       0.522707      0.522707  1.000000
+9   hadamard_paired    pairwise  0.01      0.1     1       5       0.016631      0.016631  1.000000
+10   random_uniform         agc  0.01      0.1     1       5       0.600157      0.600157  1.000000
+11   random_uniform  scgi_proxy  0.01      0.1     1       5       0.600902      0.600902  1.000000
+12  hadamard_paired    pairwise  0.01      0.3     0       0       0.101623      0.101623  1.000000
+13   random_uniform         agc  0.01      0.3     0       0       0.867044      0.867044  1.000000
+14   random_uniform  scgi_proxy  0.01      0.3     0       0       0.864278      0.864278  1.000000
+15  hadamard_paired    pairwise  0.01      0.3     0       5       0.126279      0.126279  1.000000
+16   random_uniform         agc  0.01      0.3     0       5       0.905385      0.905385  1.000000
+17   random_uniform  scgi_proxy  0.01      0.3     0       5       0.905573      0.905573  1.000000
+18  hadamard_paired    pairwise  0.01      0.3     1       0       0.107882      0.107882  1.000000
+19   random_uniform         agc  0.01      0.3     1       0       0.868998      0.868998  1.000000
+20   random_uniform  scgi_proxy  0.01      0.3     1       0       0.865984      0.865984  1.000000
+21  hadamard_paired    pairwise  0.01      0.3     1       5       0.131862      0.131862  1.000000
+22   random_uniform         agc  0.01      0.3     1       5       0.908455      0.908455  1.000000
+23   random_uniform  scgi_proxy  0.01      0.3     1       5       0.910833      0.910833  1.000000
+24  hadamard_paired    pairwise  1.00      0.1     0       0       0.435364      0.435364  1.000000
+25   random_uniform         agc  1.00      0.1     0       0       0.800694      0.800694  1.000000
+26   random_uniform  scgi_proxy  1.00      0.1     0       0       0.800224      0.800224  1.000000
+27  hadamard_paired    pairwise  1.00      0.1     0       5       0.510169      0.510169  1.000000
+28   random_uniform         agc  1.00      0.1     0       5       0.852844      0.852844  1.000000
+29   random_uniform  scgi_proxy  1.00      0.1     0       5       0.852925      0.852925  1.000000
+30  hadamard_paired    pairwise  1.00      0.1     1       0       0.467860      0.467860  1.000000
+31   random_uniform         agc  1.00      0.1     1       0       0.786214      0.786214  1.000000
+32   random_uniform  scgi_proxy  1.00      0.1     1       0       0.786125      0.786124  1.000000
+33  hadamard_paired    pairwise  1.00      0.1     1       5       0.511016      0.511016  1.000000
+34   random_uniform         agc  1.00      0.1     1       5       0.844118      0.844118  1.000000
+35   random_uniform  scgi_proxy  1.00      0.1     1       5       0.844351      0.844351  1.000000
+36  hadamard_paired    pairwise  1.00      0.3     0       0       0.862813      0.862813  1.000000
+37   random_uniform         agc  1.00      0.3     0       0       0.966024      0.966024  1.000000
+38   random_uniform  scgi_proxy  1.00      0.3     0       0       0.965516      0.965516  1.000000
+39  hadamard_paired    pairwise  1.00      0.3     0       5       0.901866      0.901866  1.000000
+40   random_uniform         agc  1.00      0.3     0       5       0.979398      0.979398  1.000000
+41   random_uniform  scgi_proxy  1.00      0.3     0       5       0.979444      0.979444  1.000000
+42  hadamard_paired    pairwise  1.00      0.3     1       0       0.899873      0.899873  1.000000
+43   random_uniform         agc  1.00      0.3     1       0       0.969289      0.969289  1.000000
+44   random_uniform  scgi_proxy  1.00      0.3     1       0       0.968889      0.968889  1.000000
+45  hadamard_paired    pairwise  1.00      0.3     1       5       0.899709      0.899709  1.000000
+46   random_uniform         agc  1.00      0.3     1       5       0.978681      0.978681  1.000000
+47   random_uniform  scgi_proxy  1.00      0.3     1       5       0.978699      0.978699  1.000000
+[4/5] fine (rho, sigma) scan of the two Prop-3 arms ...
+[scan] 200/8250 units, 3.0s elapsed
+[scan] 400/8250 units, 5.8s elapsed
+[scan] 600/8250 units, 8.7s elapsed
+[scan] 800/8250 units, 11.6s elapsed
+[scan] 1000/8250 units, 14.5s elapsed
+[scan] 1200/8250 units, 17.5s elapsed
+[scan] 1400/8250 units, 20.5s elapsed
+[scan] 1600/8250 units, 23.5s elapsed
+[scan] 1800/8250 units, 26.4s elapsed
+[scan] 2000/8250 units, 29.4s elapsed
+[scan] 2200/8250 units, 32.6s elapsed
+[scan] 2400/8250 units, 35.5s elapsed
+[scan] 2600/8250 units, 38.4s elapsed
+[scan] 2800/8250 units, 41.1s elapsed
+[scan] 3000/8250 units, 44.0s elapsed
+[scan] 3200/8250 units, 46.8s elapsed
+[scan] 3400/8250 units, 49.7s elapsed
+[scan] 3600/8250 units, 52.8s elapsed
+[scan] 3800/8250 units, 55.6s elapsed
+[scan] 4000/8250 units, 58.3s elapsed
+[scan] 4200/8250 units, 61.1s elapsed
+[scan] 4400/8250 units, 63.9s elapsed
+[scan] 4600/8250 units, 66.6s elapsed
+[scan] 4800/8250 units, 69.4s elapsed
+[scan] 5000/8250 units, 72.3s elapsed
+[scan] 5200/8250 units, 75.0s elapsed
+[scan] 5400/8250 units, 77.8s elapsed
+[scan] 5600/8250 units, 80.6s elapsed
+[scan] 5800/8250 units, 83.4s elapsed
+[scan] 6000/8250 units, 86.2s elapsed
+[scan] 6200/8250 units, 89.0s elapsed
+[scan] 6400/8250 units, 91.7s elapsed
+[scan] 6600/8250 units, 94.5s elapsed
+[scan] 6800/8250 units, 97.2s elapsed
+[scan] 7000/8250 units, 100.1s elapsed
+[scan] 7200/8250 units, 103.0s elapsed
+[scan] 7400/8250 units, 105.8s elapsed
+[scan] 7600/8250 units, 108.6s elapsed
+[scan] 7800/8250 units, 111.3s elapsed
+[scan] 8000/8250 units, 114.1s elapsed
+[scan] 8200/8250 units, 116.9s elapsed
+[5/5] crossings, predictions, agreement ...
+Empty DataFrame
+Columns: []
+Index: []
+[done] 121.5s -> E:\GAN_FCC_WORK\github_sync\GI_a1_scgi_20260709_014434\scgi_repro\results\prop3_nofreeparam_r1
