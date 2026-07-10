@@ -137,3 +137,195 @@ bias transition, which calibration removes.
   m_alpha_calibration_table.csv, fig7_gainMSE_vs_photon.png, fig7_caption.md,
   summary.md, run_manifest.json}`
 - Archived (untouched): `results/paper_fig7_lowphoton_r2/`
+
+---
+
+# E1 (second-round audit): Theorem C chain repair — carrier-aware calibration, finite-W bound, log-domain metric
+
+Date: 2026-07-10, Wave E1. Scope: `run_paper_fig7_lowphoton.py`, NEW results dir
+`results/paper_fig7_lowphoton_r4_carrier/` (r3 dir untouched, archived), Appendix D.4
+rewritten in `paper_draft/latex/appendix_body.tex` + `paper_draft/APPENDICES.md`, plus
+the Prop 3 Q<=0 sign fix (F.4) in both. body.tex / supplement.tex / MANUSCRIPT_DRAFT.md
+were NOT touched (owned by other agents); required edits there are listed in E1.5.
+
+## E1.1 What was wrong (six audited findings, all verified)
+
+1. **(F1) Calibration omitted the random carrier.** Theorem C's m_alpha takes the
+   expectation over the carrier (and dark counts); the r3 `SoftLogCalibration` tabulated
+   only homogeneous Poisson(lambda) (carrier == 1, d = 0) and applied the homogeneous
+   inverse to frame-varying carriers. The r3 arm was therefore a "mean-Poisson calibrated
+   proxy", not the theorem's estimator (numerical impact small at this carrier CV — see
+   E1.3 — so r3 data is not invalidated, but the estimator identity claim was wrong).
+2. **(F2) The finite-W risk bound (D.8) was FALSE as stated.** It used the SIGNED
+   long-run variance sigma_{alpha,LR}^2 = sum_h gamma(h) as a finite-W variance bound.
+   Counterexample: z_n = eps_n - eps_{n-1} has zero long-run variance but window-mean
+   variance 2 sigma^2 / W^2 > 0. The signed sum is only the asymptotic (W -> infinity)
+   constant; the valid finite-W constant is sigma_abs^2 = sum_h |gamma(h)| (absolutely
+   summable autocovariances), exactly as Lemma D.1 already stated.
+3. **(F3) beta > 1 composite-bias gap.** The proof transferred the W^beta window bias
+   through the nonlinear m_alpha by Lipschitz continuity; that preserves only beta <= 1
+   (the beta in (1,2] case of (D.1) relies on SIGNED cancellation in centered windows,
+   which composition with m_alpha destroys). The statement admitted beta in (0,2].
+4. **(F4) Truncation undefined.** The theory's inverse hits -infinity on all-zero
+   windows; the code silently clamped via interpolation ends. The clamp was not part of
+   the stated estimator and its probability/bias cost was not bounded.
+5. **(F5) Metric mismatch.** Fig. 7 reported gain-domain scale-aligned relMSE but
+   compared it to the LOG-intensity Fisher rate 1/(W*lambda). "Never sub-Fisher",
+   "within 3-31%", and "minimax-rate-optimal" were stated across mismatched metrics.
+6. **(F6) Prop 3 Q<=0 sign error (Appendix F.4).** With rho* = inf{rho : R_pair >=
+   R_rand}, Q<=0 means the random arm is already AT LEAST AS GOOD at rho = 0, hence
+   rho* = 0 (immediate flip); the text said "random already worse" — backwards.
+
+## E1.2 What changed
+
+Runner (`run_paper_fig7_lowphoton.py`; legacy arms verified bit-identical to r3,
+max |r3-r4| mean gain relMSE = 0.0 over all 40 shared (arm, budget) cells):
+
+- NEW arm `soft_log_calibrated_carrier` = Theorem C's estimator: per window solve
+  (1/W) sum_k m_alpha(theta_hat * b_k) = (1/W) sum_k log(C_k + alpha) with the KNOWN
+  per-frame carrier intensities b_k (design values; d = 0), by 60-step monotone
+  bisection in log(theta) reusing the exact homogeneous table (key identity:
+  E[log(Pois(theta*b)+alpha)] = m_alpha(theta*b), same curve). Window membership
+  replicates `moving_average_1d` exactly (odd width 65, replicate padding; verified to
+  1e-15). theta_hat is clamped to [lam_lo/max(b), lam_hi/min(b)] — the theorem's clamp;
+  all-zero windows return the lower end. Unit checks: constant carrier reproduces the
+  homogeneous inversion to 2e-7; varying-carrier variance matches the exact
+  multiplicity-correct conditional prediction (0.0030 predicted vs 0.0026 empirical
+  with centering; interior windows 0.00178 vs 0.00176).
+- Previous `soft_log_calibrated` arm KEPT, relabeled mean-Poisson calibrated proxy.
+- NEW primary metric `log_gain_mse` = mean_n[((log ghat - mean log ghat) -
+  (log g - mean log g))^2] — Theorem C's centered-log-gain loss, the only metric
+  comparable to 1/(W*lambda). All Fisher comparisons, sub-Fisher flags, slopes, and a
+  new per-budget Fisher-excess table (`fig7_fisher_excess_logdomain.csv`) use it.
+  `gain_rel_mse` kept as labeled continuity column; the gain-domain figure no longer
+  draws the Fisher line. New primary figure `fig7_logMSE_vs_photon.png`.
+- Full r3-protocol rerun -> `results/paper_fig7_lowphoton_r4_carrier/` (2500 rows +
+  floor probe; run_manifest.json carries both slope sets, Fisher-excess, and the
+  carrier-solver convention).
+
+Appendix D.4 (both appendix_body.tex and APPENDICES.md), restated and re-proved:
+
+- Estimator (D.8a) is now the carrier-aware window-calibration root WITH the clamp as
+  part of the definition (generalized monotone inverse + clip to the operating range).
+- (D.8) variance term now carries sigma_bar_alpha^2 (sup of Var log(Pois(lambda)+alpha)
+  on the operating intensity range): with KNOWN carriers the counts are conditionally
+  independent given the gain path, so Var(window mean) = W^-2 sum_k Var psi_alpha(C_k)
+  <= sigma_bar_alpha^2 / W is a finite-W IDENTITY — no mixing, no long-run variance.
+  (D.8) gains the explicit clamp term (theta_max-theta_min)^2 P(clamp).
+- Remark D.4.3 handles the unknown-random-carrier variant: marginal calibration curve,
+  finite-W bound via W^-1 sum_{|h|<W} (1-|h|/W) gamma(h) <= sigma_{psi,abs}^2 / W with
+  absolute summability derived from the standing mixing assumptions via Davydov (the
+  Poisson randomization is conditionally independent, so (B_n, C_n) inherits the
+  carrier's mixing coefficients); the signed sigma_LR^2 is restated as the W->infinity
+  asymptotic equality ONLY, with the eps-differencing counterexample recorded.
+- Smoothness hypothesis restricted to beta in (0,1] with the POINTWISE Hoelder modulus;
+  Remark D.4.2 explains why (triangle inequality cannot exploit sign cancellation
+  through the nonlinear m_alpha) and labels any beta in (1,2] calibrated rate an open
+  conjecture. Operative case beta = 1 unaffected.
+- Remark D.4.4 bounds the clamp event: E_n^c subset {|y_n - M_n(ell_n)| >= kappa_min *
+  Delta} (margin Delta), Chebyshev gives P <= (bias^2 + sigma_bar^2/W)/(kappa_min *
+  Delta)^2 — same 1/W order, absorbed; exact all-zero-window probability
+  exp(-sum_k lambda_k) <= exp(-W lambda_minus) ~ 1e-7 per window at the most starved
+  grid point. Clamp bias contribution <= (theta_max-theta_min)^2 P(E_n^c).
+- The theorem's loss is now EXPLICITLY the log-domain squared error, and the van Trees
+  / minimax-order-sharpness sentence is stated in that loss only.
+- Remark D.4.1 records the Fig. 7 instantiation (d = 0, known design carriers, gauge by
+  record-mean centering) and names the r3 arm a mean-Poisson proxy.
+- F6: the Q<=0 sentence in Prop 3 (F.4) now reads "random/DGI already at least as good
+  at rho = 0 ... so rho* = 0 — the flip is immediate, not absent" (both files).
+
+## E1.3 Old vs new numbers (r4; 10 objects x 5 seeds, W=64, alpha=0.5, rho=1e-3)
+
+Proxy vs carrier-aware (log-domain mean-MSE ratio meanpois/carrier): 0.998-1.007 for
+budgets <= 4 — the auditor's <0.3% impact estimate confirmed where photons are scarce —
+growing to 1.06 / 1.09 / 1.14 at budgets 32 / 64 / 128: at the drift-limited floor the
+carrier-aware estimator is strictly BETTER, because it deconvolves the known carrier
+exactly instead of leaving a Jensen-gap floor (floor 2.446e-4 vs proxy 2.792e-4 at
+rho=1e-3; 1.362e-4 vs 1.726e-4 at rho=1e-4 — floor remains drift-limited).
+
+Gain-domain vs log-domain (the metric correction, carrier-aware arm):
+
+| quantity | r3 claim (gain-domain, proxy arm) | r4 honest (log-domain, carrier arm) |
+|---|---|---|
+| Fisher excess, budgets <= 1 | "3-31% above" | 1.112-1.421x (11-42% above) |
+| Fisher excess, [2,32] | "1.3-1.5x" | 1.228-1.492x |
+| Fisher excess at 128 (drift floor) | 2.3x | 2.004x |
+| sub-Fisher budgets (calibrated arm) | none | none (min excess 1.112) |
+| slope [2,32] / [1,16] | -0.974 / -0.981 | -1.025 / -1.030 |
+| naive/calibrated, budgets <= 1 | 3.8-10.7x | 2.01-11.03x |
+| Anscombe/calibrated, budgets <= 1 | 0.13-0.55 | 0.114-0.521 |
+| calibrated/soft, budgets <= 1 | 2.14-12.08x | 2.29-13.43x |
+
+Unchanged qualitative story (all in the correct log-domain metric now): the calibrated
+estimator is the only arm tracking the 1/(W*lambda) law across both fit windows
+(-1.025/-1.030 vs soft-log proxy -0.930/-0.739, Anscombe -0.893/-0.802, naive
+-1.97/-2.02); the uncalibrated proxy IS sub-Fisher at budgets 0.25/0.5/1 (log-domain
+confirmed: 0.083/0.217/0.619x Fisher) — shrinkage bias, exactly as the Sec. 6 caveat
+says; Anscombe beats the calibrated arm at budgets <= 8 (bias-bought) and loses to it
+at budgets >= 16; all naive/soft/Anscombe ratios converge to 1 at high budgets.
+
+## E1.4 Verification
+
+- Unit: constant-carrier equivalence 2e-7; window-index mirror 1e-15; exact conditional
+  variance match (interior 0.00178 pred vs 0.00176); all-zero record clamps finite.
+- Reproduction: all 40 shared (arm, budget) mean-relMSE cells identical to r3 (diff 0.0).
+- LaTeX: supplement.tex (which inputs appendix_body.tex) compiles clean (2 passes,
+  exit 0). main.tex currently FAILS at an undefined macro \EEprobe at main.tex:62 —
+  that line is a concurrent agent's in-flight probe edit in main.tex (not one of E1's
+  files; appendix_body.tex is not input by main.tex). Final compile harmony is a later
+  wave per the wave plan.
+
+## E1.5 For the body.tex / supplement.tex owners (claims to DELETE and replacements)
+
+body.tex Sec. 6 (Theorem C display, ~line 171): replace
+sigma_{alpha,LR}^{4beta/(2beta+1)} by bar-sigma_alpha^{4beta/(2beta+1)} and "the
+standard nonparametric rate in the effective per-frame noise sigma_{alpha,LR}" by "the
+standard nonparametric rate in the effective per-frame noise bar-sigma_alpha
+(operating-range bound on the per-count soft-log variance; Appendix D.4)". If the
+main-text theorem states a smoothness range, restrict to beta in (0,1].
+
+body.tex Sec. 9.5 "Low-photon robustness" paragraph (~line 304) — sentences to DELETE
+and their replacements:
+
+- DELETE "whereas the calibrated estimator is never sub-Fisher, staying within 3-31%
+  above the reference at lambda_bar <= 1".
+  REPLACE with: "whereas the calibrated estimator stays above the reference at every
+  tested budget (no sub-Fisher cell on this grid), within 11-42% of it at
+  lambda_bar <= 1 and within 23-49% through the variance regime lambda_bar in [2,32]
+  (log-domain loss)."
+- DELETE the slope sentence values "-0.974 / -0.981 vs -0.910 / -0.730"; REPLACE with
+  "-1.025 over lambda_bar in [2,32] and -1.030 over [1,16], against -0.930 and -0.739
+  for the proxy" (log-domain).
+- DELETE "3.8-10.7x worse than the calibrated estimator"; REPLACE with "2.0-11.0x worse
+  than the calibrated estimator". Also update naive/soft to 25.3-30.2x, naive/Anscombe
+  to 17.6-21.2x, Anscombe-over-calibrated to 0.11-0.52 (i.e. Anscombe 1.9-8.8x better
+  there), and proxy-over-Anscombe ("1.18-1.55x") to 1.19-1.53x — IF the paragraph
+  adopts the log-domain metric, which it must for every Fisher-adjacent sentence;
+  gain-domain versions may be quoted only if labeled "gain-domain (not
+  Fisher-comparable)".
+- DELETE the floor values "2.78e-4 -> 1.73e-4 identically for the proxy and the
+  calibrated arm"; REPLACE with: "gain MSE 2.79e-4 at rho=1e-3 falling to 1.73e-4 at
+  rho=1e-4 for the proxy arms, and 2.45e-4 falling to 1.36e-4 for the carrier-aware
+  estimator, which sits ~12% below the proxies at the floor because it deconvolves the
+  known carrier exactly (log-domain)."
+- "minimax-rate-optimal" (conclusion + Theorem D sentence): keep ONLY with the two
+  qualifiers "at rate level, in the log-domain loss" for anything referencing Theorem
+  C / Fig. 7; the Theorems B-D windowed-estimator sentence itself is unaffected (linear
+  theory), but must not be cited as covering the calibrated estimator for beta > 1.
+- Estimator naming: the Fig. 7 arm to headline is now "the calibrated soft-log of
+  Theorem C, solving (1/W) sum_k m_alpha(theta_hat b_k) = (1/W) sum_k psi_alpha(C_k)
+  with known carriers b_k" (the old theta_hat = m_alpha^{-1}(mean_W psi_alpha) formula
+  is the mean-Poisson proxy; if kept in text, label it as such).
+- Figure asset: the primary panel should switch to
+  `results/paper_fig7_lowphoton_r4_carrier/fig7_logMSE_vs_photon.png` (y-axis:
+  centered-log-gain MSE; the Fisher dashed line is valid there); the gain-domain PNG no
+  longer draws the Fisher line. `paper_draft/latex/figs/fig7_gainMSE_vs_photon.png` is
+  the stale r3 asset.
+
+supplement.tex (~line 123, Fig. S4(b) floor sentence): update the floor numbers as in
+the floor bullet above and drop "identically for the uncalibrated proxy and the
+calibrated soft-log estimator" (the carrier-aware arm's floor is ~12% lower, not
+identical); data now at `results/paper_fig7_lowphoton_r4_carrier/`.
+
+Caption-ready sentences (log-domain, carrier-aware arm) are in
+`results/paper_fig7_lowphoton_r4_carrier/fig7_caption.md`.

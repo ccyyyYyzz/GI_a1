@@ -104,6 +104,57 @@ class SoftLogCalibration:
         targets = np.asarray(targets, dtype=np.float64)
         return np.exp(np.interp(targets, self.m_grid, self._log_lam_grid))
 
+    def evaluate(self, lam: np.ndarray) -> np.ndarray:
+        """Forward interpolation of m_alpha at arbitrary intensities.
+
+        Interpolates log(lambda) against the tabulated m values (the table is
+        log-spaced, and m_alpha is smooth in log(lambda)); intensities outside
+        the tabulated range clamp to the grid ends (constant extension)."""
+
+        lam = np.asarray(lam, dtype=np.float64)
+        return np.interp(np.log(np.maximum(lam, 1.0e-300)), self._log_lam_grid, self.m_grid)
+
+    def solve_carrier_windows(
+        self, targets: np.ndarray, carrier_windows: np.ndarray, iters: int = 60
+    ) -> np.ndarray:
+        """Carrier-aware calibrated inversion (Theorem C with known per-frame carriers).
+
+        For each window n with known positive per-frame intensity factors
+        b_{n,k} (the carrier times the photon budget; dark counts d = 0 in this
+        protocol) it solves the theorem's window calibration equation
+
+            (1/W) sum_k m_alpha(theta * b_{n,k}) = targets_n
+                                       = (1/W) sum_k log(C_{n,k} + alpha),
+
+        by bisection in log(theta): the left side is strictly increasing in
+        theta because m_alpha is strictly increasing and every b_{n,k} > 0, and
+        each m_alpha evaluation reuses the exact homogeneous table (for C ~
+        Pois(theta*b), E[log(C+alpha)] = m_alpha(theta*b) with the SAME
+        homogeneous curve -- no new tabulation is needed). The returned
+        theta_hat is CLAMPED to the bracket
+
+            [theta_lo, theta_hi] = [lam_lo / max(b), lam_hi / min(b)],
+
+        the range over which every evaluated intensity stays within (or clamps
+        to) the tabulated calibration range: targets below the attainable range
+        (e.g. an all-zero window, whose target is log(alpha)) return theta_lo,
+        targets above it return theta_hi. This clamp is part of the estimator's
+        definition in the theorem statement (Appendix D.4)."""
+
+        b = np.asarray(carrier_windows, dtype=np.float64)
+        if float(b.min()) <= 0.0:
+            raise ValueError("Carrier-aware inversion requires strictly positive carriers.")
+        t = np.asarray(targets, dtype=np.float64)
+        lo = np.full(t.shape, math.log(self.lam_lo) - math.log(float(b.max())))
+        hi = np.full(t.shape, math.log(self.lam_hi) - math.log(float(b.min())))
+        for _ in range(int(iters)):
+            mid = 0.5 * (lo + hi)
+            lhs = self.evaluate(np.exp(mid)[:, None] * b).mean(axis=1)
+            go_up = lhs < t
+            lo = np.where(go_up, mid, lo)
+            hi = np.where(go_up, hi, mid)
+        return np.exp(0.5 * (lo + hi))
+
     def metadata(self) -> Dict[str, object]:
         return {
             "alpha": self.alpha,
@@ -117,12 +168,45 @@ class SoftLogCalibration:
         }
 
 
+def _window_indices(num_frames: int, window: int) -> np.ndarray:
+    """Member indices of the centered moving-average windows.
+
+    Mirrors ``moving_average_1d`` exactly: odd effective width (window+1 when
+    even, capped at the record length made odd), centered, replicate padding
+    (out-of-range member indices clamp to the record ends)."""
+
+    width = max(1, int(window))
+    if width % 2 == 0:
+        width += 1
+    width = min(width, max(1, num_frames if num_frames % 2 == 1 else num_frames - 1))
+    left = width // 2
+    idx = np.arange(num_frames)[:, None] + (np.arange(width) - left)[None, :]
+    return np.clip(idx, 0, num_frames - 1)
+
+
+def centered_log_gain_mse(gain_hat: torch.Tensor, true_gains: torch.Tensor) -> float:
+    """Log-domain (Theorem C) loss: mean over frames of the squared centered-log error.
+
+    Theorem C's target is the log-gain up to the additive gauge constant; the
+    gauge is fixed by centering both log profiles at their record means, so the
+    metric is invariant to the (unidentifiable) global scale of each profile.
+    This is the loss the local Fisher reference 1/(W*lambda) is stated in (the
+    Poisson Fisher information for LOG-intensity is lambda), so only this
+    column is Fisher-comparable; the gain-domain relMSE is kept for continuity
+    but is a different (scale-aligned, linear-domain) loss."""
+
+    lg = torch.log(gain_hat.reshape(-1).to(dtype=torch.float64).clamp_min(1.0e-300))
+    lt = torch.log(true_gains.reshape(-1).to(dtype=torch.float64).clamp_min(1.0e-300))
+    return float(((lg - lg.mean()) - (lt - lt.mean())).pow(2).mean().item())
+
+
 def estimate_from_counts(
     counts: torch.Tensor,
     method: str,
     window: int,
     alpha: float,
     calibration: Optional[SoftLogCalibration] = None,
+    carrier_lam: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     values = counts.reshape(-1).to(dtype=torch.float32)
     if method == "soft_log":
@@ -130,14 +214,35 @@ def estimate_from_counts(
         smooth = moving_average_1d(transformed, window)
         gain_hat = torch.exp(smooth - smooth.mean())
     elif method == "soft_log_calibrated":
-        # Theorem C estimator: per-window mean of log(C+alpha) -> m_alpha^{-1} ->
-        # estimated lambda profile -> normalize by its mean (centered-log-gain gauge).
+        # Mean-Poisson calibrated PROXY (previous r3 arm, kept for continuity):
+        # per-window mean of log(C+alpha) -> homogeneous m_alpha^{-1} ->
+        # estimated lambda profile -> normalize by its mean. It inverts the
+        # HOMOGENEOUS Poisson(lambda) curve, i.e. it ignores the frame-varying
+        # carrier inside the window, so it is NOT Theorem C's estimator when
+        # the carrier is random; see soft_log_calibrated_carrier.
         if calibration is None:
             raise ValueError("soft_log_calibrated requires a SoftLogCalibration instance.")
         transformed = torch.log(values + float(alpha))
         smooth = moving_average_1d(transformed, window)
         lam_hat = calibration.invert(smooth.to(dtype=torch.float64).cpu().numpy())
         gain_hat = torch.from_numpy(lam_hat).to(dtype=torch.float32)
+    elif method == "soft_log_calibrated_carrier":
+        # Theorem C estimator (carrier-aware): with the per-frame carrier
+        # intensities b_k KNOWN (design values; dark counts d = 0 here), solve
+        # per window  (1/W) sum_k m_alpha(theta_hat * b_k) = (1/W) sum_k
+        # log(C_k + alpha)  by monotone bisection on the exact homogeneous
+        # table (E[log(Pois(theta*b)+alpha)] = m_alpha(theta*b)), with the
+        # theorem's clamp of theta_hat to the tabulated range.
+        if calibration is None or carrier_lam is None:
+            raise ValueError(
+                "soft_log_calibrated_carrier requires a SoftLogCalibration instance and per-frame carriers."
+            )
+        psi = np.log(values.to(dtype=torch.float64).cpu().numpy() + float(alpha))
+        idx = _window_indices(psi.size, window)
+        targets = psi[idx].mean(axis=1)
+        b_win = carrier_lam.reshape(-1).to(dtype=torch.float64).cpu().numpy()[idx]
+        theta_hat = calibration.solve_carrier_windows(targets, b_win)
+        gain_hat = torch.from_numpy(theta_hat).to(dtype=torch.float32)
     elif method == "naive_log":
         transformed = torch.log(values.clamp_min(1.0e-3))
         smooth = moving_average_1d(transformed, window)
@@ -151,7 +256,7 @@ def estimate_from_counts(
     return gain_hat / gain_hat.mean().clamp_min(1.0e-8)
 
 
-METHODS = ["soft_log", "soft_log_calibrated", "naive_log", "anscombe"]
+METHODS = ["soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier", "naive_log", "anscombe"]
 
 
 def simulate(
@@ -175,9 +280,15 @@ def simulate(
                 counts = torch.poisson(lam, generator=generator)
                 zero_fraction = float((counts <= 0).to(dtype=torch.float32).mean().item())
                 lambda_bar = float(lam.mean().item())
+                carrier_lam = float(budget) * carrier
                 for method in METHODS:
                     gain_hat = estimate_from_counts(
-                        counts, method=method, window=args.window, alpha=args.alpha, calibration=calibration
+                        counts,
+                        method=method,
+                        window=args.window,
+                        alpha=args.alpha,
+                        calibration=calibration,
+                        carrier_lam=carrier_lam,
                     )
                     rows.append(
                         {
@@ -194,14 +305,17 @@ def simulate(
                             "zero_fraction": zero_fraction,
                             "method": method,
                             "gain_rel_mse": scale_aligned_gain_error(gain_hat, gains) ** 2,
+                            "log_gain_mse": centered_log_gain_mse(gain_hat, gains),
                             "fisher_reference": float(1.0 / max(args.window * lambda_bar, 1.0e-12)),
                         }
                     )
     return pd.DataFrame(rows)
 
 
-def fisher_slope(summary: pd.DataFrame, method: str, budget_lo: float, budget_hi: float) -> float:
-    """Log-log slope of mean gain MSE vs nominal photon budget over [budget_lo, budget_hi].
+def fisher_slope(
+    summary: pd.DataFrame, method: str, budget_lo: float, budget_hi: float, value_col: str = "log_gain_mse_mean"
+) -> float:
+    """Log-log slope of a mean-MSE column vs nominal photon budget over [budget_lo, budget_hi].
 
     Filters on the discrete design column ``photon_budget`` (NOT on the realized
     ``lambda_bar_mean``, which drifts slightly above the nominal budget and
@@ -212,11 +326,11 @@ def fisher_slope(summary: pd.DataFrame, method: str, budget_lo: float, budget_hi
         & (summary["photon_budget"] >= budget_lo)
         & (summary["photon_budget"] <= budget_hi)
     ]
-    sub = sub[sub["gain_rel_mse_mean"] > 0]
+    sub = sub[sub[value_col] > 0]
     if len(sub) < 2:
         return float("nan")
     x = np.log10(sub["photon_budget"].to_numpy(dtype=float))
-    y = np.log10(sub["gain_rel_mse_mean"].to_numpy(dtype=float))
+    y = np.log10(sub[value_col].to_numpy(dtype=float))
     return float(np.polyfit(x, y, deg=1)[0])
 
 
@@ -224,16 +338,17 @@ RATIO_PAIRS = [
     ("naive_log", "soft_log", "naive/soft"),
     ("naive_log", "anscombe", "naive/anscombe"),
     ("anscombe", "soft_log", "anscombe/soft"),
-    ("naive_log", "soft_log_calibrated", "naive/calibrated"),
-    ("anscombe", "soft_log_calibrated", "anscombe/calibrated"),
-    ("soft_log_calibrated", "soft_log", "calibrated/soft"),
+    ("naive_log", "soft_log_calibrated_carrier", "naive/carrier"),
+    ("anscombe", "soft_log_calibrated_carrier", "anscombe/carrier"),
+    ("soft_log_calibrated_carrier", "soft_log", "carrier/soft"),
+    ("soft_log_calibrated", "soft_log_calibrated_carrier", "meanpois/carrier"),
 ]
 
 
-def build_ratio_table(summary: pd.DataFrame) -> pd.DataFrame:
+def build_ratio_table(summary: pd.DataFrame, value_col: str) -> pd.DataFrame:
     """Pairwise mean-MSE ratio table per photon budget, numerator/denominator named."""
 
-    pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean")
+    pivot = summary.pivot(index="photon_budget", columns="method", values=value_col)
     out = pd.DataFrame(index=pivot.index)
     for num, den, label in RATIO_PAIRS:
         out[label] = pivot[num] / pivot[den]
@@ -255,20 +370,24 @@ def _md_table(frame: pd.DataFrame, float_fmt: str = "{:.4g}") -> List[str]:
 def write_summary_md(
     path: Path,
     summary: pd.DataFrame,
-    ratio_table: pd.DataFrame,
-    slopes: Dict[str, Dict[str, float]],
-    low_budget_ranges: Dict[str, tuple],
+    ratio_table_log: pd.DataFrame,
+    ratio_table_gain: pd.DataFrame,
+    slopes_log: Dict[str, Dict[str, float]],
+    slopes_gain: Dict[str, Dict[str, float]],
+    low_budget_ranges_log: Dict[str, tuple],
+    fisher_excess: pd.DataFrame,
     floor_lines: List[str],
     calibration: SoftLogCalibration,
     args: argparse.Namespace,
     n_rows: int,
 ) -> None:
-    mse_pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean").reset_index()
     fisher_ref = summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"].mean()
-    mse_pivot = mse_pivot.merge(fisher_ref, on="photon_budget")
+    log_pivot = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean").reset_index()
+    log_pivot = log_pivot.merge(fisher_ref, on="photon_budget")
+    gain_pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean").reset_index()
 
     lines: List[str] = []
-    lines.append("# Fig. 7 low-photon gain estimation (r3, calibrated soft-log) - native summary")
+    lines.append("# Fig. 7 low-photon gain estimation (r4, carrier-aware calibrated soft-log) - native summary")
     lines.append("")
     lines.append(
         f"Protocol: random_uniform basis, {args.objects} objects, {args.seeds} seeds, W={args.window}, "
@@ -277,61 +396,102 @@ def write_summary_md(
     )
     lines.append("")
     lines.append(
-        "`soft_log_calibrated` is the Theorem C estimator: per-window mean of log(C+alpha), inverted through the "
-        "exactly tabulated calibration curve m_alpha(lambda) = E[log(Poisson(lambda)+alpha)] (truncated Poisson sum, "
+        "`soft_log_calibrated_carrier` is Theorem C's estimator (Appendix D.4, carrier-aware form): with the "
+        "per-frame carrier intensities b_k known (design values; dark counts d = 0 in this protocol), it solves per "
+        "window (1/W) sum_k m_alpha(theta_hat * b_k) = (1/W) sum_k log(C_k + alpha) by monotone bisection on the "
+        "exactly tabulated homogeneous curve m_alpha(lambda) = E[log(Poisson(lambda)+alpha)] (truncated Poisson sum, "
         f"rigorous tail bound <= {calibration.max_tail_bound:.2e} on a {calibration.num_points}-point log grid over "
-        f"lambda in [{calibration.lam_lo:g}, {calibration.lam_hi:g}]), then normalized by its mean (centered-log-gain "
-        "gauge, same as every other arm). `soft_log` is the legacy uncalibrated proxy exp(movmean(log(C+alpha)) - mean), "
-        "kept unchanged for comparison."
+        f"lambda in [{calibration.lam_lo:g}, {calibration.lam_hi:g}]), with theta_hat clamped to the tabulated range "
+        "(the theorem's clamp; all-zero windows clamp to the lower end). `soft_log_calibrated` is the r3 mean-Poisson "
+        "calibrated PROXY (homogeneous inversion that ignores the frame-varying carrier), kept for continuity; "
+        "`soft_log` is the legacy uncalibrated proxy exp(movmean(log(C+alpha)) - mean), also unchanged."
     )
     lines.append("")
-    lines.append("## (a) Per-photon-level mean gain relMSE by arm")
+    lines.append(
+        "METRICS. `log_gain_mse` (PRIMARY, Fisher-comparable) is Theorem C's loss: mean over frames of the squared "
+        "centered-log-gain error, mean_n[((log ghat_n - mean log ghat) - (log g_n - mean log g))^2]. The local Fisher "
+        "reference 1/(W*lambda) is the Cramer-Rao scale for LOG-intensity (Poisson information for log-intensity is "
+        "lambda), so Fisher comparisons, sub-Fisher flags, and rate slopes are stated in this metric. `gain_rel_mse` "
+        "(gain-domain scale-aligned relMSE) is retained for continuity with r2/r3 but is NOT Fisher-comparable. "
+        "The centered moving-average window has odd effective width W+1=65 (moving_average_1d convention) while the "
+        "Fisher reference uses the nominal W=64, a <=1.6% conservative slack in the reference."
+    )
     lines.append("")
-    lines.extend(_md_table(mse_pivot))
+    lines.append("## (a) Per-photon-level mean LOG-domain gain MSE by arm (primary, Fisher-comparable)")
     lines.append("")
-    lines.append("## (b) Pairwise mean-MSE ratio table (numerator/denominator as named)")
+    lines.extend(_md_table(log_pivot))
     lines.append("")
-    lines.extend(_md_table(ratio_table))
+    lines.append("## (a') Per-photon-level mean gain-domain relMSE by arm (continuity with r3; not Fisher-comparable)")
     lines.append("")
-    lines.append("Low-photon ranges (over budgets <= 1):")
-    for label, (lo, hi) in low_budget_ranges.items():
+    lines.extend(_md_table(gain_pivot))
+    lines.append("")
+    lines.append("## (b) Pairwise mean-MSE ratio tables (numerator/denominator as named)")
+    lines.append("")
+    lines.append("Log-domain (primary):")
+    lines.append("")
+    lines.extend(_md_table(ratio_table_log))
+    lines.append("")
+    lines.append("Gain-domain (continuity):")
+    lines.append("")
+    lines.extend(_md_table(ratio_table_gain))
+    lines.append("")
+    lines.append("Low-photon log-domain ranges (over budgets <= 1):")
+    for label, (lo, hi) in low_budget_ranges_log.items():
         lines.append(f"- {label}: {lo:.2f}-{hi:.2f}x")
     lines.append("")
     lines.append("## (c) Fitted log-log rate slopes of mean MSE vs photon budget (1/(W*lambda) law => slope -1)")
     lines.append("")
-    lines.append("| method | slope over budgets [2,32] | slope over budgets [1,16] |")
-    lines.append("|---|---|---|")
+    lines.append("| method | log-domain [2,32] | log-domain [1,16] | gain-domain [2,32] | gain-domain [1,16] |")
+    lines.append("|---|---|---|---|---|")
     for method in METHODS:
         lines.append(
-            f"| {method} | {slopes[method]['budget_2_32']:.3f} | {slopes[method]['budget_1_16']:.3f} |"
+            f"| {method} | {slopes_log[method]['budget_2_32']:.3f} | {slopes_log[method]['budget_1_16']:.3f} "
+            f"| {slopes_gain[method]['budget_2_32']:.3f} | {slopes_gain[method]['budget_1_16']:.3f} |"
         )
     lines.append("")
     lines.append("Slopes are fit on the discrete design column photon_budget (endpoints included); "
                  "no post-hoc correction is needed.")
     lines.append("")
-    lines.append("## (d) Qualitative checks")
+    lines.append("## (d) Fisher-excess table (log-domain mean MSE / local Fisher reference, per budget)")
     lines.append("")
-    pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean")
+    lines.extend(_md_table(fisher_excess))
+    lines.append("")
+    lines.append("## (e) Qualitative checks (log-domain metric)")
+    lines.append("")
+    pivot = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean")
     fisher = summary.groupby("photon_budget")["fisher_reference_mean"].mean()
-    calib_beats_ansc = [f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated"] < pivot.loc[b, "anscombe"]]
-    ansc_beats_calib = [f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated"] >= pivot.loc[b, "anscombe"]]
+    carrier_beats_ansc = [
+        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier"] < pivot.loc[b, "anscombe"]
+    ]
+    ansc_beats_carrier = [
+        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier"] >= pivot.loc[b, "anscombe"]
+    ]
     lines.append(
-        f"- Calibrated soft-log beats Anscombe (lower mean MSE) at budgets: {', '.join(calib_beats_ansc) or 'none'}; "
-        f"Anscombe is equal/better at: {', '.join(ansc_beats_calib) or 'none'}."
+        f"- Carrier-aware calibrated soft-log beats Anscombe (lower mean log-domain MSE) at budgets: "
+        f"{', '.join(carrier_beats_ansc) or 'none'}; Anscombe is equal/better at: {', '.join(ansc_beats_carrier) or 'none'}."
     )
     sub_fisher = {
-        m: [f"{b:g}" for b in pivot.index if pivot.loc[b, m] < fisher.loc[b]] for m in ("soft_log", "soft_log_calibrated")
+        m: [f"{b:g}" for b in pivot.index if pivot.loc[b, m] < fisher.loc[b]]
+        for m in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier")
     }
     lines.append(
-        f"- MSE below the unbiased local Fisher reference 1/(W*lambda) (shrinkage-bias signature): "
+        f"- Log-domain MSE below the unbiased local Fisher reference 1/(W*lambda) (shrinkage-bias signature): "
         f"soft_log at budgets {', '.join(sub_fisher['soft_log']) or 'none'}; "
-        f"soft_log_calibrated at budgets {', '.join(sub_fisher['soft_log_calibrated']) or 'none'}."
+        f"soft_log_calibrated at budgets {', '.join(sub_fisher['soft_log_calibrated']) or 'none'}; "
+        f"soft_log_calibrated_carrier at budgets {', '.join(sub_fisher['soft_log_calibrated_carrier']) or 'none'}."
     )
-    calib_over_soft = ratio_table.set_index("photon_budget")["calibrated/soft"]
+    meanpois_over_carrier = ratio_table_log.set_index("photon_budget")["meanpois/carrier"]
     lines.append(
-        f"- calibrated/soft mean-MSE ratio spans {float(calib_over_soft.min()):.3f}-{float(calib_over_soft.max()):.3f} "
-        "across all budgets (values near 1 mean calibration does not change the qualitative Fig. 7 story; "
-        "values > 1 mean the calibrated estimator pays extra MSE at that budget, < 1 that it gains)."
+        f"- meanpois/carrier log-domain mean-MSE ratio spans {float(meanpois_over_carrier.min()):.4f}-"
+        f"{float(meanpois_over_carrier.max()):.4f} across all budgets (values near 1 mean the r3 mean-Poisson proxy "
+        "and the true carrier-aware estimator agree numerically at this carrier CV; the carrier-aware arm is the one "
+        "the theorem is about)."
+    )
+    carrier_over_soft = ratio_table_log.set_index("photon_budget")["carrier/soft"]
+    lines.append(
+        f"- carrier/soft log-domain mean-MSE ratio spans {float(carrier_over_soft.min()):.3f}-"
+        f"{float(carrier_over_soft.max()):.3f} across all budgets (> 1 means the calibrated estimator pays extra MSE "
+        "over the biased proxy at that budget, < 1 that it gains)."
     )
     for line in floor_lines:
         lines.append(f"- {line}")
@@ -340,8 +500,10 @@ def write_summary_md(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Fig. 7 low-photon gain estimation (r3, calibrated soft-log).")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r3_calibrated")
+    parser = argparse.ArgumentParser(
+        description="Fig. 7 low-photon gain estimation (r4, carrier-aware calibrated soft-log)."
+    )
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r4_carrier")
     parser.add_argument("--image-size", type=int, default=32)
     parser.add_argument("--objects", type=int, default=10)
     parser.add_argument("--seeds", type=int, default=5)
@@ -382,53 +544,101 @@ def main() -> None:
         gain_rel_mse_mean=("gain_rel_mse", "mean"),
         gain_rel_mse_std=("gain_rel_mse", "std"),
         gain_rel_mse_count=("gain_rel_mse", "count"),
+        log_gain_mse_mean=("log_gain_mse", "mean"),
+        log_gain_mse_std=("log_gain_mse", "std"),
         lambda_bar_mean=("lambda_bar", "mean"),
         zero_fraction_mean=("zero_fraction", "mean"),
         fisher_reference_mean=("fisher_reference", "mean"),
     )
     summary.to_csv(out / "fig7_lowphoton_summary.csv", index=False)
 
-    # Native slope fits per arm on the nominal photon_budget column (endpoints included).
-    slopes: Dict[str, Dict[str, float]] = {
+    # Native slope fits per arm on the nominal photon_budget column (endpoints included),
+    # in BOTH metrics; the log-domain metric is the Fisher-comparable (primary) one.
+    slopes_log: Dict[str, Dict[str, float]] = {
         method: {
-            "budget_2_32": fisher_slope(summary, method, budget_lo=2.0, budget_hi=32.0),
-            "budget_1_16": fisher_slope(summary, method, budget_lo=1.0, budget_hi=16.0),
+            "budget_2_32": fisher_slope(summary, method, 2.0, 32.0, value_col="log_gain_mse_mean"),
+            "budget_1_16": fisher_slope(summary, method, 1.0, 16.0, value_col="log_gain_mse_mean"),
+        }
+        for method in METHODS
+    }
+    slopes_gain: Dict[str, Dict[str, float]] = {
+        method: {
+            "budget_2_32": fisher_slope(summary, method, 2.0, 32.0, value_col="gain_rel_mse_mean"),
+            "budget_1_16": fisher_slope(summary, method, 1.0, 16.0, value_col="gain_rel_mse_mean"),
         }
         for method in METHODS
     }
     soft = summary[summary["method"] == "soft_log"].sort_values("photon_budget")
-    peak_budget = float(soft.loc[soft["gain_rel_mse_mean"].idxmax(), "photon_budget"]) if len(soft) else float("nan")
+    peak_budget = float(soft.loc[soft["log_gain_mse_mean"].idxmax(), "photon_budget"]) if len(soft) else float("nan")
 
-    # Native pairwise ratio table (numerator/denominator named in the column labels).
-    ratio_table = build_ratio_table(summary)
-    ratio_table.to_csv(out / "fig7_ratio_table.csv", index=False)
-    low = ratio_table[ratio_table["photon_budget"] <= 1.0]
-    low_budget_ranges = {
+    # Native pairwise ratio tables (numerator/denominator named in the column labels).
+    ratio_table_log = build_ratio_table(summary, value_col="log_gain_mse_mean")
+    ratio_table_log.to_csv(out / "fig7_ratio_table_logdomain.csv", index=False)
+    ratio_table_gain = build_ratio_table(summary, value_col="gain_rel_mse_mean")
+    ratio_table_gain.to_csv(out / "fig7_ratio_table.csv", index=False)
+    low = ratio_table_log[ratio_table_log["photon_budget"] <= 1.0]
+    low_budget_ranges_log = {
         label: (float(low[label].min()), float(low[label].max())) for _, _, label in RATIO_PAIRS
     }
 
-    fig, ax = plt.subplots(figsize=(7.2, 4.8))
-    for method, group in summary.groupby("method"):
-        curve = group.sort_values("photon_budget")
-        ax.errorbar(
-            curve["photon_budget"],
-            curve["gain_rel_mse_mean"],
-            yerr=curve["gain_rel_mse_std"].fillna(0.0),
-            marker="o",
-            capsize=2,
-            label=method,
-        )
-    ref = summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"].mean().sort_values("photon_budget")
-    ax.plot(ref["photon_budget"], ref["fisher_reference_mean"], linestyle="--", color="black", label="1/(W lambda)")
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    ax.set_xlabel("mean photon budget")
-    ax.set_ylabel("gain MSE")
-    ax.grid(True, alpha=0.25)
-    ax.legend(frameon=False)
-    fig.tight_layout()
-    fig.savefig(out / "fig7_gainMSE_vs_photon.png", dpi=200)
-    plt.close(fig)
+    # Fisher-excess table (log-domain only: the reference 1/(W*lambda) is the
+    # Cramer-Rao scale for LOG-intensity, so only the log-domain MSE compares).
+    fisher = summary.groupby("photon_budget")["fisher_reference_mean"].mean()
+    log_pivot_full = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean")
+    fisher_excess = pd.DataFrame(index=log_pivot_full.index)
+    for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier", "anscombe"):
+        fisher_excess[f"{method}/fisher"] = log_pivot_full[method] / fisher
+    fisher_excess = fisher_excess.reset_index()
+    fisher_excess.to_csv(out / "fig7_fisher_excess_logdomain.csv", index=False)
+
+    def _mse_figure(value_col: str, std_col: str, ylabel: str, filename: str, with_fisher: bool) -> None:
+        fig, ax = plt.subplots(figsize=(7.2, 4.8))
+        for method, group in summary.groupby("method"):
+            curve = group.sort_values("photon_budget")
+            ax.errorbar(
+                curve["photon_budget"],
+                curve[value_col],
+                yerr=curve[std_col].fillna(0.0),
+                marker="o",
+                capsize=2,
+                label=method,
+            )
+        if with_fisher:
+            ref = (
+                summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"]
+                .mean()
+                .sort_values("photon_budget")
+            )
+            ax.plot(
+                ref["photon_budget"], ref["fisher_reference_mean"], linestyle="--", color="black", label="1/(W lambda)"
+            )
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel("mean photon budget")
+        ax.set_ylabel(ylabel)
+        ax.grid(True, alpha=0.25)
+        ax.legend(frameon=False)
+        fig.tight_layout()
+        fig.savefig(out / filename, dpi=200)
+        plt.close(fig)
+
+    # Primary figure: LOG-domain MSE against the log-intensity Fisher reference.
+    _mse_figure(
+        "log_gain_mse_mean",
+        "log_gain_mse_std",
+        "centered-log-gain MSE",
+        "fig7_logMSE_vs_photon.png",
+        with_fisher=True,
+    )
+    # Continuity figure: gain-domain relMSE, WITHOUT the Fisher line (the
+    # reference is a log-domain quantity and is not comparable in this metric).
+    _mse_figure(
+        "gain_rel_mse_mean",
+        "gain_rel_mse_std",
+        "gain relMSE (scale-aligned)",
+        "fig7_gainMSE_vs_photon.png",
+        with_fisher=False,
+    )
 
     # Optional: high-photon floor vs drift.
     floor_lines: List[str] = []
@@ -439,41 +649,52 @@ def main() -> None:
 
         def _floor(frame: pd.DataFrame, method: str) -> float:
             sel = frame[(frame["method"] == method) & (frame["photon_budget"] == max_budget)]
-            return float(sel["gain_rel_mse"].mean()) if len(sel) else float("nan")
+            return float(sel["log_gain_mse"].mean()) if len(sel) else float("nan")
 
-        for method in ("soft_log", "soft_log_calibrated"):
+        for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier"):
             floor_lines.append(
-                f"At the high-photon end (budget={max_budget:g}) the {method} gain-MSE floor shrinks from "
+                f"At the high-photon end (budget={max_budget:g}) the {method} log-domain gain-MSE floor shrinks from "
                 f"{_floor(df, method):.3e} (rho={args.rho:g}) to {_floor(df_probe, method):.3e} "
                 f"(rho={args.floor_probe_rho:g}), confirming the floor is drift-limited."
             )
 
+    carrier_excess = fisher_excess.set_index("photon_budget")["soft_log_calibrated_carrier/fisher"]
+    low_excess = carrier_excess[carrier_excess.index <= 1.0]
+    mid_excess = carrier_excess[(carrier_excess.index >= 2.0) & (carrier_excess.index <= 32.0)]
     write_caption(
         out / "fig7_caption.md",
-        "Fig. 7 Low-Photon Gain Estimation (r3, calibrated soft-log)",
+        "Fig. 7 Low-Photon Gain Estimation (r4, carrier-aware calibrated soft-log)",
         [
             "Poisson bucket counts are evaluated under identical random-basis carriers and shared gain traces; the summary is "
-            "aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated arm is the "
-            "Theorem C estimator (windowed mean of log(C+alpha) inverted through the exact calibration curve "
-            "m_alpha(lambda) = E[log(Poisson(lambda)+alpha)]); soft_log is the legacy uncalibrated proxy, retained "
-            "unchanged for comparison.",
-            f"(i) Ratio bookkeeping (mean-MSE ratios over budgets <= 1, numerator/denominator named): "
-            f"naive/soft {low_budget_ranges['naive/soft'][0]:.1f}-{low_budget_ranges['naive/soft'][1]:.1f}x, "
-            f"naive/Anscombe {low_budget_ranges['naive/anscombe'][0]:.1f}-{low_budget_ranges['naive/anscombe'][1]:.1f}x, "
-            f"Anscombe/soft {low_budget_ranges['anscombe/soft'][0]:.2f}-{low_budget_ranges['anscombe/soft'][1]:.2f}x, "
-            f"naive/calibrated {low_budget_ranges['naive/calibrated'][0]:.1f}-{low_budget_ranges['naive/calibrated'][1]:.1f}x, "
-            f"Anscombe/calibrated {low_budget_ranges['anscombe/calibrated'][0]:.2f}-{low_budget_ranges['anscombe/calibrated'][1]:.2f}x, "
-            f"calibrated/soft {low_budget_ranges['calibrated/soft'][0]:.2f}-{low_budget_ranges['calibrated/soft'][1]:.2f}x.",
-            f"(ii) The 1/(W*lambda) Fisher scaling in the variance regime, fit natively on photon_budget in [2,32] "
-            f"(endpoints included): slope {slopes['soft_log']['budget_2_32']:.2f} (soft_log), "
-            f"{slopes['soft_log_calibrated']['budget_2_32']:.2f} (calibrated); over the wider [1,16] window the fits "
-            f"shallow to {slopes['soft_log']['budget_1_16']:.2f} / {slopes['soft_log_calibrated']['budget_1_16']:.2f} "
-            f"because lambda_bar~{peak_budget:g} is the bias->variance transition peak, and above lambda_bar~32 a "
+            "aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated_carrier arm is "
+            "Theorem C's estimator (per-window root of (1/W) sum_k m_alpha(theta*b_k) = (1/W) sum_k log(C_k+alpha) with the "
+            "known per-frame carriers b_k, dark counts d=0, and the theorem's clamp to the tabulated range); "
+            "soft_log_calibrated is the r3 mean-Poisson calibrated proxy (homogeneous inversion, carrier ignored) and "
+            "soft_log the legacy uncalibrated proxy, both retained unchanged for continuity.",
+            "METRIC: the primary loss is the LOG-domain centered-log-gain MSE (Theorem C's loss), the only metric "
+            "comparable to the local Fisher reference 1/(W*lambda) (Poisson information for LOG-intensity); the "
+            "gain-domain relMSE is kept as a continuity column and is not Fisher-comparable.",
+            f"(i) Log-domain ratio bookkeeping (mean-MSE ratios over budgets <= 1, numerator/denominator named): "
+            f"naive/soft {low_budget_ranges_log['naive/soft'][0]:.1f}-{low_budget_ranges_log['naive/soft'][1]:.1f}x, "
+            f"naive/Anscombe {low_budget_ranges_log['naive/anscombe'][0]:.1f}-{low_budget_ranges_log['naive/anscombe'][1]:.1f}x, "
+            f"Anscombe/soft {low_budget_ranges_log['anscombe/soft'][0]:.2f}-{low_budget_ranges_log['anscombe/soft'][1]:.2f}x, "
+            f"naive/carrier {low_budget_ranges_log['naive/carrier'][0]:.1f}-{low_budget_ranges_log['naive/carrier'][1]:.1f}x, "
+            f"Anscombe/carrier {low_budget_ranges_log['anscombe/carrier'][0]:.2f}-{low_budget_ranges_log['anscombe/carrier'][1]:.2f}x, "
+            f"carrier/soft {low_budget_ranges_log['carrier/soft'][0]:.2f}-{low_budget_ranges_log['carrier/soft'][1]:.2f}x, "
+            f"meanpois/carrier {low_budget_ranges_log['meanpois/carrier'][0]:.4f}-{low_budget_ranges_log['meanpois/carrier'][1]:.4f}x.",
+            f"(ii) The 1/(W*lambda) law in the variance regime (log-domain, fit natively on photon_budget, endpoints "
+            f"included): slope {slopes_log['soft_log_calibrated_carrier']['budget_2_32']:.2f} (carrier-aware) / "
+            f"{slopes_log['soft_log_calibrated']['budget_2_32']:.2f} (mean-Poisson proxy) / "
+            f"{slopes_log['soft_log']['budget_2_32']:.2f} (uncalibrated proxy) on [2,32]; "
+            f"{slopes_log['soft_log_calibrated_carrier']['budget_1_16']:.2f} / "
+            f"{slopes_log['soft_log_calibrated']['budget_1_16']:.2f} / {slopes_log['soft_log']['budget_1_16']:.2f} on "
+            f"[1,16]. lambda_bar~{peak_budget:g} is the soft_log bias->variance transition peak; above lambda_bar~32 a "
             f"drift-limited floor sets in.",
-            "(iii) For lambda_bar < 1 the soft-log arms are shrinkage-bias-dominated: MSE falls BELOW the unbiased local "
-            "Fisher reference (biased estimator, consistent with kappa_alpha(lambda) -> lambda*log(1+1/alpha)), so this "
-            "region is NOT ~1/(W*lambda). See summary.md for the per-budget sub-Fisher flags of both soft-log arms.",
-            "(iv) Naive clipped log does not diverge: it saturates at a bias floor (~0.25 relMSE) set by the clip.",
+            f"(iii) Fisher excess of the carrier-aware arm (log-domain MSE / (1/(W*lambda))): "
+            f"{float(low_excess.min()):.2f}-{float(low_excess.max()):.2f}x over budgets <= 1 and "
+            f"{float(mid_excess.min()):.2f}-{float(mid_excess.max()):.2f}x over [2,32]. Sub-Fisher entries (<1) are a "
+            f"shrinkage-bias signature, not super-efficiency; see summary.md section (e) for per-arm flags.",
+            "(iv) Naive clipped log does not diverge: it saturates at a bias floor set by the clip.",
             *floor_lines,
             f"Rows: {len(df)}. Runtime seconds: {time.time() - start:.2f}.",
         ],
@@ -482,9 +703,12 @@ def main() -> None:
     write_summary_md(
         out / "summary.md",
         summary,
-        ratio_table,
-        slopes,
-        low_budget_ranges,
+        ratio_table_log,
+        ratio_table_gain,
+        slopes_log,
+        slopes_gain,
+        low_budget_ranges_log,
+        fisher_excess,
         floor_lines,
         calibration,
         args,
@@ -500,11 +724,22 @@ def main() -> None:
                     "rows": int(len(df)),
                     "methods": METHODS,
                     "calibration": calibration.metadata(),
-                    "slopes_vs_photon_budget": slopes,
+                    "slopes_vs_photon_budget_logdomain": slopes_log,
+                    "slopes_vs_photon_budget_gaindomain": slopes_gain,
                     "soft_log_mse_peak_budget": peak_budget,
-                    "low_budget_ratio_ranges": {k: list(v) for k, v in low_budget_ranges.items()},
-                    "slope_convention": "log10(mean gain_rel_mse) vs log10(photon_budget), filtered on the nominal "
+                    "low_budget_ratio_ranges_logdomain": {k: list(v) for k, v in low_budget_ranges_log.items()},
+                    "carrier_fisher_excess_logdomain": {
+                        f"{b:g}": float(v) for b, v in carrier_excess.items()
+                    },
+                    "metric_convention": "PRIMARY metric log_gain_mse = mean_n[((log ghat - mean log ghat) - "
+                    "(log g - mean log g))^2] (Theorem C loss; Fisher-comparable to 1/(W*lambda)); gain_rel_mse "
+                    "retained for r2/r3 continuity only.",
+                    "slope_convention": "log10(mean MSE) vs log10(photon_budget), filtered on the nominal "
                     "photon_budget design column so the window endpoints are included; emitted natively by this run.",
+                    "carrier_estimator": "soft_log_calibrated_carrier solves (1/W) sum_k m_alpha(theta*b_k) = "
+                    "(1/W) sum_k log(C_k+alpha) per centered window (odd width, replicate padding, identical to "
+                    "moving_average_1d) by 60-step bisection in log(theta) on the exact homogeneous m_alpha table; "
+                    "theta clamped to [lam_lo/max(b), lam_hi/min(b)] (theorem's clamp); dark counts d=0.",
                 },
             ),
             indent=2,
@@ -514,8 +749,9 @@ def main() -> None:
     )
     print(
         f"Fig7 complete rows={len(df)} output={out} runtime={time.time() - start:.2f}s "
-        f"soft slope[2,32]={slopes['soft_log']['budget_2_32']:.3f} "
-        f"calibrated slope[2,32]={slopes['soft_log_calibrated']['budget_2_32']:.3f} peak_budget={peak_budget:g}"
+        f"log-domain slope[2,32]: carrier={slopes_log['soft_log_calibrated_carrier']['budget_2_32']:.3f} "
+        f"meanpois={slopes_log['soft_log_calibrated']['budget_2_32']:.3f} "
+        f"soft={slopes_log['soft_log']['budget_2_32']:.3f} peak_budget={peak_budget:g}"
     )
 
 

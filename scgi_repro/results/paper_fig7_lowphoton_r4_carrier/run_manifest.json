@@ -1,0 +1,184 @@
+{
+  "utc_timestamp": "2026-07-10T13:44:23.779628+00:00",
+  "git_commit": "e6d68f42dc2899afee96a63053edb5268cd2d9a0",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\paper_fig7_lowphoton_r4_carrier",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "sigma_a": 0.1,
+    "window": 64,
+    "alpha": 0.5,
+    "photon_budgets": "0.25,0.5,1,2,4,8,16,32,64,128",
+    "floor_probe_rho": 0.0001,
+    "calibration_points": 3000,
+    "calibration_tol": 1e-12
+  },
+  "manifest_version": 2,
+  "manifest_version_minor": 1,
+  "git_commit_full": "e6d68f42dc2899afee96a63053edb5268cd2d9a0",
+  "git_branch": "scgi-ceiling-diagnostic-r1",
+  "git_dirty": true,
+  "git_diff_sha256": "3204dee7fda8a347f8589b7216f383131505a5e11b5a747628148cbb385706e0",
+  "git_status_porcelain": [
+    " M scgi_repro/paper_draft/APPENDICES.md",
+    " M scgi_repro/paper_draft/latex/appendix_body.tex",
+    " M scgi_repro/paper_draft/latex/main.pdf",
+    " M scgi_repro/paper_draft/latex/main.tex",
+    " M scgi_repro/paper_draft/latex/supplement.pdf",
+    " M scgi_repro/paper_draft/latex/supplement.tex",
+    " M scgi_repro/run_paper_fig7_lowphoton.py",
+    "?? scgi_repro/paper_draft/latex/texput.pdf",
+    "?? scgi_repro/results/paper_fig7_lowphoton_r4_carrier/"
+  ],
+  "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_paper_fig7_lowphoton.py",
+  "runner_sha256": "2c1b30ce5e22665bc0b4068c96d68ea377250a19615c5d5b431e9456e8e2b77d",
+  "argv": [
+    "run_paper_fig7_lowphoton.py",
+    "--output-dir",
+    "results/paper_fig7_lowphoton_r4_carrier",
+    "--objects",
+    "10",
+    "--seeds",
+    "5",
+    "--seed",
+    "20240708",
+    "--rho",
+    "0.001",
+    "--sigma-a",
+    "0.1",
+    "--window",
+    "64",
+    "--alpha",
+    "0.5",
+    "--photon-budgets",
+    "0.25,0.5,1,2,4,8,16,32,64,128",
+    "--floor-probe-rho",
+    "0.0001",
+    "--calibration-points",
+    "3000",
+    "--calibration-tol",
+    "1e-12"
+  ],
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": null,
+  "untracked_files": [
+    "scgi_repro/paper_draft/latex/texput.pdf",
+    "scgi_repro/results/paper_fig7_lowphoton_r4_carrier/"
+  ],
+  "provenance_note": null,
+  "rows": 2500,
+  "methods": [
+    "soft_log",
+    "soft_log_calibrated",
+    "soft_log_calibrated_carrier",
+    "naive_log",
+    "anscombe"
+  ],
+  "calibration": {
+    "alpha": 0.5,
+    "lam_lo": 0.00025,
+    "lam_hi": 12800.0,
+    "num_points": 3000,
+    "truncation_tol": 1e-12,
+    "max_tail_bound": 3.493818336773206e-34,
+    "m_at_lam_lo": -0.692872545855035,
+    "m_at_lam_hi": 9.457200449697321
+  },
+  "slopes_vs_photon_budget_logdomain": {
+    "soft_log": {
+      "budget_2_32": -0.9297422183470401,
+      "budget_1_16": -0.7391838306897887
+    },
+    "soft_log_calibrated": {
+      "budget_2_32": -1.0076012215771228,
+      "budget_1_16": -1.0172243824249556
+    },
+    "soft_log_calibrated_carrier": {
+      "budget_2_32": -1.0250584431896628,
+      "budget_1_16": -1.0302281778083984
+    },
+    "naive_log": {
+      "budget_2_32": -1.9720045554965766,
+      "budget_1_16": -2.014897783298752
+    },
+    "anscombe": {
+      "budget_2_32": -0.8928225871091959,
+      "budget_1_16": -0.8017586117163865
+    }
+  },
+  "slopes_vs_photon_budget_gaindomain": {
+    "soft_log": {
+      "budget_2_32": -0.9102827891709258,
+      "budget_1_16": -0.7296179591704542
+    },
+    "soft_log_calibrated": {
+      "budget_2_32": -0.9742137156234296,
+      "budget_1_16": -0.9813637623181265
+    },
+    "soft_log_calibrated_carrier": {
+      "budget_2_32": -0.9925034513735062,
+      "budget_1_16": -0.9946692472976333
+    },
+    "naive_log": {
+      "budget_2_32": -1.8372172316140856,
+      "budget_1_16": -1.9388479617747232
+    },
+    "anscombe": {
+      "budget_2_32": -0.8749568726980753,
+      "budget_1_16": -0.7864241002016183
+    }
+  },
+  "soft_log_mse_peak_budget": 1.0,
+  "low_budget_ratio_ranges_logdomain": {
+    "naive/soft": [
+      25.28672525959082,
+      30.15238385224705
+    ],
+    "naive/anscombe": [
+      17.604948420718024,
+      21.166514000515573
+    ],
+    "anscombe/soft": [
+      1.194657054013471,
+      1.5305249430003771
+    ],
+    "naive/carrier": [
+      2.006623893259839,
+      11.032233603783968
+    ],
+    "anscombe/carrier": [
+      0.11398067437098447,
+      0.5212116460705455
+    ],
+    "carrier/soft": [
+      2.29207666985203,
+      13.427933739177767
+    ],
+    "meanpois/carrier": [
+      0.9978956475275056,
+      1.0012650424571854
+    ]
+  },
+  "carrier_fisher_excess_logdomain": {
+    "0.25": 1.1120345685851707,
+    "0.5": 1.2219998688510494,
+    "1": 1.4192232525304445,
+    "2": 1.4820710517056421,
+    "4": 1.4906067213145275,
+    "8": 1.227908303003924,
+    "16": 1.4041203094855015,
+    "32": 1.4000117685388607,
+    "64": 1.7614695420806925,
+    "128": 2.0036001755870285
+  },
+  "metric_convention": "PRIMARY metric log_gain_mse = mean_n[((log ghat - mean log ghat) - (log g - mean log g))^2] (Theorem C loss; Fisher-comparable to 1/(W*lambda)); gain_rel_mse retained for r2/r3 continuity only.",
+  "slope_convention": "log10(mean MSE) vs log10(photon_budget), filtered on the nominal photon_budget design column so the window endpoints are included; emitted natively by this run.",
+  "carrier_estimator": "soft_log_calibrated_carrier solves (1/W) sum_k m_alpha(theta*b_k) = (1/W) sum_k log(C_k+alpha) per centered window (odd width, replicate padding, identical to moving_average_1d) by 60-step bisection in log(theta) on the exact homogeneous m_alpha table; theta clamped to [lam_lo/max(b), lam_hi/min(b)] (theorem's clamp); dark counts d=0."
+}

@@ -1,0 +1,12 @@
+# Fig. 7 Low-Photon Gain Estimation (r4, carrier-aware calibrated soft-log)
+
+Poisson bucket counts are evaluated under identical random-basis carriers and shared gain traces; the summary is aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated_carrier arm is Theorem C's estimator (per-window root of (1/W) sum_k m_alpha(theta*b_k) = (1/W) sum_k log(C_k+alpha) with the known per-frame carriers b_k, dark counts d=0, and the theorem's clamp to the tabulated range); soft_log_calibrated is the r3 mean-Poisson calibrated proxy (homogeneous inversion, carrier ignored) and soft_log the legacy uncalibrated proxy, both retained unchanged for continuity.
+METRIC: the primary loss is the LOG-domain centered-log-gain MSE (Theorem C's loss), the only metric comparable to the local Fisher reference 1/(W*lambda) (Poisson information for LOG-intensity); the gain-domain relMSE is kept as a continuity column and is not Fisher-comparable.
+(i) Log-domain ratio bookkeeping (mean-MSE ratios over budgets <= 1, numerator/denominator named): naive/soft 25.3-30.2x, naive/Anscombe 17.6-21.2x, Anscombe/soft 1.19-1.53x, naive/carrier 2.0-11.0x, Anscombe/carrier 0.11-0.52x, carrier/soft 2.29-13.43x, meanpois/carrier 0.9979-1.0013x.
+(ii) The 1/(W*lambda) law in the variance regime (log-domain, fit natively on photon_budget, endpoints included): slope -1.03 (carrier-aware) / -1.01 (mean-Poisson proxy) / -0.93 (uncalibrated proxy) on [2,32]; -1.03 / -1.02 / -0.74 on [1,16]. lambda_bar~1 is the soft_log bias->variance transition peak; above lambda_bar~32 a drift-limited floor sets in.
+(iii) Fisher excess of the carrier-aware arm (log-domain MSE / (1/(W*lambda))): 1.11-1.42x over budgets <= 1 and 1.23-1.49x over [2,32]. Sub-Fisher entries (<1) are a shrinkage-bias signature, not super-efficiency; see summary.md section (e) for per-arm flags.
+(iv) Naive clipped log does not diverge: it saturates at a bias floor set by the clip.
+At the high-photon end (budget=128) the soft_log log-domain gain-MSE floor shrinks from 2.792e-04 (rho=0.001) to 1.726e-04 (rho=0.0001), confirming the floor is drift-limited.
+At the high-photon end (budget=128) the soft_log_calibrated log-domain gain-MSE floor shrinks from 2.792e-04 (rho=0.001) to 1.726e-04 (rho=0.0001), confirming the floor is drift-limited.
+At the high-photon end (budget=128) the soft_log_calibrated_carrier log-domain gain-MSE floor shrinks from 2.446e-04 (rho=0.001) to 1.362e-04 (rho=0.0001), confirming the floor is drift-limited.
+Rows: 2500. Runtime seconds: 563.49.
