@@ -16,7 +16,7 @@ Outputs (paper_draft/latex/figs/, PNGs overwritten in place; fig1 is new):
     fig4_relmse_theory_vs_sim.png
     fig5_flip_boundary.png
     fig6_ablation.png
-    fig7_gainMSE_vs_photon.png
+    fig7_logMSE_vs_photon.png
     fig8_threshold.png
 """
 
@@ -75,8 +75,10 @@ DIVERGING = mcolors.LinearSegmentedColormap.from_list("blue_red", ["#0d366b", "#
 #   raw_shuffled .............. P3 yellow    (hadamard_raw_shuffled, either budget)
 #   raw_ordered ............... P4 green     (hadamard_raw_ordered, either budget)
 #   srht_paired ............... P5 violet    (srht_inverse, srht_full, K=128,
-#                                             also soft_log_calibrated -- the Theorem-C
-#                                             "hero" estimator; no SRHT arm in fig7)
+#                                             also soft_log_calibrated_carrier_oracle --
+#                                             the Theorem-C "hero" estimator; no SRHT
+#                                             arm in fig7; the mean-Poisson proxy
+#                                             soft_log_calibrated gets P7 magenta)
 #   hadamard_ordered .......... P6 red       (hadamard_paired, orthogonal_inverse, naive_log)
 #   hadamard_shuffled/permuted  P8 orange    (hadamard_random_paired)
 # --------------------------------------------------------------------------------------
@@ -101,7 +103,8 @@ SERIES_COLOR = {
     "soft_log": P1,
     "anscombe": P2,
     "naive_log": P6,
-    "soft_log_calibrated": P5,
+    "soft_log_calibrated": P7,
+    "soft_log_calibrated_carrier_oracle": P5,
     # fig8 design sizes
     "K64": P1,
     "K128": P5,
@@ -800,22 +803,27 @@ def fig6_ablation() -> Path:
 
 
 # --------------------------------------------------------------------------------------
-# Fig 7  --  low-photon gain MSE vs photon budget: four estimator arms (naive clipped
-# log, Anscombe, uncalibrated soft-log proxy, and the CALIBRATED soft-log of Theorem C)
-# against the local Fisher reference 1/(W lambda_bar).
-# Source: the audited rerun results/paper_fig7_lowphoton_r3_calibrated.
+# Fig 7  --  low-photon LOG-domain (centered-log-gain) MSE vs photon budget: naive
+# clipped log, Anscombe, uncalibrated soft-log proxy, mean-Poisson calibrated proxy,
+# and the ORACLE-KNOWN-CARRIER calibrated soft-log of Theorem C, against the LOCAL
+# realized Fisher reference mean_n[1/I_n] (dashed) and the nominal 1/(W lambda_bar)
+# (dotted).  Emitted natively here (no hand-copied run asset).
+# Source: the audited rerun results/paper_fig7_lowphoton_r5_final.
 # --------------------------------------------------------------------------------------
-def fig7_gainMSE_vs_photon() -> Path:
+def fig7_logMSE_vs_photon() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton.csv")
+    df = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r5_final" / "fig7_lowphoton.csv")
     summary = df.groupby(["method", "photon_budget"], as_index=False).agg(
-        y=("gain_rel_mse", "mean"),
-        yerr=("gain_rel_mse", "std"),
+        y=("log_gain_mse", "mean"),
+        yerr=("log_gain_mse", "std"),
         lam=("lambda_bar", "mean"),
         fisher=("fisher_reference", "mean"),
+        fisher_nominal=("fisher_reference_nominal", "mean"),
     )
 
-    fig, ax = plt.subplots(figsize=(3.5, 2.7))
+    # Compact aspect (matches the old asset's 3:2 footprint so the main
+    # document's float budget is unchanged).
+    fig, ax = plt.subplots(figsize=(3.5, 2.3))
 
     # Shade the shrinkage-bias region (mean photon count lambda_bar < 1).
     soft = summary[summary["method"] == "soft_log"].sort_values("photon_budget")
@@ -826,39 +834,50 @@ def fig7_gainMSE_vs_photon() -> Path:
         ax.axvspan(xlo, xhi * (float(soft["photon_budget"].iloc[1] / soft["photon_budget"].iloc[0]) ** 0.5),
                    color=MUTED, alpha=0.18, zorder=1, label=r"$\bar\lambda<1$")
 
-    # Draw order: background arms first, the Theorem-C calibrated estimator last (hero).
-    method_order = ["naive_log", "anscombe", "soft_log", "soft_log_calibrated"]
+    # Draw order: background arms first, the Theorem-C oracle-carrier estimator last
+    # (hero); the mean-Poisson proxy overlaps the hero and is drawn as a thin dashed
+    # magenta line beneath it.
+    method_order = ["naive_log", "anscombe", "soft_log", "soft_log_calibrated",
+                    "soft_log_calibrated_carrier_oracle"]
     method_disp = {
         "soft_log": "soft-log proxy (uncal.)",
         "naive_log": "naive log",
         "anscombe": "Anscombe",
-        "soft_log_calibrated": "calibrated soft-log (Thm C)",
+        "soft_log_calibrated": "mean-Poisson proxy",
+        "soft_log_calibrated_carrier_oracle": "oracle-carrier soft-log (Thm C)",
     }
     for method in method_order:
         g = summary[summary["method"] == method].sort_values("photon_budget")
         color = SERIES_COLOR[method]
-        hero = method == "soft_log_calibrated"
+        hero = method == "soft_log_calibrated_carrier_oracle"
+        thin = method == "soft_log_calibrated"
         ax.errorbar(g["photon_budget"], g["y"], yerr=g["yerr"].fillna(0.0),
-                    marker=("D" if hero else "o"), ms=(4.6 if hero else 4.6),
-                    lw=(2.3 if hero else 1.5), capsize=2, color=color,
+                    marker=("D" if hero else ("s" if thin else "o")),
+                    ms=(4.6 if hero else (3.0 if thin else 4.6)),
+                    lw=(2.3 if hero else (0.9 if thin else 1.5)),
+                    linestyle=((0, (3, 2)) if thin else "-"),
+                    capsize=(0 if thin else 2), color=color,
                     markeredgecolor="white", markeredgewidth=0.5,
                     ecolor=color, elinewidth=0.8,
                     zorder=(9 if hero else zorder_for(color)),
                     label=method_disp[method])
 
-    ref = summary.groupby("photon_budget", as_index=False)["fisher"].mean().sort_values("photon_budget")
+    ref = summary.groupby("photon_budget", as_index=False)[["fisher", "fisher_nominal"]].mean()
+    ref = ref.sort_values("photon_budget")
     ax.plot(ref["photon_budget"], ref["fisher"], linestyle=(0, (4, 3)), lw=1.2,
-            color=INK_GRAY, zorder=3, label=r"Fisher ref. $1/(W\bar\lambda)$")
+            color=INK_GRAY, zorder=3, label=r"local Fisher ref. $\mathrm{mean}_n[1/I_n]$")
+    ax.plot(ref["photon_budget"], ref["fisher_nominal"], linestyle=(0, (1, 2)), lw=1.0,
+            color=INK_GRAY, zorder=3, label=r"nominal $1/(W\bar\lambda)$")
 
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"mean photon budget $\bar\lambda$")
-    ax.set_ylabel("gain MSE")
+    ax.set_ylabel("centered-log-gain MSE")
     style_ax(ax)
-    ax.legend(loc="lower left", fontsize=6.2, handlelength=1.4, labelspacing=0.3,
+    ax.legend(loc="lower left", fontsize=5.7, handlelength=1.4, labelspacing=0.25,
               borderaxespad=0.2)
     fig.tight_layout()
-    return save(fig, "fig7_gainMSE_vs_photon.png")
+    return save(fig, "fig7_logMSE_vs_photon.png")
 
 
 # --------------------------------------------------------------------------------------
@@ -1136,15 +1155,15 @@ def figS3_c0_oracle() -> Path:
 
 # --------------------------------------------------------------------------------------
 # Fig S4  --  extended flip-boundary detail (corrected-C0 no-flip margins) + the
-# low-photon drift-limited floor probe
+# low-photon drift-limited floor probe (LOG-domain metric, r5 oracle-carrier arm)
 # (Supplementary Material S4; data: results/prop3_nofreeparam_r1/,
-#  results/paper_fig7_lowphoton_r3_calibrated/fig7_lowphoton_floorprobe.csv)
+#  results/paper_fig7_lowphoton_r5_final/fig7_lowphoton{,_floorprobe}.csv)
 # --------------------------------------------------------------------------------------
 def figS4_flip_floorprobe() -> Path:
     apply_rcparams()
     nf = pd.read_csv(RESULTS / "prop3_nofreeparam_r1" / "prop3_correctedC0_noflip_consistency.csv")
-    main7 = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton.csv")
-    probe = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton_floorprobe.csv")
+    main7 = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r5_final" / "fig7_lowphoton.csv")
+    probe = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r5_final" / "fig7_lowphoton_floorprobe.csv")
 
     fig, axes = plt.subplots(1, 2, figsize=(3.5, 2.2))
 
@@ -1172,24 +1191,25 @@ def figS4_flip_floorprobe() -> Path:
     ax.legend(loc="upper right", fontsize=5.8, handlelength=1.0, labelspacing=0.25,
               handletextpad=0.3, borderaxespad=0.2)
 
-    # Panel (b): high-photon floor probe --- drift-limited, not photon-limited.
+    # Panel (b): high-photon floor probe --- drift-limited, not photon-limited
+    # (log-domain metric; r5 oracle-known-carrier arm vs the uncalibrated proxy).
     ax = axes[1]
     runs = [(main7, 1e-3, "-", "o"), (probe, 1e-4, (0, (4, 2)), "s")]
     for df, rho, ls, mk in runs:
-        for method, c in (("soft_log", P1), ("soft_log_calibrated", P5)):
+        for method, c in (("soft_log", P1), ("soft_log_calibrated_carrier_oracle", P5)):
             sel = df[df["method"] == method]
             if "rho" in sel.columns:
                 sel = sel[np.isclose(sel["rho"], rho)]
             g = sel.groupby("photon_budget", as_index=False).agg(
-                y=("gain_rel_mse", "mean"), lam=("lambda_bar", "mean"))
+                y=("log_gain_mse", "mean"), lam=("lambda_bar", "mean"))
             g = g[g["lam"] >= 4.0].sort_values("lam")
             ax.plot(g["lam"], g["y"], marker=mk, ms=3.6, lw=1.4, linestyle=ls, color=c,
                     markeredgecolor="white", markeredgewidth=0.3, zorder=zorder_for(c))
-    # Floor annotations from the two runs' highest-budget calibrated points.
-    hi_main = main7[(main7["method"] == "soft_log_calibrated")]
-    hi_main = float(hi_main[hi_main["lambda_bar"] > 100]["gain_rel_mse"].mean())
-    hi_probe = probe[(probe["method"] == "soft_log_calibrated")]
-    hi_probe = float(hi_probe[hi_probe["lambda_bar"] > 100]["gain_rel_mse"].mean())
+    # Floor annotations from the two runs' highest-budget oracle-carrier points.
+    hi_main = main7[(main7["method"] == "soft_log_calibrated_carrier_oracle")]
+    hi_main = float(hi_main[hi_main["lambda_bar"] > 100]["log_gain_mse"].mean())
+    hi_probe = probe[(probe["method"] == "soft_log_calibrated_carrier_oracle")]
+    hi_probe = float(hi_probe[hi_probe["lambda_bar"] > 100]["log_gain_mse"].mean())
     place_end_labels(ax, [(128.0, hi_main, TICK_INK, r"$\rho{=}10^{-3}$"),
                           (128.0, hi_probe, TICK_INK, r"$\rho{=}10^{-4}$")],
                      log_y=True, min_gap=0.16, dx=3, fontsize=5.7)
@@ -1198,12 +1218,12 @@ def figS4_flip_floorprobe() -> Path:
     ax.set_ylim(hi_probe * 0.55, None)
     ax.set_xlim(3.4, 260.0)
     ax.set_xlabel(r"mean photon budget $\bar\lambda$", fontsize=7.5)
-    ax.set_ylabel("gain MSE", fontsize=7.5)
+    ax.set_ylabel("centered-log-gain MSE", fontsize=7.5)
     ax.set_title("(b) drift-limited floor", fontsize=8, loc="left")
     style_ax(ax)
     handles = [
         plt.Line2D([0], [0], color=P1, lw=1.4, label="proxy"),
-        plt.Line2D([0], [0], color=P5, lw=1.4, label="calibrated (Thm C)"),
+        plt.Line2D([0], [0], color=P5, lw=1.4, label="oracle-carrier (Thm C)"),
         plt.Line2D([0], [0], color=TICK_INK, lw=1.2, linestyle="-", label=r"$\rho=10^{-3}$"),
         plt.Line2D([0], [0], color=TICK_INK, lw=1.2, linestyle=(0, (4, 2)), label=r"$\rho=10^{-4}$"),
     ]
@@ -1229,7 +1249,7 @@ def main() -> None:
         ("fig4_relmse_theory_vs_sim.png", fig4_relmse_theory_vs_sim),
         ("fig5_flip_boundary.png", fig5_flip_boundary),
         ("fig6_ablation.png", fig6_ablation),
-        ("fig7_gainMSE_vs_photon.png", fig7_gainMSE_vs_photon),
+        ("fig7_logMSE_vs_photon.png", fig7_logMSE_vs_photon),
         ("fig8_threshold.png", fig8_threshold),
         # Supplementary Material S1--S4 panels.
         ("figS1_perm_whitening.png", figS1_perm_whitening),

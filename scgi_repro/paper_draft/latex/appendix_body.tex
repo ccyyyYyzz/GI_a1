@@ -586,64 +586,421 @@ For a linear functional $L\theta$: if $\mathrm{row}(L)\subseteq\mathrm{range}(I_
 
 \subsection{D.4 Theorem C (low-photon calibrated soft-log rate and the \texorpdfstring{$1/(W\bar\lambda)$}{1/(W lambda-bar)} law)}
 
-\paragraph{Statement.} Let counts follow the calibrated model $C_n\mid \ell_n\sim\mathrm{Pois}(\lambda_n)$, $\lambda_n=\Lambda_0e^{\ell_n}b_n+d$, with $d\ge0$ dark counts and $\{b_n\}$ the \emph{known} per-frame carrier intensities ($b_n>0$; in the Fig.~7 protocol these are the programmed design values and $d=0$ --- Remark D.4.1; the unknown-random-carrier variant is Remark D.4.3). Fix $\alpha>0$, let $\psi_\alpha(c)=\log(c+\alpha)$, and let $m_\alpha(\lambda)=\mathbb{E}[\psi_\alpha(C)]$ for $C\sim\mathrm{Pois}(\lambda)$ --- the homogeneous calibration curve, strictly increasing. For each window $W_n$ define the strictly increasing \emph{window calibration function}
+\paragraph{Statement (exact finite-window identity with known carriers, weighted form).} Let counts follow the calibrated model $C_n\mid \ell_n\sim\mathrm{Pois}(\lambda_n)$, $\lambda_n=\Lambda_0e^{\ell_n}b_n+d$, with $d\ge0$ dark counts and $\{b_n\}$ the \emph{known} per-frame carrier intensities ($b_n>0$; in the Fig.~7 protocol these are \emph{oracle} values supplied from the simulation truth --- a flat-field-calibrated benchmark, not programmed design intensities --- and $d=0$ --- Remark D.4.1; the unknown-random-carrier variant is Remark D.4.3). Fix $\alpha>0$, let $\psi_\alpha(c)=\log(c+\alpha)$, and let $m_\alpha(\lambda)=\mathbb{E}[\psi_\alpha(C)]$ for $C\sim\mathrm{Pois}(\lambda)$ --- the homogeneous calibration curve, strictly increasing. For a fixed window $n$, let $\mathcal I_n$ be the set of \emph{distinct} frame indices used by the estimator and let $w_{nk}\ge0$, $\sum_{k\in\mathcal I_n}w_{nk}=1$, be its weights (for the implementation's windows, $\mathcal I_n=W_n$ and $w_{nk}=1/W$). If a padding convention repeats a frame, all repeated occurrences are first aggregated into its single weight $w_{nk}$. Put
 \[
-M_n(\theta)\;=\;W^{-1}\!\!\sum_{k\in W_n} m_\alpha\big(\Lambda_0e^{\theta}b_k+d\big),
+q_k(t)=m_\alpha(\Lambda_0e^t b_k+d),
 \]
-and fix a compact operating range $\Theta=[\theta_{\min},\theta_{\max}]$ (in the implementation, the tabulated calibration range). The estimator is defined \emph{with the clamp}:
+\[
+v_k(t)=\operatorname{Var}\!\left[
+\psi_\alpha(\operatorname{Pois}(\Lambda_0e^t b_k+d))\right],
+\]
+\[
+M_n(t)=\sum_{k\in\mathcal I_n}w_{nk}q_k(t),
+\qquad
+y_n=\sum_{k\in\mathcal I_n}w_{nk}\psi_\alpha(C_k),
+\]
+and define
+\[
+B_n=\sum_{k\in\mathcal I_n}w_{nk}
+\{q_k(\ell_k)-q_k(\ell_n)\},
+\qquad
+V_n=\sum_{k\in\mathcal I_n}w_{nk}^2v_k(\ell_k).
+\]
+Fix a compact operating range $\Theta=[\theta_{\min},\theta_{\max}]$ (in the implementation, the safe tabulated calibration range) and let
+\[
+\underline\kappa_n=\inf_{t\in\Theta}M_n'(t)>0,
+\qquad
+D_\Theta=\theta_{\max}-\theta_{\min}.
+\]
+The estimator is defined \emph{with the clamp}:
 \begin{equation}
-\hat\theta_n\;=\;\Pi_\Theta\Big[M_n^{-1}\Big(W^{-1}\!\!\sum_{k\in W_n}\psi_\alpha(C_k)\Big)\Big], \tag{D.8a}
+\hat\theta_n\;=\;\Pi_\Theta\big[M_n^{-1}(y_n)\big], \tag{D.8a}
 \end{equation}
-where $\Pi_\Theta$ clips to $\Theta$ and $M_n^{-1}$ is the generalized monotone inverse, returning the corresponding endpoint of $\Theta$ when the window mean falls outside $M_n(\Theta)$ (an all-zero window has window mean $\log\alpha$ and returns $\theta_{\min}$; without the clamp the inverse would diverge to $-\infty$ there --- the clamp is part of the estimator, not an implementation afterthought). Assume:
+where $\Pi_\Theta$ clips to $\Theta$ and $M_n^{-1}$ is the generalized monotone inverse, returning the corresponding endpoint of $\Theta$ when $y_n$ falls outside $M_n(\Theta)$ (an all-zero window has $y_n=\log\alpha$ and returns $\theta_{\min}$; without the clamp the inverse would diverge to $-\infty$ there --- the clamp is part of the estimator, not an implementation afterthought). Assume:
 \begin{enumerate}
-\item \emph{(Operating range)} for every $k$ and every $\theta\in\Theta$, $\lambda_k(\theta)=\Lambda_0e^{\theta}b_k+d\in[\lambda_-,\lambda_+]\subset(0,\infty)$; consequently, with $\kappa_\alpha(\lambda)$ the log-domain sensitivity of the proof, $0<\kappa_{\min}\le\frac{d}{d\theta}m_\alpha(\lambda_k(\theta))\le\kappa_{\max}<\infty$ and $\operatorname{Var}[\psi_\alpha(\mathrm{Pois}(\lambda))]\le\bar\sigma_\alpha^2<\infty$ on $[\lambda_-,\lambda_+]$;
-\item \emph{(Smoothness)} $\ell\in H_\beta(L_a)$ with the \emph{pointwise} modulus $|\ell_k-\ell_n|\le L_a|k-n|^{\beta}$ and $\beta\in(0,1]$ (the paper's operative case is $\beta=1$; $\beta>1$ is not claimed --- Remark D.4.2);
+\item \emph{(Operating range; per-frame sensitivities and noise)} for every $k$ and every $\theta\in\Theta$, $\lambda_k(\theta)=\Lambda_0e^{\theta}b_k+d\in[\lambda_-,\lambda_+]\subset(0,\infty)$; consequently the per-frame sensitivity bound $\overline\kappa_k=\sup_{t\in\Theta}q_k'(t)$ and the per-frame noise $v_k(t)$ are finite, with $v_k(t)\le\bar\sigma_\alpha^2:=\sup_{\lambda\in[\lambda_-,\lambda_+]}\operatorname{Var}[\psi_\alpha(\mathrm{Pois}(\lambda))]<\infty$, $\kappa_{\max}:=\sup_k\overline\kappa_k<\infty$, and $\underline\kappa_n>0$;
+\item \emph{(Smoothness)} $\ell\in H_\beta(L_a)$ with the \emph{pointwise} modulus $|\ell_k-\ell_n|\le L_a|k-n|^{\beta}$ and $\beta\in(0,1]$ (the paper's operative case is $\beta=1$; the precise obstruction above one and its partial repair are Remark D.4.2);
 \item \emph{(Margin)} $\ell_n\in\Theta$ for all $n$, with margin $\Delta:=\min_n\operatorname{dist}(\ell_n,\partial\Theta)>0$.
 \end{enumerate}
-Then, counts being independent across frames given the gain path and carriers,
+Then, conditionally on the gain path and known carriers,
+\[
+\operatorname{Var}\!\left[
+\sum_{k\in\mathcal I_n}w_{nk}
+\{\psi_\alpha(C_k)-q_k(\ell_k)\}\right]
+=V_n
+\]
+\emph{exactly}, and no mixing or stationarity assumption is required. If $\mathcal E_n=\{y_n\in M_n(\Theta)\}$, then
 \begin{equation}
-\mathbb{E}\big(\hat\theta_n-\ell_n\big)^2\;\le\;C\Big(\tfrac{\kappa_{\max}}{\kappa_{\min}}\Big)^{2}L_a^2W^{2\beta}\;+\;C\,\frac{\bar\sigma_\alpha^2}{\kappa_{\min}^2\,W}\;+\;(\theta_{\max}-\theta_{\min})^2\,\mathbb{P}(\mathcal E_n^c), \tag{D.8}
+\mathbb E(\hat\theta_n-\ell_n)^2
+\le
+\frac{B_n^2+V_n}{\underline\kappa_n^2}
++D_\Theta^2\,\mathbb P(\mathcal E_n^c).
+\tag{D.8}
 \end{equation}
-with $\mathcal E_n$ the no-clamp event of the proof; the clamp term is bounded in Remark D.4.4 and is of the same $1/W$ order (or exponentially small), so for fixed $(\theta_{\max}-\theta_{\min})/\Delta$ it is absorbed into the constants. Optimizing over $W$,
+Moreover, the pointwise modulus gives
+\[
+|B_n|
+\le
+L_a\sum_{k\in\mathcal I_n}
+w_{nk}\overline\kappa_k|k-n|^\beta.
+\]
+For an unpadded average of $W$ distinct frames, $w_{nk}=1/W$ and hence
+\[
+V_n=\frac{\bar v_{n,\alpha}}{W},
+\qquad
+\bar v_{n,\alpha}
+=\frac1W\sum_{k\in W_n}v_k(\ell_k)
+\le\bar\sigma_\alpha^2,
+\]
+while $|B_n|\le C\,\kappa_{\max}L_aW^{\beta}$, so (D.8) specializes to
+\[
+\begin{aligned}
+\mathbb{E}\big(\hat\theta_n-\ell_n\big)^2\;\le\;&C\Big(\tfrac{\kappa_{\max}}{\underline\kappa_n}\Big)^{2}L_a^2W^{2\beta}\\
+&+\frac{\bar\sigma_\alpha^2}{\underline\kappa_n^2\,W}\;+\;D_\Theta^2\,\mathbb{P}(\mathcal E_n^c),
+\end{aligned}
+\]
+with $\mathcal E_n$ the no-clamp event; the clamp term is bounded in Remark D.4.4 and is of the same $1/W$ order (or exponentially small under a residual margin), so for fixed $D_\Theta/\Delta$ it is absorbed into the constants. Optimizing over $W$,
 \begin{equation}
-\mathrm{MSE}_\alpha^{*}\;\le\;C\,\kappa_{\min}^{-2}\,\big[\kappa_{\max}L_a\big]^{2/(2\beta+1)}\,\bar\sigma_\alpha^{4\beta/(2\beta+1)} \tag{D.9}
+\mathrm{MSE}_\alpha^{*}\;\le\;C\,\underline\kappa^{-2}\,\big[\kappa_{\max}L_a\big]^{2/(2\beta+1)}\,\bar\sigma_\alpha^{4\beta/(2\beta+1)} \tag{D.9}
 \end{equation}
---- Theorem~C of the main text. \textbf{The loss throughout is the log-domain squared error}: $\hat\theta_n-\ell_n$ is an increment of log-gain (equivalently log-intensity), the record-mean centering fixes the additive gauge, and this is the metric in which the Fisher comparison below is stated (and which Fig.~7 reports). In the photon-starved regime $\bar\lambda\ll1$ the variance term of (D.8) becomes $C/(W\bar\lambda)$, which is minimax-\emph{order} sharp \emph{in this log-domain loss}: the Poisson Fisher information for the log-intensity parameter is $I(\theta)=\lambda$, so $W$ counts carry information $\asymp W\bar\lambda$ and no estimator improves on the $1/(W\bar\lambda)$ order (van Trees~\cite{GillLevit1995}). Zeros only reduce Fisher information; with the clamp (D.8a) they never make the estimator diverge.
+--- Theorem~C of the main text, with $\underline\kappa:=\inf_n\underline\kappa_n$. \textbf{The loss throughout is the log-domain squared error}: $\hat\theta_n-\ell_n$ is an increment of log-gain (equivalently log-intensity), the record-mean centering fixes the additive gauge, and this is the metric in which the Fisher comparison below is stated (and which Fig.~7 reports). In the photon-starved regime the variance-to-sensitivity ratio obeys the window-average law $V_n/M_n'(\ell_n)^2=\{1+O_\alpha(\varepsilon)\}/(W\bar\lambda_n)$ (low-photon corollary below), which is minimax-\emph{order} sharp \emph{in this log-domain loss at $d=0$} by the gauge-invariant lower bound following the proof. Zeros only reduce Fisher information; with the clamp (D.8a) they never make the estimator diverge.
 
 \paragraph{Proof.} \emph{Sensitivity and variance of the soft-log.} The Poisson derivative identity $\frac{d}{d\lambda}\mathbb{E}f(C)=\mathbb{E}[f(C{+}1)-f(C)]$ (differentiate $\sum_c e^{-\lambda}\lambda^c f(c)/c!$ term by term) gives
 \[
 \kappa_\alpha(\lambda):=\frac{d}{d\log\lambda}\mathbb{E}\log(C+\alpha)=\lambda\,\mathbb{E}\log\frac{C+1+\alpha}{C+\alpha},
 \]
-with the expansions $\kappa_\alpha(\lambda)=1+O(1/\lambda)$ for $\lambda\gg1$ and $\kappa_\alpha(\lambda)=\lambda\log(1+1/\alpha)+O(\lambda^2)$ for $\lambda\ll1$. Since $\frac{d}{d\theta}m_\alpha(\lambda_k(\theta))=\kappa_\alpha(\lambda_k(\theta))\cdot\Lambda_0e^\theta b_k/\lambda_k(\theta)$, hypothesis 1 holds with $\kappa_{\min}\asymp c_\alpha\bar\lambda$ ($c_\alpha=\log(1+1/\alpha)$) in the starved regime and $\kappa_{\min}\approx\kappa_{\max}\approx1$ at high counts. The Poisson Poincar\'e inequality~\cite{Klaassen1985,BobkovLedoux1998}, $\operatorname{Var}f(C)\le\lambda\,\mathbb{E}[(f(C{+}1)-f(C))^2]$, yields $\operatorname{Var}[\psi_\alpha(C)]=O(1/\lambda)$ at high $\lambda$ and $=\lambda\log^2(1+1/\alpha)+O(\lambda^2)$ at low $\lambda$, whence $\bar\sigma_\alpha^2<\infty$ on $[\lambda_-,\lambda_+]$.
+with the expansions $\kappa_\alpha(\lambda)=1+O(1/\lambda)$ for $\lambda\gg1$ and $\kappa_\alpha(\lambda)=c_\alpha\lambda+O(\lambda^2)$ for $\lambda\ll1$, where $c_\alpha=\log(1+1/\alpha)$. Since $q_k'(t)=\kappa_\alpha(\lambda_k(t))\cdot\Lambda_0e^{t}b_k/\lambda_k(t)$ ($=\kappa_\alpha(\lambda_k(t))$ at $d=0$), hypothesis 1 holds on any compact operating range. No uniform identification $\underline\kappa_n\asymp c_\alpha\bar\lambda_n$ is claimed: under unrestricted heteroscedastic carriers the infimum of $M_n'$ over $\Theta$ can sit far below $c_\alpha\bar\lambda_n$ (two-frame example $\lambda_1=\varepsilon^2$, $\lambda_2=2\varepsilon-\varepsilon^2$), so $\underline\kappa_n$-based displays are conservative bounds only; the correct low-photon law is the window-average corollary below. The Poisson Poincar\'e inequality~\cite{Klaassen1985,BobkovLedoux1998}, $\operatorname{Var}f(C)\le\lambda\,\mathbb{E}[(f(C{+}1)-f(C))^2]$, yields $v_k=O(1/\lambda)$ at high $\lambda$ and $v_k=c_\alpha^2\lambda+O(\lambda^2)$ at low $\lambda$, whence $\bar\sigma_\alpha^2<\infty$ on $[\lambda_-,\lambda_+]$.
 
-\emph{Rate.} Write $y_n=W^{-1}\sum_{k\in W_n}\psi_\alpha(C_k)$ and decompose
-\begin{align*}
-y_n-M_n(\ell_n)=\;&\Big[W^{-1}\!\!\sum_k \big(m_\alpha(\lambda_k(\ell_k))-m_\alpha(\lambda_k(\ell_n))\big)\Big]\\
-&+\Big[W^{-1}\!\!\sum_k\big(\psi_\alpha(C_k)-m_\alpha(\lambda_k(\ell_k))\big)\Big].
-\end{align*}
-\emph{Bias bracket:} each summand is bounded by $\kappa_{\max}|\ell_k-\ell_n|\le\kappa_{\max}L_a|k-n|^{\beta}$ (mean value theorem in $\theta$, hypothesis 1), so the first bracket is $\le C\kappa_{\max}L_aW^{\beta}$ --- the triangle inequality, valid for the pointwise modulus with $\beta\le1$; no cancellation across the window is invoked (cf.\ Remark D.4.2). \emph{Noise bracket:} conditionally on the gain path the summands are \emph{independent} zero-mean variables (Poisson counts are independent across frames given their intensities --- the carrier is known, so no carrier randomness remains), hence \emph{exactly}
+\emph{Risk bound.} Write
 \[
-\operatorname{Var}\Big(W^{-1}\!\!\sum_k\big(\psi_\alpha(C_k)-m_\alpha(\lambda_k(\ell_k))\big)\Big)=W^{-2}\!\!\sum_k\operatorname{Var}\psi_\alpha(C_k)\;\le\;\bar\sigma_\alpha^2/W,
+\begin{aligned}
+y_n-M_n(\ell_n)&=B_n+Z_n,\\
+Z_n&=\sum_{k\in\mathcal I_n}w_{nk}
+\{\psi_\alpha(C_k)-q_k(\ell_k)\}.
+\end{aligned}
 \]
-a finite-$W$ identity requiring no mixing and no long-run variance. \emph{Inversion with clamp:} on the event $\mathcal E_n=\{y_n\in M_n(\Theta)\}$, both $M_n^{-1}(y_n)$ and $\ell_n$ lie in $\Theta$, where $M_n'\ge\kappa_{\min}$, so $|M_n^{-1}(y_n)-\ell_n|\le\kappa_{\min}^{-1}|y_n-M_n(\ell_n)|$, and clipping to $\Theta\ni\ell_n$ can only decrease the error. On $\mathcal E_n^c$ the clamped estimator and $\ell_n$ are both in $\Theta$, so the error is at most $\theta_{\max}-\theta_{\min}$. Combining, squaring, and using $(x+y)^2\le2x^2+2y^2$ on the two brackets gives (D.8); the standard bias--variance optimization gives (D.9).
-
-\emph{Photon-starved limit.} Substituting $\kappa_{\min}\asymp c_\alpha\bar\lambda$ and $\bar\sigma_\alpha^2\asymp c_\alpha^2\bar\lambda$ into the variance term of (D.8) gives $\bar\sigma_\alpha^2/(\kappa_{\min}^2W)\asymp1/(W\bar\lambda)$ --- here an exact-order consequence of the small-$\lambda$ expansions above (the conditional-independence variance identity needs no long-run/single-count identification). Sharpness at rate level, in the log-domain loss: for $\theta=\log$-intensity, $I(\theta)=(\partial_\theta\lambda)^2/\lambda=\lambda$; independence across frames gives total information $\asymp W\bar\lambda$, and the van Trees inequality converts this into a $c/(W\bar\lambda)$ lower bound on the local MSE of any estimator of the log-gain. \hfill$\blacksquare$
-
-\paragraph{Remark D.4.1 (instantiation in the Fig.~7 protocol).} There $d=0$, the carriers $b_k$ are the programmed design intensities (photon budget $\times$ mean-normalized carrier), and $\Theta$ is the tabulated calibration range with $\Lambda_0$ fixed by convention (the record-mean centering absorbs the global gauge). The implemented estimator solves $M_n(\hat\theta_n)=y_n$ per window by monotone bisection on the exactly tabulated homogeneous $m_\alpha$ --- for $C\sim\mathrm{Pois}(\theta b)$, $\mathbb{E}\psi_\alpha(C)=m_\alpha(\theta b)$ with the \emph{same} homogeneous curve, so no carrier-averaged table is needed --- with the clamp of (D.8a). The earlier (r3) arm inverted the homogeneous curve at the window mean, $m_\alpha^{-1}(y_n)$: a \emph{mean-Poisson calibrated proxy} that ignores the within-window carrier variation and coincides with (D.8a) only for a constant carrier. Both arms are reported in Fig.~7; at the protocol's small carrier coefficient of variation they agree numerically, but only (D.8a) is the estimator this theorem is about.
-
-\paragraph{Remark D.4.2 (why $\beta\le1$).} For $\beta\in(1,2]$ the linear theory (Lemma D.1, Theorem D) attains $W^{\beta}$ bias through \emph{signed cancellation} in centered windows --- definition (D.1). Composition with the nonlinear $m_\alpha$ destroys that cancellation: $m_\alpha\circ\ell$ is in general only Lipschitz in $\ell$, and the bias bracket above uses the triangle inequality, which cannot exploit sign structure. Theorem~C is therefore stated for $\beta\in(0,1]$ only. Whether a second-order calibrated estimator (kernel of order $\ge2$ applied \emph{after} inversion, or a local-polynomial fit in $\theta$) recovers $\beta\in(1,2]$ is an open question we do not claim --- a conjecture, not a theorem.
-
-\paragraph{Remark D.4.3 (unknown random carrier; the correct finite-$W$ variance bound).} If $\{B_n\}$ is an \emph{unobserved} stationary random carrier with known law, replace $M_n$ by the marginal calibration curve $\bar m_\alpha(\theta)=\mathbb{E}_B\,m_\alpha(\Lambda_0e^{\theta}B+d)$. The noise bracket then inherits the carrier's temporal dependence, and the correct finite-$W$ statement is the stationary-variance identity already used in Lemma D.1 and Theorem B:
+The variables in $Z_n$ are independent and centered conditionally on the gain path and known carriers (Poisson counts are independent across frames given their intensities --- the carrier is known, so no carrier randomness remains), so $\mathbb EZ_n=0$ and $\operatorname{Var}(Z_n)=V_n$ \emph{exactly} --- a finite-window identity requiring no mixing and no long-run variance. On $\mathcal E_n$, the mean value theorem and $M_n'\ge\underline\kappa_n$ imply
 \[
-\operatorname{Var}\Big(W^{-1}\!\!\sum_{k\in W_n}z_k\Big)=W^{-1}\!\!\sum_{|h|<W}\big(1-\tfrac{|h|}{W}\big)\gamma_\psi(h)\;\le\;\frac{\sigma_{\psi,\mathrm{abs}}^2}{W},\qquad \sigma_{\psi,\mathrm{abs}}^2:=\sum_h|\gamma_\psi(h)|,
+|\hat\theta_n-\ell_n|
+\le\underline\kappa_n^{-1}|B_n+Z_n|,
 \]
-requiring \emph{absolutely summable} autocovariances of $z_n=\psi_\alpha(C_n)-\mathbb{E}\psi_\alpha(C_n)$. Absolute summability follows from the standing Appendix-D assumptions: if $\{B_n\}$ is $\alpha$- or $\beta$-mixing with $\sum_h\alpha(h)^{\eta/(2+\eta)}<\infty$, then so is $\{(B_n,C_n)\}$ with the same coefficients (the Poisson randomization is conditionally independent across frames, so it cannot increase dependence), $\|\psi_\alpha(C_0)\|_{2+\eta}<\infty$ on the operating range, and Davydov's covariance inequality~\cite{Davydov1968} gives $\sum_h|\gamma_\psi(h)|<\infty$ exactly as in Lemma D.1. The \emph{signed} long-run variance $\sigma_{\psi,\mathrm{LR}}^2=\sum_h\gamma_\psi(h)$ enters only asymptotically, $\operatorname{Var}(W^{-1}\sum z_k)=\sigma_{\psi,\mathrm{LR}}^2/W\,(1+o(1))$ as $W\to\infty$; it is \textbf{not} a finite-$W$ bound: for $z_n=\epsilon_n-\epsilon_{n-1}$ with i.i.d.\ $\epsilon_n$, $\sigma_{\mathrm{LR}}^2=0$ while the window-mean variance is $2\sigma_\epsilon^2/W^2>0$. An earlier version of (D.8)--(D.9) used a ``long-run variance'' $\sigma_{\alpha,\mathrm{LR}}^2$ in the finite-$W$ display; that was incorrect as stated and is repaired here ($\bar\sigma_\alpha^2$ in the known-carrier theorem, $\sigma_{\psi,\mathrm{abs}}^2$ in this remark; any statement in which the signed constant is wanted --- e.g.\ asymptotic efficiency --- must be phrased as the $W\to\infty$ equality above, cleanly separated from the finite-$W$ bound).
+and clipping to $\Theta\ni\ell_n$ can only decrease the error. On $\mathcal E_n^c$, both $\hat\theta_n$ and $\ell_n$ belong to $\Theta$, so the error is at most $D_\Theta$. Taking expectations and using $\mathbb E(B_n+Z_n)^2=B_n^2+V_n$ gives (D.8). The bound on $B_n$ follows by applying the mean value theorem to each $q_k$ and then the pointwise modulus; for equal weights the triangle inequality gives $|B_n|\le C\kappa_{\max}L_aW^{\beta}$ (valid for the pointwise modulus with $\beta\le1$; no cancellation across the window is invoked --- cf.\ Remark D.4.2), and the standard bias--variance optimization gives (D.9). \hfill$\blacksquare$
 
-\paragraph{Remark D.4.4 (clamp-event probability and its bias contribution).} Since $M_n'\ge\kappa_{\min}$ on $\Theta$ and $\ell_n$ has margin $\Delta$, $\mathcal E_n^c\subseteq\{|y_n-M_n(\ell_n)|\ge\kappa_{\min}\Delta\}$; Chebyshev with the bias--variance bound above gives $\mathbb{P}(\mathcal E_n^c)\le\big(C\kappa_{\max}^2L_a^2W^{2\beta}+\bar\sigma_\alpha^2/W\big)/(\kappa_{\min}\Delta)^2$, so the clamp term of (D.8) is $\le(\theta_{\max}-\theta_{\min})^2/\Delta^2$ times the two main terms --- same order, absorbed into $C$ (a Bernstein bound sharpens this to exponentially small in $W$, not needed at rate level). The extreme lower-clamp cause is the all-zero window, whose probability is exactly $\mathbb{P}(\text{all }C_k=0,\,k\in W_n)=\exp\!\big(-\sum_{k\in W_n}\lambda_k(\ell_k)\big)\le e^{-W\lambda_-}$; at the most photon-starved Fig.~7 grid point ($\bar\lambda\approx0.25$, $W=65$) this is of order $e^{-16}\approx10^{-7}$ per window. On the clamp event the error is bounded by $\theta_{\max}-\theta_{\min}$ by construction, so the associated bias contribution to the MSE is at most $(\theta_{\max}-\theta_{\min})^2\,\mathbb{P}(\mathcal E_n^c)$ --- the term displayed in (D.8).
+\paragraph{Low-photon corollary (window-average sensitivity).} For an unpadded equal-weight window, $d=0$, fixed $\alpha$, and $\max_{k\in W_n}\lambda_k(\ell_n)\le\varepsilon$, the per-frame expansions of the proof average into
+\[
+M_n'(\ell_n)=c_\alpha\bar\lambda_n\{1+O_\alpha(\varepsilon)\},\qquad
+V_n=\frac{c_\alpha^2\bar\lambda_n}{W}\{1+O_\alpha(\varepsilon)\},
+\]
+\[
+\frac{V_n}{M_n'(\ell_n)^2}
+=\frac{1+O_\alpha(\varepsilon)}{W\bar\lambda_n},
+\qquad
+\bar\lambda_n=\frac1W\sum_{k\in W_n}\lambda_k(\ell_n),
+\]
+with \emph{no carrier-comparability assumption}: both the sensitivity and the variance linearize frame by frame in $\lambda_k$ and are then averaged, so heteroscedastic carriers are covered. These expansions are stated for fixed $\alpha$; $c_\alpha=\log(1+1/\alpha)\to\infty$ as $\alpha\to0$, so the fixed-$\alpha$ small-$\lambda$ theorem must not be read as a triangular $\alpha\to0$ asymptotic. This window-average law is the $1/(W\bar\lambda)$ statement quoted in the main text.
 
-\begin{statusblock}\textbf{Shrinkage-bias caveat (load-bearing, per Sec.~6).} For $\bar\lambda<1$ the windowed soft-log statistic is \emph{bias-fragile}: the mass at $C=0$ pulls $W^{-1}\sum\psi_\alpha$ toward $\log\alpha$, and the amplification factor $(\kappa_{\max}/\kappa_{\min})^2$ in the bias term of (D.8) blows up as $\kappa_{\min}\propto\bar\lambda\to0$. Empirically the MSE of the \emph{uncalibrated} proxy (and of Anscombe) can then sit \emph{below} the Fisher reference curve --- that is bias, not super-efficiency, and it does not contradict the lower bound (which constrains variance-limited, locally unbiased behavior). The $1/(W\bar\lambda)$ law is asserted only in the variance-limited regime above the $\bar\lambda\sim1$ crossover; below it, honest accounting reports the bias floor, and all Fisher comparisons are made in the log-domain loss of this theorem (Fig.~7's \texttt{log\_gain\_mse} metric) --- the gain-domain relMSE column retained for continuity is a different loss and is not Fisher-comparable. Recovering the rate below the crossover requires the offset-design, Anscombe~\cite{Anscombe1948} ($2\sqrt{C+3/8}$), or full Poisson-mixture MLE variants; for the mixture MLE the claim $\mathrm{MSE}\approx1/(WJ(\theta))$ with $J\sim\mathbb{E}\lambda$ at low photons is standard parametric asymptotics under regularity of the mixture likelihood and is \emph{not} re-proven here.\end{statusblock}
+\paragraph{Gauge-invariant low-photon lower bound.}
+The loss corresponding to the unidentifiable global scale is
+\[
+\begin{aligned}
+d_{\mathrm{quot}}^2(\hat g,g)
+&=\inf_{a\in\mathbb R}\frac1N\|\log\hat g-\log g-a\mathbf1\|_2^2\\
+&=\frac1N\|P_N(\log\hat g-\log g)\|_2^2,
+\quad
+P_N=I-\tfrac1N\mathbf1\mathbf1^\top.
+\end{aligned}
+\]
+This is the centered-log-gain loss reported in Fig.~7. Multiplying
+either gain profile by an arbitrary positive scalar leaves the loss
+unchanged.
 
-\paragraph{What this does not claim.} No absolute gain scale is estimated (gauge remains). The calibration curve $m_\alpha$ and the carriers $b_k$ are assumed known (programmed design or flat-field); miscalibration adds a bias not covered by (D.8). Constants in (D.8)--(D.9) are not tracked. Smoothness beyond $\beta=1$ is not claimed (Remark D.4.2). The minimax matching of (D.9) is at rate level only, inherited from Theorem~D, and \emph{in the log-domain loss}; no optimality of any kind is claimed in the gain-domain (linear) metric, and no claim is made that the calibrated estimator beats bias-accepting transforms (e.g.\ Anscombe) in MSE below the $\bar\lambda\sim1$ crossover --- empirically it does not (Sec.~9). As $\Phi\to0$ with no offset and no reference, Fisher information for the gain vanishes --- an information limit no estimator evades (Sec.~10).
+For the carrier-averaged model, let $B$ have a parameter-independent
+known law and, conditionally on $B$, let
+\[
+C_k\sim\operatorname{Pois}(s_k(\theta,B_k)+d),\qquad
+s_k(\theta,B_k)=\Lambda_0e^\theta B_k,
+\]
+independently across frames. The complete-data Fisher information
+for a common log-gain parameter is
+\[
+I_{\mathrm{comp}}(\theta)
+=\sum_{k=1}^W\mathbb E_B\frac{s_k(\theta,B_k)^2}{s_k(\theta,B_k)+d}.
+\]
+The observed mixed-Poisson score is the conditional expectation of
+the complete-data score, so
+$I_{\mathrm{obs}}(\theta)\le I_{\mathrm{comp}}(\theta)$.
+For $d=0$ this becomes
+\[
+I_{\mathrm{comp}}(\theta)=\sum_{k=1}^W\mathbb E_Bs_k(\theta,B_k)
+=W\bar\lambda.
+\]
+
+A lower bound valid for biased estimators follows directly from
+Le Cam's method~\cite{Tsybakov2009}. Let $v\perp\mathbf1$ be a bounded contrast supported
+on $O(W)$ frames and compare $\ell^{(0)}=\ell_0$ with
+$\ell^{(1)}=\ell_0+\delta v$. Conditional on the carrier and with
+$d=0$,
+\[
+\begin{aligned}
+\operatorname{KL}(P_0(\cdot\mid B),P_1(\cdot\mid B))
+&=\sum_k\lambda_{k,0}\{e^{\delta v_k}-1-\delta v_k\}\\
+&\le C\delta^2\sum_k\lambda_{k,0}v_k^2.
+\end{aligned}
+\]
+Marginalization over the unobserved carrier cannot increase KL, hence
+\[
+\operatorname{KL}(P_0^C,P_1^C)\le C\delta^2W\bar\lambda.
+\]
+Choosing $\delta^2\asymp\min\{\delta_0^2,(W\bar\lambda)^{-1}\}$
+and applying Le Cam's lemma gives the local quotient-risk bound
+\[
+R_{\mathrm{minimax}}\ge c\min\left\{\delta_0^2,\frac1{W\bar\lambda}\right\}.
+\]
+Thus the $1/(W\bar\lambda)$ law is a local-minimax statement in the
+regime $W\bar\lambda\to\infty$; for bounded total information the
+risk saturates at the squared diameter of the local parameter
+neighborhood.
+
+Taking a mean-zero $H_\beta(L_a)$ bump of width $W$ and amplitude
+$\delta\asymp L_aW^\beta$, $0<\beta\le1$, gives
+$\operatorname{KL}\lesssim L_a^2\bar\lambda W^{2\beta+1}$. The choice
+$W_*\asymp(L_a^2\bar\lambda)^{-1/(2\beta+1)}$ therefore yields
+\[
+\inf_{\hat\ell}\sup_{\ell\in H_\beta(L_a)}
+\mathbb E(\hat\ell_n^c-\ell_n^c)^2
+\ge c_\beta L_a^{2/(2\beta+1)}\bar\lambda^{-2\beta/(2\beta+1)},
+\]
+with the usual boundary regimes when $W_*\notin[1,N]$. This is the
+direct Poisson counterpart of the upper rate (D.9), and it remains
+valid after averaging over an unobserved carrier because
+marginalization only decreases KL; in particular it does \emph{not}
+route through Theorem~D's Gaussian bound (a Gaussian model is not a
+submodel of the mixed-Poisson experiment).
+
+For fixed $\alpha$, $d=0$, and uniformly small per-frame intensities,
+\[
+M_n'(\ell_n)=c_\alpha\bar\lambda_n\{1+o(1)\},\qquad
+\operatorname{Var}(y_n)=\frac{c_\alpha^2\bar\lambda_n}{W}\{1+o(1)\},
+\]
+so the calibrated soft-log variance has leading constant
+$1/(W\bar\lambda_n)$. Sharp minimax constants beyond this local
+rare-event calculation are not claimed.
+
+When $d>0$, every occurrence of $W\bar\lambda$ in the information
+statement must instead be replaced by the effective log-gain
+information $\sum_{k=1}^W\mathbb E_B\,s_k^2/(s_k+d)$; the identity
+$I(\theta)=\lambda$ does not hold for log gain in the presence of
+additive dark counts.
+
+\paragraph{Remark D.4.1 (instantiation in the Fig.~7 protocol).} There $d=0$, the carriers $b_k$ are \emph{oracle} values supplied from the simulation truth --- the noiseless bucket carrier of the simulated object, times the photon budget; operationally a flat-field-calibrated benchmark, \emph{not} programmed design intensities --- and $\Theta$ is the safe tabulated operating range $[\lambda_-/\min_kb_k,\lambda_+/\max_kb_k]$ with $\Lambda_0$ fixed by convention (the record-mean centering absorbs the global gauge). The implemented estimator solves $M_n(\hat\theta_n)=y_n$ per window by monotone bisection on the exactly tabulated homogeneous $m_\alpha$ --- for $C\sim\mathrm{Pois}(\theta b)$, $\mathbb{E}\psi_\alpha(C)=m_\alpha(\theta b)$ with the \emph{same} homogeneous curve, so no carrier-averaged table is needed --- with the clamp of (D.8a); its windows are truncated and renormalized to their distinct in-record members at the record boundaries (the equal-weight instance of the weighted statement; no replicate padding). Calibration accuracy: between grid points the table is evaluated by linear interpolation of $m_\alpha$ against $\log\lambda$, and the measured interpolation error on the dense midpoint check grid is $\varepsilon_{\mathrm{cal}}=\text{XXEPSCALXX}$ (bisection resolution $\varepsilon_{\mathrm{bis}}\le\text{XXEPSBISXX}$), entering (D.8) as a deterministic $(\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}})^2/\underline\kappa_n^2$ term and shrinking the clamp margin by $\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}}$ --- an empirical measurement, honestly labeled, not a certified analytic bound. The earlier (r3) arm inverted the homogeneous curve at the window mean, $m_\alpha^{-1}(y_n)$: a \emph{mean-Poisson calibrated proxy} that ignores the within-window carrier variation and coincides with (D.8a) only for a constant carrier. Both arms are reported in Fig.~7; at the protocol's small carrier coefficient of variation they agree numerically, but only (D.8a) is the estimator this theorem is about.
+
+\paragraph{Remark D.4.2 (the $\beta\le1$ theorem and the precise
+obstruction above one).}
+For $\beta\in(0,1]$, the pointwise modulus
+$|\ell_k-\ell_n|\le L_a|k-n|^\beta$ and the mean value theorem give
+\[
+|q_k(\ell_k)-q_k(\ell_n)|\le\overline\kappa_kL_a|k-n|^\beta,
+\]
+so the triangle-inequality bias bound used in Theorem C is valid for
+arbitrary known carriers.
+
+For $\beta\in(1,2]$, standard smoothness has the local form
+\[
+\ell_k-\ell_n=v_nu_k+r_{nk},\quad
+u_k=\frac{k-n}{N},\quad
+|r_{nk}|\le L|u_k|^\beta,
+\]
+rather than a pointwise modulus of order $\beta$ on the function
+itself. Let $w_k$ be centered weights, $\sum_kw_ku_k=0$, and write
+$q_k(t)=m_\alpha(\Lambda_0e^tb_k+d)$. Taylor's theorem gives
+\[
+\begin{aligned}
+|B_n|\le{}&
+|v_n|\left|\sum_kw_kq_k'(\ell_n)u_k\right|
++Q_1L\sum_kw_k|u_k|^\beta\\
+&+Q_2\left\{v_n^2\sum_kw_ku_k^2+L^2\sum_kw_k|u_k|^{2\beta}\right\},
+\end{aligned}
+\tag{D.10}
+\]
+where $Q_1=\sup_{k,t\in\Theta}q_k'(t)$ and
+$Q_2=\sup_{k,t\in\Theta}|q_k''(t)|$.
+
+The first term in (D.10) is the load-bearing obstruction. Ordinary
+centering cancels $\sum_kw_ku_k$, but it need not cancel the
+carrier-weighted moment $\sum_kw_kq_k'(\ell_n)u_k$. With an
+asymmetric heteroscedastic carrier this term is generally $O(W/N)$,
+so an $O((W/N)^\beta)$ claim is false for $\beta>1$ under the present
+assumptions.
+
+For a constant carrier, or more generally under the
+sensitivity-balance condition
+\[
+\left|\sum_kw_kq_k'(\ell_n)u_k\right|\lesssim (W/N)^\beta,
+\]
+the first term has the desired order. The remaining nonlinear term
+is $O((W/N)^2)$ and is therefore no larger than $O((W/N)^\beta)$ for
+$1<\beta\le2$, provided the local slope is bounded. Thus the existing
+calibrated inverse does recover the $\beta$-order deterministic bias
+under homogeneous or sensitivity-balanced carriers, with a constant
+depending also on the slope bound and on $Q_2$.
+
+A second-order Taylor expansion of $M_n^{-1}$ by itself does not
+remove an unbalanced first moment. For arbitrary carriers, recovery
+of the $\beta>1$ rate requires carrier-adapted moment conditions,
+carrier-adapted local-linear weights, or a local-polynomial
+likelihood fit. Theorem C therefore remains restricted to
+$\beta\le1$, while the homogeneous-carrier and sensitivity-balanced
+extensions above are valid weaker statements.
+
+\paragraph{Remark D.4.3 (unknown random carrier; nonstationary
+finite-$W$ covariance bound).}
+Let $\{B_k\}$ be an unobserved stationary random carrier with known
+law, independent of the parameter, and let
+\[
+\bar m_{\alpha,k}(t)
+=\mathbb E_B\,m_\alpha(\Lambda_0e^tB_k+d).
+\]
+Because the gain path $\ell_k$ may vary, stationarity of $\{B_k\}$
+does not in general make the soft-log sequence stationary. Define
+\[
+z_k=\psi_\alpha(C_k)-\mathbb E\psi_\alpha(C_k),
+\qquad
+g_k(b)=m_\alpha(\Lambda_0e^{\ell_k}b+d).
+\]
+Conditional independence of the Poisson randomization gives, for
+$i\ne j$,
+\[
+\operatorname{Cov}(z_i,z_j)
+=\operatorname{Cov}(g_i(B_i),g_j(B_j)).
+\]
+Consequently the exact finite-window identity is
+\[
+\begin{aligned}
+\operatorname{Var}\!\left(W^{-1}\sum_{i=1}^Wz_i\right)
+={}&W^{-2}\sum_{i=1}^W\operatorname{Var}(z_i)\\
+&+2W^{-2}\sum_{h=1}^{W-1}
+\sum_{i=1}^{W-h}\operatorname{Cov}(z_i,z_{i+h}).
+\end{aligned}
+\tag{D.11}
+\]
+Let $p=2+\eta$, $r_\eta=\eta/(2+\eta)$, and assume
+\[
+v_*:=\sup_i\operatorname{Var}(z_i)<\infty,
+\]
+\[
+G_p:=\sup_i\|g_i(B_i)-\mathbb Eg_i(B_i)\|_p<\infty.
+\]
+If the carrier is strongly mixing with coefficient $\alpha_B(h)$,
+Davydov's inequality~\cite{Davydov1968} gives
+\[
+|\operatorname{Cov}(z_i,z_{i+h})|
+\le8\,\alpha_B(h)^{r_\eta}G_p^2.
+\]
+Substitution into (D.11) yields the explicit finite-$W$ bound
+\[
+\begin{aligned}
+&\operatorname{Var}\!\left(W^{-1}\sum_{i=1}^Wz_i\right)\\
+&\quad\le
+\frac1W\left[
+v_*+16G_p^2\sum_{h=1}^{W-1}
+\left(1-\frac hW\right)\alpha_B(h)^{r_\eta}
+\right]\\
+&\quad\le
+\frac{v_*+16G_p^2\sum_{h\ge1}\alpha_B(h)^{r_\eta}}{W}.
+\end{aligned}
+\]
+The factor $16$ is the constant obtained from Davydov's constant $8$
+and the two covariance triangles. It is sharper to apply Davydov to
+the conditional means $g_i(B_i)$ than to $z_i$ itself, because
+independent Poisson shot noise contributes only to the diagonal
+variance $v_*$.
+
+If $\ell_k$ is constant and the resulting marked process is strictly
+stationary, write $\gamma_\psi(h)=\operatorname{Cov}(z_0,z_h)$. Then
+\[
+\begin{aligned}
+\operatorname{Var}\!\left(W^{-1}\sum_{k=1}^Wz_k\right)
+&=
+W^{-1}\sum_{|h|<W}\left(1-\frac{|h|}{W}\right)\gamma_\psi(h)\\
+&\le\frac{\sum_h|\gamma_\psi(h)|}{W},
+\end{aligned}
+\]
+and when $\sum_h|\gamma_\psi(h)|<\infty$,
+\[
+\begin{aligned}
+\operatorname{Var}\!\left(W^{-1}\sum_{k=1}^Wz_k\right)
+&=\frac{\sigma_{\psi,\mathrm{LR}}^2}{W}+o(W^{-1}),\\
+\sigma_{\psi,\mathrm{LR}}^2
+&=\sum_h\gamma_\psi(h).
+\end{aligned}
+\]
+The multiplicative notation
+$\sigma_{\psi,\mathrm{LR}}^2W^{-1}\{1+o(1)\}$ is valid only when
+$\sigma_{\psi,\mathrm{LR}}^2>0$. For
+$z_n=\epsilon_n-\epsilon_{n-1}$ the signed long-run variance is zero
+while the finite-window variance is $2\sigma_\epsilon^2/W^2$.
+
+\paragraph{Remark D.4.4 (clamp probability and its risk
+contribution).}
+Use the notation $B_n,V_n,\underline\kappa_n$ of the finite-window
+proof and put
+\[
+r_n=
+\min\{M_n(\ell_n)-M_n(\theta_{\min}),
+M_n(\theta_{\max})-M_n(\ell_n)\}.
+\]
+If $\ell_n$ has margin $\Delta_n$ from $\partial\Theta$, then
+$r_n\ge\underline\kappa_n\Delta_n$. Since
+$y_n-M_n(\ell_n)=B_n+Z_n$, with
+$\mathbb EZ_n=0$ and $\operatorname{Var}(Z_n)=V_n$,
+\[
+\mathcal E_n^c\subseteq\{|B_n+Z_n|\ge r_n\}.
+\]
+Therefore
+\[
+\mathbb P(\mathcal E_n^c)
+\le\min\left\{1,\frac{B_n^2+V_n}{r_n^2}\right\}
+\le\min\left\{1,\frac{B_n^2+V_n}{(\underline\kappa_n\Delta_n)^2}\right\}.
+\]
+If $|B_n|<r_n$, the sharper centered bound is
+\[
+\mathbb P(\mathcal E_n^c)
+\le\min\left\{1,\frac{V_n}{(r_n-|B_n|)^2}\right\}.
+\]
+An exponential Bernstein bound requires a positive residual margin
+$r_n-|B_n|$; it is not available merely from a positive parameter
+margin when the deterministic smoothing bias can reach the boundary.
+
+On $\mathcal E_n^c$, both the clamped estimate and the target lie in
+$\Theta$, so
+\[
+\mathbb E\!\left[(\hat\theta_n-\ell_n)^2\mathbf1_{\mathcal E_n^c}\right]
+\le D_\Theta^2\,\mathbb P(\mathcal E_n^c).
+\]
+This is the complete clamp-event contribution to the MSE. The
+corresponding contribution to the squared bias alone is at most
+$D_\Theta^2\mathbb P(\mathcal E_n^c)^2$.
+
+For a window containing $W$ distinct, conditionally independent
+Poisson counts,
+\[
+\begin{aligned}
+&\mathbb P(C_k=0\ \hbox{for all }k\in W_n)\\
+&\quad=\exp\!\left(-\sum_{k\in W_n}\lambda_k(\ell_k)\right)
+\le e^{-W\lambda_-}.
+\end{aligned}
+\]
+If a padding convention repeats observations, the sum and the
+cardinality in this formula are over distinct frames after repeated
+weights have been aggregated; in that case the exponent need not be
+$W\lambda_-$ (the first width-65 replicate-padded window of the
+former convention had only 33 distinct frames, so its all-zero
+probability was $e^{-33\lambda}$, not $e^{-65\lambda}$ --- at
+$\lambda=0.25$, $2.6\times10^{-4}$ versus $8.8\times10^{-8}$).
+
+\begin{statusblock}\textbf{Shrinkage-bias caveat (load-bearing, per Sec.~6).} For $\bar\lambda<1$ the windowed soft-log statistic is \emph{bias-fragile}: the mass at $C=0$ pulls the weighted mean of $\psi_\alpha$ toward $\log\alpha$, and the amplification factor $(\kappa_{\max}/\underline\kappa_n)^2$ in the specialized bias term of (D.8) blows up as the window sensitivity vanishes with $\bar\lambda_n\to0$ (at $d=0$; window-average form $M_n'(\ell_n)\approx c_\alpha\bar\lambda_n$). Empirically the MSE of the \emph{uncalibrated} proxy (and of Anscombe) can then sit \emph{below} the Fisher reference curve --- that is bias, not super-efficiency, and it does not contradict the lower bound (which constrains variance-limited, locally unbiased behavior). The $1/(W\bar\lambda)$ law is asserted only in the variance-limited regime above the $\bar\lambda\sim1$ crossover; below it, honest accounting reports the bias floor, and all Fisher comparisons are made in the log-domain loss of this theorem (Fig.~7's \texttt{log\_gain\_mse} metric, against the \emph{local realized} information $I_n=\sum_{k\in W_n}\lambda_k$ at $d=0$) --- the gain-domain relMSE column retained for continuity is a different loss and is not Fisher-comparable. Recovering the rate below the crossover requires the offset-design, Anscombe~\cite{Anscombe1948} ($2\sqrt{C+3/8}$), or full Poisson-mixture MLE variants; for the mixture MLE the claim $\mathrm{MSE}\approx1/(WJ(\theta))$ with $J\sim\mathbb{E}\lambda$ at low photons is standard parametric asymptotics under regularity of the mixture likelihood and is \emph{not} re-proven here.\end{statusblock}
+
+\paragraph{What this does not claim.} No absolute gain scale is estimated (gauge remains). The calibration curve $m_\alpha$ and the carriers $b_k$ are assumed known; in the Fig.~7 protocol the carriers are \emph{oracle} values from the simulation truth (a flat-field-calibrated benchmark), so Fig.~7 upper-bounds what a real flat-field calibration could achieve rather than demonstrating blind carrier recovery. Miscalibration beyond the measured interpolation term $(\varepsilon_{\mathrm{cal}}+\varepsilon_{\mathrm{bis}})$ of Remark D.4.1 adds a bias not covered by (D.8). Constants in (D.8)--(D.9) are not tracked. Smoothness beyond $\beta=1$ is claimed only in the homogeneous-carrier / sensitivity-balanced form of Remark D.4.2 (display (D.10)); for arbitrary carriers the carrier-weighted first moment obstructs every $\beta>1$ rate. The minimax matching of (D.9) is at rate level only, \emph{in the log-domain quotient loss and at $d=0$}, proved by the direct Poisson Le Cam bounds above --- not inherited from Theorem~D, whose Gaussian model is not a submodel of the mixed-Poisson experiment; for $d>0$ every information statement must replace $W\bar\lambda$ by $\sum_k\mathbb{E}_B\,s_k^2/(s_k+d)$. No optimality of any kind is claimed in the gain-domain (linear) metric, and no claim is made that the calibrated estimator beats bias-accepting transforms (e.g.\ Anscombe) in MSE below the $\bar\lambda\sim1$ crossover --- empirically it does not (Sec.~9). As $\Phi\to0$ with no offset and no reference, Fisher information for the gain vanishes --- an information limit no estimator evades (Sec.~10).
 
 \section{SRHT whitening: exact Walsh condition and permutation bounds}
 

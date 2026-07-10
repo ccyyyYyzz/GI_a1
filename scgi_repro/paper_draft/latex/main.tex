@@ -31,16 +31,19 @@
 % table, or sentence is removed. Restores headroom so the real author block
 % fits within the 13-page limit.
 \AtBeginDocument{%
-  \setlength{\textfloatsep}{7pt plus 2pt minus 2pt}%
-  \setlength{\dbltextfloatsep}{7pt plus 2pt minus 2pt}%
-  \setlength{\floatsep}{5pt plus 2pt minus 1pt}%
-  \setlength{\dblfloatsep}{5pt plus 2pt minus 1pt}%
-  \setlength{\intextsep}{5pt plus 2pt minus 1pt}%
-  \setlength{\abovedisplayskip}{4pt plus 2pt minus 1pt}%
-  \setlength{\belowdisplayskip}{4pt plus 2pt minus 1pt}%
+  \setlength{\textfloatsep}{5pt plus 2pt minus 2pt}%
+  \setlength{\dbltextfloatsep}{5pt plus 2pt minus 2pt}%
+  \setlength{\floatsep}{4pt plus 2pt minus 1pt}%
+  \setlength{\dblfloatsep}{4pt plus 2pt minus 1pt}%
+  \setlength{\intextsep}{4pt plus 2pt minus 1pt}%
+  \setlength{\abovedisplayskip}{3pt plus 2pt minus 1pt}%
+  \setlength{\belowdisplayskip}{3pt plus 2pt minus 1pt}%
   \setlength{\abovedisplayshortskip}{2pt plus 1pt}%
   \setlength{\belowdisplayshortskip}{2pt plus 1pt minus 1pt}%
-  \setlength{\abovecaptionskip}{4pt}%
+  \setlength{\abovecaptionskip}{2pt}%
+  % Wave E5a: the named-theorem/status blocks (macros.tex) pad with \smallskip;
+  % tighten its amount in the MAIN document only (supplement has no page limit).
+  \setlength{\smallskipamount}{2pt plus 1pt minus 1pt}%
 }
 
 \begin{document}

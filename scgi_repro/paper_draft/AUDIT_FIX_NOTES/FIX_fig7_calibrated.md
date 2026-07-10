@@ -329,3 +329,101 @@ identical); data now at `results/paper_fig7_lowphoton_r4_carrier/`.
 
 Caption-ready sentences (log-domain, carrier-aware arm) are in
 `results/paper_fig7_lowphoton_r4_carrier/fig7_caption.md`.
+
+---
+
+# E5 (Wave E5a, R12 integration): edge-window fix, oracle relabel, local Fisher reference, safe bracket, measured eps_cal — Fig. 7 r5
+
+Date: 2026-07-10, Wave E5a. Scope: `run_paper_fig7_lowphoton.py`, NEW results dir
+`results/paper_fig7_lowphoton_r5_final/` (r4 dir untouched, archived), Appendix D.4
+replaced per `paper_draft/REVIEWS/GPT_R12_appendixD_rederivation.md` (R12-A..E) in
+`appendix_body.tex` + `APPENDICES.md`, Fig. 7 numbers resynced in body.tex Sec. 6/9.5 +
+caption, MANUSCRIPT_DRAFT.md, supplement.tex S1/S4/S5, and the fig7/figS4 sections of
+`paper_draft/latex/make_pub_figures.py` retargeted to r5 (fig7 log-domain panel now
+emitted natively — closes the hand-copied-asset flag).
+
+## E5.1 Code changes (all six R12 implementation flags)
+
+1. **Replicate padding REMOVED** (R12 counterexample 1: a padded width-65 edge window
+   is 33 copies of frame 0 + frames 1..32, effective size 65^2/(33^2+32) = 3.77, up to
+   17.25x the claimed sigma^2/65 variance). ALL windowed arms (soft_log,
+   soft_log_calibrated, naive_log, anscombe, and the carrier window solver) now use
+   truncated, RENORMALIZED windows over distinct in-record frames (equal weights
+   w_k = 1/|I_n|), via `moving_average_truncated` / `_window_membership`. Interior
+   windows are computed from the identical member sets (bit-identical by construction —
+   verified, see E5.3).
+2. **Oracle relabel**: the carrier-aware arm is renamed
+   `soft_log_calibrated_carrier_oracle`; summary/caption/manifest state the carriers
+   are supplied from the SIMULATION TRUTH (flat-field-calibrated benchmark), not
+   "programmed design intensities"; manifest carries `oracle_carrier: true`.
+3. **Fisher reference is now LOCAL realized information**: per window
+   I_n = sum_{k in I_n} lambda_k (d=0), reference = mean_n[1/I_n], computed over the
+   same distinct members as the estimators; the old global nominal 1/(W*lambda_bar) is
+   kept as the secondary column `fisher_reference_nominal` and a dotted line.
+4. **Operating-range bracket fixed to the SAFE interval**
+   [lam_lo/min(b), lam_hi/max(b)] per window (ALL bisection evaluations stay in-table;
+   the old [lam_lo/max(b), lam_hi/min(b)] let extreme carriers evaluate the constant
+   extension); clamp takes over outside; documented in the solver docstring.
+5. **Interpolation acknowledged empirically**: eps_cal = max |m_alpha - interp| on the
+   2999-midpoint dense check grid (exact truncated-Poisson recomputation as ground
+   truth) = **1.64e-06** (near lambda = 0.92); bisection resolution eps_bis <=
+   log(lam_hi/lam_lo) * 2^-60 = **1.54e-17** (log-theta units). Both printed into
+   summary.md; the (eps_cal + eps_bis)^2 / kappa_lower^2 risk term and the
+   eps_cal + eps_bis clamp-margin shrinkage are stated in Remark D.4.1 (quoting the
+   measured value) — an empirical measurement honestly labeled, not a certified bound.
+6. **alpha -> 0 non-uniformity** recorded in the low-photon corollary text (fixed-alpha
+   theorem, not a triangular alpha -> 0 asymptotic).
+
+## E5.2 Old (r4) -> new (r5) headline numbers (log-domain, 10 objects x 5 seeds)
+
+Legacy arms change ONLY through the 64/2048 edge windows (3.1% of frames) and, for the
+Fisher-relative quantities, through the new LOCAL reference.
+
+| quantity | r4 (padded windows, nominal 1/(W*lambda)) | r5 (truncated windows, local mean_n[1/I_n]) |
+|---|---|---|
+| slope [2,32] / [1,16], oracle-carrier | -1.025 / -1.030 | **-1.000 / -1.002** |
+| slope [2,32] / [1,16], mean-Poisson proxy | -1.008 / -1.017 | -0.986 / -0.992 |
+| slope [2,32] / [1,16], uncalibrated proxy | -0.930 / -0.739 | -0.920 / -0.732 |
+| slope [2,32] / [1,16], Anscombe | -0.893 / -0.802 | -0.882 / -0.797 |
+| slope [2,32] / [1,16], naive | -1.972 / -2.015 | -1.963 / -2.001 |
+| naive/soft, budgets <= 1 | 25.3-30.2x | 24.9-28.7x |
+| naive/Anscombe, budgets <= 1 | 17.6-21.2x | 16.3-21.0x |
+| naive/carrier, budgets <= 1 | 2.0-11.0x | 1.8-11.4x |
+| Anscombe/carrier, budgets <= 1 | 0.11-0.52 | 0.11-0.54 (Anscombe 1.8-8.9x better) |
+| carrier/soft, budgets <= 1 | 2.29-13.43x | 2.19-13.67x |
+| meanpois/carrier, budgets <= 1 | 0.998-1.001 | 0.999-1.004 |
+| Fisher excess (carrier), budgets <= 1 | 1.112-1.421x (11-42%) | **1.023-1.184x (2-18%)** |
+| Fisher excess (carrier), [2,32] | 1.228-1.492x (23-49%) | **1.138-1.311x (14-31%)** |
+| Fisher excess (carrier) at 128 (drift floor) | 2.004x | 1.776x |
+| sub-Fisher budgets, carrier arm | none | none (min excess 1.023) |
+| sub-Fisher budgets, uncalibrated proxy | 0.25/0.5/1 | 0.25/0.5/1/2 (vs the larger local ref.) |
+| carrier overtakes Anscombe at | >= 16 | >= 32 |
+| drift floor, proxy arms (rho 1e-3 -> 1e-4) | 2.79e-4 -> 1.73e-4 | 2.43e-4 -> 1.41e-4 |
+| drift floor, carrier arm (rho 1e-3 -> 1e-4) | 2.45e-4 -> 1.36e-4 (~12% lower) | 2.17e-4 -> 1.13e-4 (~11% lower) |
+
+The floor drop (2.79e-4 -> 2.43e-4 for the proxies) is the edge-window repair itself:
+replicate-padded edge windows carried up to 17x the interior variance and inflated the
+frame-averaged MSE; truncating and renormalizing them removes that inflation. The
+Fisher-excess tightening (11-42% -> 2-18%) has two causes: the local reference
+mean_n[1/I_n] is slightly LARGER than nominal 1/(64*lambda_bar) (65 distinct interior
+members + Jensen), and the edge windows no longer pay the padding variance penalty.
+The "65 vs 64 = <=1.6% slack" note is retired (the reference is now exact per window).
+
+## E5.3 Edge-vs-interior effect (measured, first object/seed, all budgets)
+
+- Interior windows: max |smoothed_r4 - smoothed_r5| = **0.0** — bit-identical, as
+  designed (the truncated smoother reuses the padded convolution on the interior).
+- Boundary windows (64 of 2048 per record, 3.12%): max |delta| = **3.46e-01**, mean
+  **7.32e-02** (soft-log transform units) — the expected, intended change.
+
+## E5.4 Files
+
+- Runner (modified): `run_paper_fig7_lowphoton.py`
+- New results: `results/paper_fig7_lowphoton_r5_final/` (2500 rows + floor probe;
+  manifest carries `oracle_carrier`, `window_semantics`, eps_cal/eps_bis, and the
+  edge-effect probe)
+- Figures: `paper_draft/latex/figs/fig7_logMSE_vs_photon.png` now emitted natively by
+  `make_pub_figures.py` from r5 (stale hand-copied r4 asset replaced;
+  `fig7_gainMSE_vs_photon.png` deleted — no TeX references it);
+  `figS4_flip_floorprobe.png` retargeted to r5 (log-domain, oracle-carrier arm).
+- Archived (untouched): `results/paper_fig7_lowphoton_r4_carrier/`, `..._r3_calibrated/`.

@@ -1,0 +1,196 @@
+{
+  "utc_timestamp": "2026-07-10T14:59:23.094919+00:00",
+  "git_commit": "ecc65b8505762f6d60b90a76945bdc9f1800fe05",
+  "hostname": "cyz912",
+  "python_version": "3.9.21",
+  "torch_version": "2.1.0+cu121",
+  "numpy_version": "1.26.4",
+  "args": {
+    "output_dir": "results\\paper_fig7_lowphoton_r5_final",
+    "image_size": 32,
+    "objects": 10,
+    "seeds": 5,
+    "seed": 20240708,
+    "rho": 0.001,
+    "sigma_a": 0.1,
+    "window": 64,
+    "alpha": 0.5,
+    "photon_budgets": "0.25,0.5,1,2,4,8,16,32,64,128",
+    "floor_probe_rho": 0.0001,
+    "calibration_points": 3000,
+    "calibration_tol": 1e-12
+  },
+  "manifest_version": 2,
+  "manifest_version_minor": 1,
+  "git_commit_full": "ecc65b8505762f6d60b90a76945bdc9f1800fe05",
+  "git_branch": "scgi-ceiling-diagnostic-r1",
+  "git_dirty": true,
+  "git_diff_sha256": "2fc9685446e6465f670f69ee40ad5d8dd6689059237fa7b14febf0331094ef6b",
+  "git_status_porcelain": [
+    " M scgi_repro/paper_draft/APPENDICES.md",
+    " M scgi_repro/paper_draft/latex/appendix_body.tex",
+    " M scgi_repro/paper_draft/latex/supplement.pdf",
+    " M scgi_repro/run_paper_fig7_lowphoton.py",
+    "?? scgi_repro/results/paper_fig7_lowphoton_r5_final/"
+  ],
+  "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_paper_fig7_lowphoton.py",
+  "runner_sha256": "a56ea0420b5f96b6ad6ebe3fcea197f485a5b72b9ff19f2d8ea268e2d8ec5b72",
+  "argv": [
+    "run_paper_fig7_lowphoton.py",
+    "--output-dir",
+    "results/paper_fig7_lowphoton_r5_final",
+    "--objects",
+    "10",
+    "--seeds",
+    "5",
+    "--seed",
+    "20240708",
+    "--rho",
+    "0.001",
+    "--sigma-a",
+    "0.1",
+    "--window",
+    "64",
+    "--alpha",
+    "0.5",
+    "--photon-budgets",
+    "0.25,0.5,1,2,4,8,16,32,64,128",
+    "--floor-probe-rho",
+    "0.0001",
+    "--calibration-points",
+    "3000",
+    "--calibration-tol",
+    "1e-12"
+  ],
+  "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": null,
+  "untracked_files": [
+    "scgi_repro/results/paper_fig7_lowphoton_r5_final/"
+  ],
+  "provenance_note": null,
+  "rows": 2500,
+  "methods": [
+    "soft_log",
+    "soft_log_calibrated",
+    "soft_log_calibrated_carrier_oracle",
+    "naive_log",
+    "anscombe"
+  ],
+  "calibration": {
+    "alpha": 0.5,
+    "lam_lo": 0.00025,
+    "lam_hi": 12800.0,
+    "num_points": 3000,
+    "truncation_tol": 1e-12,
+    "max_tail_bound": 3.493818336773206e-34,
+    "m_at_lam_lo": -0.692872545855035,
+    "m_at_lam_hi": 9.457200449697321
+  },
+  "slopes_vs_photon_budget_logdomain": {
+    "soft_log": {
+      "budget_2_32": -0.9200119443861461,
+      "budget_1_16": -0.7317449354122226
+    },
+    "soft_log_calibrated": {
+      "budget_2_32": -0.9857836645142954,
+      "budget_1_16": -0.9918766040433882
+    },
+    "soft_log_calibrated_carrier_oracle": {
+      "budget_2_32": -1.0003391279425482,
+      "budget_1_16": -1.0024168726049127
+    },
+    "naive_log": {
+      "budget_2_32": -1.9633688129010605,
+      "budget_1_16": -2.001424254885931
+    },
+    "anscombe": {
+      "budget_2_32": -0.881869653140675,
+      "budget_1_16": -0.7969199072844088
+    }
+  },
+  "slopes_vs_photon_budget_gaindomain": {
+    "soft_log": {
+      "budget_2_32": -0.9188843228668035,
+      "budget_1_16": -0.7340811981191638
+    },
+    "soft_log_calibrated": {
+      "budget_2_32": -0.9807894339374343,
+      "budget_1_16": -0.9830951037075526
+    },
+    "soft_log_calibrated_carrier_oracle": {
+      "budget_2_32": -0.9957675370534412,
+      "budget_1_16": -0.9940769996761856
+    },
+    "naive_log": {
+      "budget_2_32": -1.8869188984810956,
+      "budget_1_16": -1.9627718973171846
+    },
+    "anscombe": {
+      "budget_2_32": -0.8820115092267783,
+      "budget_1_16": -0.7957736424287837
+    }
+  },
+  "soft_log_mse_peak_budget": 1.0,
+  "low_budget_ratio_ranges_logdomain": {
+    "naive/soft": [
+      24.914182849232894,
+      28.674458441561413
+    ],
+    "naive/anscombe": [
+      16.307112574674875,
+      21.000828332418358
+    ],
+    "anscombe/soft": [
+      1.1870922244916007,
+      1.5278108086360362
+    ],
+    "naive/carrier": [
+      1.8231272727536105,
+      11.373613845013354
+    ],
+    "anscombe/carrier": [
+      0.11179951474578934,
+      0.5415792970154535
+    ],
+    "carrier/soft": [
+      2.1919084260300443,
+      13.665630053135606
+    ],
+    "meanpois/carrier": [
+      0.9985005895767766,
+      1.0035871699016272
+    ]
+  },
+  "carrier_fisher_excess_logdomain": {
+    "0.25": 1.0229300526363931,
+    "0.5": 1.026283349660963,
+    "1": 1.1835514298022234,
+    "2": 1.1879264316771763,
+    "4": 1.310766817051454,
+    "8": 1.1375749417322432,
+    "16": 1.199372655138077,
+    "32": 1.2404085607546607,
+    "64": 1.440410153696143,
+    "128": 1.775675232306399
+  },
+  "metric_convention": "PRIMARY metric log_gain_mse = mean_n[((log ghat - mean log ghat) - (log g - mean log g))^2] (Theorem C loss; Fisher-comparable to the LOCAL realized reference mean_n[1/I_n], I_n = sum_{k in I_n} lambda_k at d=0; nominal 1/(W*lambda_bar) kept as fisher_reference_nominal); gain_rel_mse retained for r2/r3 continuity only.",
+  "slope_convention": "log10(mean MSE) vs log10(photon_budget), filtered on the nominal photon_budget design column so the window endpoints are included; emitted natively by this run.",
+  "oracle_carrier": true,
+  "carrier_estimator": "soft_log_calibrated_carrier_oracle solves sum_k w_k m_alpha(theta*b_k) = sum_k w_k log(C_k+alpha) per centered window over DISTINCT in-record members (odd width, truncated renormalized at record edges -- NO replicate padding, r5) by 60-step bisection in log(theta) on the exact homogeneous m_alpha table; theta clamped to the SAFE per-window bracket [lam_lo/min(b), lam_hi/max(b)] (all evaluations in-table; theorem's clamp); dark counts d=0. ORACLE: carriers b_k are supplied from the simulation truth (flat-field-calibrated benchmark), not programmed design intensities.",
+  "window_semantics": "ALL windowed arms (soft_log, soft_log_calibrated, naive_log, anscombe, carrier solver) use truncated renormalized distinct windows at record boundaries; interior windows bit-identical to the r4 replicate-padded convention.",
+  "calibration_interpolation_probe": {
+    "eps_cal_max": 1.6410164796060167e-06,
+    "eps_cal_argmax_lambda": 0.9164223257231872,
+    "check_points": 2999
+  },
+  "eps_bis_bound_logtheta": 1.5396755129537647e-17,
+  "edge_effect_probe": {
+    "record_frames": 2048,
+    "effective_width": 65,
+    "edge_windows_per_record": 64,
+    "edge_window_fraction": 0.03125,
+    "interior_max_abs_diff": 0.0,
+    "edge_max_abs_diff": 0.3464907705783844,
+    "edge_mean_abs_diff": 0.07320696784299799
+  }
+}

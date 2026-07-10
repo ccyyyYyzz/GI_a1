@@ -115,45 +115,92 @@ class SoftLogCalibration:
         return np.interp(np.log(np.maximum(lam, 1.0e-300)), self._log_lam_grid, self.m_grid)
 
     def solve_carrier_windows(
-        self, targets: np.ndarray, carrier_windows: np.ndarray, iters: int = 60
+        self,
+        targets: np.ndarray,
+        carrier_windows: np.ndarray,
+        valid: Optional[np.ndarray] = None,
+        iters: int = 60,
     ) -> np.ndarray:
-        """Carrier-aware calibrated inversion (Theorem C with known per-frame carriers).
+        """Oracle-known-carrier calibrated inversion (Theorem C with known per-frame carriers).
 
         For each window n with known positive per-frame intensity factors
-        b_{n,k} (the carrier times the photon budget; dark counts d = 0 in this
-        protocol) it solves the theorem's window calibration equation
+        b_{n,k} (the oracle carrier times the photon budget, supplied from the
+        simulation truth; dark counts d = 0 in this protocol) it solves the
+        theorem's weighted window calibration equation
 
-            (1/W) sum_k m_alpha(theta * b_{n,k}) = targets_n
-                                       = (1/W) sum_k log(C_{n,k} + alpha),
+            sum_k w_{n,k} m_alpha(theta * b_{n,k}) = targets_n
+                                     = sum_k w_{n,k} log(C_{n,k} + alpha),
 
+        with equal weights w_{n,k} = 1/|I_n| over the window's DISTINCT
+        in-record members I_n (truncated, renormalized windows at the record
+        boundaries -- no replicate padding; `valid` masks out-of-record slots),
         by bisection in log(theta): the left side is strictly increasing in
         theta because m_alpha is strictly increasing and every b_{n,k} > 0, and
         each m_alpha evaluation reuses the exact homogeneous table (for C ~
         Pois(theta*b), E[log(C+alpha)] = m_alpha(theta*b) with the SAME
-        homogeneous curve -- no new tabulation is needed). The returned
-        theta_hat is CLAMPED to the bracket
+        homogeneous curve -- no new tabulation is needed).
 
-            [theta_lo, theta_hi] = [lam_lo / max(b), lam_hi / min(b)],
+        Operating-range bracket (SAFE interval): the per-window root search is
+        confined to
 
-        the range over which every evaluated intensity stays within (or clamps
-        to) the tabulated calibration range: targets below the attainable range
-        (e.g. an all-zero window, whose target is log(alpha)) return theta_lo,
-        targets above it return theta_hi. This clamp is part of the estimator's
-        definition in the theorem statement (Appendix D.4)."""
+            [theta_lo_n, theta_hi_n] = [lam_lo / min_k b_{n,k}, lam_hi / max_k b_{n,k}],
+
+        the largest interval on which EVERY evaluated intensity theta*b_{n,k}
+        stays inside the tabulated calibration range for every bisection
+        iterate (all evaluations in-table; the wider interval
+        [lam_lo/max b, lam_hi/min b] used before r5 let extreme carriers
+        evaluate the constant extension outside the table). Outside the safe
+        interval the clamp takes over: targets below the attainable range
+        (e.g. an all-zero window, whose target is log(alpha)) return
+        theta_lo_n, targets above it return theta_hi_n. This clamp is part of
+        the estimator's definition in the theorem statement (Appendix D.4)."""
 
         b = np.asarray(carrier_windows, dtype=np.float64)
-        if float(b.min()) <= 0.0:
+        if valid is None:
+            valid = np.ones(b.shape, dtype=bool)
+        valid = np.asarray(valid, dtype=bool)
+        if float(np.where(valid, b, np.inf).min()) <= 0.0:
             raise ValueError("Carrier-aware inversion requires strictly positive carriers.")
+        weights = valid.astype(np.float64)
+        weights /= weights.sum(axis=1, keepdims=True)
+        b_min = np.where(valid, b, np.inf).min(axis=1)
+        b_max = np.where(valid, b, -np.inf).max(axis=1)
         t = np.asarray(targets, dtype=np.float64)
-        lo = np.full(t.shape, math.log(self.lam_lo) - math.log(float(b.max())))
-        hi = np.full(t.shape, math.log(self.lam_hi) - math.log(float(b.min())))
+        lo = math.log(self.lam_lo) - np.log(b_min)
+        hi = math.log(self.lam_hi) - np.log(b_max)
+        if np.any(hi <= lo):
+            raise RuntimeError(
+                "Empty safe operating bracket [lam_lo/min(b), lam_hi/max(b)]: "
+                "widen the calibration table relative to the carrier spread."
+            )
+        b_eval = np.where(valid, b, 1.0)  # zero-weight slots; value irrelevant
         for _ in range(int(iters)):
             mid = 0.5 * (lo + hi)
-            lhs = self.evaluate(np.exp(mid)[:, None] * b).mean(axis=1)
+            lhs = (self.evaluate(np.exp(mid)[:, None] * b_eval) * weights).sum(axis=1)
             go_up = lhs < t
             lo = np.where(go_up, mid, lo)
             hi = np.where(go_up, hi, mid)
         return np.exp(0.5 * (lo + hi))
+
+    def interpolation_error_probe(self) -> Dict[str, float]:
+        """Empirical calibration-interpolation error (the eps_cal of Remark D.4.1).
+
+        The table is exact at its grid points, but `evaluate`/`invert` use
+        linear interpolation of m_alpha against log(lambda) between them (with
+        constant extension outside, where the clamp takes over). This probe
+        measures max |m_alpha(lambda) - interp(lambda)| on the dense check grid
+        of all geometric midpoints of adjacent tabulated points -- where the
+        interpolation error of a smooth function of log(lambda) is largest --
+        with the exact truncated-Poisson tabulation as ground truth."""
+
+        mids = np.sqrt(self.lam_grid[:-1] * self.lam_grid[1:])
+        exact, _ = self._tabulate(mids, self.alpha, self.tol)
+        err = np.abs(self.evaluate(mids) - exact)
+        return {
+            "eps_cal_max": float(err.max()),
+            "eps_cal_argmax_lambda": float(mids[int(np.argmax(err))]),
+            "check_points": int(mids.size),
+        }
 
     def metadata(self) -> Dict[str, object]:
         return {
@@ -168,20 +215,61 @@ class SoftLogCalibration:
         }
 
 
-def _window_indices(num_frames: int, window: int) -> np.ndarray:
-    """Member indices of the centered moving-average windows.
-
-    Mirrors ``moving_average_1d`` exactly: odd effective width (window+1 when
-    even, capped at the record length made odd), centered, replicate padding
-    (out-of-range member indices clamp to the record ends)."""
+def _effective_width(num_frames: int, window: int) -> int:
+    """Odd effective window width: window+1 when even, capped at the record length made odd."""
 
     width = max(1, int(window))
     if width % 2 == 0:
         width += 1
-    width = min(width, max(1, num_frames if num_frames % 2 == 1 else num_frames - 1))
+    return min(width, max(1, num_frames if num_frames % 2 == 1 else num_frames - 1))
+
+
+def _window_membership(num_frames: int, window: int) -> tuple[np.ndarray, np.ndarray]:
+    """Member indices and validity mask of the centered windows (no replicate padding).
+
+    Same centered odd-width convention as ``moving_average_1d``, but at the
+    record boundaries the window is TRUNCATED to its distinct in-record
+    members (``valid`` masks the out-of-record slots) and the estimators
+    renormalize by the actual member count -- the equal-weight instance
+    w_{n,k} = 1/|I_n| of the weighted finite-window theorem (Appendix D.4).
+    Replicate padding (repeating edge frames) was removed in r5: a repeated
+    frame aggregates into a single weight, so a width-65 padded edge window
+    had effective size 65^2/(33^2+32) = 3.77, not 65."""
+
+    width = _effective_width(num_frames, window)
     left = width // 2
     idx = np.arange(num_frames)[:, None] + (np.arange(width) - left)[None, :]
-    return np.clip(idx, 0, num_frames - 1)
+    valid = (idx >= 0) & (idx < num_frames)
+    return np.clip(idx, 0, num_frames - 1), valid
+
+
+def moving_average_truncated(values: torch.Tensor, window: int) -> torch.Tensor:
+    """Centered moving average over distinct in-record frames only.
+
+    Interior windows are computed exactly as ``moving_average_1d`` (bit-identical
+    by construction); the 2*(width//2) boundary windows are recomputed as
+    truncated, RENORMALIZED means over the in-record members (float64
+    accumulation), removing the replicate padding of ``moving_average_1d``."""
+
+    values = values.reshape(-1)
+    n = values.numel()
+    smooth = moving_average_1d(values, window)
+    width = _effective_width(n, window)
+    left = width // 2
+    if left == 0:
+        return smooth
+    csum = torch.cat(
+        [
+            torch.zeros(1, dtype=torch.float64, device=values.device),
+            torch.cumsum(values.to(dtype=torch.float64), dim=0),
+        ]
+    )
+    out = smooth.clone()
+    for pos in list(range(left)) + list(range(n - left, n)):
+        a = max(0, pos - left)
+        b = min(n, pos + left + 1)
+        out[pos] = ((csum[b] - csum[a]) / float(b - a)).to(dtype=values.dtype)
+    return out
 
 
 def centered_log_gain_mse(gain_hat: torch.Tensor, true_gains: torch.Tensor) -> float:
@@ -209,9 +297,12 @@ def estimate_from_counts(
     carrier_lam: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
     values = counts.reshape(-1).to(dtype=torch.float32)
+    # ALL windowed arms share one window semantics (r5): centered odd-width
+    # windows TRUNCATED and renormalized over distinct in-record frames at the
+    # boundaries (no replicate padding); interior windows are unchanged.
     if method == "soft_log":
         transformed = torch.log(values + float(alpha))
-        smooth = moving_average_1d(transformed, window)
+        smooth = moving_average_truncated(transformed, window)
         gain_hat = torch.exp(smooth - smooth.mean())
     elif method == "soft_log_calibrated":
         # Mean-Poisson calibrated PROXY (previous r3 arm, kept for continuity):
@@ -219,44 +310,49 @@ def estimate_from_counts(
         # estimated lambda profile -> normalize by its mean. It inverts the
         # HOMOGENEOUS Poisson(lambda) curve, i.e. it ignores the frame-varying
         # carrier inside the window, so it is NOT Theorem C's estimator when
-        # the carrier is random; see soft_log_calibrated_carrier.
+        # the carrier is random; see soft_log_calibrated_carrier_oracle.
         if calibration is None:
             raise ValueError("soft_log_calibrated requires a SoftLogCalibration instance.")
         transformed = torch.log(values + float(alpha))
-        smooth = moving_average_1d(transformed, window)
+        smooth = moving_average_truncated(transformed, window)
         lam_hat = calibration.invert(smooth.to(dtype=torch.float64).cpu().numpy())
         gain_hat = torch.from_numpy(lam_hat).to(dtype=torch.float32)
-    elif method == "soft_log_calibrated_carrier":
-        # Theorem C estimator (carrier-aware): with the per-frame carrier
-        # intensities b_k KNOWN (design values; dark counts d = 0 here), solve
-        # per window  (1/W) sum_k m_alpha(theta_hat * b_k) = (1/W) sum_k
-        # log(C_k + alpha)  by monotone bisection on the exact homogeneous
-        # table (E[log(Pois(theta*b)+alpha)] = m_alpha(theta*b)), with the
-        # theorem's clamp of theta_hat to the tabulated range.
+    elif method == "soft_log_calibrated_carrier_oracle":
+        # Theorem C estimator with ORACLE-KNOWN carriers: the per-frame carrier
+        # intensities b_k are supplied from the SIMULATION TRUTH (the noiseless
+        # bucket carrier of the simulated object; a flat-field-calibrated
+        # benchmark, NOT programmed design intensities; dark counts d = 0
+        # here). Solves per window  sum_k w_k m_alpha(theta_hat * b_k) =
+        # sum_k w_k log(C_k + alpha)  over the window's distinct members by
+        # monotone bisection on the exact homogeneous table
+        # (E[log(Pois(theta*b)+alpha)] = m_alpha(theta*b)), with the theorem's
+        # clamp to the safe operating bracket (see solve_carrier_windows).
         if calibration is None or carrier_lam is None:
             raise ValueError(
-                "soft_log_calibrated_carrier requires a SoftLogCalibration instance and per-frame carriers."
+                "soft_log_calibrated_carrier_oracle requires a SoftLogCalibration instance and per-frame carriers."
             )
         psi = np.log(values.to(dtype=torch.float64).cpu().numpy() + float(alpha))
-        idx = _window_indices(psi.size, window)
-        targets = psi[idx].mean(axis=1)
+        idx, valid = _window_membership(psi.size, window)
+        weights = valid.astype(np.float64)
+        weights /= weights.sum(axis=1, keepdims=True)
+        targets = (psi[idx] * weights).sum(axis=1)
         b_win = carrier_lam.reshape(-1).to(dtype=torch.float64).cpu().numpy()[idx]
-        theta_hat = calibration.solve_carrier_windows(targets, b_win)
+        theta_hat = calibration.solve_carrier_windows(targets, b_win, valid=valid)
         gain_hat = torch.from_numpy(theta_hat).to(dtype=torch.float32)
     elif method == "naive_log":
         transformed = torch.log(values.clamp_min(1.0e-3))
-        smooth = moving_average_1d(transformed, window)
+        smooth = moving_average_truncated(transformed, window)
         gain_hat = torch.exp(smooth - smooth.mean())
     elif method == "anscombe":
         transformed = 2.0 * torch.sqrt(values + 0.375)
-        smooth = moving_average_1d(transformed, window)
+        smooth = moving_average_truncated(transformed, window)
         gain_hat = (smooth / smooth.mean().clamp_min(1.0e-8)).pow(2)
     else:
         raise ValueError(method)
     return gain_hat / gain_hat.mean().clamp_min(1.0e-8)
 
 
-METHODS = ["soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier", "naive_log", "anscombe"]
+METHODS = ["soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier_oracle", "naive_log", "anscombe"]
 
 
 def simulate(
@@ -267,6 +363,7 @@ def simulate(
     calibration: Optional[SoftLogCalibration],
 ) -> pd.DataFrame:
     budgets = [float(x) for x in args.photon_budgets.replace(" ", ",").split(",") if x.strip()]
+    idx, valid = _window_membership(basis.num_frames, int(args.window))
     rows: List[Dict[str, object]] = []
     for obj in objects:
         carrier = (basis.patterns @ obj.vector).cpu().to(dtype=torch.float32)
@@ -281,6 +378,16 @@ def simulate(
                 zero_fraction = float((counts <= 0).to(dtype=torch.float32).mean().item())
                 lambda_bar = float(lam.mean().item())
                 carrier_lam = float(budget) * carrier
+                # LOCAL realized Fisher reference: per window n, the realized
+                # log-gain information at d = 0 is I_n = sum_{k in I_n} lambda_k
+                # (Poisson information for log-intensity is lambda itself);
+                # the record-level reference is the frame average of 1/I_n,
+                # matching the frame-averaged log-domain loss. The nominal
+                # global reference 1/(W * lambda_bar) is kept as a secondary
+                # column for continuity with r2-r4.
+                lam_np = lam.to(dtype=torch.float64).cpu().numpy()
+                info_local = (lam_np[idx] * valid).sum(axis=1)
+                fisher_local = float(np.mean(1.0 / np.maximum(info_local, 1.0e-12)))
                 for method in METHODS:
                     gain_hat = estimate_from_counts(
                         counts,
@@ -306,7 +413,8 @@ def simulate(
                             "method": method,
                             "gain_rel_mse": scale_aligned_gain_error(gain_hat, gains) ** 2,
                             "log_gain_mse": centered_log_gain_mse(gain_hat, gains),
-                            "fisher_reference": float(1.0 / max(args.window * lambda_bar, 1.0e-12)),
+                            "fisher_reference": fisher_local,
+                            "fisher_reference_nominal": float(1.0 / max(args.window * lambda_bar, 1.0e-12)),
                         }
                     )
     return pd.DataFrame(rows)
@@ -338,10 +446,10 @@ RATIO_PAIRS = [
     ("naive_log", "soft_log", "naive/soft"),
     ("naive_log", "anscombe", "naive/anscombe"),
     ("anscombe", "soft_log", "anscombe/soft"),
-    ("naive_log", "soft_log_calibrated_carrier", "naive/carrier"),
-    ("anscombe", "soft_log_calibrated_carrier", "anscombe/carrier"),
-    ("soft_log_calibrated_carrier", "soft_log", "carrier/soft"),
-    ("soft_log_calibrated", "soft_log_calibrated_carrier", "meanpois/carrier"),
+    ("naive_log", "soft_log_calibrated_carrier_oracle", "naive/carrier"),
+    ("anscombe", "soft_log_calibrated_carrier_oracle", "anscombe/carrier"),
+    ("soft_log_calibrated_carrier_oracle", "soft_log", "carrier/soft"),
+    ("soft_log_calibrated", "soft_log_calibrated_carrier_oracle", "meanpois/carrier"),
 ]
 
 
@@ -380,6 +488,9 @@ def write_summary_md(
     calibration: SoftLogCalibration,
     args: argparse.Namespace,
     n_rows: int,
+    calib_probe: Dict[str, float],
+    eps_bis_bound: float,
+    edge_probe: Dict[str, object],
 ) -> None:
     fisher_ref = summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"].mean()
     log_pivot = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean").reset_index()
@@ -387,7 +498,7 @@ def write_summary_md(
     gain_pivot = summary.pivot(index="photon_budget", columns="method", values="gain_rel_mse_mean").reset_index()
 
     lines: List[str] = []
-    lines.append("# Fig. 7 low-photon gain estimation (r4, carrier-aware calibrated soft-log) - native summary")
+    lines.append("# Fig. 7 low-photon gain estimation (r5, oracle-known-carrier calibrated soft-log) - native summary")
     lines.append("")
     lines.append(
         f"Protocol: random_uniform basis, {args.objects} objects, {args.seeds} seeds, W={args.window}, "
@@ -396,26 +507,55 @@ def write_summary_md(
     )
     lines.append("")
     lines.append(
-        "`soft_log_calibrated_carrier` is Theorem C's estimator (Appendix D.4, carrier-aware form): with the "
-        "per-frame carrier intensities b_k known (design values; dark counts d = 0 in this protocol), it solves per "
-        "window (1/W) sum_k m_alpha(theta_hat * b_k) = (1/W) sum_k log(C_k + alpha) by monotone bisection on the "
-        "exactly tabulated homogeneous curve m_alpha(lambda) = E[log(Poisson(lambda)+alpha)] (truncated Poisson sum, "
+        "`soft_log_calibrated_carrier_oracle` is Theorem C's estimator (Appendix D.4, weighted known-carrier form) "
+        "run as an ORACLE-KNOWN-CARRIER / flat-field-calibrated BENCHMARK: the per-frame carrier intensities b_k are "
+        "supplied from the SIMULATION TRUTH (the noiseless bucket carrier of the simulated object, times the photon "
+        "budget), NOT programmed design intensities. With b_k known (d = 0 in this protocol) it solves per window "
+        "sum_k w_k m_alpha(theta_hat * b_k) = sum_k w_k log(C_k + alpha) over the window's distinct members "
+        "(equal weights w_k = 1/|I_n|) by monotone bisection on the exactly tabulated homogeneous curve "
+        "m_alpha(lambda) = E[log(Poisson(lambda)+alpha)] (truncated Poisson sum, "
         f"rigorous tail bound <= {calibration.max_tail_bound:.2e} on a {calibration.num_points}-point log grid over "
-        f"lambda in [{calibration.lam_lo:g}, {calibration.lam_hi:g}]), with theta_hat clamped to the tabulated range "
-        "(the theorem's clamp; all-zero windows clamp to the lower end). `soft_log_calibrated` is the r3 mean-Poisson "
-        "calibrated PROXY (homogeneous inversion that ignores the frame-varying carrier), kept for continuity; "
-        "`soft_log` is the legacy uncalibrated proxy exp(movmean(log(C+alpha)) - mean), also unchanged."
+        f"lambda in [{calibration.lam_lo:g}, {calibration.lam_hi:g}]), with theta_hat clamped to the SAFE per-window "
+        "operating bracket [lam_lo/min(b), lam_hi/max(b)] (all bisection evaluations in-table; all-zero windows clamp "
+        "to the lower end). `soft_log_calibrated` is the r3 mean-Poisson calibrated PROXY (homogeneous inversion that "
+        "ignores the frame-varying carrier), kept for continuity; `soft_log` is the legacy uncalibrated proxy "
+        "exp(movmean(log(C+alpha)) - mean)."
+    )
+    lines.append("")
+    lines.append(
+        "WINDOW SEMANTICS (changed in r5). ALL windowed arms use centered odd-width windows over DISTINCT in-record "
+        "frames, truncated and renormalized at the record boundaries -- replicate padding removed (a padded width-65 "
+        "edge window aggregates to effective size 65^2/(33^2+32) = 3.77 and falsified the sigma^2/W claim there). "
+        "Interior windows are unchanged; only the 2*(W_eff//2) boundary windows differ from r4. See the edge-vs-"
+        "interior probe below."
     )
     lines.append("")
     lines.append(
         "METRICS. `log_gain_mse` (PRIMARY, Fisher-comparable) is Theorem C's loss: mean over frames of the squared "
-        "centered-log-gain error, mean_n[((log ghat_n - mean log ghat) - (log g_n - mean log g))^2]. The local Fisher "
-        "reference 1/(W*lambda) is the Cramer-Rao scale for LOG-intensity (Poisson information for log-intensity is "
-        "lambda), so Fisher comparisons, sub-Fisher flags, and rate slopes are stated in this metric. `gain_rel_mse` "
-        "(gain-domain scale-aligned relMSE) is retained for continuity with r2/r3 but is NOT Fisher-comparable. "
-        "The centered moving-average window has odd effective width W+1=65 (moving_average_1d convention) while the "
-        "Fisher reference uses the nominal W=64, a <=1.6% conservative slack in the reference."
+        "centered-log-gain error, mean_n[((log ghat_n - mean log ghat) - (log g_n - mean log g))^2]. The LOCAL "
+        "realized Fisher reference (r5) is mean_n[1/I_n] with I_n = sum_{k in I_n} lambda_k the realized per-window "
+        "log-gain information at d = 0 (Poisson information for log-intensity is lambda itself), computed over the "
+        "same distinct window members as the estimators; the nominal global 1/(W*lambda_bar) reference of r2-r4 is "
+        "kept as the secondary column `fisher_reference_nominal`. Fisher comparisons, sub-Fisher flags, and rate "
+        "slopes are stated in the log-domain metric against the LOCAL reference. `gain_rel_mse` (gain-domain "
+        "scale-aligned relMSE) is retained for continuity with r2/r3 but is NOT Fisher-comparable."
     )
+    lines.append("")
+    lines.append(
+        f"CALIBRATION INTERPOLATION (empirical eps_cal, Remark D.4.1). The m_alpha table is exact at its "
+        f"{calibration.num_points} grid points; between them the code linearly interpolates m_alpha against "
+        f"log(lambda). Measured on the dense check grid of all {calib_probe['check_points']} geometric midpoints "
+        f"(exact truncated-Poisson recomputation as ground truth): eps_cal = max|m_alpha - interp| = "
+        f"{calib_probe['eps_cal_max']:.3e} (attained near lambda = {calib_probe['eps_cal_argmax_lambda']:.3g}); "
+        f"the 60-step bisection contributes eps_bis <= {eps_bis_bound:.3e} (log-theta units). These enter the risk "
+        f"bound as a deterministic (eps_cal + eps_bis)^2 / kappa_lower_n^2 term and shrink the clamp margin by "
+        f"eps_cal + eps_bis -- empirical measurement, honestly labeled, not a certified analytic bound."
+    )
+    lines.append("")
+    lines.append("## (0) Edge-vs-interior window-semantics probe (r4 replicate padding -> r5 truncation)")
+    lines.append("")
+    for line in edge_probe["lines"]:
+        lines.append(f"- {line}")
     lines.append("")
     lines.append("## (a) Per-photon-level mean LOG-domain gain MSE by arm (primary, Fisher-comparable)")
     lines.append("")
@@ -452,7 +592,7 @@ def write_summary_md(
     lines.append("Slopes are fit on the discrete design column photon_budget (endpoints included); "
                  "no post-hoc correction is needed.")
     lines.append("")
-    lines.append("## (d) Fisher-excess table (log-domain mean MSE / local Fisher reference, per budget)")
+    lines.append("## (d) Fisher-excess table (log-domain mean MSE / LOCAL realized Fisher reference, per budget)")
     lines.append("")
     lines.extend(_md_table(fisher_excess))
     lines.append("")
@@ -461,31 +601,33 @@ def write_summary_md(
     pivot = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean")
     fisher = summary.groupby("photon_budget")["fisher_reference_mean"].mean()
     carrier_beats_ansc = [
-        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier"] < pivot.loc[b, "anscombe"]
+        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier_oracle"] < pivot.loc[b, "anscombe"]
     ]
     ansc_beats_carrier = [
-        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier"] >= pivot.loc[b, "anscombe"]
+        f"{b:g}" for b in pivot.index if pivot.loc[b, "soft_log_calibrated_carrier_oracle"] >= pivot.loc[b, "anscombe"]
     ]
     lines.append(
-        f"- Carrier-aware calibrated soft-log beats Anscombe (lower mean log-domain MSE) at budgets: "
+        f"- Oracle-known-carrier calibrated soft-log beats Anscombe (lower mean log-domain MSE) at budgets: "
         f"{', '.join(carrier_beats_ansc) or 'none'}; Anscombe is equal/better at: {', '.join(ansc_beats_carrier) or 'none'}."
     )
     sub_fisher = {
         m: [f"{b:g}" for b in pivot.index if pivot.loc[b, m] < fisher.loc[b]]
-        for m in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier")
+        for m in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier_oracle")
     }
     lines.append(
-        f"- Log-domain MSE below the unbiased local Fisher reference 1/(W*lambda) (shrinkage-bias signature): "
+        f"- Log-domain MSE below the unbiased LOCAL realized Fisher reference mean_n[1/I_n] "
+        f"(shrinkage-bias signature): "
         f"soft_log at budgets {', '.join(sub_fisher['soft_log']) or 'none'}; "
         f"soft_log_calibrated at budgets {', '.join(sub_fisher['soft_log_calibrated']) or 'none'}; "
-        f"soft_log_calibrated_carrier at budgets {', '.join(sub_fisher['soft_log_calibrated_carrier']) or 'none'}."
+        f"soft_log_calibrated_carrier_oracle at budgets "
+        f"{', '.join(sub_fisher['soft_log_calibrated_carrier_oracle']) or 'none'}."
     )
     meanpois_over_carrier = ratio_table_log.set_index("photon_budget")["meanpois/carrier"]
     lines.append(
         f"- meanpois/carrier log-domain mean-MSE ratio spans {float(meanpois_over_carrier.min()):.4f}-"
         f"{float(meanpois_over_carrier.max()):.4f} across all budgets (values near 1 mean the r3 mean-Poisson proxy "
-        "and the true carrier-aware estimator agree numerically at this carrier CV; the carrier-aware arm is the one "
-        "the theorem is about)."
+        "and the oracle-known-carrier estimator agree numerically at this carrier CV; the oracle-carrier arm is the "
+        "one the theorem is about, run as a flat-field-calibrated benchmark)."
     )
     carrier_over_soft = ratio_table_log.set_index("photon_budget")["carrier/soft"]
     lines.append(
@@ -499,11 +641,68 @@ def write_summary_md(
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def edge_effect_probe(args: argparse.Namespace, basis, objects) -> Dict[str, object]:
+    """Quantify the r4->r5 window-semantics change (replicate padding removed).
+
+    On the first object / first gain seed, across all photon budgets: compare
+    the replicate-padded smoother (moving_average_1d, r4 semantics) with the
+    truncated renormalized smoother (r5) on the soft-log transform, split into
+    interior windows (identical member sets; expected bit-identical by
+    construction) and the 2*(W_eff//2) boundary windows (member sets differ)."""
+
+    budgets = [float(x) for x in args.photon_budgets.replace(" ", ",").split(",") if x.strip()]
+    obj = objects[0]
+    carrier = (basis.patterns @ obj.vector).cpu().to(dtype=torch.float32)
+    carrier = carrier / carrier.mean().clamp_min(1.0e-8)
+    gains = make_shared_channel(basis.num_frames, rho=float(args.rho), sigma_a=args.sigma_a, seed=args.seed)
+    n = basis.num_frames
+    width = _effective_width(n, int(args.window))
+    left = width // 2
+    interior_max = 0.0
+    edge_max = 0.0
+    edge_mean_sum, edge_cells = 0.0, 0
+    for budget in budgets:
+        lam = (float(budget) * gains * carrier).clamp_min(0.0)
+        generator = torch.Generator(device="cpu")
+        generator.manual_seed(args.seed + int(round(1000 * budget)))
+        counts = torch.poisson(lam, generator=generator)
+        transformed = torch.log(counts.reshape(-1).to(dtype=torch.float32) + float(args.alpha))
+        old = moving_average_1d(transformed, int(args.window)).to(dtype=torch.float64)
+        new = moving_average_truncated(transformed, int(args.window)).to(dtype=torch.float64)
+        diff = (old - new).abs()
+        interior_max = max(interior_max, float(diff[left : n - left].max().item()))
+        edge = torch.cat([diff[:left], diff[n - left :]])
+        edge_max = max(edge_max, float(edge.max().item()))
+        edge_mean_sum += float(edge.mean().item())
+        edge_cells += 1
+    probe = {
+        "record_frames": int(n),
+        "effective_width": int(width),
+        "edge_windows_per_record": int(2 * left),
+        "edge_window_fraction": float(2 * left / n),
+        "interior_max_abs_diff": float(interior_max),
+        "edge_max_abs_diff": float(edge_max),
+        "edge_mean_abs_diff": float(edge_mean_sum / max(edge_cells, 1)),
+    }
+    probe["lines"] = [
+        f"Windows per record: {n}; effective width {width}; boundary windows affected: "
+        f"{2 * left} ({100.0 * probe['edge_window_fraction']:.2f}% of frames).",
+        f"Interior windows (identical member sets): max |smoothed_r4 - smoothed_r5| = "
+        f"{probe['interior_max_abs_diff']:.3e} over all budgets (bit-identical expected: the truncated smoother "
+        f"reuses the padded convolution on the interior).",
+        f"Boundary windows (replicate padding removed): max |smoothed_r4 - smoothed_r5| = "
+        f"{probe['edge_max_abs_diff']:.3e}, mean {probe['edge_mean_abs_diff']:.3e} (soft-log transform units, "
+        f"first object / first seed, all budgets).",
+    ]
+    return probe
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fig. 7 low-photon gain estimation (r4, carrier-aware calibrated soft-log)."
+        description="Fig. 7 low-photon gain estimation (r5, oracle-known-carrier calibrated soft-log; "
+        "truncated renormalized windows, local realized Fisher reference)."
     )
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r4_carrier")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "results" / "paper_fig7_lowphoton_r5_final")
     parser.add_argument("--image-size", type=int, default=32)
     parser.add_argument("--objects", type=int, default=10)
     parser.add_argument("--seeds", type=int, default=5)
@@ -536,6 +735,14 @@ def main() -> None:
     calib_table = pd.DataFrame({"lambda": calibration.lam_grid, "m_alpha": calibration.m_grid})
     calib_table.to_csv(out / "m_alpha_calibration_table.csv", index=False)
 
+    # Empirical calibration-interpolation error (eps_cal) + deterministic
+    # bisection-resolution bound (eps_bis): the per-window bisection bracket in
+    # log(theta) is at most log(lam_hi/lam_lo) wide, halved 60 times.
+    calib_probe = calibration.interpolation_error_probe()
+    eps_bis_bound = (math.log(calibration.lam_hi) - math.log(calibration.lam_lo)) * 2.0 ** (-60)
+
+    edge_probe = edge_effect_probe(args, basis, objects)
+
     df = simulate(args, basis, objects, rho=args.rho, calibration=calibration)
     df.to_csv(out / "fig7_lowphoton.csv", index=False)
 
@@ -549,6 +756,7 @@ def main() -> None:
         lambda_bar_mean=("lambda_bar", "mean"),
         zero_fraction_mean=("zero_fraction", "mean"),
         fisher_reference_mean=("fisher_reference", "mean"),
+        fisher_reference_nominal_mean=("fisher_reference_nominal", "mean"),
     )
     summary.to_csv(out / "fig7_lowphoton_summary.csv", index=False)
 
@@ -581,12 +789,13 @@ def main() -> None:
         label: (float(low[label].min()), float(low[label].max())) for _, _, label in RATIO_PAIRS
     }
 
-    # Fisher-excess table (log-domain only: the reference 1/(W*lambda) is the
-    # Cramer-Rao scale for LOG-intensity, so only the log-domain MSE compares).
+    # Fisher-excess table (log-domain only: the LOCAL realized reference
+    # mean_n[1/I_n] is the Cramer-Rao scale for LOG-intensity at d = 0, so
+    # only the log-domain MSE compares).
     fisher = summary.groupby("photon_budget")["fisher_reference_mean"].mean()
     log_pivot_full = summary.pivot(index="photon_budget", columns="method", values="log_gain_mse_mean")
     fisher_excess = pd.DataFrame(index=log_pivot_full.index)
-    for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier", "anscombe"):
+    for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier_oracle", "anscombe"):
         fisher_excess[f"{method}/fisher"] = log_pivot_full[method] / fisher
     fisher_excess = fisher_excess.reset_index()
     fisher_excess.to_csv(out / "fig7_fisher_excess_logdomain.csv", index=False)
@@ -605,12 +814,26 @@ def main() -> None:
             )
         if with_fisher:
             ref = (
-                summary.groupby("photon_budget", as_index=False)["fisher_reference_mean"]
+                summary.groupby("photon_budget", as_index=False)[
+                    ["fisher_reference_mean", "fisher_reference_nominal_mean"]
+                ]
                 .mean()
                 .sort_values("photon_budget")
             )
             ax.plot(
-                ref["photon_budget"], ref["fisher_reference_mean"], linestyle="--", color="black", label="1/(W lambda)"
+                ref["photon_budget"],
+                ref["fisher_reference_mean"],
+                linestyle="--",
+                color="black",
+                label="local Fisher ref. mean 1/I_n",
+            )
+            ax.plot(
+                ref["photon_budget"],
+                ref["fisher_reference_nominal_mean"],
+                linestyle=":",
+                color="gray",
+                linewidth=1.0,
+                label="nominal 1/(W lambda)",
             )
         ax.set_xscale("log")
         ax.set_yscale("log")
@@ -651,29 +874,34 @@ def main() -> None:
             sel = frame[(frame["method"] == method) & (frame["photon_budget"] == max_budget)]
             return float(sel["log_gain_mse"].mean()) if len(sel) else float("nan")
 
-        for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier"):
+        for method in ("soft_log", "soft_log_calibrated", "soft_log_calibrated_carrier_oracle"):
             floor_lines.append(
                 f"At the high-photon end (budget={max_budget:g}) the {method} log-domain gain-MSE floor shrinks from "
                 f"{_floor(df, method):.3e} (rho={args.rho:g}) to {_floor(df_probe, method):.3e} "
                 f"(rho={args.floor_probe_rho:g}), confirming the floor is drift-limited."
             )
 
-    carrier_excess = fisher_excess.set_index("photon_budget")["soft_log_calibrated_carrier/fisher"]
+    carrier_excess = fisher_excess.set_index("photon_budget")["soft_log_calibrated_carrier_oracle/fisher"]
     low_excess = carrier_excess[carrier_excess.index <= 1.0]
     mid_excess = carrier_excess[(carrier_excess.index >= 2.0) & (carrier_excess.index <= 32.0)]
     write_caption(
         out / "fig7_caption.md",
-        "Fig. 7 Low-Photon Gain Estimation (r4, carrier-aware calibrated soft-log)",
+        "Fig. 7 Low-Photon Gain Estimation (r5, oracle-known-carrier calibrated soft-log)",
         [
             "Poisson bucket counts are evaluated under identical random-basis carriers and shared gain traces; the summary is "
-            "aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated_carrier arm is "
-            "Theorem C's estimator (per-window root of (1/W) sum_k m_alpha(theta*b_k) = (1/W) sum_k log(C_k+alpha) with the "
-            "known per-frame carriers b_k, dark counts d=0, and the theorem's clamp to the tabulated range); "
-            "soft_log_calibrated is the r3 mean-Poisson calibrated proxy (homogeneous inversion, carrier ignored) and "
-            "soft_log the legacy uncalibrated proxy, both retained unchanged for continuity.",
+            "aggregated over discrete design columns (method, photon_budget) only. The soft_log_calibrated_carrier_oracle arm "
+            "is Theorem C's estimator run as an ORACLE-KNOWN-CARRIER (flat-field-calibrated) benchmark: the per-frame "
+            "carriers b_k are supplied from the simulation truth (the noiseless bucket carrier of the simulated object), NOT "
+            "programmed design intensities. It solves the per-window root of sum_k w_k m_alpha(theta*b_k) = sum_k w_k "
+            "log(C_k+alpha) over the window's distinct members (dark counts d=0, the theorem's clamp to the safe per-window "
+            "operating bracket); soft_log_calibrated is the r3 mean-Poisson calibrated proxy (homogeneous inversion, carrier "
+            "ignored) and soft_log the legacy uncalibrated proxy, retained for continuity. ALL windowed arms use truncated, "
+            "renormalized distinct windows at the record boundaries (replicate padding removed in r5; interior windows "
+            "unchanged).",
             "METRIC: the primary loss is the LOG-domain centered-log-gain MSE (Theorem C's loss), the only metric "
-            "comparable to the local Fisher reference 1/(W*lambda) (Poisson information for LOG-intensity); the "
-            "gain-domain relMSE is kept as a continuity column and is not Fisher-comparable.",
+            "comparable to the LOCAL realized Fisher reference mean_n[1/I_n], I_n = sum_{k in I_n} lambda_k (Poisson "
+            "information for LOG-intensity at d=0); the nominal 1/(W*lambda_bar) line is kept as a secondary reference; "
+            "the gain-domain relMSE is kept as a continuity column and is not Fisher-comparable.",
             f"(i) Log-domain ratio bookkeeping (mean-MSE ratios over budgets <= 1, numerator/denominator named): "
             f"naive/soft {low_budget_ranges_log['naive/soft'][0]:.1f}-{low_budget_ranges_log['naive/soft'][1]:.1f}x, "
             f"naive/Anscombe {low_budget_ranges_log['naive/anscombe'][0]:.1f}-{low_budget_ranges_log['naive/anscombe'][1]:.1f}x, "
@@ -683,19 +911,22 @@ def main() -> None:
             f"carrier/soft {low_budget_ranges_log['carrier/soft'][0]:.2f}-{low_budget_ranges_log['carrier/soft'][1]:.2f}x, "
             f"meanpois/carrier {low_budget_ranges_log['meanpois/carrier'][0]:.4f}-{low_budget_ranges_log['meanpois/carrier'][1]:.4f}x.",
             f"(ii) The 1/(W*lambda) law in the variance regime (log-domain, fit natively on photon_budget, endpoints "
-            f"included): slope {slopes_log['soft_log_calibrated_carrier']['budget_2_32']:.2f} (carrier-aware) / "
+            f"included): slope {slopes_log['soft_log_calibrated_carrier_oracle']['budget_2_32']:.2f} (oracle-carrier) / "
             f"{slopes_log['soft_log_calibrated']['budget_2_32']:.2f} (mean-Poisson proxy) / "
             f"{slopes_log['soft_log']['budget_2_32']:.2f} (uncalibrated proxy) on [2,32]; "
-            f"{slopes_log['soft_log_calibrated_carrier']['budget_1_16']:.2f} / "
+            f"{slopes_log['soft_log_calibrated_carrier_oracle']['budget_1_16']:.2f} / "
             f"{slopes_log['soft_log_calibrated']['budget_1_16']:.2f} / {slopes_log['soft_log']['budget_1_16']:.2f} on "
             f"[1,16]. lambda_bar~{peak_budget:g} is the soft_log bias->variance transition peak; above lambda_bar~32 a "
             f"drift-limited floor sets in.",
-            f"(iii) Fisher excess of the carrier-aware arm (log-domain MSE / (1/(W*lambda))): "
+            f"(iii) Fisher excess of the oracle-carrier arm (log-domain MSE / LOCAL realized reference mean_n[1/I_n]): "
             f"{float(low_excess.min()):.2f}-{float(low_excess.max()):.2f}x over budgets <= 1 and "
             f"{float(mid_excess.min()):.2f}-{float(mid_excess.max()):.2f}x over [2,32]. Sub-Fisher entries (<1) are a "
             f"shrinkage-bias signature, not super-efficiency; see summary.md section (e) for per-arm flags.",
             "(iv) Naive clipped log does not diverge: it saturates at a bias floor set by the clip.",
             *floor_lines,
+            f"Calibration interpolation: empirical eps_cal = {calib_probe['eps_cal_max']:.3e} "
+            f"(max |m_alpha - interp| on {calib_probe['check_points']} midpoint checks), bisection eps_bis <= "
+            f"{eps_bis_bound:.3e}; see summary.md.",
             f"Rows: {len(df)}. Runtime seconds: {time.time() - start:.2f}.",
         ],
     )
@@ -713,6 +944,9 @@ def main() -> None:
         calibration,
         args,
         n_rows=len(df),
+        calib_probe=calib_probe,
+        eps_bis_bound=eps_bis_bound,
+        edge_probe=edge_probe,
     )
 
     (out / "run_manifest.json").write_text(
@@ -732,14 +966,25 @@ def main() -> None:
                         f"{b:g}": float(v) for b, v in carrier_excess.items()
                     },
                     "metric_convention": "PRIMARY metric log_gain_mse = mean_n[((log ghat - mean log ghat) - "
-                    "(log g - mean log g))^2] (Theorem C loss; Fisher-comparable to 1/(W*lambda)); gain_rel_mse "
-                    "retained for r2/r3 continuity only.",
+                    "(log g - mean log g))^2] (Theorem C loss; Fisher-comparable to the LOCAL realized reference "
+                    "mean_n[1/I_n], I_n = sum_{k in I_n} lambda_k at d=0; nominal 1/(W*lambda_bar) kept as "
+                    "fisher_reference_nominal); gain_rel_mse retained for r2/r3 continuity only.",
                     "slope_convention": "log10(mean MSE) vs log10(photon_budget), filtered on the nominal "
                     "photon_budget design column so the window endpoints are included; emitted natively by this run.",
-                    "carrier_estimator": "soft_log_calibrated_carrier solves (1/W) sum_k m_alpha(theta*b_k) = "
-                    "(1/W) sum_k log(C_k+alpha) per centered window (odd width, replicate padding, identical to "
-                    "moving_average_1d) by 60-step bisection in log(theta) on the exact homogeneous m_alpha table; "
-                    "theta clamped to [lam_lo/max(b), lam_hi/min(b)] (theorem's clamp); dark counts d=0.",
+                    "oracle_carrier": True,
+                    "carrier_estimator": "soft_log_calibrated_carrier_oracle solves sum_k w_k m_alpha(theta*b_k) = "
+                    "sum_k w_k log(C_k+alpha) per centered window over DISTINCT in-record members (odd width, "
+                    "truncated renormalized at record edges -- NO replicate padding, r5) by 60-step bisection in "
+                    "log(theta) on the exact homogeneous m_alpha table; theta clamped to the SAFE per-window bracket "
+                    "[lam_lo/min(b), lam_hi/max(b)] (all evaluations in-table; theorem's clamp); dark counts d=0. "
+                    "ORACLE: carriers b_k are supplied from the simulation truth (flat-field-calibrated benchmark), "
+                    "not programmed design intensities.",
+                    "window_semantics": "ALL windowed arms (soft_log, soft_log_calibrated, naive_log, anscombe, "
+                    "carrier solver) use truncated renormalized distinct windows at record boundaries; interior "
+                    "windows bit-identical to the r4 replicate-padded convention.",
+                    "calibration_interpolation_probe": calib_probe,
+                    "eps_bis_bound_logtheta": eps_bis_bound,
+                    "edge_effect_probe": {k: v for k, v in edge_probe.items() if k != "lines"},
                 },
             ),
             indent=2,
@@ -749,9 +994,10 @@ def main() -> None:
     )
     print(
         f"Fig7 complete rows={len(df)} output={out} runtime={time.time() - start:.2f}s "
-        f"log-domain slope[2,32]: carrier={slopes_log['soft_log_calibrated_carrier']['budget_2_32']:.3f} "
+        f"log-domain slope[2,32]: carrier_oracle={slopes_log['soft_log_calibrated_carrier_oracle']['budget_2_32']:.3f} "
         f"meanpois={slopes_log['soft_log_calibrated']['budget_2_32']:.3f} "
-        f"soft={slopes_log['soft_log']['budget_2_32']:.3f} peak_budget={peak_budget:g}"
+        f"soft={slopes_log['soft_log']['budget_2_32']:.3f} peak_budget={peak_budget:g} "
+        f"eps_cal={calib_probe['eps_cal_max']:.3e} edge_max={edge_probe['edge_max_abs_diff']:.3e}"
     )
 
 
