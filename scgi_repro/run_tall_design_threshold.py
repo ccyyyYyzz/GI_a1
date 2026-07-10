@@ -1,17 +1,19 @@
-"""Experiment A -- Tall-design identifiability threshold (validates "Theorem A'").
+"""Experiment A -- Tall-design threshold scan: validates the LOCAL-RANK component
+of Theorem A' (part (i)) and probes algorithmic recovery.
 
-Theorem A' (local + generic-exact identifiability of the joint
-(log-gain, object) recovery problem): for the noiseless bilinear-with-log-gain
-forward model
+Scope note: this runner does NOT test the global sufficiency thresholds of
+Theorem A'(ii)-(iii) (generic exact at ``N >= K + p``; uniform at
+``N >= 2K + p - 1``) nor their conjectured sharpness -- those are a.e.-(M,T)
+uniqueness statements that a rank scan cannot certify.  What it measures is:
+
+For the noiseless bilinear-with-log-gain forward model
 
     R_n = exp(ell_n) * (M_n . T),   ell = U theta,
 
 with a generic Gaussian design ``M in R^{N x K}`` and a Fourier low-pass gain
-basis ``U in R^{N x p}`` (p odd), the pair ``(theta, T)`` is
-
-  * LOCALLY identifiable up to the single global-scale gauge as soon as
-    ``N >= K + p - 1`` (the Jacobian drops its extra deficiency there), and
-  * GENERICALLY exactly (globally) recoverable once ``N >= K + p``.
+basis ``U in R^{N x p}`` (p odd), Theorem A'(i) predicts the pair ``(theta, T)``
+is LOCALLY identifiable up to the single global-scale gauge iff
+``N >= K + p - 1`` (the collision Jacobian drops its extra deficiency there).
 
 The forward map has exactly one continuous gauge freedom: rescaling
 ``T -> alpha T`` while shifting the constant log-gain column by ``-log alpha``
@@ -22,14 +24,21 @@ gauge dimension is ``1``; local identifiability is therefore
 This runner produces two panels per ``(N, K, p, seed)`` cell:
 
   (a) LOCAL RANK TEST (deterministic, cheap): assemble the analytic Jacobian of
-      the forward map at the ground truth and test ``rank(J) == p + K - 1``.
-  (b) RECOVERY TEST (expensive): blind alternating-minimisation recovery of
+      the forward map at the ground truth and test ``rank(J) == p + K - 1``
+      -- the direct verification of Theorem A'(i)'s rank wall.
+  (b) RECOVERY PROBE (expensive): blind alternating-minimisation recovery of
       ``(theta, T)`` from ``R`` alone, with the global scale gauge fixed to
-      ``mean(ell) = 0`` and up to ``--restarts`` random restarts.
+      ``mean(ell) = 0`` and up to ``--restarts`` random restarts.  This is an
+      ALGORITHMIC-RECOVERY observation, not a uniqueness test.
 
 The gap between the (a) rank wall at ``N = K + p - 1`` and the (b) solver wall a
 few measurements higher is the point of the figure: uniqueness (identifiability)
 is not the same as conditioning (recoverability) near the wall.
+
+Each CSV row also records the carrier margin ``min_n |(M T)_n|`` of its cell
+(``carrier_margin_min_abs``): Theorem A' quantifies over the nonvanishing-carrier
+set, and the margin lets later analyses condition on how close a draw came to
+violating that hypothesis.
 
 Outputs (in ``results/tall_design_threshold_r1/`` by default):
   * ``threshold_scan.csv``          -- one row per (N, p, seed) with both panels.
@@ -390,7 +399,11 @@ def main() -> None:
 
         U = fourier_lowpass_basis(N, p, device, dtype)
         ell_true = U @ theta_true
-        R = torch.exp(ell_true) * (M @ T_true)
+        carrier = M @ T_true
+        # Carrier margin min_n |(MT)_n|: distance of this draw from the vanishing-carrier
+        # exceptional set that Theorem A' excludes (recorded per cell for later analyses).
+        carrier_margin = float(carrier.abs().min().item())
+        R = torch.exp(ell_true) * carrier
 
         rank_info = local_rank_test(M, U, ell_true, R, args.rank_rtol)
         rec_info = recover(
@@ -419,6 +432,7 @@ def main() -> None:
                 "seed": seed_idx,
                 "object_kind": kind,
                 "shard": args.shard or "0/1",
+                "carrier_margin_min_abs": carrier_margin,
                 **rank_info,
                 **rec_info,
             }
@@ -535,7 +549,8 @@ def _make_figures_and_readout(df: pd.DataFrame, out: Path, K: int) -> List[str]:
     return [
         f"Measured rank-test wall: first offset with local-ID rate >= 0.95 is {rank_on} (theory: -1 = N=K+p-1); "
         f"cell-level agreement rank_id == (offset >= -1) is {rank_exact_frac:.3f} (acceptance >= 0.95).",
-        f"Measured solver wall: first offset with success rate >= 0.90 is {solver_on} (theory near +0 = N=K+p).",
+        f"Measured solver wall: first offset with success rate >= 0.90 is {solver_on} "
+        "(algorithmic-recovery probe, not a uniqueness test; the N=K+p count of A'(ii) is not tested here).",
         f"Acceptance bands: solver success for offset >= +4 is {high_band:.3f} (target >= 0.90); "
         f"for offset <= -4 is {low_band:.3f} (target <= 0.10). The intermediate band may be ragged.",
     ]

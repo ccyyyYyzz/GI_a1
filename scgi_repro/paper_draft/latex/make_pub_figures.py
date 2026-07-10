@@ -70,11 +70,13 @@ DIVERGING = mcolors.LinearSegmentedColormap.from_list("blue_red", ["#0d366b", "#
 # --------------------------------------------------------------------------------------
 # SERIES -> COLOUR MAPPING  (fixed by series identity, identical across every figure)
 #
-#   random_uniform ............ P1 blue      (also soft_log, K=64)
+#   random_uniform ............ P1 blue      (also soft_log proxy, K=64)
 #   random_binary ............. P2 aqua      (also anscombe)
-#   raw_shuffled .............. P3 yellow    (hadamard_raw_shuffled)
-#   raw_ordered ............... P4 green     (hadamard_raw_ordered)
-#   srht_paired ............... P5 violet    (srht_inverse, srht_full, K=128)
+#   raw_shuffled .............. P3 yellow    (hadamard_raw_shuffled, either budget)
+#   raw_ordered ............... P4 green     (hadamard_raw_ordered, either budget)
+#   srht_paired ............... P5 violet    (srht_inverse, srht_full, K=128,
+#                                             also soft_log_calibrated -- the Theorem-C
+#                                             "hero" estimator; no SRHT arm in fig7)
 #   hadamard_ordered .......... P6 red       (hadamard_paired, orthogonal_inverse, naive_log)
 #   hadamard_shuffled/permuted  P8 orange    (hadamard_random_paired)
 # --------------------------------------------------------------------------------------
@@ -83,7 +85,11 @@ SERIES_COLOR = {
     "random_uniform": P1,
     "random_binary": P2,
     "hadamard_raw_shuffled": P3,
+    "hadamard_raw_shuffled_2048": P3,
+    "hadamard_raw_shuffled_1024": P3,
     "hadamard_raw_ordered": P4,
+    "hadamard_raw_ordered_2048": P4,
+    "hadamard_raw_ordered_1024": P4,
     "srht_paired": P5,
     "hadamard_paired": P6,
     "hadamard_random_paired": P8,
@@ -95,6 +101,7 @@ SERIES_COLOR = {
     "soft_log": P1,
     "anscombe": P2,
     "naive_log": P6,
+    "soft_log_calibrated": P5,
     # fig8 design sizes
     "K64": P1,
     "K128": P5,
@@ -109,6 +116,8 @@ ARM_LABEL = {
     "hadamard_random_paired": "permuted Hadamard",
     "hadamard_raw_ordered": "raw ordered",
     "hadamard_raw_shuffled": "raw shuffled",
+    "hadamard_raw_ordered_2048": "raw ordered",
+    "hadamard_raw_shuffled_2048": "raw shuffled",
 }
 
 
@@ -240,11 +249,12 @@ def fig1_conceptmap() -> Path:
     ax.text(0.42, 0.46, "trade-off", rotation=-34, ha="center", va="bottom",
             fontsize=7, color=INK_GRAY, style="italic")
 
-    # Four regions.  (x, y, color, marker, size, label, label x/y, ha, va)
+    # Regions.  (x, y, color, marker, size, label, label x/y, ha, va)
     pts = [
         (0.22, 0.80, P6, "o", 90, "Ordered Hadamard /\nDCT / Fourier", 0.04, 0.90, "left", "bottom"),
         (0.82, 0.22, P1, "o", 90, "i.i.d. random\n+ DGI", 0.82, 0.115, "center", "top"),
         (0.22, 0.24, MUTED, "o", 70, "single fixed\npattern", 0.30, 0.24, "left", "center"),
+        (0.93, 0.50, P2, "o", 90, "tall random\n($N\\geq K+p$)", 0.905, 0.50, "right", "center"),
     ]
     for x, y, c, m, s, label, lx, ly, ha, va in pts:
         ax.scatter([x], [y], s=s, c=[c], marker=m, edgecolors="white",
@@ -338,16 +348,28 @@ def fig2_carrier_traces() -> Path:
 
 
 # --------------------------------------------------------------------------------------
-# Fig 3a  --  mean blind gain error vs W (log-log), one line per arm, rho = 1e-3
+# Fig 3a  --  median blind gain error vs W (log-log), one line per arm, rho = 1e-3.
+# Source: the audited frame-matched rerun (r3_fair): raw signed-Walsh arms at the same
+# 2048-frame budget as the physical arms.  Solid/filled = ratio AGC; dashed/open = the
+# windowed log-domain estimator of Theorem B (masked to the R>0 record).  Error bars at
+# each arm's best window = two-way (seeds-and-objects) clustered 95% bootstrap CI of the
+# median best-window error (fig3_bootstrap_cis.csv, scheme "two_way").
 # --------------------------------------------------------------------------------------
 def fig3a_error_vs_W() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig3_gain_error_e12_local_r1" / "fig3_gain_est_error.csv")
+    src = RESULTS / "paper_fig3_gain_error_r3_fair"
+    df = pd.read_csv(src / "fig3_gain_est_error.csv")
     df = df[np.isclose(df["rho"], 1e-3)]
+    cis = pd.read_csv(src / "fig3_bootstrap_cis.csv")
+    cis = cis[np.isclose(cis["rho"], 1e-3)
+              & (cis["estimator"] == "gain_rel_err_ratio")
+              & (cis["statistic"] == "log10_best_err")].set_index("basis")
 
     # Fixed plotting order (keeps overlaps predictable; low-contrast arms drawn on top).
+    # Matched-budget (2048-frame) arms only; the 1024-frame single-pass diagnostics are
+    # indistinguishable (see the r3_fair summary) and are not drawn.
     order = [
-        "hadamard_raw_ordered", "hadamard_raw_shuffled", "random_uniform",
+        "hadamard_raw_ordered_2048", "hadamard_raw_shuffled_2048", "random_uniform",
         "random_binary", "srht_paired", "hadamard_paired", "hadamard_random_paired",
     ]
     order = [b for b in order if b in set(df["basis"])]
@@ -357,17 +379,48 @@ def fig3a_error_vs_W() -> Path:
     ends = []
     for basis in order:
         sub = df[df["basis"] == basis]
-        curve = sub.groupby("W", as_index=False)["gain_rel_err"].mean().sort_values("W")
         color = SERIES_COLOR[basis]
-        ax.plot(curve["W"], curve["gain_rel_err"], marker="o", ms=5, lw=1.8,
+        # Ratio AGC (the published estimator): solid line, filled markers.
+        curve = sub.groupby("W", as_index=False)["gain_rel_err_ratio"].median().sort_values("W")
+        ax.plot(curve["W"], curve["gain_rel_err_ratio"], marker="o", ms=4.5, lw=1.8,
                 color=color, zorder=zorder_for(color),
                 markeredgecolor="white", markeredgewidth=0.5)
+        # Theorem-B log-domain estimator: thin dashed line, open markers, same colour.
+        logc = sub.groupby("W", as_index=False)["gain_rel_err_log"].median().sort_values("W")
+        ax.plot(logc["W"], logc["gain_rel_err_log"], marker="o", ms=3.4, lw=0.9,
+                linestyle=(0, (3, 2)), color=color, zorder=zorder_for(color) - 1,
+                markerfacecolor="white", markeredgecolor=color, markeredgewidth=0.8,
+                alpha=0.9)
+        # Two-way clustered CI of the median best-window error at the argmin-W of the
+        # median ratio curve.
+        if basis in cis.index:
+            row = cis.loc[basis]
+            w_best = float(curve.loc[curve["gain_rel_err_ratio"].idxmin(), "W"])
+            y_med = 10.0 ** float(row["median"])
+            y_lo = 10.0 ** float(row["ci_lo_two_way"])
+            y_hi = 10.0 ** float(row["ci_hi_two_way"])
+            ax.errorbar([w_best], [y_med],
+                        yerr=[[max(y_med - y_lo, 0.0)], [max(y_hi - y_med, 0.0)]],
+                        fmt="none", ecolor=color, elinewidth=1.1, capsize=2.4,
+                        zorder=zorder_for(color) + 3)
         xe = float(curve["W"].iloc[-1])
-        ye = float(curve["gain_rel_err"].iloc[-1])
+        ye = float(curve["gain_rel_err_ratio"].iloc[-1])
         xmax = max(xmax, xe)
         ends.append((xe, ye, color, ARM_LABEL[basis]))
     # Direct labels at line ends, vertically de-collided for the converging arms.
     place_end_labels(ax, ends, log_y=True, min_gap=0.135, fontsize=6.5)
+
+    # Estimator-style key (colours carry arm identity; styles carry the estimator).
+    from matplotlib.lines import Line2D
+    style_handles = [
+        Line2D([], [], color=TICK_INK, lw=1.8, marker="o", ms=4.5,
+               markeredgecolor="white", markeredgewidth=0.5, label="ratio AGC"),
+        Line2D([], [], color=TICK_INK, lw=0.9, linestyle=(0, (3, 2)), marker="o", ms=3.4,
+               markerfacecolor="white", markeredgecolor=TICK_INK, markeredgewidth=0.8,
+               label="log estimator (Thm B)"),
+    ]
+    ax.legend(handles=style_handles, loc="lower left", fontsize=6.0,
+              handlelength=1.7, labelspacing=0.3, borderaxespad=0.2)
 
     ax.set_xscale("log", base=2)
     ax.set_yscale("log")
@@ -384,7 +437,7 @@ def fig3a_error_vs_W() -> Path:
 # --------------------------------------------------------------------------------------
 def fig3c_collapse() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig3_gain_error_e12_local_r1" / "fig3_gain_est_error.csv")
+    df = pd.read_csv(RESULTS / "paper_fig3_gain_error_r3_fair" / "fig3_gain_est_error.csv")
     df = df[np.isclose(df["rho"], 1e-3)]
 
     collapse_arms = ["random_uniform", "random_binary", "srht_paired", "hadamard_random_paired"]
@@ -495,24 +548,108 @@ def fig4_relmse_theory_vs_sim() -> Path:
 
 
 # --------------------------------------------------------------------------------------
-# Fig 5  --  finite-N flip boundary: interpolated rho* vs sigma_a for R^2 >= 0.9 fits
+# Fig 5  --  (a) 45-cell winner/phase map, (b) empirical SRHT crossover (descriptive
+# power-law fits, NOT the Prop-3 boundary), (c) no-free-parameter Prop-3 skeleton test
+# (gain-known random arm) with the factor-2 band.  Two-column (figure*) layout.
+# Sources: results/prop3_nofreeparam_r1 (winner_table_cells.csv, scope
+# equal_frame_non_oracle; prop3_skeleton_oracle_test.csv; prop3_constants.csv) and the
+# existing results/m2_boundary_audit_hadamard_order_dense_r1 fits for panel (b).
 # --------------------------------------------------------------------------------------
 def fig5_flip_boundary() -> Path:
     apply_rcparams()
+    prop3 = RESULTS / "prop3_nofreeparam_r1"
+    winners = pd.read_csv(prop3 / "winner_table_cells.csv")
+    winners = winners[winners["scope"] == "equal_frame_non_oracle"].copy()
+    skel = pd.read_csv(prop3 / "prop3_skeleton_oracle_test.csv")
+    consts = pd.read_csv(prop3 / "prop3_constants.csv")
     audit = RESULTS / "m2_boundary_audit_hadamard_order_dense_r1"
     fits = pd.read_csv(audit / "m2_boundary_fit.csv")
     boundaries = pd.read_csv(audit / "m2_boundary_interpolated.csv")
 
+    fig, axes = plt.subplots(1, 3, figsize=(7.16, 2.45))
+
+    # ---------------- Panel (a): categorical winner map over the 45-cell grid ----------
+    ax = axes[0]
+    rhos = np.array(sorted(winners["rho"].unique()), dtype=float)      # 9 values
+    sigmas = np.array(sorted(winners["sigma_a"].unique()), dtype=float)  # 5 values
+
+    def log_edges(vals: np.ndarray) -> np.ndarray:
+        lv = np.log10(vals)
+        mid = 0.5 * (lv[1:] + lv[:-1])
+        lo = lv[0] - (mid[0] - lv[0])
+        hi = lv[-1] + (lv[-1] - mid[-1])
+        return 10.0 ** np.concatenate([[lo], mid, [hi]])
+
+    xe, ye = log_edges(rhos), log_edges(sigmas)
+    # Categories: 0 = noise floor (grey), 1 = SRHT-paired + pairwise (violet),
+    #             2 = hadamard_random_paired + scgi_proxy (orange, single marginal cell).
+    cat = np.zeros((len(sigmas), len(rhos)), dtype=int)
+    for _, row in winners.iterrows():
+        i = int(np.argmin(np.abs(sigmas - float(row["sigma_a"]))))
+        j = int(np.argmin(np.abs(rhos - float(row["rho"]))))
+        if not bool(row["above_floor"]):
+            cat[i, j] = 0
+        elif row["winner_basis"] == "srht_paired":
+            cat[i, j] = 1
+        else:
+            cat[i, j] = 2
+    cmap = mcolors.ListedColormap([tint(MUTED, 0.45), tint(P5, 0.28), tint(P8, 0.12)])
+    ax.pcolormesh(xe, ye, cat, cmap=cmap, vmin=-0.5, vmax=2.5,
+                  edgecolors="white", linewidth=0.6)
+    # Outline the single marginal orange cell (relMSE 0.468, near the gate).
+    ii, jj = np.argwhere(cat == 2)[0]
+    ax.add_patch(plt.Rectangle((xe[jj], ye[ii]), xe[jj + 1] - xe[jj], ye[ii + 1] - ye[ii],
+                               fill=False, edgecolor=P8, linewidth=1.3, zorder=6))
+    # Above-floor gate boundary (relMSE = 0.5 contour): heavy ink segments between
+    # above-floor and floor cells.
+    above = cat > 0
+    for i in range(len(sigmas)):
+        for j in range(len(rhos)):
+            if j + 1 < len(rhos) and above[i, j] != above[i, j + 1]:
+                ax.plot([xe[j + 1], xe[j + 1]], [ye[i], ye[i + 1]],
+                        color=TICK_INK, lw=1.4, zorder=5)
+            if i + 1 < len(sigmas) and above[i, j] != above[i + 1, j]:
+                ax.plot([xe[j], xe[j + 1]], [ye[i + 1], ye[i + 1]],
+                        color=TICK_INK, lw=1.4, zorder=5)
+    # Prop-3 gain-known skeleton boundary from median measured constants (dashed).
+    C0_over_N = float((consts["C0_pipeline"] / 2048.0).median())
+    KD = float((consts["K_eff"] * consts["D_H"]).median())
+    sig_curve = np.geomspace(ye[0], ye[-1], 200)
+    q = 2.0 * C0_over_N / (KD * sig_curve ** 2)
+    valid = q < 1.0
+    rho_curve = np.full_like(sig_curve, np.nan)
+    rho_curve[valid] = -np.log1p(-q[valid])
+    ax.plot(rho_curve, sig_curve, linestyle=(0, (4, 3)), lw=1.3, color=INK_GRAY, zorder=7,
+            label="Prop 3 skeleton\n(gain-known arm)")
+    ax.legend(loc="upper left", fontsize=5.6, handlelength=1.5, borderaxespad=0.25,
+              labelspacing=0.3)
+    # In-panel category labels.
+    ax.text(0.006, 0.10, "SRHT-paired\n+ pairwise\n(28 cells)", fontsize=6.2,
+            color=tuple(np.array(mcolors.to_rgb(P5)) * 0.75), fontweight="bold",
+            ha="center", va="center", zorder=8)
+    ax.text(3.2, 0.185, "noise floor\n(16 cells)", fontsize=6.2, color=TICK_INK,
+            ha="center", va="center", zorder=8)
+    ax.annotate("perm. Hadamard\n+ SCGI proxy (1)", xy=(0.42, 0.17), xytext=(1.9, 0.45),
+                fontsize=5.8, color=tuple(np.array(mcolors.to_rgb(P8)) * 0.85),
+                ha="center", va="center",
+                arrowprops=dict(arrowstyle="->", color=P8, lw=0.8), zorder=8)
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"$\rho_{\mathrm{pair}}$ (adjacent-pair decorrelation)")
+    ax.set_ylabel(r"gain amplitude $\sigma_a$")
+    ax.set_title("(a) winner map (45 cells)", fontsize=7.6, loc="left")
+    style_ax(ax)
+    ax.grid(False)
+
+    # ---------------- Panel (b): empirical SRHT crossover + power-law fits -------------
+    ax = axes[1]
     ok = fits[(fits["fit_status"] == "ok") & (fits["r2"] >= 0.9)].copy()
     ok = ok.sort_values("r2", ascending=False)
-
     # All ok fits are SRHT-paired vs ordered Hadamard under different correction refs;
     # give each correction a distinct, fixed palette hue (SRHT identity = violet first).
     corr_color = {"none": P5, "reference_k8": P1, "reference_k32": P2, "scgi_proxy": P8}
     corr_label = {"none": "no correction", "reference_k8": "ref k=8",
                   "reference_k32": "ref k=32", "scgi_proxy": "SCGI proxy"}
-
-    fig, ax = plt.subplots(figsize=(3.5, 2.7))
     for _, row in ok.iterrows():
         corr = str(row["correction"])
         color = corr_color.get(corr, PALETTE[0])
@@ -526,21 +663,58 @@ def fig5_flip_boundary() -> Path:
         pts = boundaries[mask].sort_values("sigma_a")
         if pts.empty:
             continue
-        ax.scatter(pts["sigma_a"], pts["rho_star_log_interp"], s=30, color=color,
+        ax.scatter(pts["sigma_a"], pts["rho_star_log_interp"], s=26, color=color,
                    edgecolors="white", linewidths=0.5, zorder=zorder_for(color) + 2,
                    label=f"{corr_label.get(corr, corr)} ($R^2$={float(row['r2']):.3f})")
         x = np.geomspace(float(pts["sigma_a"].min()), float(pts["sigma_a"].max()), 80)
         y = 10 ** (float(row["intercept"]) + float(row["sigma_a_exponent"]) * np.log10(x))
-        ax.plot(x, y, lw=1.4, color=color, zorder=zorder_for(color))
-
+        ax.plot(x, y, lw=1.3, color=color, zorder=zorder_for(color))
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"gain amplitude $\sigma_a$")
-    ax.set_ylabel(r"interpolated $\rho^{*}$")
+    ax.set_ylabel(r"empirical $\rho^{*}_{\mathrm{SRHT}}$")
+    ax.set_title("(b) empirical SRHT crossover", fontsize=7.6, loc="left")
     style_ax(ax)
-    ax.legend(loc="best", fontsize=6.3, handlelength=1.0, labelspacing=0.35,
-              handletextpad=0.4)
-    fig.tight_layout()
+    ax.legend(loc="lower left", fontsize=5.6, handlelength=1.0, labelspacing=0.3,
+              handletextpad=0.4, borderaxespad=0.2)
+
+    # ---------------- Panel (c): no-free-parameter Prop-3 skeleton test ----------------
+    ax = axes[2]
+    obs = skel[skel["emp_status"] == "observed"].copy()
+    cens = skel[skel["emp_status"] != "observed"].copy()
+    # Median predicted rho*(sigma) curve across objects, with its factor-2 band.
+    med_pred = skel.groupby("sigma_a")["rho_star_pred"].median()
+    sig_v = med_pred.index.to_numpy(dtype=float)
+    pred_v = med_pred.to_numpy(dtype=float)
+    fin = np.isfinite(pred_v)
+    ax.fill_between(sig_v[fin], pred_v[fin] / 2.0, pred_v[fin] * 2.0,
+                    color=tint(P1, 0.75), zorder=1, label="factor-2 band")
+    ax.plot(sig_v[fin], pred_v[fin], linestyle=(0, (4, 3)), lw=1.4, color=INK_GRAY,
+            zorder=3, label=r"predicted $\rho^{*}(\sigma_a)$ (no free param.)")
+    # Observed crossings (42 cells), jittered slightly in sigma for visibility.
+    rng = np.random.default_rng(20240708)
+    jitter = 10 ** (rng.uniform(-0.02, 0.02, size=len(obs)))
+    ax.scatter(obs["sigma_a"].to_numpy() * jitter, obs["rho_star_emp"], s=22, color=P1,
+               edgecolors="white", linewidths=0.4, zorder=5,
+               label="observed crossings (42 cells)")
+    # Censored cells at sigma_a = 0.05 (no crossing reached): open markers at top edge.
+    if len(cens):
+        ytop = float(np.nanmax([np.nanmax(obs["rho_star_emp"]), np.nanmax(pred_v[fin])])) * 2.6
+        ax.scatter(cens["sigma_a"], np.full(len(cens), ytop), marker="^", s=20,
+                   facecolors="white", edgecolors=TICK_INK, linewidths=0.8, zorder=5,
+                   label="censored (no crossing)")
+    ax.text(0.03, 0.05, "median factor 1.54;\n40/40 within 2$\\times$ for $\\sigma_a\\geq0.1$",
+            transform=ax.transAxes, fontsize=6.0, color=TICK_INK, ha="left", va="bottom")
+    ax.set_xscale("log")
+    ax.set_yscale("log")
+    ax.set_xlabel(r"gain amplitude $\sigma_a$")
+    ax.set_ylabel(r"$\rho^{*}$ (gain-known arm)")
+    ax.set_title("(c) Prop 3 skeleton test", fontsize=7.6, loc="left")
+    style_ax(ax)
+    ax.legend(loc="upper right", fontsize=5.6, handlelength=1.2, labelspacing=0.3,
+              handletextpad=0.4, borderaxespad=0.2)
+
+    fig.tight_layout(w_pad=1.3)
     return save(fig, "fig5_flip_boundary.png")
 
 
@@ -552,15 +726,20 @@ def fig6_ablation() -> Path:
     m = pd.read_csv(RESULTS / "srht_m3_audit_highrho_r2" / "m3_srht_delta_summary.csv")
 
     # Panel (a): delta vs ordered Hadamard (dB) at rho=1e-3 (agc correction).
+    # Truthful arm labels (perm-semantics audit, Appendix E.6): every "permutation" here
+    # reorders the Hadamard ROW/acquisition-time order (P_row); "signs" are i.i.d.
+    # Rademacher PIXEL sign flips (D).  No arm applies the pixel/column permutation
+    # P_col of the Appendix-E SRHT analysis (factorized P_col arms: Sec. 9.6 /
+    # results/perm_ablation_r1).
     row = m[(np.isclose(m["rho"], 1e-3)) & (m["correction"] == "agc")].iloc[0]
     base_psnr = float(row["hadamard_ordered_psnr"])
     arms = ["perm_only", "sign_only", "sign_block_shuffle", "sign_time_interleave", "srht_full"]
     arm_disp = {
-        "perm_only": "permutation only",
-        "sign_only": "sign only",
-        "sign_block_shuffle": "sign + block shuffle",
-        "sign_time_interleave": "sign + time interleave",
-        "srht_full": "full SRHT",
+        "perm_only": "row perm ($P_{\\mathrm{row}}$)",
+        "sign_only": "pixel signs ($D$)",
+        "sign_block_shuffle": "$D$ + block row shuffle",
+        "sign_time_interleave": "$D$ + time interleave",
+        "srht_full": "row perm + signs ($P_{\\mathrm{row}}{+}D$)",
     }
     deltas = [(a, float(row[a + "_psnr"]) - base_psnr) for a in arms]
 
@@ -582,7 +761,7 @@ def fig6_ablation() -> Path:
         ax.text(d + 0.06, ypos[i], f"{d:+.2f}", va="center", ha="left",
                 fontsize=6.3, color=TICK_INK)
     ax.set_yticks(ypos)
-    ax.set_yticklabels([arm_disp[a] for a, _ in deltas], fontsize=6.6)
+    ax.set_yticklabels([arm_disp[a] for a, _ in deltas], fontsize=6.2)
     ax.set_xlabel(r"$\Delta$ PSNR vs ordered (dB)")
     ax.set_xlim(0, max(d for _, d in deltas) * 1.22)
     ax.set_title(r"(a) ablation at $\rho=10^{-3}$", fontsize=8, loc="left")
@@ -612,16 +791,22 @@ def fig6_ablation() -> Path:
     style_ax(ax)
     ax.legend(loc="upper right", fontsize=6.0, handlelength=1.1, borderaxespad=0.2)
 
-    fig.tight_layout(w_pad=1.1)
+    fig.tight_layout(w_pad=1.1, rect=(0, 0.055, 1, 1))
+    fig.text(0.01, 0.012, r"all arms randomize acquisition time only --- "
+             r"no pixel-permutation ($P_{\mathrm{col}}$) arm (Sec. 9.6)",
+             fontsize=5.8, color=TICK_INK, style="italic", ha="left", va="bottom")
     return save(fig, "fig6_ablation.png")
 
 
 # --------------------------------------------------------------------------------------
-# Fig 7  --  low-photon gain MSE vs photon budget (three estimators + Fisher reference)
+# Fig 7  --  low-photon gain MSE vs photon budget: four estimator arms (naive clipped
+# log, Anscombe, uncalibrated soft-log proxy, and the CALIBRATED soft-log of Theorem C)
+# against the local Fisher reference 1/(W lambda_bar).
+# Source: the audited rerun results/paper_fig7_lowphoton_r3_calibrated.
 # --------------------------------------------------------------------------------------
 def fig7_gainMSE_vs_photon() -> Path:
     apply_rcparams()
-    df = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r2" / "fig7_lowphoton.csv")
+    df = pd.read_csv(RESULTS / "paper_fig7_lowphoton_r3_calibrated" / "fig7_lowphoton.csv")
     summary = df.groupby(["method", "photon_budget"], as_index=False).agg(
         y=("gain_rel_mse", "mean"),
         yerr=("gain_rel_mse", "std"),
@@ -640,27 +825,36 @@ def fig7_gainMSE_vs_photon() -> Path:
         ax.axvspan(xlo, xhi * (float(soft["photon_budget"].iloc[1] / soft["photon_budget"].iloc[0]) ** 0.5),
                    color=MUTED, alpha=0.18, zorder=1, label=r"$\bar\lambda<1$")
 
-    method_order = ["soft_log", "naive_log", "anscombe"]
-    method_disp = {"soft_log": "soft-log", "naive_log": "naive log", "anscombe": "Anscombe"}
+    # Draw order: background arms first, the Theorem-C calibrated estimator last (hero).
+    method_order = ["naive_log", "anscombe", "soft_log", "soft_log_calibrated"]
+    method_disp = {
+        "soft_log": "soft-log proxy (uncal.)",
+        "naive_log": "naive log",
+        "anscombe": "Anscombe",
+        "soft_log_calibrated": "calibrated soft-log (Thm C)",
+    }
     for method in method_order:
         g = summary[summary["method"] == method].sort_values("photon_budget")
         color = SERIES_COLOR[method]
+        hero = method == "soft_log_calibrated"
         ax.errorbar(g["photon_budget"], g["y"], yerr=g["yerr"].fillna(0.0),
-                    marker="o", ms=5, lw=1.8, capsize=2, color=color,
+                    marker=("D" if hero else "o"), ms=(4.6 if hero else 4.6),
+                    lw=(2.3 if hero else 1.5), capsize=2, color=color,
                     markeredgecolor="white", markeredgewidth=0.5,
-                    ecolor=color, elinewidth=0.8, zorder=zorder_for(color),
+                    ecolor=color, elinewidth=0.8,
+                    zorder=(9 if hero else zorder_for(color)),
                     label=method_disp[method])
 
     ref = summary.groupby("photon_budget", as_index=False)["fisher"].mean().sort_values("photon_budget")
     ax.plot(ref["photon_budget"], ref["fisher"], linestyle=(0, (4, 3)), lw=1.2,
-            color=INK_GRAY, zorder=3, label=r"$1/(W\bar\lambda)$")
+            color=INK_GRAY, zorder=3, label=r"Fisher ref. $1/(W\bar\lambda)$")
 
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel(r"mean photon budget $\bar\lambda$")
     ax.set_ylabel("gain MSE")
     style_ax(ax)
-    ax.legend(loc="lower left", fontsize=6.6, handlelength=1.4, labelspacing=0.3,
+    ax.legend(loc="lower left", fontsize=6.2, handlelength=1.4, labelspacing=0.3,
               borderaxespad=0.2)
     fig.tight_layout()
     return save(fig, "fig7_gainMSE_vs_photon.png")
