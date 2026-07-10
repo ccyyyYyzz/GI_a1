@@ -2,7 +2,7 @@
 % The wrapper (main.tex) issues \appendices before \input, so each \section below is
 % lettered A, B, ... automatically. Do NOT add \appendices here. Order A--F is preserved.
 
-Appendix~A supports Sec.~4 (Theorem~A and Corollaries 1--2); Appendix~B supports Sec.~4 (Theorem~A$'$, low-pass lemmas); Appendix~C supports Sec.~5 (Propositions 1--2, condition ($\bigstar$), Theorem~B); Appendix~D supports Sec.~6 (Theorems C--D, Fisher geometry, low-photon); Appendix~E supports Sec.~7 (SRHT Walsh condition, permutation bounds); Appendix~F supports Sec.~8 (Theorem~1, specializations, Prop~3). Heuristic or genericity steps are labeled as such inside each proof; every appendix ends its theorems with a ``What this does not claim'' paragraph.
+Appendix~A supports Sec.~4 (Theorem~A and Corollaries 1--2); Appendix~B supports Sec.~4 (Theorem~A$'$, parametric-transversality proof); Appendix~C supports Sec.~5 (Propositions 1--2, condition ($\bigstar$), Theorem~B); Appendix~D supports Sec.~6 (Theorems C--D, Fisher geometry, low-photon); Appendix~E supports Sec.~7 (SRHT Walsh condition, permutation bounds); Appendix~F supports Sec.~8 (Theorem~1, specializations, Prop~3). Heuristic or genericity steps are labeled as such inside each proof; every appendix ends its theorems with a ``What this does not claim'' paragraph.
 
 \section{Square-design non-identifiability}
 
@@ -38,7 +38,7 @@ reproduces the bucket record exactly: $e^{\ell'_n} c'_n = R_n$ for all $n$. If $
 
 The display in the main text (Sec.~4) is the instance $s = \bar\ell\,\mathbf 1 - \ell$: the drift is absorbed \emph{in one step} into the relabelled object $T' = M^{-1}\operatorname{diag}(a)MT$ (up to the gauge constant), leaving a constant gain. The hypothesis ``$a$ nonconstant on the support of $MT$'' in the main-text statement is exactly the distinctness condition established above.
 
-\paragraph{What this does not claim.} Theorem~A is a statement about the square case $N = K$ and an unconstrained object; for $N > K$ the construction fails unless $e^{-s}\odot MT$ remains in $\operatorname{range}(M)$, and the correct analysis is the tall-design collision count of Theorem~A$'$ (see Appendix~B). It does not say the record is uninformative about the gain in a statistical model: under random illumination, the \emph{relative} gain is consistently estimable (Theorem~B; see Appendix~C), a different --- statistical, asymptotic --- notion of identifiability which Theorem~A neither contradicts nor implies. Finally, Theorem~A is about uniqueness, not conditioning: it makes no claim about how well- or ill-posed any estimator is.
+\paragraph{What this does not claim.} Theorem~A is a statement about the square case $N = K$ and an unconstrained object; for $N > K$ the construction fails unless $e^{-s}\odot MT$ remains in $\operatorname{range}(M)$, and the correct analysis is the tall-design identifiability theory of Theorem~A$'$ (see Appendix~B). It does not say the record is uninformative about the gain in a statistical model: under random illumination, the \emph{relative} gain is consistently estimable (Theorem~B; see Appendix~C), a different --- statistical, asymptotic --- notion of identifiability which Theorem~A neither contradicts nor implies. Finally, Theorem~A is about uniqueness, not conditioning: it makes no claim about how well- or ill-posed any estimator is.
 
 \subsection{A.2 Corollary 1 (slowness does not help)}
 
@@ -113,227 +113,258 @@ A nonzero $F(s)$ means $M_sT \notin \mathcal T_\Omega$ (support constraint viola
 
 \paragraph{Remark A.2 (zero buckets).} If some $c_n = (MT)_n = 0$, two separate pathologies arise, which the statements above deliberately quarantine via (A4): the gain values $a_n$ at zero-carrier frames are entirely unobservable (a trivial extra ambiguity, of dimension $\dim(S \cap \{s : s = 0 \text{ on } \operatorname{supp}(c)\})$ beyond the count of Theorem~A), and log-domain processing of $R_n = 0$ is undefined, an estimation-side issue treated by the calibrated soft-log machinery of the low-photon analysis (Sec.~6; see Appendix~D), not an identifiability issue.
 
-\section{Tall-Design Thresholds and the Low-Pass Drift Space}
+\section{Tall-Design Identifiability: the Parametric-Transversality Proof}
 
-This appendix proves the tall-design identifiability thresholds quoted as \textbf{Theorem~A$'$} in Sec.~4 (local differential identifiability at $N\ge K+p-1$; generic exact finite-sample identifiability at $N\ge K+p$; uniform identifiability at $N\ge 2K+p-1$), restated below as Theorem~A$'$(i)--(iii), and the two lemmas that transfer these thresholds from \emph{generic} drift subspaces to the \emph{physical} Fourier low-pass drift space $S_{\mathrm{LP}}$. Throughout we distinguish carefully between fully rigorous steps and steps that are standard algebraic-geometry \emph{genericity / dimension-count} arguments; the latter are flagged where they occur.
+This appendix proves the tall-design identifiability results quoted as \textbf{Theorem~A$'$} in Sec.~4, restated in full as Theorem~A$'$(i)--(iv) in Sec.~B.8: the generic local threshold with a genuine \emph{iff} at $N=K+p-1$ for $K\ge2$, genuine (exact, positive-dimensional) failure below that wall, generic exact identifiability at $N\ge K+p$, uniform identifiability over the nonvanishing-carrier set at $N\ge 2K+p-1$, and the degenerate $K=1$ stratum. The proof route is \textbf{parametric transversality} (a rowwise design-perturbation witness plus Fubini), verified adversarially in review round R11; it holds for \textbf{every fixed drift subspace $S\ni\mathbf 1$} --- no genericity of $S$ is assumed anywhere, so the physical Fourier low-pass space $S_{\mathrm{LP}}$ is covered directly, with no transfer lemmas. Sharpness (necessity) of the two global thresholds is \textbf{not} claimed as a theorem; its status is stated precisely after Theorem~A$'$. This appendix \textbf{supersedes} the earlier incidence-variety/stratum-counting route (see Sec.~B.9); the superseded ``sharp iff'' statements at $N=K+p$ and $N=2K+p-1$ are withdrawn.
 
-\subsection{B.0 Setting, notation, and the meaning of ``generic''}
+\subsection{B.0 Setting, notation, and the reduction}
 
-The bucket record is $R_n=a_nB_n$ with $B=MT$, i.e. in vector form
-\begin{equation}
+The bucket record is $R_n=a_nB_n$ with $B=MT$: in vector form the data map is
+\[
 \begin{gathered}
-y=\operatorname{diag}(e^{\ell})\,M\,T,\qquad M\in\mathbb R^{N\times K},\ N>K,\\
-\ell\in S,\ T\in\mathbb R^{K}\setminus\{0\},
+\Phi_M(T,s)\;=\;D_{e^{s}}\,M\,T,\qquad M\in\mathbb R^{N\times K},\ N\ge K,\\
+s\in S,\ T\in\mathbb R^{K},
 \end{gathered}
+\]
+where $D_x=\operatorname{diag}(x)$, $e^{s}$ is componentwise, and the log-gain trajectory is confined to the fixed, known drift class $S\subset\mathbb R^{N}$ with $\dim S=p\ge2$ and $\mathbf 1\in S$. Write $y=MT$ for the carrier and define
+\[
+\begin{gathered}
+\mathcal U=\{(M,T):(MT)_n\neq0\ \forall n\},\\
+\mathcal U_M=\{T\in\mathbb R^K:(MT)_n\neq0\ \forall n\},\\
+\mathcal R=\{M\in\mathbb R^{N\times K}:\operatorname{rank}M<K\}.
+\end{gathered}
+\]
+$\mathcal U$ is open with null complement (each $\{m_n^\top T=0\}$ is a proper algebraic subset); $\mathcal R$ is a proper algebraic subset (vanishing of all $K\times K$ minors), hence Lebesgue-null. \textbf{Every exceptional set below explicitly includes $\mathcal R$ (or $\mathcal R\times\mathbb R^K$).} The gauge is $(T,s)\sim(cT,\,s-\log c\,\mathbf 1)$, $c>0$; identifiability is always modulo this gauge. ``For a.e.''\ always refers to Lebesgue measure on the stated parameter space.
+
+\begin{namedthm}{Lemma B.0 (reduction)}
+Assume $\operatorname{rank}M=K$ and $(M,T)\in\mathcal U$, and fix any $s\in S$. Then $(T',s')\in\mathbb R^K\times S$ is an alias of $(T,s)$ --- i.e.\ $\Phi_M(T',s')=\Phi_M(T,s)$ --- iff, with $d:=s-s'\in S$,
+\begin{equation}
+M\,T'\;=\;D_{e^{d}}\,M\,T.
 \tag{B.1}
 \end{equation}
-where $\ell=\log a$ is the log-gain trajectory, confined to the drift class $S\subset\mathbb R^{N}$ with $p=\dim S$. Set
-\[
-C=S\cap\operatorname{span}\{\mathbf 1\},\qquad c=\dim C\in\{0,1\},\qquad r=p-c .
-\]
-The integer $r$ counts the \emph{nonconstant} gain degrees of freedom. In the convention used throughout the paper, $\mathbf 1\in S$ (the constant direction is the unavoidable global-scale gauge $(a,T)\mapsto(ca,\,T/c)$), so $c=1$ and $r=p-1$. All identifiability statements are modulo this gauge. Via the bandwidth relation $p\approx\rho_{\mathrm{bw}}N$ of Sec.~2, every threshold below can be re-read as a condition on $\rho_{\mathrm{bw}}$; the pair-decorrelation parameter $\rho_{\mathrm{pair}}$ of Sec.~8 plays no role in this appendix.
+If $d=a\mathbf 1$ is constant, then (B.1) reads $MT'=e^{a}MT$ and full column rank gives $T'=e^{a}T$ --- exactly the gauge orbit with $c=e^{a}$; conversely every gauge point solves (B.1) with constant $d$. Hence $(M,T)$ is identifiable iff (B.1) has no solution $(T',d)$ with $d\in S\setminus\mathbb R\mathbf 1$. Moreover, fixing a complement $S_0$ of $\mathbb R\mathbf 1$ in $S$ ($\dim S_0=p-1$) and writing $d=d_0+a\mathbf 1$, the normalization $(T',d)\mapsto(e^{-a}T',d_0)$ maps solutions to solutions; so $(M,T)$ is identifiable iff (B.1) has no solution with $d\in S_0\setminus\{0\}$.
+\end{namedthm}
 
-\paragraph{Genericity convention.} ``Generic $M$'' (and, where stated, ``generic drift subspace'') means: outside a proper real semialgebraic subset of the relevant parameter space. Equivalently, the stated property holds almost surely when the excluded parameters are drawn from any distribution absolutely continuous with respect to Lebesgue measure. The standard proof route is to verify the property over $\mathbb C$ on a Zariski-open set and restrict to the real points; we use this convention silently below. Note at the outset that a \emph{deterministic structured} design --- e.g. an ordered Hadamard matrix --- is \textbf{not} covered by any genericity statement here and must be checked separately.
+\noindent\textbf{Proof.} $D_{e^{s}}$ is invertible, so record equality is equivalent to (B.1) with $d=s-s'$. Constant $d=a\mathbf 1$: row $n$ reads $m_n^\top T'=e^{a}y_n$, i.e.\ $MT'=e^{a}MT$, and $\operatorname{rank}M=K$ forces $T'=e^{a}T$, which is the gauge point $(cT,\,s-\log c\,\mathbf 1)$ with $c=e^{a}>0$. The equivariance $(T',d)\mapsto(e^{a}T',d+a\mathbf 1)$ is a direct substitution in (B.1). \hfill$\blacksquare$
 
-\subsection{B.1 The collision equation}
+Two structural remarks. \emph{(a) The reduction eliminates $s$:} identifiability is a property of $(M,T,S)$ alone, uniform over the true drift --- this is the source of the ``for every $s\in S$ simultaneously'' quantifier in every theorem below. \emph{(b) Full column rank is necessary:} for rank-deficient $M$ the equivalence ``constant $d$ $\Leftrightarrow$ gauge-trivial'' is \textbf{false} even on $\mathcal U$. Counterexample ($\operatorname{rank}M=1$): $N=K=2$, both rows of $M$ equal to $(0,1)$, $T=(0,1)^\top$, $T'=(1,1)^\top$: $MT=MT'=(1,1)^\top$, so $(T',d=0)$ solves (B.1) with constant $d$, yet $T'\notin\mathbb R T$ --- an object-kernel ambiguity invisible to the normalized $d\neq0$ incidence set. This is why $\mathcal R$ is carried explicitly in every exceptional set.
 
-\begin{namedthm}{Lemma B.1 (lifted collision equation)}
-Two parameter pairs $(\ell,T)$ and $(\ell',T')$, with $\ell,\ell'\in S$ and $T,T'\neq0$, produce identical noiseless records~(B.1) if and only if
+\paragraph{What this does not claim.} The reduction is exact but presupposes $\operatorname{rank}M=K$ and a nonvanishing carrier; neither is a restriction for the a.e.\ statements (both failure sets are null), but both must be --- and are --- carried explicitly.
+
+\subsection{B.1 Lemma B.1 (row dichotomy)}
+
+\begin{namedthm}{Lemma B.1}
+Let $(M,T)\in\mathcal U$ and let $(T',d)$ solve (B.1) with $d$ nonconstant ($d\notin\mathbb R\mathbf 1$). Then $T'$ is not a scalar multiple of $T$; consequently $T'-e^{d_n}T\neq0$ for every $n=1,\dots,N$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Suppose $T'=\beta T$. Row $n$ of (B.1): $\beta y_n=e^{d_n}y_n$; since $y_n\neq0$ on $\mathcal U$, $e^{d_n}=\beta$ for all $n$, so $d$ is constant --- contradiction. For the display: if $T'=e^{d_n}T$ for a single $n$, then $T'\parallel T$ ($T\neq0$ because $y=MT\neq0$). \hfill$\blacksquare$
+
+Only \emph{global} nonconstancy of $d$ is used --- partial constancy (some equal components) is harmless --- and the only division is by $y_n$, legitimate on $\mathcal U$.
+
+\subsection{B.2 Lemma B.2 (joint submersivity)}
+
+Define $F:\mathbb R^{N\times K}\times\mathbb R^K\times\mathbb R^K\times S_0\to\mathbb R^N$,
 \begin{equation}
-MT = D_s\,M\,T',\qquad s=\ell'-\ell\in S,\qquad D_s=\operatorname{diag}(e^{s}) .
+\begin{gathered}
+F(M,T,T',d)\;=\;MT'-D_{e^{d}}MT,\\
+F_n=m_n^\top\bigl(T'-e^{d_n}T\bigr).
+\end{gathered}
 \tag{B.2}
 \end{equation}
-The constant part of $s$ is exactly the gauge (a relative rescaling of $T$ vs.\ $T'$); consequently all non-gauge aliases are described by the incidence relation
+
+\begin{namedthm}{Lemma B.2}
+At every zero of $F$ with $(M,T)\in\mathcal U$ and $d\in S_0\setminus\{0\}$, the differential of $F$ with respect to $M$ alone is surjective onto $\mathbb R^N$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Perturb row $n$ only: $\delta M=e_n\,\delta m_n^\top$ gives $\delta F=e_n\cdot\delta m_n^\top(T'-e^{d_n}T)$, which spans $\mathbb R e_n$ as $\delta m_n$ ranges over $\mathbb R^K$, provided $T'-e^{d_n}T\neq0$ --- which holds at every such zero for every $n$ by Lemma B.1. Rows are decoupled, so the image contains every $e_n$. \hfill$\blacksquare$
+
+Only $\delta M$ is used: no genericity of $S$, no structure of $d$ beyond nonconstancy, and the object is untouched. This rowwise witness is uniform over the whole zero set --- the ingredient the superseded route lacked.
+
+\subsection{B.3 A measure lemma, and generic exact identifiability at $N\ge K+p$}
+
+\begin{namedthm}{Lemma B.3 ($C^1$ image of a lower-dimensional manifold is null)}
+Let $X$ be a second-countable $C^1$ manifold with $\dim X=m<q$, and $f:X\to\mathbb R^q$ a $C^1$ map. Then $f(X)$ has $q$-dimensional Lebesgue measure zero.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Second countability gives a countable chart cover $\varphi_i:U_i\to\mathbb R^m$, and each chart domain is exhausted by countably many compact cubes; by countable subadditivity it suffices to treat one compact cube $Q$ of side $\ell$. On $Q$, $g=f\circ\varphi_i^{-1}$ is $C^1$, hence Lipschitz with some constant $L$. Subdividing $Q$ into $k^m$ subcubes of side $\ell/k$, each image lies in a ball of radius $L\sqrt m\,\ell/k$ in $\mathbb R^q$, so the outer measure of $g(Q)$ is at most $k^m\,c_q(2L\sqrt m\,\ell/k)^q=C\,k^{m-q}\to0$ since $m<q$. \hfill$\blacksquare$
+
+No properness or compactness of $f$ is needed; the zero manifolds below are embedded in Euclidean space, hence second countable and $\sigma$-compact automatically. The statement is \textbf{false} for merely continuous maps (space-filling curves) --- the $C^1$ regularity supplied by Lemma B.2 is load-bearing.
+
+\begin{namedthm}{Theorem B.4 (generic exact identifiability; Theorem A$'$(ii))}
+Fix $S\ni\mathbf 1$, $\dim S=p\ge2$. If $N\ge K+p$, there is a Lebesgue-null set $E_{\mathrm{gen}}\subset\mathbb R^{N\times K}\times\mathbb R^K$ such that every $(M,T)\notin E_{\mathrm{gen}}$ is identifiable: for every $s\in S$, the only $(T',s')\in\mathbb R^K\times S$ with $\Phi_M(T',s')=\Phi_M(T,s)$ are the gauge orbit of $(T,s)$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Work on the open set $\Omega=\{(M,T,T',d):(M,T)\in\mathcal U,\ T'\in\mathbb R^K,\ d\in S_0\setminus\{0\}\}$. By Lemma B.2, $0$ is a regular value of $F$ on $\Omega$, so $Z=F^{-1}(0)\cap\Omega$ is an embedded real-analytic submanifold of codimension $N$:
+\[
+\dim Z=(NK+K)+K+(p-1)-N.
+\]
+The projection $\pi:Z\to\mathbb R^{N\times K}\times\mathbb R^K$ onto $(M,T)$ is $C^1$ and
+\[
+\dim Z-\dim(\mathbb R^{N\times K}\times\mathbb R^K)=K+p-1-N\le-1
+\]
+when $N\ge K+p$, so $\pi(Z)$ is Lebesgue-null by Lemma B.3. By the reduction (Lemma B.0, which requires $\operatorname{rank}M=K$),
+\[
+\{\text{non-identifiable pairs in }\mathcal U\}\;\subset\;(\mathcal R\times\mathbb R^K)\,\cup\,\pi(Z),
+\]
+and the full non-identifiable set is contained in $(\mathcal R\times\mathbb R^K)\cup\pi(Z)\cup\mathcal U^{c}$ --- three null sets. Set $E_{\mathrm{gen}}$ to their union. \hfill$\blacksquare$
+
+\paragraph{Remark B.4.1 (quantifier order, proved).} For a.e.\ $(M,T)$: for \textbf{every} $s\in S$, no non-gauge alias --- the null set $E_{\mathrm{gen}}$ is independent of $s$, because the reduction eliminated $s$ before any measure-theoretic step. This does \textbf{not} imply that one design works for every object; that is Theorem B.5 at its own larger threshold. ($T'=0$ needs no special handling: $T'=0$ forces $D_{e^{d}}y=0$, impossible on $\mathcal U$.)
+
+\paragraph{Remark B.4.2 (fixed-object slice).} For each \textbf{fixed} $T\neq0$: a.e.\ $M$ identifies that particular $T$ when $N\ge K+p$ (the exceptional design set may depend on $T$). Proof: freeze $T$, run the same argument with $F_T(M,T',d)=MT'-D_{e^{d}}MT$ on $\{M:(M,T)\in\mathcal U\}\times\mathbb R^K\times(S_0\setminus\{0\})$; Lemma B.2's witness uses only $\delta M$, the zero set has dimension $NK+K+(p-1)-N\le NK-1$ when $N\ge K+p$, and Lemma B.3 applies; add $\mathcal R$ and the proper algebraic set $\{M:(M,T)\notin\mathcal U\}$. This slice form is what covers the fixed structured objects of the Fig.~8 protocol.
+
+\paragraph{What this does not claim.} No claim of uniformity over objects for a fixed design (see Theorem B.5 and its counterexample); no claim at the boundary $N=K+p-1$ (necessity is open --- Sec.~B.8, sharpness paragraph); nothing about conditioning, noise, or estimators; deterministic structured designs are not covered by any a.e.\ statement.
+
+\subsection{B.4 Uniform identifiability on the nonvanishing-carrier set at $N\ge 2K+p-1$}
+
+\begin{namedthm}{Theorem B.5 (uniform sufficiency on $\mathcal U_M$; Theorem A$'$(iii))}
+Fix $S\ni\mathbf 1$, $\dim S=p\ge2$. If $N\ge 2K+p-1$, there is a Lebesgue-null set $E_{\mathrm{unif}}\subset\mathbb R^{N\times K}$ such that for every $M\notin E_{\mathrm{unif}}$: every $T\in\mathcal U_M$ is identifiable, for every $s\in S$ simultaneously.
+\end{namedthm}
+
+\noindent\textbf{Proof.} The solution set of (B.1) is scaling-equivariant --- $(T,T',d)$ solves iff $(cT,cT',d)$ does, $c\neq0$ --- and nonvanishing carrier and nonconstancy are scale-invariant, so it suffices to rule out solutions with $|T|=1$. Let
+\[
+\begin{gathered}
+\Omega'=\{(M,T,T',d):|T|=1,\ (M,T)\in\mathcal U,\\
+\hspace{5.2em} T'\in\mathbb R^K,\ d\in S_0\setminus\{0\}\},
+\end{gathered}
+\]
+an open subset of $\mathbb R^{N\times K}\times S^{K-1}\times\mathbb R^K\times S_0$. Lemma B.2 holds verbatim on $\Omega'$ (the sphere constrains $T$, not $M$), so $Z'=F^{-1}(0)\cap\Omega'$ is an embedded real-analytic manifold of codimension $N$ with
+\[
+\begin{aligned}
+\dim Z'&=NK+(K-1)+K+(p-1)-N\\
+&=NK+(2K+p-2-N),
+\end{aligned}
+\]
+and the projection $\pi':Z'\to\mathbb R^{N\times K}$ onto $M$ has deficit $2K+p-2-N\le-1$ when $N\ge2K+p-1$; $\pi'(Z')$ is null by Lemma B.3. Set $E_{\mathrm{unif}}=\mathcal R\cup\pi'(Z')$ (rank-deficient designs added explicitly: the reduction needs $\operatorname{rank}M=K$). If $M\notin E_{\mathrm{unif}}$ and $(T',d)$ solved (B.1) for some $T\in\mathcal U_M$, $d\in S_0\setminus\{0\}$, then rescaling by $c=1/|T|$ would put $(M,cT,cT',d)\in Z'$, i.e.\ $M\in\pi'(Z')$ --- contradiction. Lemma B.0 concludes. \hfill$\blacksquare$
+
+\paragraph{Remark B.5.1 (why $\mathcal U_M$ cannot be dropped: a zero-carrier counterexample at the threshold).} ``Every nonzero object'' is \textbf{false} even at $N=2K+p-1$. Take $K=2$, $p=2$, $N=5=2K+p-1$, $S=\operatorname{span}\{\mathbf 1,e_1\}$, $T=(1,1)^\top$, and $M$ with rows $(1,-1),(1,0),(0,1),(1,1),(1,2)$, so $MT=(0,1,1,2,3)^\top$ --- full column rank, first carrier coordinate zero. For every $t\neq0$, $d=t\,e_1\in S$ is nonconstant and $(T',d)=(T,\,t\,e_1)$ solves (B.1): row 1 reads $m_1^\top T'=e^{t}\cdot0=0$, rows 2--5 are unchanged. So $(T,s)$ and $(T,s-t\,e_1)$ produce identical records for every $t$ --- a one-parameter family of non-gauge aliases. This mechanism is available for \textbf{any} design: every object on the hyperplane $\{m_1^\top T=0\}$ acquires such aliases whenever $S$ contains a vector supported on the zero-carrier row. The correct conclusion is the stated one: for a.e.\ $M$, every $T\in\mathcal U_M$, every $s\in S$.
+
+\paragraph{What this does not claim.} Uniformity is over nonvanishing-carrier objects and drifts, not over designs: an adversarially chosen $M$ can defeat the bound. Necessity of $2K+p-1$ is not claimed (Sec.~B.8). No claim about recovery algorithms or noise.
+
+\subsection{B.5 Lemma W: position of the twisted column space}
+
+For $(M,T)\in\mathcal U$ with $\operatorname{rank}M=K$ define
+\[
+W(M,T)\;:=\;D_y^{-1}\operatorname{col}(M)\subset\mathbb R^N,\qquad y=MT,
+\]
+a $K$-dimensional subspace with $\mathbf 1\in W$ (since $D_y\mathbf 1=y\in\operatorname{col}(M)$). Aliases relate to $W$ by: \emph{$d\in S$ solves (B.1) for some $T'$ iff $e^{d}\in W(M,T)$} --- indeed $D_{e^{d}}y=D_y e^{d}$, so (B.1) reads $MT'=D_ye^{d}$, i.e.\ $e^{d}=D_y^{-1}MT'\in W$; conversely $e^{d}=D_y^{-1}Mu$ gives the (unique, by full column rank) solution $T'=u$.
+
+\begin{namedthm}{Lemma W}
+Fix any subspace $S\ni\mathbf 1$ with $\dim S=p\le N$, and $K\ge1$. For a.e.\ $(M,T)\in\mathcal U$, with $W=W(M,T)$:
 \begin{equation}
-[\,M,\ -D_s M\,]\begin{bmatrix}T\\ T'\end{bmatrix}=0
+\begin{aligned}
+\dim(S\cap W)&=1+\max\{0,\ (p-1)+(K-1)-(N-1)\}\\
+&=1+\max\{0,\,K+p-N-1\}.
+\end{aligned}
 \tag{B.3}
 \end{equation}
-with $s$ nonconstant modulo $C$. Equivalently, writing $U=\operatorname{range}(M)$, an alias exists iff $MT\in U\cap D_sU$.
+No genericity of $S$ is assumed or used --- only $\mathbf 1\in S$.
 \end{namedthm}
 
-\noindent\textbf{Proof.} $\operatorname{diag}(e^{\ell})$ is invertible, so equality of the two records is equivalent to (B.2). If $s$ is constant, $s=\sigma\mathbf 1$, then (B.2) reads $MT=e^{\sigma}MT'$; since $N>K$ and generic $M$ has full column rank, $T=e^{\sigma}T'$, which is the gauge orbit. Conversely a nonconstant $s\bmod C$ gives a genuinely distinct pair. Rewriting (B.2) as a nullspace condition gives (B.3). Finally, note that a kernel vector of $[M,-D_sM]$ with $T=0$ forces $D_sMT'=0$, hence $T'=0$ (both $M$ and $D_sM$ are injective for full-column-rank $M$); so every nonzero kernel element has both blocks nonzero. \hfill$\blacksquare$
+\noindent\textbf{Proof.} \emph{(Step 1: basis completion; fixed $T$.)} Fix $T\neq0$ and complete it to a basis $B_T=[T,b_2,\dots,b_K]\in GL_K$. The map $M\mapsto MB_T=(y,v_2,\dots,v_K)$ is a linear isomorphism of $\mathbb R^{N\times K}$, hence maps null sets to null sets both ways: a.e.\ $M$ $\Leftrightarrow$ a.e.\ $(y,v_2,\dots,v_K)$.
 
-This diagonal structure is why the generic bilinear counts of Kech--Krahmer (arXiv:1603.07316) do not apply verbatim: $y_n=a_n m_n^{\top}T$ is a \emph{diagonal-row} measurement, not a generic rank-one measurement, and the ambiguity is governed by the intersection of the fixed $K$-plane $U$ with its diagonally modulated copy $D_sU$.
+\emph{(Step 2: fixed-$y$ isomorphism.)} For fixed $y\in(\mathbb R^*)^N$ (a co-null condition), set $w_j:=D_y^{-1}v_j$. For fixed $y$ this is a linear isomorphism of $\mathbb R^{N(K-1)}$ in $(v_2,\dots,v_K)$ --- it preserves ``a.e.''\ and introduces no correlation between the $w_j$ and the fixed $S$. Then $W=D_y^{-1}\operatorname{span}(y,v_2,\dots,v_K)=\operatorname{span}(\mathbf 1,w_2,\dots,w_K)$.
 
-\subsection{B.2 The stratum-counting lemma}
+\emph{(Step 3: quotient.)} Let $q:\mathbb R^N\to\mathbb R^N/\mathbb R\mathbf 1$ (dimension $N-1$). $A:=q(S)$ has dimension $p-1$ (the kernel $\mathbb R\mathbf 1$ lies in $S$); $q(W)=\operatorname{span}(qw_2,\dots,qw_K)$.
 
-Let $B=\exp(S)/\mathbb R_{+}$ be the nonconstant gain-ratio manifold (dimension $r=p-1$), parametrizing the classes $b=e^{s}$ modulo positive scalars, $s$ nonconstant. For a \textbf{fixed} design $M$, stratify $B$ by the level sets of the rank function:
-\[
-\begin{gathered}
-B=\bigsqcup_{\alpha}B_{\alpha},\qquad r_\alpha:=\dim B_\alpha,\\
-\rho_\alpha := \operatorname{rank}[\,M,-D_bM\,]\ \text{constant for }b\in B_\alpha .
-\end{gathered}
-\]
-Such a finite stratification into locally closed strata exists for every $M$: after the substitution $u=e^{s}$ the rank function is semialgebraic in $u$, its finitely many level sets are semialgebraic, and finite semialgebraic stratification is standard (Bochnak--Coste--Roy, \emph{Real Algebraic Geometry}, Ch.~9). Define the \textbf{projective collision dimension}
+\emph{(Step 4: general position against the fixed $A$.)} For a.e.\ $(w_2,\dots,w_K)$: the $q(w_j)$ are independent and $\dim(A\cap q(W))=\max\{0,(p-1)+(K-1)-(N-1)\}$. Failure is the vanishing of suitable maximal minors of the matrix $[A\text{-basis}\mid qw_2\cdots qw_K]$ --- a polynomial condition in the $w_j$, not identically zero (a witness exists: against one fixed subspace, vectors can be chosen stepwise outside a finite union of proper subspaces), hence a proper algebraic --- null --- subset. This is general position with respect to the fixed $A$ only; no genericity of $S$.
+
+\emph{(Step 5: $q(S\cap W)=q(S)\cap q(W)$, via $\mathbf 1\in W$.)} ``$\subseteq$'' is trivial. ``$\supseteq$'': if $x\in S$, $x'\in W$ and $q(x)=q(x')$, then $x-x'\in\mathbb R\mathbf 1\subseteq W$, so $x\in W$, i.e.\ $x\in S\cap W$. The kernel of $q$ on $S\cap W$ is exactly $\mathbb R\mathbf 1$ (as $\mathbf 1\in S\cap W$), whence $\dim(S\cap W)=1+\dim(q(S)\cap q(W))$.
+
+\emph{(Step 6: Fubini twice, with Borel measurability.)} The quantifier order so far: for every fixed $T\neq0$, for a.e.\ $y$, for a.e.\ $(v_j)$ --- hence, by Steps 1--2 and Fubini on $\mathbb R^N\times\mathbb R^{N(K-1)}$, for every fixed $T\neq0$, for a.e.\ $M$, formula (B.3) holds. The failure set $B=\{(M,T)\in\mathcal U:\text{(B.3) fails}\}$ is Borel: the dimension condition is a Boolean combination of rank conditions (minor vanishing/nonvanishing) on matrices whose entries are rational in $(M,T)$ on $\mathcal U$ (the $w_j$ are entries of $M$ divided by coordinates of $MT$). Measurability licenses a second Fubini, over $T$: every $T$-slice of $B$ is $M$-null, so $B$ is null in $\mathbb R^{N\times K}\times\mathbb R^K$. \hfill$\blacksquare$
+
+\paragraph{Remark W.1 ($K=1$).} For $K=1$ the lemma \textbf{holds}: $W=\mathbb R\mathbf 1$ identically, $\dim(S\cap W)=1$, and (B.3) also gives $1+\max\{0,p-N\}=1$ since $p\le N$. What degenerates at $K=1$ is the necessity of the global thresholds (Sec.~B.7), not Lemma W.
+
+\paragraph{What this does not claim.} (B.3) is an a.e.\ statement over $(M,T)$; it says nothing about any \emph{particular} design (e.g.\ structured $M$), and nothing about the conditioning of the intersection, only its dimension.
+
+\subsection{B.6 The generic local threshold ($K\ge2$) and genuine failure below the wall}
+
+\paragraph{Kernel derivation (independent; no import from the superseded route).} Fix $(M,T)\in\mathcal U$ with $\operatorname{rank}M=K$ and any $s\in S$. The differential of $\Phi_M$ at $(T,s)$ is
 \begin{equation}
-\Delta_\alpha := r_\alpha + 2K-1-\rho_\alpha .
+D\Phi_M(T,s)[\delta T,\delta s]\;=\;D_{e^{s}}\bigl(M\,\delta T+D_y\,\delta s\bigr),\qquad y=MT.
 \tag{B.4}
 \end{equation}
-
-\begin{namedthm}{Lemma B.2 (stratum counting)}
-Fix $M\in\mathbb R^{N\times K}$ of full column rank and stratify $B$ as above. Consider the collision incidence variety
-\[
-Z_\alpha=\bigl\{(b,[T:T'])\in B_\alpha\times\mathbb P^{2K-1}\ :\ [M,-D_bM]\begin{bmatrix}T\\T'\end{bmatrix}=0\bigr\}.
-\]
-Then:
-\begin{enumerate}
-\item $Z_\alpha=\varnothing$ if and only if $\rho_\alpha=2K$; otherwise $\dim Z_\alpha=\Delta_\alpha$ (and then automatically $\Delta_\alpha\ge r_\alpha\ge0$).
-\item The ``bad first-object'' set contributed by stratum $\alpha$ --- the projection of $Z_\alpha$ to $[T]\in\mathbb P^{K-1}$ --- has dimension at most $\Delta_\alpha$.
-\item (Sufficiency, rigorous.) If $\max_\alpha\Delta_\alpha<K-1$, where the maximum runs over strata with $\rho_\alpha<2K$, then a generic object $T$ has no non-gauge alias. (Necessity, genericity-flagged.) Conversely, if some stratum has $\Delta_\alpha\ge K-1$ \textbf{and} the projection $Z_\alpha\to\mathbb P^{K-1}$ is dominant, a generic object has an alias.
-\item Uniform identifiability (every nonzero object alias-free) holds if and only if $\rho_\alpha=2K$ for every stratum --- equivalently, with the convention that the maximum in (3) runs over kernel-supporting strata (empty maximum $=-\infty$), iff $\max_\alpha\Delta_\alpha<0$.
-\end{enumerate}
-\end{namedthm}
-
-\noindent\textbf{Proof.} (1) For fixed $b\in B_\alpha$ the fiber of $Z_\alpha$ is the projectivized nullspace of $[M,-D_bM]$, of projective dimension $(2K-\rho_\alpha)-1=2K-1-\rho_\alpha$; it is empty iff the nullspace is $\{0\}$, i.e.\ iff $\rho_\alpha=2K$ (possible only when $N\ge2K$, since $\rho_\alpha\le\min(N,2K)$). On a constant-rank stratum the nullspaces form a vector bundle over $B_\alpha$ (constant-rank kernels vary continuously; locally trivial by choosing complementary minors), so the fiber dimension is constant and
-\[
-\dim Z_\alpha=\dim B_\alpha+(2K-1-\rho_\alpha)=\Delta_\alpha .
-\]
-When $\rho_\alpha\le 2K-1$ we get $\Delta_\alpha\ge r_\alpha\ge0$.
-
-(2) The image of a semialgebraic set under the projection $Z_\alpha\to\mathbb P^{K-1}$ has dimension at most $\dim Z_\alpha$ (semialgebraic dimension is non-increasing under maps; Bochnak--Coste--Roy, Prop.~2.8.6).
-
-(3) \emph{Sufficiency:} the union over the finitely many strata of the bad projections is semialgebraic of dimension $\le\max_\alpha\Delta_\alpha<K-1=\dim\mathbb P^{K-1}$, hence its complement is dense and full-measure. Every $T$ in the complement has no alias with any nonconstant ratio. This direction is fully rigorous. \emph{Necessity:} if $\Delta_\alpha\ge K-1$ and the projection is dominant, the image fills $\mathbb P^{K-1}$ up to lower-dimensional sets, so a generic $T$ has an alias. \textbf{Status:} the dominance of the projection for generic $M$ is a \emph{standard algebraic-geometry genericity assertion} --- failure of dominance is the vanishing of a Jacobian minor of the projection, hence a proper algebraic condition on $M$ once a single example with full projection rank exists; this rests on the usual dimension/transversality count and does not exhibit the witness per stratum. We record the necessity direction as resting on this dominant-projection argument, in the same way as the generic bilinear identifiability literature (Kech--Krahmer; Li--Lee--Bresler).
-
-(4) Uniform injectivity means (B.3) has no solution with nonconstant $s$ and $T,T'\neq0$, i.e.\ every fiber over every $b\in B$ is empty. By (1) this happens iff $\rho_\alpha=2K$ on every stratum. Since strata with $\rho_\alpha\le2K-1$ have $\Delta_\alpha\ge0$, the stated $\max\Delta_\alpha<0$ criterion is equivalent under the empty-maximum convention. This direction is deterministic and rigorous given the stratification. \hfill$\blacksquare$
-
-\paragraph{Remark (a boundary case).} A looser phrasing of claim 1 --- ``$Z_\alpha$ has dimension $\Delta_\alpha$ if $\Delta_\alpha\ge0$, empty if $\Delta_\alpha<0$'' --- would miss the case $\rho_\alpha=2K$, $r_\alpha\ge1$ (where $\Delta_\alpha=r_\alpha-1\ge0$ but $Z_\alpha=\varnothing$). The corrected bookkeeping above --- emptiness governed by $\rho_\alpha=2K$, not by the sign of $\Delta_\alpha$ --- is what claims 3--4 actually use, and is how the uniform threshold at $N\ge 2K+p-1$ (which lives in the regime $N>2K$) is consistent with $\rho_\alpha\le\min(N,2K)$.
-
-\paragraph{What this does not claim.} Lemma B.2 is a statement about \emph{exact noiseless collisions} only: it says nothing about conditioning, noise robustness, or the behavior of any estimator. It does not evaluate the ranks $\rho_\alpha$ --- that is where genericity of $M$ (Sec.~B.3) or the low-pass lemmas (Sec.~B.4) enter. It does not cover deterministic structured designs unless their stratum ranks are computed explicitly. The necessity half of claim 3 has genericity status as flagged.
-
-\subsection{B.3 Clean thresholds for generic drift families}
-
-On a \emph{generic} $p$-dimensional log-gain subspace, the ratio manifold has a dense open stratum on which $D_b$ has no forced coordinate equalities, and for generic $M$ the rank on that stratum is maximal:
-\begin{equation}
-\operatorname{rank}[\,M,-D_bM\,]=\min(N,2K).
-\tag{B.5}
-\end{equation}
-
-\begin{statusblock}\textbf{Status of (B.5):} this is the \emph{dominant-stratum hypothesis} --- a genericity/dimension-count assertion (a single $(M,b)$ witness with full rank makes the relevant minor a not-identically-zero polynomial, hence nonzero generically). For the physical low-pass space it is \emph{proved at generic-pair level} --- for each fixed nonconstant $b$, with the exceptional design set allowed to depend on $b$ --- in Sec.~B.4--B.5 below; the uniform-over-$b$ version for a single generic $M$ is a labeled dimension-count argument (Prop.~B.7, level (ii)). That is precisely why the low-pass lemmas matter.\end{statusblock}
-
-Under (B.5) the collision count takes a single unified form. If $N<2K$, the dense stratum has $\rho=N$ and, by Lemma B.2(1),
-\begin{equation}
-\Delta = r+2K-1-N .
-\tag{B.6}
-\end{equation}
-If $N\ge2K$, the dense stratum has $\rho=2K$ and empty fibers; collisions can then live only on the \emph{rank-drop locus} $\{b: \operatorname{rank}[M,-D_bM]\le 2K-1\}$. The corank-one determinantal variety in $\mathbb R^{N\times2K}$ has codimension $(N-2K+1)\cdot 1$ (classical; Eagon--Northcott / Bruns--Vetter, \emph{Determinantal Rings}), so a \emph{transversally embedded} $r$-parameter family meets it in a set of dimension $r-(N-2K+1)$, over which the kernel fiber is $0$-dimensional; the incidence dimension is again $r-(N-2K+1)+0=r+2K-1-N=\Delta$. Thus (B.6) controls both regimes. \textbf{Status:} the transversality of the structured family $b\mapsto[M,-D_bM]$ to the determinantal variety is again a genericity assertion of the same standard type, asserted rather than instance-verified.
-
-\begin{namedthm}{Theorem A$'$(i) (local differential threshold: $N\ge K+p-1$)}
-Let $M$ be generic, $S$ a generic $p$-dimensional log-gain space with $\mathbf 1\in S$ ($r=p-1$), and $T$ generic. After quotienting the global-scale gauge, the parameter manifold of pairs $(\ell\bmod C,\,[T])$ has dimension $(K-1)+r=K+p-2$, and the projectivized data space has dimension $N-1$. Local differential identifiability (injectivity of the differential of $(\ell,T)\mapsto[\operatorname{diag}(e^{\ell})MT]$ at generic points) holds iff $N-1\ge K+p-2$, i.e.\ $N\ge K+p-1$.
-\end{namedthm}
-
-\noindent\textbf{Proof.} Necessity is the dimension inequality: an injective linear map from a $(K+p-2)$-dimensional tangent space into an $(N-1)$-dimensional one requires $N-1\ge K+p-2$. For sufficiency, the differential has columns $M\,\delta T$ (object directions) and $\operatorname{diag}(MT)\,\delta\ell$, $\delta\ell\in S/C$ (gain directions), with the joint scale direction quotiented out. Full rank $K+p-2$ of this $N\times(K+p-1)$-block-minus-gauge system is the nonvanishing of some minor --- a polynomial condition in $(M,S,T)$. \textbf{Status:} the existence of a full-rank witness follows by ``a generic rank calculation,'' i.e.\ the standard specialization argument; the witness is not exhibited. We therefore record sufficiency as a \emph{standard dimension-count genericity argument}, consistent with its use throughout this literature. \hfill$\blacksquare$
-
-\paragraph{What this does not claim.} Local injectivity of the differential does not imply global uniqueness; at the boundary $N=K+p-1$ the map is generically locally finite-to-one but \textbf{not} generically one-to-one (see Theorem~A$'$(ii): there $\Delta=K-1$, so aliases generically exist). No statement is made about the singular values of the Jacobian, i.e.\ about conditioning.
-
-\begin{namedthm}{Theorem A$'$(ii) (sharp generic-point threshold: $N\ge K+p$)}
-For generic tall $M$ and a generic (transverse) nonconstant gain-ratio family of dimension $r=p-1\ge1$, almost every pair $(\ell,T)$ is identifiable modulo global scale iff $N>K+r$, i.e.\ iff
-\begin{equation}
-N\ \ge\ K+p .
-\tag{B.7}
-\end{equation}
-For $K<N\le K+p-1$, a generic object has a non-gauge algebraic alias: overdetermination alone is insufficient.
-\end{namedthm}
-
-\noindent\textbf{Proof.} By (B.6), the bad-object projection has dimension at most $\Delta=r+2K-1-N$ (Lemma B.2(2)). Generic-point identifiability holds when $\Delta<K-1$, i.e.\ $r+2K-1-N<K-1$, i.e.\ $N>K+r=K+p-1$; integrality gives (B.7). This direction inherits only the rank hypothesis (B.5) --- rigorous once (B.5) is established (for low-pass $S$, at generic-pair level by Sec.~B.5). For the converse, $N\le K+r$ gives $\Delta\ge K-1$, and under the dominant-projection assertion (Lemma B.2(3), genericity-flagged) the bad set fills $\mathbb P^{K-1}$, so a generic object has an alias. \hfill$\blacksquare$
-
-\paragraph{What this does not claim.} ``Generic'' excludes an unquantified measure-zero exceptional set of objects; below the uniform threshold, exceptional objects with exact aliases \emph{do} exist (the gap $K+p\le N<2K+p-1$ is real). The theorem says nothing about the conditioning of the inversion near $N=K+p$ --- uniqueness at the threshold is compatible with arbitrarily bad stability, which is a separate random-matrix question (Sec.~10). It does not apply to deterministic designs, and it does not say statistical mechanisms are useless above threshold --- only that they are not \emph{logically required} for identifiability.
-
-\begin{namedthm}{Theorem A$'$(iii) (sharp uniform threshold: $N\ge 2K+p-1$)}
-In the setting of Theorem~A$'$(ii), every nonzero object is identifiable modulo global scale iff $N\ge 2K+r=2K+p-1$.
-\end{namedthm}
-
-\noindent\textbf{Proof.} Uniform identifiability is emptiness of the whole collision incidence, i.e.\ $\Delta<0$ in the unified count: $r+2K-1-N<0 \iff N\ge 2K+r$. Concretely, for $N\ge 2K+r$ the rank-drop locus has expected dimension $r-(N-2K+1)\le r-(r+1)<0$ in the $r$-dimensional family, so (under the determinantal-transversality assertion flagged above) the family misses it entirely and every $b$ has trivial kernel, $\rho=2K$; Lemma B.2(4) concludes. Conversely for $2K\le N<2K+r$ the drop locus has nonnegative expected dimension and (generically, same flag) is nonempty, producing an exact alias for some object; for $N<2K$ the kernel is nontrivial for \emph{every} $b$, so uniform identifiability fails outright. \hfill$\blacksquare$
-
-\paragraph{What this does not claim.} Uniformity is over \emph{objects}, not over designs: $M$ and the drift family are still generic, and an adversarially chosen $M$ can defeat the bound. No claim is made about recovery algorithms or noise.
-
-\subsection{B.4 The two low-pass lemmas}
-
-The clean thresholds above rest on the rank identity (B.5), asserted generically. The physical drift space is not generic --- it is the Fourier low-pass space
-\begin{equation}
-\begin{gathered}
-S_{\mathrm{LP}}=\operatorname{span}\Bigl\{\mathbf 1,\ \cos\tfrac{2\pi qn}{N},\ \sin\tfrac{2\pi qn}{N}\ :\ q=1,\dots,m\Bigr\},\\
-p=\dim S_{\mathrm{LP}}=2m+1,
-\end{gathered}
-\tag{B.8}
-\end{equation}
-with $r=p-1=2m$ and the below-Nyquist condition $p\le N$. The next two lemmas verify (B.5) for this space \emph{without} any genericity assumption on $S$.
-
-\begin{namedthm}{Lemma B.5 (level-multiplicity bound; fully rigorous)}
-Let $s\in S_{\mathrm{LP}}$ be nonconstant, $p<N$. Then no value is attained by $(s_n)_{n=0}^{N-1}$ more than $2m=p-1$ times. Consequently the largest eigenvalue multiplicity of $D_s=\operatorname{diag}(e^{s_n})$ satisfies
-\begin{equation}
-m_{\max}(s)\ \le\ p-1 .
-\tag{B.9}
-\end{equation}
-\end{namedthm}
-
-\noindent\textbf{Proof.} Write $z_n=e^{2\pi i n/N}$; the $N$ points $z_0,\dots,z_{N-1}$ are distinct. Every $s\in S_{\mathrm{LP}}$ has the Laurent representation $s_n=\sum_{q=-m}^{m}c_qz_n^{q}$ with conjugate symmetry $c_{-q}=\overline{c_q}$ (real $s$). Suppose $s_n=c$ at more than $2m$ distinct indices. Then the ordinary polynomial
-\[
-P(z)=z^{m}\bigl(\textstyle\sum_{q=-m}^{m}c_qz^{q}-c\bigr),\qquad \deg P\le 2m,
-\]
-has more than $2m$ distinct roots on the unit circle, hence $P\equiv0$ (fundamental theorem of algebra). Then $s(z)\equiv c$ on the whole circle, so $s$ is the constant sequence --- contradiction. Since $x\mapsto e^{x}$ is injective, the eigenvalue multiplicities of $D_s$ equal the level multiplicities of $s$, giving (B.9). \hfill$\blacksquare$
-
-\begin{namedthm}{Lemma B.6 (generic rank of $[M,-DM]$ with repeated diagonal values)}
-Let $D\in\mathbb R^{N\times N}$ be a non-scalar diagonal matrix whose most-repeated diagonal value has multiplicity $m_{\max}$. Then for generic $M\in\mathbb R^{N\times K}$,
-\begin{equation}
-\operatorname{rank}[\,M,-DM\,]=\min\bigl(N,\ 2K,\ K+N-m_{\max}\bigr).
-\tag{B.10}
-\end{equation}
-\end{namedthm}
-
-\noindent\textbf{Proof.} \emph{Upper bound (deterministic --- holds for every $M$).} The column space of $[M,-DM]$ is $U+DU$ with $U=\operatorname{range}(M)$. Let $\lambda$ be a most-repeated diagonal value and write $D=\lambda I+Q$, so $Q$ is diagonal with exactly $N-m_{\max}$ nonzero entries, $\operatorname{rank}Q=N-m_{\max}$. Then $U+DU=U+QU$, hence
-\[
-\dim(U+DU)\ \le\ \dim U+\dim QU\ \le\ K+\min(K,\,N-m_{\max}),
-\]
-together with the trivial bounds $\le N$ and $\le 2K$. This is the right-hand side of (B.10).
-
-\emph{Lower bound (genericity via witness; status flagged).} It suffices to exhibit a single $M_0$ attaining the bound: then the corresponding maximal minor of $[M,-DM]$ is a polynomial in the entries of $M$ that is not identically zero, so it is nonzero off a proper algebraic set --- the standard specialization argument. One constructs $M_0$ in coordinates adapted to $Q$: order the coordinates so that the $Q$-active indices (those with $d_i\neq\lambda$) come first, and build the $K$ columns of $M_0$ by pairing active coordinates with inactive ones (each pair $u=e_{\text{act}}+e_{\text{inact}}$ contributes two independent directions to $U+QU$, since $Qu=q\,e_{\text{act}}$) and, when inactive coordinates are exhausted, pairing active coordinates carrying \emph{distinct} diagonal values (possible because no value has multiplicity exceeding $m_{\max}$), until the count saturates at $N$, $2K$, or $K+(N-m_{\max})$. \textbf{Status:} this is a construction sketch; the saturation bookkeeping across the finitely many cases is elementary but is not carried out line-by-line. We record the lower bound as a \emph{standard witness-plus-specialization genericity argument}, not as an instance-checked computation. \hfill$\blacksquare$
-
-\paragraph{What these lemmas do not claim.} Lemma B.5 is specific to the exact Fourier grid (B.8) below Nyquist; a different ``low-pass'' convention (e.g.\ a wavelet or spline drift class, or an off-grid Fourier family) can have larger level multiplicity and must be re-checked via (B.12) below. Lemma B.6 is a statement about \emph{generic} $M$ given $D$; a deterministic design may realize strictly smaller rank (only the upper bound is universal).
-
-\subsection{B.5 Transfer to the physical low-pass space}
-
-\begin{namedthm}{Proposition B.7 (low-pass transfer: a three-level hierarchy)}
-Let $S=S_{\mathrm{LP}}$ as in (B.8), $p=2m+1<N$, and suppose the generic-point threshold $N\ge K+p$ holds. The transfer of the clean thresholds of Theorem~A$'$(i)--(iii),
+The diagonal factor is invertible, so $(\delta T,\delta s)\in\ker\Leftrightarrow M\delta T=-D_y\delta s$; the right side lies in $\operatorname{col}(M)$ iff $\delta s\in D_y^{-1}\operatorname{col}(M)=W(M,T)$, and then $\delta T=-(M^\top M)^{-1}M^\top D_y\delta s$ is unique. Hence $\ker D\Phi_M(T,s)\cong S\cap W$ via $(\delta T,\delta s)\mapsto\delta s$, and
 \[
 \begin{gathered}
-\text{local: } N\ge K+p-1,\qquad \text{generic: } N\ge K+p,\\
-\text{uniform: } N\ge 2K+p-1 ,
+\dim\ker D\Phi_M(T,s)=\dim(S\cap W),\\
+\operatorname{rank}D\Phi_M(T,s)=K+p-\dim(S\cap W),
 \end{gathered}
 \]
-to the physical low-pass drift space holds at three distinct levels, which we state --- and use --- separately.
+independently of $s$. The gauge tangent is the line spanned by $(-T,\mathbf 1)$ (from $c\mapsto(cT,s-\log c\,\mathbf 1)$), and it lies in the kernel since $MT=D_y\mathbf 1$; as $\mathbf 1\in S\cap W$ always, the maximal gauge-compatible rank is $K+p-1$ and the defect from it is $\dim(S\cap W)-1$. This derivation is self-contained: nothing is imported from the superseded route, and no genericity of $S$ is used. By Lemma W, for a.e.\ $(M,T)\in\mathcal U$ and every $s$:
+\[
+\operatorname{rank}D\Phi_M(T,s)=\min\{N,\ K+p-1\}.
+\]
 
-(i) \textbf{Generic-pair statement (proven).} For each \textbf{fixed} nonconstant $s\in S_{\mathrm{LP}}$, a generic $M$ --- the exceptional design set may depend on $s$ --- satisfies
-\begin{equation}
-\operatorname{rank}[\,M,-D_sM\,]=\min(N,2K),
-\tag{B.11}
-\end{equation}
-i.e.\ the fixed pair $(M,s)$ behaves as the dense stratum of Sec.~B.3. Given (B.11) at a generic pair, the sufficiency directions of Theorem~A$'$(ii)--(iii) are rigorous for that pair; the necessity directions retain the dominant-projection flag of Lemma B.2(3).
-
-(ii) \textbf{Uniform over the drift family for a single generic $M$ (dimension-count argument --- not a theorem).} For fixed nonconstant $s$, let $c$ denote the codimension in $\mathbb R^{N\times K}$ of the bad-design set $X_s=\{M:\operatorname{rank}[M,-D_sM]<\min(N,2K)\}$ (a proper algebraic subset by level (i), so $c\ge1$). The nonconstant gain-ratio family is $(p-1)$-dimensional, so the union $\bigcup_{s}X_s$ is expected to have codimension $\ge c-(p-1)$, and a single generic $M$ avoids the entire union provided $c\ge p$. If the codimension of the rank drop matched the estimate for a \emph{free} $N\times2K$ matrix family --- corank one is determinantal of codimension $2K-N+1$ in the regime $K+p\le N<2K$ --- then $c=2K-N+1\ge p$ gives the explicit sufficient window $N\le 2K-p+1$; and in the regime $N\ge2K$ the drop codimension is $N-2K+1$, so $c\ge p$ reads $N\ge 2K+p-1$ --- recovering exactly the uniform threshold of Theorem~A$'$(iii). The count is stated for the \emph{constrained} family $[M,-D_sM]$ --- the two blocks share the same $M$, and $D_s$ ranges over a structured exponential-trigonometric family --- for which the free determinantal codimension is not automatic. We therefore label the whole of level (ii) a \textbf{dimension-count argument at heuristic level, not a theorem}. In particular, in the gap window $2K-p+1<N<2K+p-1$ even this count fails to cover the union, and only the generic-pair statement (i) is available there.
-
-(iii) \textbf{Empirical support (numerical, not proof).} The tall-design threshold scans at $K=64$ (1300 cells: five drift dimensions $p\in\{3,5,9,17,33\}$, 20 seeds per cell) and $K=128$ (1950 cells: same five $p$, 30 seeds per cell) --- Sec.~9, Fig.~8 --- find the local rank test transitioning from 0\% to 100\% pass \textbf{exactly} at $N=K+p-1$ for every $p$ at both object sizes (3250 cells, no exceptions) --- consistent with the uniform reading at the local-differential level, though a finite scan cannot prove it.
+\begin{namedthm}{Theorem B.6 (generic local iff; Theorem A$'$(i), rank part)}
+Fix $S\ni\mathbf 1$, $\dim S=p\ge2$, and $K\ge2$. There is a Lebesgue-null set $E_{\mathrm{loc}}\subset\mathbb R^{N\times K}\times\mathbb R^K$ --- take $E_{\mathrm{loc}}=(\mathcal R\times\mathbb R^K)\cup\mathcal U^c\cup B$ with $B$ the failure set of Lemma W --- such that for every $(M,T)\notin E_{\mathrm{loc}}$ with $T\in\mathcal U_M$ and every $s\in S$: $\operatorname{rank}D\Phi_M(T,s)=\min\{N,K+p-1\}$, and $(T,s)$ is locally identifiable modulo gauge \textbf{iff} $N\ge K+p-1$.
 \end{namedthm}
 
-\noindent\textbf{Proof of (i).} Fix a nonconstant $s\in S_{\mathrm{LP}}$. By Lemma B.5, $m_{\max}(s)\le p-1$. Apply Lemma B.6:
+\noindent\textbf{Proof.} The rank formula is the kernel derivation plus Lemma W. \emph{Sufficiency at $N\ge K+p-1$ (ordinary local injectivity modulo gauge):} write $S=\mathbb R\mathbf 1\oplus S_0$; the bookkeeping
+\[
+S\cap W=\mathbb R\mathbf 1\oplus(S_0\cap W)
+\]
+holds because for $x\in S\cap W$, $x=a\mathbf 1+x_0$ with $x_0\in S_0$ gives $x_0=x-a\mathbf 1\in W$. At maximal rank $\dim(S\cap W)=1$, so $S_0\cap W=0$. Restrict $\Phi_M$ to the gauge slice $\mathbb R^K\times(s+S_0)$, of dimension $K+p-1$: by (B.4) its differential at $(T,s)$ has kernel $\cong S_0\cap W=0$, so the restricted map is an immersion there, hence (constant-rank/immersion theorem) a local embedding --- locally injective on the slice. Any nearby alias is gauge-normalized into the slice by a factor $c$ near $1$, so ordinary local identifiability modulo gauge holds. \emph{Necessity at $N\le K+p-2$:} Theorem B.7 below supplies a positive-dimensional manifold of exact aliases through $(T,s)$ --- genuine failure, not merely a rank diagnostic. \hfill$\blacksquare$
+
+\begin{namedthm}{Theorem B.7 (genuine failure below the wall; Theorem A$'$(i), below-wall part)}
+Fix $S\ni\mathbf 1$, $K\ge2$, $N\le K+p-2$. For every $(M,T)\notin E_{\mathrm{loc}}$ with $T\in\mathcal U_M$ and every $s\in S$: through $(T,s)$ passes a real-analytic manifold of exact aliases of dimension $K+p-N-1\ge1$; every point with $d\neq0$ is gauge-inequivalent to $(T,s)$, and the aliased objects satisfy $T'(d)\to T$ as $d\to0$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} Let $P=\Pi_{W^\perp}$ be the orthogonal projection onto $W^\perp$ ($\dim W^\perp=N-K$ by full column rank) and define the real-analytic map $\varphi:S_0\to W^\perp$, $\varphi(d)=P(e^{d})$. Then $e^{d}\in W\Leftrightarrow\varphi(d)=0$ and $\varphi(0)=P\mathbf 1=0$. The differential is $D\varphi_0=P|_{S_0}$ ($\tfrac{d}{dt}\big|_0e^{td}=d$ componentwise; $P$ linear). By the bookkeeping $S\cap W=\mathbb R\mathbf 1\oplus(S_0\cap W)$ and Lemma W with $N\le K+p-2$ (the max in (B.3) is attained), $\dim(S_0\cap W)=K+p-N-1$, so
+\[
+\operatorname{rank}D\varphi_0=(p-1)-(K+p-N-1)=N-K=\dim W^\perp:
+\]
+$D\varphi_0$ is surjective. By the (real-analytic) submersion/implicit-function theorem, $\varphi^{-1}(0)$ is, near $0$, a real-analytic manifold of dimension $(p-1)-(N-K)=K+p-N-1\ge1$. For each $d$ in it, $e^{d}\in W$; with the left inverse $L=(M^\top M)^{-1}M^\top$ set
+\[
+T'(d)\;:=\;L\,D_y\,e^{d},
+\]
+so that $MT'(d)=D_ye^{d}$ ($D_ye^{d}=D_{e^{d}}y\in\operatorname{col}(M)$ precisely when $e^{d}\in W$): $(T'(d),d)$ solves (B.1), $T'(0)=Ly=T$, and $T'(d)\to T$ by continuity. Every $d\neq0$ lies in $S_0\setminus\{0\}$, hence $d\notin\mathbb R\mathbf 1$: a genuine non-gauge alias --- $(T,s)$ and $(T'(d),s-d)$ produce identical records but are gauge-inequivalent. \hfill$\blacksquare$
+
+\paragraph{Consistency check at $N=K$.} At $N=K$ (square, $\operatorname{rank}M=K$): $W=\mathbb R^N$, $W^\perp=0$, $\varphi\equiv0$, and the alias manifold is a full neighborhood of $0$ in $S_0$ --- ambiguity dimension $p-1$, exactly Theorem~A. There is no hidden $N\ge K+1$ assumption, and no contradiction ($p\ge2$ gives $K<K+p\le2K+p-1$, so the square case lies strictly below both global thresholds).
+
+\paragraph{What this does not claim.} The local iff is generic in $(M,T)$ --- a particular structured design must be checked separately. Local identifiability at $N\ge K+p-1$ does not imply global uniqueness (far aliases at the boundary are exactly the open sharpness question, Sec.~B.8). Nothing about the singular values of the Jacobian, i.e.\ conditioning.
+
+\subsection{B.7 The $K=1$ stratum}
+
+\begin{namedthm}{Theorem B.8 ($K=1$: global identifiability; Theorem A$'$(iv))}
+Let $K=1$. For every $M$, every $T\in\mathcal U_M$, and every $s\in S$, the pair $(T,s)$ is globally identifiable modulo gauge, for every admissible $N$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} $T\in\mathcal U_M$ means $T\neq0$ and $m_n\neq0$ for all $n$ (scalars $m_nT\neq0$). Any solution of (B.1) satisfies $e^{d_n}=m_nT'/(m_nT)=T'/T$ for every $n$, so $d$ is constant and $c:=T'/T=e^{d_1}>0$ --- the gauge. \hfill$\blacksquare$
+
+The local threshold at $K=1$ reads $N\ge K+p-1=p$, which is \textbf{automatically satisfied} ($S\subseteq\mathbb R^N$ forces $p\le N$) --- the threshold is vacuous, not ``inapplicable''. Consequently neither $N\ge K+p$ nor $N\ge2K+p-1$ is necessary at $K=1$: corner strata break naive universal-necessity claims, which is why all necessity statements in this appendix are restricted to $K\ge2$.
+
+\subsection{B.8 Theorem A$'$ --- the manuscript statement, and sharpness status}
+
+\begin{namedthm}{Theorem A$'$ (proved tall-design identifiability results)}
+Let $K\ge1$, $N\ge K$, and let $S\le\mathbb R^N$ be a fixed, known linear subspace of dimension $p\ge2$ with $\mathbf 1\in S$. For $M\in\mathbb R^{N\times K}$ define $\Phi_M(T,s)=D_{e^{s}}MT$ and $\mathcal U_M=\{T\in\mathbb R^K:(MT)_n\neq0$ for every $n\}$. Parameters are identified modulo the positive global-scale gauge $(T,s)\sim(cT,\,s-\log c\,\mathbf 1)$, $c>0$.
+
+(i) \textbf{(Generic local threshold and genuine failure below it, $K\ge2$.)} There is a Lebesgue-null set $E_{\mathrm{loc}}\subset\mathbb R^{N\times K}\times\mathbb R^K$ such that for every $(M,T)\notin E_{\mathrm{loc}}$ with $T\in\mathcal U_M$ and every $s\in S$: $\operatorname{rank}D\Phi_M(T,s)=\min\{N,K+p-1\}$. Consequently $(T,s)$ is locally identifiable modulo gauge iff $N\ge K+p-1$. If $N\le K+p-2$ then a gauge-normalized neighborhood of $(T,s)$ contains a real-analytic manifold of exact aliases of dimension $K+p-N-1\ge1$, and every other sufficiently nearby point of it is gauge-inequivalent.
+
+(ii) \textbf{(Generic exact-identifiability sufficiency.)} If $N\ge K+p$, there is a Lebesgue-null set $E_{\mathrm{gen}}\subset\mathbb R^{N\times K}\times\mathbb R^K$ such that for every $(M,T)\notin E_{\mathrm{gen}}$ and every $s\in S$: $D_{e^{s'}}MT'=D_{e^{s}}MT$ with $(T',s')\in\mathbb R^K\times S$ implies $T'=cT$, $s'=s-\log c\,\mathbf 1$ for a unique $c>0$. Exact identifiability holds simultaneously for every possible true drift $s\in S$. This statement is \textbf{not} uniform over all objects for one fixed $M$.
+
+(iii) \textbf{(Uniform exact-identifiability sufficiency on the nonvanishing-carrier set.)} If $N\ge2K+p-1$, there is a Lebesgue-null set $E_{\mathrm{unif}}\subset\mathbb R^{N\times K}$ such that for every $M\notin E_{\mathrm{unif}}$, every $T\in\mathcal U_M$, every $s\in S$, and every $(T',s')\in\mathbb R^K\times S$: $D_{e^{s'}}MT'=D_{e^{s}}MT$ implies $T'=cT$, $s'=s-\log c\,\mathbf 1$ for a unique $c>0$. The same generic design works simultaneously for all nonvanishing-carrier objects and all true drifts in $S$.
+
+(iv) \textbf{(Degenerate one-dimensional object stratum.)} If $K=1$ then for every $M$ and every $T\in\mathcal U_M$ and every $s\in S$, the pair $(T,s)$ is globally identifiable modulo gauge, for every admissible $N$. Neither $N\ge K+p$ nor $N\ge2K+p-1$ is necessary when $K=1$.
+\end{namedthm}
+
+\noindent\textbf{Proof.} (i) = Theorems B.6--B.7 ($E_{\mathrm{loc}}$ from Lemma W); (ii) = Theorem B.4; (iii) = Theorem B.5; (iv) = Theorem B.8 (which holds for every $M$, not just a.e.). \hfill$\blacksquare$
+
+\begin{statusblock}\textbf{Sharpness status.} Parts (ii) and (iii) are sufficient conditions, not proved if-and-only-if thresholds. For $K\ge2$, the below-wall part of (i) proves generic exact failure whenever $N\le K+p-2$. The remaining necessity assertion for the $K+p$ bound is the boundary case $N=K+p-1$: dimension counting predicts nonlocal aliases there, but dominance of the bad-pair projection has not been proved. Likewise, dimension counting predicts that a generic design fails uniform identifiability for some object when $N\le2K+p-2$, but this necessity direction has not been proved in the intermediate regime. Thus $K+p$ and $2K+p-1$ are conjecturally sharp for $K\ge2$ under generic/nondegenerate drift geometry, not universal sharp thresholds for every fixed $S$. The $K=1$ stratum explicitly rules out any universal necessity claim.\end{statusblock}
+
+\paragraph{What this does not claim.} Necessity of the two global thresholds (see the sharpness paragraph); anything about deterministic structured designs (the ordered-Hadamard obstruction of Theorem~A is unaffected, and no a.e.\ statement covers a fixed named design); anything about conditioning, noise robustness, or estimators --- uniqueness at a threshold is compatible with arbitrarily bad stability; and no coverage of objects constrained to lower-dimensional sets (e.g.\ exactly sparse) --- open constraint sets (e.g.\ positivity with nonvanishing carrier) inherit all a.e.\ statements by restriction. The Fig.~8 experiment (Sec.~9) is evidence for the \emph{local rank wall} of part (i) --- with the fixed-object slice covered by Remark B.4.2 --- and probes algorithmic recovery; it neither tests nor proves the sharpness predictions.
+
+\subsection{B.9 Relation to the superseded incidence-variety route}
+
+Earlier versions of this appendix proved Theorem~A$'$ through a collision incidence variety: a stratum-counting lemma over the gain-ratio manifold, a dominant-stratum rank hypothesis $\operatorname{rank}[M,-D_bM]=\min(N,2K)$, a determinantal-transversality argument for the rank-drop locus, and two low-pass lemmas (a level-multiplicity bound for $S_{\mathrm{LP}}$ and a generic-rank lemma for $[M,-DM]$) feeding a three-level transfer proposition. \textbf{That route is superseded (R11), and its claims are withdrawn or replaced as follows.}
+
 \begin{itemize}
-\item If $N<2K$: the threshold gives $p-1\le N-K-1<2K-K-1<K$, so $K+N-m_{\max}\ge K+N-(p-1)>N$, and (B.10) yields $\operatorname{rank}=N=\min(N,2K)$.
-\item If $N\ge2K$: the threshold gives $p-1\le N-K-1\le N-K$, so $K+N-m_{\max}\ge 2K$, and (B.10) yields $\operatorname{rank}=2K=\min(N,2K)$.
+\item The former ``sharp iff'' statements at $N\ge K+p$ (generic) and $N\ge2K+p-1$ (uniform) are \textbf{withdrawn}: their necessity directions rested on unproved dominant-projection and determinantal-transversality assertions. The proved statements are the sufficiency directions, now established by Theorems B.4--B.5 above, together with the genuinely sharp \emph{local} iff at $N=K+p-1$ (Theorem B.6) and genuine below-wall failure (Theorem B.7). Sharpness of the two global thresholds is a labeled prediction (Sec.~B.8).
+\item The former uniform claim quantified over ``every nonzero object''; that is \textbf{false} at the stated threshold (Remark B.5.1) and is replaced by uniformity over the nonvanishing-carrier set $\mathcal U_M$.
+\item The former route needed genericity of the drift family (or the low-pass transfer lemmas to emulate it). The parametric-transversality proof holds for \textbf{every fixed $S\ni\mathbf 1$}, so the low-pass transfer machinery (level-multiplicity bound, generic-rank lemma, three-level transfer hierarchy, and the $L_S$ multiplicity check) is no longer needed for Theorem~A$'$ and is not restated here; the withdrawn material remains available in the archived drafts for provenance.
+\item The $K=1$, $N=p=2$ counterexample that broke the old claimed generic threshold is absorbed as the degenerate stratum, Theorem~A$'$(iv).
 \end{itemize}
-This arithmetic is exact and rigorous, and for fixed $s$ Lemma B.6's exceptional design set is a proper algebraic subset (depending on $D_s$), which is exactly the generic-pair claim. Levels (ii) and (iii) carry the statuses stated above and are \textbf{not} part of what is proven. \hfill$\blacksquare$
 
-\paragraph{Other low-pass conventions.} If the implemented drift class is not exactly (B.8), define its maximal nonconstant level multiplicity
-\begin{equation}
-L_S=\sup_{\substack{s\in S\\ s\ \text{nonconstant}}}\ \max_{c}\ \#\{n: s_n=c\}.
-\tag{B.12}
-\end{equation}
-By the same arithmetic, the clean thresholds are guaranteed whenever
-\begin{equation}
-L_S\le K\ \ (\text{if }N<2K)\qquad\text{or}\qquad L_S\le N-K\ \ (\text{if }N\ge2K).
-\tag{B.13}
-\end{equation}
-If (B.13) fails, the clean $N\ge K+p$ statement must \textbf{not} be used; instead apply the stratum formula of Lemma B.2 with $\rho_\alpha=\min(N,2K,K+N-m_\alpha)$, where $m_\alpha$ is the diagonal multiplicity on stratum $\alpha$: generic-point identifiability iff $\max_\alpha(r_\alpha+2K-1-\rho_\alpha)<K-1$, uniform iff $<0$ (kernel-supporting-strata convention). For the standard Fourier space (B.8), (B.13) holds automatically at $N\ge K+p$ and no correction is needed.
-
-\paragraph{What this does not claim.} The transfer is proven at the \emph{generic-pair} level only: level (ii)'s uniform-over-drift statement is a labeled dimension-count argument --- sufficient windows $N\le 2K-p+1$ and $N\ge 2K+p-1$ under the free determinantal codimension estimate, with the gap window $(2K-p+1,\,2K+p-1)$ covered at generic-pair level only --- and level (iii)'s exact empirical $N=K+p-1$ rank transition supports, but does not prove, the uniform reading at the local level. Beyond that, the transfer says nothing about the regime $K<N<K+p$, where tallness is insufficient \emph{even generically} and the statistical stationarity anchor of Sec.~5 (Theorem~B) or a support/sparsity prior is required --- the low-pass structure does not rescue algebraic identifiability below threshold, and at $p\approx N$ ($\rho_{\mathrm{bw}}\to1$) blind algebraic separation is impossible for any $N$. It does not claim well-conditioned inversion at or near $N=K+p$. It does not cover deterministic designs (the ordered-Hadamard obstruction of Theorem~A is unaffected). And it certifies only the exact grid-Fourier below-Nyquist model; any other drift-class implementation must pass the $L_S$ check (B.12)--(B.13) before the clean thresholds are quoted.
+\paragraph{What this section does not claim.} Nothing in the superseded route is relied upon anywhere in Secs.~B.0--B.8; conversely, no assertion of the superseded route beyond the ones re-proved above should be quoted from earlier drafts.
 
 \section{Carrier statistics and the stationarity anchor}
 
@@ -730,6 +761,40 @@ For dense objects of bounded dynamic range, $K_\infty\asymp K_4\asymp K_{\mathrm
 
 \paragraph{What this does not claim.} Proposition E.5 controls window \emph{energy} over the sign draw for a pre-specified finite window family; it is a sufficient concentration tool, not the deterministic necessary-and-sufficient condition (which remains the spectral condition of Theorem E.2(3) applied to $w^P$), and it does not cover all $\binom{K}{W}$ windows simultaneously without paying for the larger union. The constants $c,C$ are universal but not optimized, and no claim is made that (E.8) is tight in its $W$- or $K_\infty$-dependence --- Hanson--Wright and matrix-Bernstein refinements can improve window-family dependence for structured $\mathcal{A}$, but they do not change the deterministic criterion. Finally, all of Appendix~E concerns the carrier statistics of the \emph{design}; the translation of whitening into gain-estimation rates ($1/W$ per window) and into image error (leverage $B_L=1$ for full SRHT inversion) is carried out in Appendix~D and Appendix~F respectively.
 
+\subsection{E.6 Two randomization semantics: pixel randomization ($P_{\mathrm{col}}$, $D$) vs.\ acquisition-order randomization ($P_{\mathrm{row}}$)}
+
+\textbf{This subsection separates two operations that earlier drafts conflated under the single word ``permutation''.} Write $P_{\mathrm{col}}$ for a uniformly random \textbf{pixel (column) permutation} of the object --- the $P$ of assumption (E3) --- write $D$ for the i.i.d.\ Rademacher \textbf{pixel sign} diagonal of (E3), and write $P_{\mathrm{row}}$ for a uniformly random reordering of the \textbf{acquisition (Hadamard row / time) order}. These control different claims:
+
+\begin{itemize}
+\item \textbf{Appendix E's theorems govern cross-row covariance.} By Lemma E.1, the sign-draw covariance $\operatorname{Cov}_D(Z_g,Z_h)=\widehat{w^P}(g+h)$ is a function of the permuted squared object $w^P$ alone; it is therefore \textbf{invariant to the acquisition order} --- $P_{\mathrm{row}}$ does not enter Lemma E.1 or Theorems E.2--E.3 at all. The whitening randomization of the theory is $x=UDP_{\mathrm{col}}T$: pixel signs plus pixel permutation, in \emph{natural} acquisition order.
+\item \textbf{The manuscript's temporal-stationarity screen is controlled by acquisition-order structure.} The Brown--Forsythe/Levene screen of Sec.~7 probes temporal homogeneity of the acquired time series; it responds to whatever breaks the coarse-to-fine sequency-energy ordering of natural Hadamard rows --- which either $P_{\mathrm{col}}$ \textbf{or} $P_{\mathrm{row}}$ accomplishes.
+\end{itemize}
+
+\paragraph{Factorized ablation (empirical attribution; \texttt{results/perm\_ablation\_r1/}).} All arms share the same ordered natural-Hadamard baseline ($K=4096$, $64\times64$, 8192 paired frames, noiseless carrier), the same 10-object panel, and the same Levene protocol (8 chunks, reject at $p<10^{-3}$); 32 draws per randomized arm. Levene rejection rates:
+
+\begin{center}
+\small
+\begin{tabular}{lcccc}
+\toprule
+arm & $P_{\mathrm{col}}$ & $D$ & $P_{\mathrm{row}}$ & rate \\
+\midrule
+ordered (baseline) & -- & -- & -- & \textbf{0.700} \\
+$P_{\mathrm{col}}$ only (theory's $P$) & Y & -- & -- & \textbf{0.056} \\
+$P_{\mathrm{row}}$ only & -- & -- & Y & \textbf{0.122} \\
+$D$ only & -- & Y & -- & \textbf{0.434} \\
+$P_{\mathrm{col}}+D$ (theory) & Y & Y & -- & \textbf{0.119} \\
+$P_{\mathrm{row}}+D$ (code's \texttt{srht\_paired}) & -- & Y & Y & \textbf{0.059} \\
+$P_{\mathrm{col}}+P_{\mathrm{row}}$ (old Exp.-B arm) & Y & -- & Y & \textbf{0.059} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The $P_{\mathrm{col}}+P_{\mathrm{row}}$ arm reproduces the historical headline ($19/320=5.9\%$) exactly, confirming the seed-compatible reconstruction of the old experiment; that historical 5.9\% is attributable to \emph{either} permutation alone ($P_{\mathrm{col}}$: 5.6\%; $P_{\mathrm{row}}$: 12.2\%).
+
+\paragraph{Code caveat (stated plainly).} The implemented basis \texttt{make\_srht\_paired\_basis} (\texttt{src/basis.py}, \texttt{permute\_rows=True}) applies pixel signs $D$ but permutes \textbf{Hadamard rows} (acquisition order), i.e.\ it implements $P_{\mathrm{row}}+D$ --- \textbf{not} the theorem's $P_{\mathrm{col}}+D$. Both combinations are empirically sufficient for the temporal-stationarity screen (5.9\% and 11.9\%, versus 70\% ordered), while \textbf{$D$ alone is not} (43.4\%): sign flips whiten carrier \emph{amplitudes} (chunk-std CV collapses from 0.76 to 0.03) but leave the temporal sequency ordering intact, so the chunk-variance test still rejects. Text and captions must therefore attach each claim to its own arm: the covariance-whitening claims of E.1--E.3 attach to $P_{\mathrm{col}}$ (+$D$); the temporal-screen results attach to the arm actually acquired ($P_{\mathrm{row}}+D$ for the code's SRHT).
+
+\paragraph{What this does not claim.} The table is an empirical attribution on one object panel and one protocol, not a theorem; no claim is made that $P_{\mathrm{row}}$ enjoys the concentration guarantees (E.2)--(E.4), which are proved for $P_{\mathrm{col}}$. The small increase from adding $D$ on top of $P_{\mathrm{col}}$ ($5.6\%\to11.9\%$) is a property of the variance-homogeneity test on near-white sequences, not a whitening failure. Nothing here alters the theorems of E.1--E.5; it fixes which experimental arm may cite them.
+
 \section{The master finite-noise identity and the flip boundary}
 
 This appendix proves Theorem~1 (the master finite-noise relMSE identity) and Prop~3 (the finite-$N$ flip boundary) of Sec.~8, together with the noise plug-ins and the three basis specializations quoted there. Throughout, $T\in\mathbb{R}^K$ is the object, with $S_1$, $S_2$, $K_{\mathrm{eff}}$ as in Appendix~C; $A\in\mathbb{R}^{N\times K}$ is the design, $b=AT$ the ideal bucket vector; the raw bucket is $R_n=a_nB_n$ with gain $a_n=e^{\ell_n}$, $\ell\in S$ (the drift class of Sec.~4, $p=\dim S$). After the pipeline applies a gain estimate $\hat a_n=e^{\hat\ell_n}$, the corrected bucket is
@@ -741,7 +806,17 @@ where $\delta_n$ is the \emph{residual} multiplicative gain error and $\xi_n$ is
 \subsection{F.1 The master identity}
 
 \begin{namedthm}{Theorem 1 (exact second-moment bridge)}
-Assume model (F.1) with $A,T,L$ fixed (all expectations conditional on them), $\delta$ and $\xi$ uncorrelated, and second moments $m_\delta,V_\delta,\Sigma_\xi$ finite. Then, exactly and with no Gaussian or small-noise approximation,
+Assume model (F.1) with $A,T,L$ fixed (all expectations conditional on them), and assume --- as part of the hypothesis, not as background convention --- that:
+
+(H1) $\mathbb{E}\,\xi=0$;
+
+(H2) $\delta$ and $\xi$ are uncorrelated, $C_{\delta\xi}:=\operatorname{Cov}(\delta,\xi)=0$;
+
+(H3) the gain estimate $\hat a$ is \textbf{exogenous} with respect to the reconstruction record --- computed independently of the noise realization $\xi$ (injected/synthetic residuals, an independent calibration record, or a cross-fitted estimate from held-out frames) --- so that (H1)--(H2) hold conditionally on the record being reconstructed;
+
+(H4) the second moments $m_\delta,V_\delta,\Sigma_\xi$ are finite.
+
+Then, exactly and with no Gaussian or small-noise approximation,
 \begin{align*}
 \frac{\mathbb{E}\|\hat T-T\|_2^2}{S_2}
 =\;&\underbrace{\frac{\|(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta\|_2^2}{S_2}}_{\text{bias}}\\
@@ -760,9 +835,11 @@ R_{\mathrm{gain}}=\frac{v}{S_2}\sum_{n,m} r_\delta(n-m)\,b_n b_m\,\langle Le_n,L
 \end{equation}
 \end{namedthm}
 
-\noindent\textbf{Proof.} Write $z=b+\mathrm{diag}(b)\,\delta+\xi$, so $\hat T-T=(LA-I)T+L\,\mathrm{diag}(b)\,\delta+L\xi$. Decompose $\delta=m_\delta+(\delta-m_\delta)$. The mean of $\hat T-T$ is $(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta$; its squared norm is the bias term. By the bias--variance decomposition $\mathbb{E}\|X\|^2=\|\mathbb{E}X\|^2+\mathrm{tr}\,\mathrm{Cov}(X)$ and the uncorrelatedness of $\delta$ and $\xi$, the covariance of $\hat T$ is $L\,\mathrm{diag}(b)\,V_\delta\,\mathrm{diag}(b)\,L^\top+L\,\Sigma_\xi L^\top$; taking traces and dividing by $S_2$ gives (F.2). For (a), $V_\delta=vI$ and $\mathrm{tr}(L\,\mathrm{diag}(b)\,\mathrm{diag}(b)\,L^\top)=\sum_n b_n^2\|Le_n\|^2$, giving (F.3). Case (b) is the coordinate expansion of the same trace with $(V_\delta)_{nm}=v\,r_\delta(n-m)$. \hfill$\blacksquare$
+\noindent\textbf{Proof.} Write $z=b+\mathrm{diag}(b)\,\delta+\xi$, so $\hat T-T=(LA-I)T+L\,\mathrm{diag}(b)\,\delta+L\xi$. Decompose $\delta=m_\delta+(\delta-m_\delta)$. The mean of $\hat T-T$ is $(LA-I)T+L\,\mathrm{diag}(b)\,m_\delta$ (using (H1)); its squared norm is the bias term. By the bias--variance decomposition $\mathbb{E}\|X\|^2=\|\mathbb{E}X\|^2+\mathrm{tr}\,\mathrm{Cov}(X)$ and (H2), the covariance of $\hat T$ is $L\,\mathrm{diag}(b)\,V_\delta\,\mathrm{diag}(b)\,L^\top+L\,\Sigma_\xi L^\top$; taking traces and dividing by $S_2$ gives (F.2). For (a), $V_\delta=vI$ and $\mathrm{tr}(L\,\mathrm{diag}(b)\,\mathrm{diag}(b)\,L^\top)=\sum_n b_n^2\|Le_n\|^2$, giving (F.3). Case (b) is the coordinate expansion of the same trace with $(V_\delta)_{nm}=v\,r_\delta(n-m)$. \hfill$\blacksquare$
 
-\paragraph{What this does not claim.} (F.2) requires the uncorrelatedness hypothesis $C_{\delta\xi}:=\operatorname{Cov}(\delta,\xi)=0$: without it, the same bias--variance decomposition produces exactly one additional term, $(2/S_2)\,\operatorname{tr}\!\big[L\,\mathrm{diag}(b)\,C_{\delta\xi}\,L^\top\big]$, which vanishes under the stated hypothesis but \emph{not} automatically when the gain estimate $\hat a$ is computed from the same noisy record that carries $\xi$ (same-record dependence --- the generic situation for a blind pipeline, and one the injected-residual protocol of Sec.~9 deliberately does not probe). Beyond that, (F.2) is a second-moment accounting identity for a \emph{linear} reconstructor with the design held fixed; it does not bound nonlinear or data-adaptive $L$, and for random-pattern pipelines the constants below are obtained by additionally averaging over the pattern draw. It says nothing about how small $v$ can be made --- that is the estimation-rate question of Sec.~6. Finally, the scalar collapse $v\,B_L$ \emph{requires} uncorrelated residuals: for smooth (coherent) residual gain --- the generic output of a windowed blind estimator --- only the matrix form (F.4) is correct. In particular, the simple summary ``orthogonal inversion gives $v$'' holds only for independent coefficient-wise residuals under exact inversion.
+\paragraph{Remark F.1.1 (same-record gain estimates violate the hypotheses; scope of the exact identity).} Hypothesis (H3) is not decorative. When $\hat a$ is estimated from the \emph{same} noisy record that carries $\xi$ --- the generic situation for a blind pipeline --- the conditional mean $\mathbb{E}[\xi\mid\text{record}]$ is generically nonzero and $\delta$ is correlated with $\xi$, so (H1)--(H2) fail: the mean of $\hat T-T$ acquires an additional bias term $L\,m_\xi$ (with $m_\xi=\mathbb{E}\,\xi\neq0$) inside the bias norm, and the covariance acquires the cross-term $(2/S_2)\,\operatorname{tr}\!\big[L\,\mathrm{diag}(b)\,C_{\delta\xi}\,L^\top\big]$. Neither term is included in (F.2). The exact identity therefore covers the \textbf{exogenous / injected-residual case} --- which is precisely what the injected-residual protocol of Sec.~9 (experiment E4, Fig.~4) validates --- and cross-fitted estimates that restore (H1)--(H2) by construction; for same-record blind pipelines, (F.2) is exact only up to the two extra terms above.
+
+\paragraph{What this does not claim.} With (H1)--(H3) now stated \emph{in} the theorem, the caveat is Remark F.1.1: (F.2) is not claimed for same-record blind gain estimation, where the $L\,m_\xi$ bias and the $C_{\delta\xi}$ cross-term appear. Beyond that, (F.2) is a second-moment accounting identity for a \emph{linear} reconstructor with the design held fixed; it does not bound nonlinear or data-adaptive $L$, and for random-pattern pipelines the constants below are obtained by additionally averaging over the pattern draw. It says nothing about how small $v$ can be made --- that is the estimation-rate question of Sec.~6. Finally, the scalar collapse $v\,B_L$ \emph{requires} uncorrelated residuals: for smooth (coherent) residual gain --- the generic output of a windowed blind estimator --- only the matrix form (F.4) is correct. In particular, the simple summary ``orthogonal inversion gives $v$'' holds only for independent coefficient-wise residuals under exact inversion.
 
 \subsection{F.2 Noise plug-ins}
 
@@ -816,7 +893,9 @@ The $K_{\mathrm{eff}}K(\mu/\sigma)^2$ term is the familiar nonnegative-backgroun
 \end{align*}
 The gain term follows from Theorem~1(a) with the \emph{leverage $\times N$ framing}: for the correlator, $\|Le_n\|^2=\|x_n\|^2/(N^2\sigma^2)$, so averaging over pattern draws, $N\,\mathbb{E}B_L=\mathbb{E}\|Z\|^2/S_2=1+C_0$ --- i.e., $R_{\mathrm{DGI,gain}}=(1+C_0)v/N$, and in residual-injection experiments the measurable slope is $N B_L\to 1+C_0$. \textbf{Status (labeled).} This pattern-averaging step treats the residuals $\delta$ as independent of the pattern draw --- exact for injected residuals (the Fig.~4 protocol), a heuristic decoupling for blind pipelines, where $\hat a$ is computed from the same record the patterns generated. Correlated residuals multiply $v$ by $\chi_\delta=1+2\sum_{h\ge1}\mathrm{corr}(\delta_0,\delta_h)$ --- a heuristic long-run-variance correction valid only when correlations are weak enough that pattern cross-terms still average; the rigorous object remains (F.4).
 
-\paragraph{What F.3.3 does not claim.} There is \textbf{no universal $C_0$}: (F.10) is exact only for the ideal known-$(\mu,\sigma)$ correlator with iid coordinates. Mean subtraction, reference normalization, and photon allocation all change the constant (not the $C_0/N$ structure), so $C_0$ must be measured from the pipeline via definition (F.9). The flux-limited convention $\Phi_n=\gamma b_n$ replaces the last term of (F.11) by $(N\sigma^2S_2)^{-1}\mathbb{E}[\|x\|^2 b_n/\gamma]$.
+\paragraph{Correction (drift-leverage constant of the gain term; measured, no fitted parameters).} As previously written, the gain term $(1+C_0)v/N$ of (F.11) --- with the \emph{pipeline} constant $C_0$ of definition (F.9) --- is \textbf{wrong for mean-subtracted DGI pipelines} under time-structured (drift-like) residual gain: on the published grid it underpredicts the measured random-arm drift excess by a median factor $\approx1.4\times10^3$ (1364 / 1527 / 1521 across the none / AGC / SCGI-proxy corrections; white-drift diagnostic, \texttt{results/prop3\_nofreeparam\_r1/}). The correct leverage carries the \textbf{raw-correlator constant} $1+C_0^{\mathrm{raw}}$, where $C_0^{\mathrm{raw}}$ is (F.10) evaluated for the ideal correlator at the measured raw pattern moments (at the grid's operating point $C_0^{\mathrm{raw}}\approx0.7$--$1.2\times10^6$, versus pipeline $C_0\approx6.2$--$7.2\times10^2$); with it the measured excess is reproduced to 0.3--4.7\% (median ratios 1.003 / 1.047 / 1.039), still with zero fitted parameters. Mechanism: mean subtraction removes the $K_{\mathrm{eff}}K(\mu/\sigma)^2$ background penalty from the \textbf{sampling floor} --- hence the small pipeline $C_0$ in the $C_0/N$ term, confirmed exactly by the flat oracle arm at $C_0/N$ --- but \textbf{not} from the \textbf{drift leverage}: a time-varying gain modulates the large DC background coherently, and the correlator pays the full raw-correlator constant. For mean-subtracted pipelines the gain term of (F.11) must therefore read $(1+C_0^{\mathrm{raw}})\,v/N$, while the sampling-floor term keeps the pipeline $C_0$. This vindicates --- and extends to the gain term --- the ``no universal $C_0$'' warning below, which earlier versions applied to the floor term only.
+
+\paragraph{What F.3.3 does not claim.} There is \textbf{no universal $C_0$}: (F.10) is exact only for the ideal known-$(\mu,\sigma)$ correlator with iid coordinates. Mean subtraction, reference normalization, and photon allocation all change the constant (not the $C_0/N$ structure), so $C_0$ must be measured from the pipeline via definition (F.9). Moreover --- per the correction above --- the sampling-floor constant and the drift-leverage constant of the \emph{same} pipeline are different measured numbers whenever the pipeline subtracts a background; quoting one for the other is a $\sim10^3$ error at nonnegative-background operating points. The flux-limited convention $\Phi_n=\gamma b_n$ replaces the last term of (F.11) by $(N\sigma^2S_2)^{-1}\mathbb{E}[\|x\|^2 b_n/\gamma]$.
 
 \subsection{F.4 Prop 3: the finite-$N$ flip boundary}
 
@@ -826,22 +905,28 @@ The gain term follows from Theorem~1(a) with the \emph{leverage $\times N$ frami
 Define $\rho^*=\inf\{\rho_{\mathrm{pair}}\ge0: R_{\mathrm{pair}}(\rho_{\mathrm{pair}})\ge R_{\mathrm{rand}}(\rho_{\mathrm{pair}},N)\}$, where $R_{\mathrm{pair}}=R_{\mathrm{pair,gain}}+R_{\mathrm{pair,read}}+R_{\mathrm{pair,Pois}}$ and $R_{\mathrm{rand}}$ is (F.11) with $v=v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$. \textbf{Assume single crossing:} since $v_{\mathrm{blind}}(\rho_{\mathrm{pair}},N)$ itself varies with $\rho_{\mathrm{pair}}$, both sides of the comparison move with $\rho_{\mathrm{pair}}$, and we assume the difference $R_{\mathrm{pair}}-R_{\mathrm{rand}}$ changes sign exactly once on the range considered --- existence and uniqueness of the crossing is an assumption at the same heuristic level as the small-drift expansion, not a proven property. Under the small-drift expansion and this assumption, $\rho^*$ solves the implicit equation
 \begin{equation}
 \begin{aligned}
-r(\rho^*)=\frac{2}{K_{\mathrm{eff}}\,D_H(T)\,s^2}\Big[&\frac{C_0}{N}+\frac{(1+C_0)\,v_{\mathrm{blind}}(\rho^*,N)}{N}\\
-&+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\Big].
+r(\rho^*)=\frac{2}{K_{\mathrm{eff}}\,D_H(T)\,s^2}\Big[&\frac{C_0}{N}+\frac{(1+C_0^{\mathrm{lev}})\,v_{\mathrm{blind}}(\rho^*,N)}{N}\\
+&+R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}}\Big],
 \end{aligned}
 \tag{F.12}
 \end{equation}
-For the OU convention this is explicit: $\rho^*=-\log(1-Q)$ with $Q=2\Delta_R/(K_{\mathrm{eff}}D_Hs^2)$, $\Delta_R$ the bracket of (F.12). If $Q\le0$, random/DGI is already worse at $\rho=0$ (sampling/noise floor dominates); if $Q\ge1$, pairwise never flips within the OU small-to-moderate range.
+where $C_0^{\mathrm{lev}}$ is the pipeline's \textbf{drift-leverage} constant: $C_0^{\mathrm{lev}}=C_0^{\mathrm{raw}}$ of (F.10) for mean-subtracted DGI pipelines (the F.3.3 correction), and $C_0^{\mathrm{lev}}=C_0$ only for pipelines without background subtraction. For the OU convention this is explicit: $\rho^*=-\log(1-Q)$ with $Q=2\Delta_R/(K_{\mathrm{eff}}D_Hs^2)$, $\Delta_R$ the bracket of (F.12). If $Q\le0$, random/DGI is already worse at $\rho=0$ (sampling/noise floor dominates); if $Q\ge1$, pairwise never flips within the OU small-to-moderate range.
 \end{namedthm}
 
-\noindent\textbf{Proof.} At the boundary, $R_{\mathrm{pair}}(\rho^*)=R_{\mathrm{rand}}(\rho^*,N)$. Substituting $R_{\mathrm{pair,gain}}=\tfrac12K_{\mathrm{eff}}D_Hs^2\,r(\rho^*)$ (from F.8 with $\mathrm{Var}\Delta=2s^2r$) and (F.11), and solving for $r(\rho^*)$, gives (F.12); monotonicity of $r$ makes the crossing the infimum. The OU form inverts $r(\rho)=1-e^{-\rho}$. Note (F.12) is a fixed-point equation because $v_{\mathrm{blind}}$ is evaluated at $\rho^*$; the single-crossing assumption stated in the proposition is what makes the crossing exist and be unique. The monotonicity intuition --- $R_{\mathrm{pair,gain}}$ increasing in $\rho_{\mathrm{pair}}$ while the right side varies slowly ($v_{\mathrm{blind}}\propto\rho_{\mathrm{pair}}^{2/3}$) --- motivates the assumption but does not prove it. \hfill$\blacksquare$
+\noindent\textbf{Proof.} At the boundary, $R_{\mathrm{pair}}(\rho^*)=R_{\mathrm{rand}}(\rho^*,N)$. Substituting $R_{\mathrm{pair,gain}}=\tfrac12K_{\mathrm{eff}}D_Hs^2\,r(\rho^*)$ (from F.8 with $\mathrm{Var}\Delta=2s^2r$) and (F.11) with the corrected leverage constant, and solving for $r(\rho^*)$, gives (F.12); monotonicity of $r$ makes the crossing the infimum. The OU form inverts $r(\rho)=1-e^{-\rho}$. Note (F.12) is a fixed-point equation because $v_{\mathrm{blind}}$ is evaluated at $\rho^*$; the single-crossing assumption stated in the proposition is what makes the crossing exist and be unique. The monotonicity intuition --- $R_{\mathrm{pair,gain}}$ increasing in $\rho_{\mathrm{pair}}$ while the right side varies slowly ($v_{\mathrm{blind}}\propto\rho_{\mathrm{pair}}^{2/3}$) --- motivates the assumption but does not prove it. \hfill$\blacksquare$
+
+\begin{statusblock}\textbf{Empirical status of Prop 3 (two regimes; corrected constant; \texttt{results/prop3\_nofreeparam\_r1/}).} The published equal-frame grid ($N=2048$, $K=1024$, OU drift, 10 objects, all constants measured, zero fitted parameters) splits the proposition's status in two:
+
+\emph{(a) The $v=0$ skeleton is VALIDATED, no-free-parameter.} For a gain-known random arm ($v=0$: oracle gains, so only the $C_0/N$ floor competes with the pair term), the predicted boundary $\rho^*=-\log\!\big(1-2(C_0/N)/(K_{\mathrm{eff}}D_Hs^2)\big)$ lands within a \textbf{median factor 1.54} of the 42 observed crossings; restricted to $\sigma_a\ge0.1$ (small-drift expansion intact), \textbf{40/40 cells within factor 2} (max 1.73). The empirical $\sigma$-scaling exponent is $-2.11$ ($R^2=0.976$) versus $-2.07$ predicted --- the leading-order $\sigma^{-2}$ law is correct. The prediction is systematically early (median $\log_{10}$ ratio $-0.187$), consistent with (F.8)'s $O(\Delta^3)$ corrections. Ingredients check out separately: the pair law (F.8) is essentially exact (median measured/predicted $0.997$ over 639 cells), and the oracle random arm sits flat at $C_0/N$ ($0.3286$) across the whole grid.
+
+\emph{(b) The blind-arm flip prediction, as previously stated, is WITHDRAWN --- the corrected theory predicts no flip, and none occurs.} With the erroneous pipeline-$C_0$ leverage, (F.12) predicted flips at $\rho^*=0.007$--$0.33$ for $\sigma_a\ge0.1$; empirically ordered pairwise Hadamard stays strictly better than blind random+DGI in \textbf{all 100} (source $\times$ correction $\times$ $\sigma$ $\times$ object) cells over the entire scanned range $\rho\in[10^{-3},20]$. With the corrected constant $C_0^{\mathrm{lev}}=C_0^{\mathrm{raw}}$, the bracket satisfies $Q(\rho)>r(\rho)$ for every $\rho$ at every grid ($\sigma_a$, object) for both blind corrections --- the theory then predicts \textbf{no flip in range}, exactly matching the 100/100 empirical no-flip. The failure of the original prediction was localized to one constant (the F.3.3 leverage correction, verified to 0.3--4.7\% at white drift), not to the functional form of (F.12); the boundary curves previously shown in Fig.~5 are SRHT-paired-versus-ordered-Hadamard crossovers --- a comparison Prop 3 explicitly does not rank --- summarized by free two-parameter power-law fits, and are not a test of (F.12).\end{statusblock}
 
 \paragraph{Leading-order heuristic (labeled as such).} If $r(\rho)=\rho$, $D_H=1$, noise differences are negligible, $v_{\mathrm{blind}}$ is negligible (or absorbed into $C_0$), and $\rho$ \emph{means} adjacent-pair decorrelation, (F.12) collapses to the engineering rule
 \begin{equation}
 \rho^*\approx\frac{2C_0}{N\,K_{\mathrm{eff}}\,s^2}, \tag{F.13}
 \end{equation}
-with first corrections $\rho^*\approx 2\big(C_0+(1+C_0)v_{\mathrm{blind}}\big)/[NK_{\mathrm{eff}}D_Hs^2]+2(R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}})/(K_{\mathrm{eff}}D_Hs^2)$ and the nonlinear replacement $\rho\mapsto r^{-1}(\cdot)$ when adjacent increments are not infinitesimal. (F.13) is a \emph{leading-order heuristic}, not a theorem; the theorem is (F.12).
+with first corrections $\rho^*\approx 2\big(C_0+(1+C_0^{\mathrm{lev}})v_{\mathrm{blind}}\big)/[NK_{\mathrm{eff}}D_Hs^2]+2(R_{\mathrm{DGI,noise}}-R_{\mathrm{pair,noise}})/(K_{\mathrm{eff}}D_Hs^2)$ and the nonlinear replacement $\rho\mapsto r^{-1}(\cdot)$ when adjacent increments are not infinitesimal. Note that for mean-subtracted pipelines ``negligible $v_{\mathrm{blind}}$'' means $(1+C_0^{\mathrm{raw}})v_{\mathrm{blind}}\ll C_0$ --- a far stronger requirement than $v_{\mathrm{blind}}\ll C_0$, and the reason the blind-arm flip vanished on the published grid (empirical-status point (b) above). (F.13) is a \emph{leading-order heuristic}, not a theorem; the theorem is (F.12).
 
 \paragraph{$\rho$-convention warning.} Throughout, $\rho_{\mathrm{pair}}$ (adjacent-pair decorrelation) is the variable of (F.12)--(F.13); it is \textbf{not} the normalized bandwidth $\rho_{\mathrm{bw}}$ of the tall-design thresholds ($p\approx\rho_{\mathrm{bw}}N$, Sec.~4). If a bandwidth parameter with adjacent-increment variance $\sim2s^2\rho_{\mathrm{bw}}/N$ is substituted, the explicit $1/N$ in (F.13) cancels and the boundary reads $\rho^*_{\mathrm{bw}}\approx2C_0/(K_{\mathrm{eff}}s^2)$ --- same physics, different symbol. Every phase-diagram axis must declare its convention.
 
-\paragraph{What Prop 3 does not claim.} The boundary compares two \emph{specific} pipelines (pairwise-normalized Hadamard vs.\ blind random+DGI with the ideal correlator); it does not rank SRHT-paired pipelines, externally calibrated systems, or prior-regularized reconstructions, each of which shifts $\Delta_R$. It inherits every assumption of its ingredients: small mismatch (F.8), a measured pipeline $C_0$ and $D_H$, a stationary drift with a declared $r(\rho)$, and a $v_{\mathrm{blind}}$ from the window rate theorem whose constants are implementation-specific. It is a mean-square crossing, not a guarantee about any single realization; the single-crossing property itself is assumed, not derived; and at $\rho_{\mathrm{pair}}$ beyond the small-drift expansion only the defining infimum --- not (F.12) --- is meaningful.
+\paragraph{What Prop 3 does not claim.} The boundary compares two \emph{specific} pipelines (pairwise-normalized Hadamard vs.\ blind random+DGI with the ideal correlator); it does not rank SRHT-paired pipelines, externally calibrated systems, or prior-regularized reconstructions, each of which shifts $\Delta_R$. It inherits every assumption of its ingredients: small mismatch (F.8), measured constants $C_0$, $C_0^{\mathrm{lev}}$, and $D_H$ (with the floor/leverage distinction of the F.3.3 correction), a stationary drift with a declared $r(\rho)$, and a $v_{\mathrm{blind}}$ from the window rate theorem whose constants are implementation-specific. It is a mean-square crossing, not a guarantee about any single realization; the single-crossing property itself is assumed, not derived; and at $\rho_{\mathrm{pair}}$ beyond the small-drift expansion only the defining infimum --- not (F.12) --- is meaningful. Finally, the validated regime is the $v=0$ skeleton (empirical-status point (a)); no flip prediction is currently claimed for the blind arm --- the corrected constant predicts, and the data confirm, no flip on the published grid.

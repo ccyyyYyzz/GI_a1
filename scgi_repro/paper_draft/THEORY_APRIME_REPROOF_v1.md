@@ -1,5 +1,7 @@
 # Theorem A′ re-proof — parametric-transversality route (v1, for adversarial review)
 
+> **SUPERSEDED (2026-07-10): see `THEORY_APRIME_REPROOF_v2.md`, which incorporates all mandatory fixes from review R11 (`REVIEWS/GPT_R11_aprime_reproof_review.md`) and is the canonical proof document.**
+
 > Status: PROOF DRAFT. Written 2026-07-10 in response to audit blocker P0-1
 > ("Theorem A′ as a sharp iff theorem does not currently hold": dominant-stratum /
 > witness / transversality steps incomplete; same-M-for-all-drifts only a heuristic
