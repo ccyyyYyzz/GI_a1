@@ -1,6 +1,6 @@
 {
-  "utc_timestamp": "2026-07-10T10:45:58.617478+00:00",
-  "git_commit": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "utc_timestamp": "2026-07-10T17:50:49.506542+00:00",
+  "git_commit": "994fcd03b13909160dd9cce65251e76f7b9893de",
   "hostname": "cyz912",
   "python_version": "3.9.21",
   "torch_version": "2.1.0+cu121",
@@ -16,35 +16,16 @@
     "metered_noise_frac": 0.01
   },
   "manifest_version": 2,
-  "git_commit_full": "214fabf7c31b7053a586f9a9855973e14400c195",
+  "manifest_version_minor": 1,
+  "git_commit_full": "994fcd03b13909160dd9cce65251e76f7b9893de",
   "git_branch": "scgi-ceiling-diagnostic-r1",
   "git_dirty": true,
-  "git_diff_sha256": "9757a2342703c60764891f49dea63f747aaedcf517d2fe2431745bb209e29d77",
+  "git_diff_sha256": "8a86e7c765932b70932f514a7ec7d4983d1deb2f169bc1f983b3f907ecba48c4",
   "git_status_porcelain": [
-    " M scgi_repro/paper_draft/latex/bibliography.tex",
-    " M scgi_repro/paper_draft/latex/body.tex",
-    " M scgi_repro/paper_draft/latex/main.tex",
-    " M scgi_repro/paper_draft/latex/make_pub_figures.py",
-    " M scgi_repro/results/c0_audit_e9_r1/e9_caption.md",
-    " M scgi_repro/results/c0_audit_e9_r1/run_manifest.json",
-    " M scgi_repro/results/coherent_residual_e4_r1/e4_caption.md",
-    " M scgi_repro/results/coherent_residual_e4_r1/run_manifest.json",
-    " M scgi_repro/results/oracle_baselines_e11_r1/e11_caption.md",
-    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/fig3_caption.md",
-    " M scgi_repro/results/paper_fig3_gain_error_r3_fair/run_manifest.json",
-    " M scgi_repro/results/paper_fig7_lowphoton_r3_calibrated/fig7_caption.md",
-    " M scgi_repro/results/paper_fig7_lowphoton_r3_calibrated/run_manifest.json",
-    " M scgi_repro/results/perm_ablation_r1/perm_ablation_caption.md",
-    " M scgi_repro/results/perm_ablation_r1/run_manifest.json",
-    "?? scgi_repro/paper_draft/latex/bibliography_supp.tex",
-    "?? scgi_repro/paper_draft/latex/figs/figS1_perm_whitening.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS2_coherent_residual.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS3_c0_oracle.png",
-    "?? scgi_repro/paper_draft/latex/figs/figS4_flip_floorprobe.png",
-    "?? scgi_repro/paper_draft/latex/macros.tex"
+    " M scgi_repro/results/oracle_baselines_e11_r1/e11_caption.md"
   ],
   "runner_path": "E:\\GAN_FCC_WORK\\github_sync\\GI_a1_scgi_20260709_014434\\scgi_repro\\run_oracle_baselines_e11.py",
-  "runner_sha256": "af70ad90ec83d4fd956715c2d92abef836df3edf0da3699015b52486406adabc",
+  "runner_sha256": "6639606c250f4b3411f47c96cfdae77eeafb98a882436dfca4c45208752d0527",
   "argv": [
     "run_oracle_baselines_e11.py",
     "--output-dir",
@@ -65,6 +46,9 @@
     "0.01"
   ],
   "platform": "Windows-10-10.0.26200-SP0",
+  "git_dirty_excluding_output": false,
+  "untracked_files": [],
+  "provenance_note": "tree clean except this run's own outputs",
   "rows": 100,
   "agc_window": 32
 }
