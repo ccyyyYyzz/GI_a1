@@ -21,32 +21,42 @@
 \hypersetup{
   pdftitle={Supplementary Material for: Identifiability by Stationarity: Blind Gain-Object Separation in Self-Calibrating Ghost Imaging},
   pdfauthor={CHEN Yongzi},
-  pdfsubject={Supplementary sections S1-S4 and Appendices A-F},
+  pdfsubject={Supplementary sections S1-S5 and Appendices A-F},
   pdfkeywords={ghost imaging, single-pixel imaging, blind calibration, identifiability, bilinear inverse problems},
   hypertexnames=false,
 }
 
 \input{macros}
 
-% Supplement numbering: sections S1..S4, figures S1.., tables S1..
+% Supplement numbering (IEEE SPS Information for Authors): supplementary
+% SECTIONS keep the S-prefix (S1..S5), but FIGURES and TABLES CONTINUE the main
+% document's counters (main ends at Fig. 6 and Table 1). The figure/table
+% counters are advanced immediately after \maketitle below, so the first
+% supplementary figure is Fig. 7 and the first supplementary table is Table 2.
+% Equations: the main text uses no numbered display equations, and the
+% appendices carry their own per-appendix tags (A.x..F.x) via \appendices, so
+% no global equation-counter offset is required.
 \renewcommand{\thesection}{S\arabic{section}}
-\renewcommand{\thefigure}{S\arabic{figure}}
-\renewcommand{\thetable}{S\arabic{table}}
 
 \begin{document}
 
 \title{Supplementary Material for: Identifiability by Stationarity: Blind Gain--Object Separation in Self-Calibrating Ghost Imaging}
 
 \author{%
-CHEN Yongzi\thanks{Draft rendering; author list and affiliations to be finalized before submission.}%
+CHEN Yongzi\thanks{Draft rendering; author list and affiliations to be finalized before submission. Extended supplementary material; length subject to editorial approval.}%
 }
 
 \markboth{Supplementary material --- draft (rendered \today)}{Identifiability by stationarity: supplementary material}
 
 \maketitle
 
+% Continue the main document's float numbering (main: Figs. 1--6, Table 1),
+% so supplementary figures run 7--12 and supplementary tables run 2--3.
+\setcounter{figure}{6}
+\setcounter{table}{1}
+
 \begin{abstract}
-This document supplements the main manuscript. Sections~S1--S4 report the supplementary verification experiments promised in Sec.~9 of the main text: the permutation-whitening / factorized-randomization ablation (S1), the coherent-residual validation of the master identity (S2), the $C_0$ audit and the oracle-to-blind baselines (S3), and the extended flip-boundary detail with the low-photon drift-floor probe and replication tables (S4), and the shared simulation protocol (S5). Appendices~A--F contain the complete proofs of every theorem, corollary, and proposition quoted in the main text. Citation numbers, section numbers (Sec.~1--10), figure numbers (Fig.~1--6), theorem labels, and equation tags (e.g.\ (F.10)) referring to the main manuscript retain their main-text meaning; objects local to this document are prefixed with S. All numerical values are descriptive results of the specified simulation grids unless a resampled interval is stated.
+This document supplements the main manuscript. Sections~S1--S5 report the supplementary verification experiments promised in Sec.~9 of the main text: the permutation-whitening / factorized-randomization ablation (S1), the coherent-residual validation of the master identity (S2), the $C_0$ audit and the oracle-to-blind baselines (S3), and the extended flip-boundary detail with the low-photon drift-floor probe and replication tables (S4), and the shared simulation protocol (S5). Appendices~A--F contain the complete proofs of every theorem, corollary, and proposition quoted in the main text. Citation numbers, section numbers (Sec.~1--10), figure numbers (Fig.~1--6), theorem labels, and equation tags (e.g.\ (F.10)) referring to the main manuscript retain their main-text meaning; figures and tables introduced here \emph{continue} the main numbering (Figs.~7--12, Tables~2--3), and only the supplementary \emph{sections} keep an S-prefix (S1--S5). All numerical values are descriptive results of the specified simulation grids unless a resampled interval is stated.
 \end{abstract}
 
 \section{Permutation whitening and the factorized randomization ablation}
@@ -89,7 +99,7 @@ This section carries the two validations of Theorem~1. Figure~\ref{fig:s2bridge}
 \label{fig:s2}
 \end{figure}
 
-\section{$C_0$ audit and oracle-to-blind baselines}
+\section{\texorpdfstring{$C_0$}{C0} audit and oracle-to-blind baselines}
 \label{sec:s3}
 
 \emph{$C_0$ audit (E9).} The one-sample DGI correlator constant $C_0=\mathbb{E}\|Z\|^2/S_2-1$ is measured from $2\times10^{4}$ single-frame pattern draws per ensemble, for four pattern ensembles $\times$ five objects (data: \texttt{results/c0\_audit\_e9\_r1/}). Figure~\ref{fig:s3}(a) compares the measurement with the moment formula of Appendix~F: mean relative error $0.35\%$, worst $2.01\%$, across values of $C_0$ spanning $10^{3}$ to $5.7\times10^{6}$. The strong ensemble dependence --- $O(K)$ for signed Rademacher patterns versus $O(K_{\mathrm{eff}}K)$ for the nonnegative offset ensembles --- confirms the main text's bookkeeping rule that $C_0$ is pipeline-specific, as Theorem~1's DGI specialization insists: there is no universal correlator constant to tabulate.
