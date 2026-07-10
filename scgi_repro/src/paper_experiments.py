@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import datetime
+import hashlib
 import math
 import platform
 import subprocess
@@ -261,30 +262,133 @@ def write_caption(path: Path, title: str, lines: Iterable[str]) -> None:
     path.write_text("\n".join(body), encoding="utf-8")
 
 
-def git_commit(root: Optional[Path] = None) -> Optional[str]:
-    """Return the current git HEAD commit, or None if unavailable."""
+def _run_git(cmd_args: Iterable[str], root: Optional[Path] = None) -> Optional[bytes]:
+    """Run a git subcommand at ``root`` and return raw stdout bytes, or None.
+
+    Never raises: any failure (git absent, not a repo, non-zero exit) yields
+    None so provenance capture degrades gracefully.
+    """
 
     try:
         cwd = str(root) if root is not None else None
-        out = subprocess.check_output(
-            ["git", "rev-parse", "HEAD"], cwd=cwd, stderr=subprocess.DEVNULL
+        return subprocess.check_output(
+            ["git", *cmd_args], cwd=cwd, stderr=subprocess.DEVNULL
         )
-        return out.decode("utf-8").strip()
     except Exception:
         return None
 
 
-def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] = None) -> dict:
-    """Provenance manifest: UTC timestamp, git commit, host, versions, full args."""
+def git_commit(root: Optional[Path] = None) -> Optional[str]:
+    """Return the current git HEAD commit (full 40-char SHA), or None."""
 
+    out = _run_git(["rev-parse", "HEAD"], root)
+    if out is None:
+        return None
+    value = out.decode("utf-8", "replace").strip()
+    return value or None
+
+
+def git_branch(root: Optional[Path] = None) -> Optional[str]:
+    """Return the current branch name (``HEAD`` if detached), or None."""
+
+    out = _run_git(["rev-parse", "--abbrev-ref", "HEAD"], root)
+    if out is None:
+        return None
+    value = out.decode("utf-8", "replace").strip()
+    return value or None
+
+
+def git_status_porcelain(root: Optional[Path] = None) -> List[str]:
+    """Return ``git status --porcelain`` lines (empty list if clean/unavailable)."""
+
+    out = _run_git(["status", "--porcelain"], root)
+    if out is None:
+        return []
+    text = out.decode("utf-8", "replace")
+    return [line for line in text.splitlines() if line.strip()]
+
+
+def git_diff_sha256(root: Optional[Path] = None) -> Optional[str]:
+    """SHA256 of ``git diff HEAD`` (tracked working-tree changes).
+
+    Returns None when the working tree is clean (empty diff) or git is
+    unavailable. Hashes the raw diff bytes so the fingerprint is deterministic.
+    """
+
+    out = _run_git(["diff", "HEAD"], root)
+    if not out:
+        return None
+    return hashlib.sha256(out).hexdigest()
+
+
+def sha256_file(path) -> Optional[str]:
+    """Return the hex SHA256 of a file, or None if it cannot be read."""
+
+    try:
+        digest = hashlib.sha256()
+        with open(path, "rb") as handle:
+            for chunk in iter(lambda: handle.read(65536), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    except Exception:
+        return None
+
+
+def _main_runner_path() -> Optional[str]:
+    """Absolute path of the ``__main__`` script (the runner), or None."""
+
+    try:
+        main_module = sys.modules.get("__main__")
+        file_path = getattr(main_module, "__file__", None)
+        if file_path:
+            return str(Path(file_path).resolve())
+    except Exception:
+        pass
+    try:
+        if sys.argv and sys.argv[0]:
+            candidate = Path(sys.argv[0])
+            if candidate.exists():
+                return str(candidate.resolve())
+    except Exception:
+        pass
+    return None
+
+
+def build_run_manifest(args, root: Optional[Path] = None, extra: Optional[dict] = None) -> dict:
+    """Provenance manifest (schema v2).
+
+    Additive upgrade over v1: every original key is preserved (``utc_timestamp``,
+    ``git_commit``, ``hostname``, ``python_version``, ``torch_version``,
+    ``numpy_version``, ``args``) so existing callers and consumers keep working.
+    v2 also records the working-tree dirty state, a ``git diff HEAD`` fingerprint,
+    the runner file's own SHA256, the full command line, and the platform string
+    so a recorded manifest pins the *exact* code+tree that produced a result.
+    """
+
+    commit_full = git_commit(root)
+    porcelain = git_status_porcelain(root)
+    diff_sha = git_diff_sha256(root)
+    runner_path = _main_runner_path()
     manifest = {
+        # --- v1 keys (preserved for backward compatibility) ---
         "utc_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-        "git_commit": git_commit(root),
+        "git_commit": commit_full,
         "hostname": platform.node(),
         "python_version": sys.version.split()[0],
         "torch_version": torch.__version__,
         "numpy_version": np.__version__,
         "args": vars(args) if hasattr(args, "__dict__") else dict(args),
+        # --- v2 additions ---
+        "manifest_version": 2,
+        "git_commit_full": commit_full,
+        "git_branch": git_branch(root),
+        "git_dirty": bool(porcelain) or (diff_sha is not None),
+        "git_diff_sha256": diff_sha,
+        "git_status_porcelain": porcelain,
+        "runner_path": runner_path,
+        "runner_sha256": sha256_file(runner_path) if runner_path else None,
+        "argv": list(sys.argv),
+        "platform": platform.platform(),
     }
     if extra:
         manifest.update(extra)
